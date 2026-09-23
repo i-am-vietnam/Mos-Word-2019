@@ -37,7 +37,7 @@ Independent product: C# Windows Forms, .NET Framework 4.7.2, Word 2019 desktop, 
 | 24 | Release candidate: builds, validation, EN/VI flows, submission, timeout, cleanup, install/uninstall |
 | 25 | Classroom acceptance on Windows 10/11 and Office 2019 |
 
-Training runtime data is now defined as Documents/MosWord2019/Working/<ProjectId>/work.<approved Word extension>. Testing paths remain future work. Logs remain planned under LocalAppData/MosWord2019/Logs.
+Training runtime data is Documents/MosWord2019/Working/<ProjectId>/work.docx. Package/workspace architecture also recognizes .docm, but Phase 4 runtime excludes it. Testing paths remain future work. Best-effort infrastructure logs use LocalAppData/MosWord2019/Logs.
 
 Milestones: M1 includes verified Word lifecycle (not achieved by the Phase 1 shell alone); M2 Training P01; M3 stable reusable grading; M4 Testing ready with at least seven validated packages; M5 release candidate.
 
@@ -45,5 +45,5 @@ No Excel source/controller/grader/assertion/package/starter/installer is copied.
 
 ## Completion checkpoint — 2026-09-23
 
-Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4+ — not started.
-Debug and Release each built with 0 errors and 0 warnings. Shell smoke checks, the Phase 2 real-Word lifecycle matrix, and the disposable Phase 3 package/workspace matrix passed. No production MOS task content exists yet.
+Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4 — complete. Phase 5+ — not started.
+Debug and Release each built with 0 errors and 0 warnings. Phase 4 Training Tests A-K, focused Phase 2/3 regressions, starter immutability and process-baseline restoration passed. No production MOS task content was fabricated; the existing user P01 draft remains incomplete and untouched. Next: Phase 5 grading architecture against a real user-supplied specification.

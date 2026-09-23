@@ -1,0 +1,18 @@
+﻿{
+  "P01_T01_TITLE": "Nhiệm vụ 1",
+  "P01_T01_INST": "Áp dụng bộ kiểu Lines (Stylish) cho tài liệu.",
+  "P01_T02_TITLE": "Nhiệm vụ 2",
+  "P01_T02_INST": "Trong phần \"Rosa\", chuyển năm đoạn văn bắt đầu từ \"Banksianae\" thành danh sách dấu đầu dòng. Căn các dấu đầu dòng thẳng với lề trái của trang. (Không thay đổi khoảng cách thụt treo.)",
+  "P01_T03_TITLE": "Nhiệm vụ 3",
+  "P01_T03_INST": "Trong phần \"Contact Us\", chèn chú thích chân trang ở bên phải tiêu đề. Nhập nội dung chú thích chân trang \"includes Address\".",
+  "P01_T04_TITLE": "Nhiệm vụ 4",
+  "P01_T04_INST": "Hiển thị đầu trang Integral trên tất cả các trang của tài liệu, ngoại trừ trang 1.",
+  "P01_T05_TITLE": "Nhiệm vụ 5",
+  "P01_T05_INST": "Trong phần \"About Us\", chèn ký hiệu tia sét trước cụm từ \"With the vision of sharing our knowledge...\". Sử dụng phông Webdings và mã ký tự \"126\" (ký hiệu tia sét).",
+  "P01_T06_TITLE": "Nhiệm vụ 6",
+  "P01_T06_INST": "Trong phần \"Rosa\", áp dụng hiệu ứng nghệ thuật Pencil Sketch cho hình ảnh hoa.",
+  "P01_T07_TITLE": "Nhiệm vụ 7",
+  "P01_T07_INST": "Ở cuối trang đầu tiên, gộp các ô trong hàng đầu tiên của bảng.",
+  "P01_T08_TITLE": "Nhiệm vụ 8",
+  "P01_T08_INST": "Trong phần \"Contact Us\", đổi chế độ ngắt dòng của hình ảnh sang Square."
+}

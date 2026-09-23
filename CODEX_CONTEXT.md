@@ -2,7 +2,7 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 3 are complete; Phase 4+ are not started. The roadmap is background scope for later work, not authorization to implement those phases now.
+Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4 are complete; Phase 5+ are not started. The roadmap is background scope for later work, not authorization to implement those phases now.
 
 Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBuild 18.10.1. All five projects use classic MSBuild format, C# 7.3, .NET Framework 4.7.2, AnyCPU. WinForms outputs MosWord2019.exe. Use Visual Studio MSBuild, not an assumed dotnet build workflow:
 
@@ -17,7 +17,7 @@ Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBu
 - Word -> Core. WordController implements the lifecycle; WordSession stores owned COM/process state; WinApiProcessHelper verifies ownership and performs bounded process cleanup.
 - Projects -> Core. ProjectLoader, ProjectValidator and TrainingWorkspaceService implement package discovery, structure and file-copy responsibilities without Office COM.
 - Data: no project references. Reserved library, no database implementation or dependencies yet.
-- WinForms -> Core, Word, Projects, Data. These references establish the requested shell structure; no engine is invoked.
+- WinForms -> Core, Word, Projects, Data. MainForm orchestrates package loading, Training workspace preparation and the Word lifecycle. Core AppLogger writes best-effort infrastructure logs under LocalAppData/MosWord2019/Logs.
 
 Word has a COMReference to Microsoft.Office.Interop.Word, type library GUID 00020905-0000-0000-C000-000000000046, version 8.7, WrapperTool primary, EmbedInteropTypes true, Private false. MSBuild resolves the installed Word 16.0 object library's PIA version 15.0.0.0. Office Core type library 2.8 is also referenced with embedded types, for AutomationSecurity. A development machine must provide the registered libraries/PIAs. Phase 2 runtime was verified on Office ProPlus2019Retail x64 16.0.14026.20302. No assertions exist.
 
@@ -25,9 +25,11 @@ Core and Projects use Newtonsoft.Json 13.0.4 through packages.config and a repos
 
 ## Current shell flow
 
-Program.Main (STA) -> Application.Run(LoginForm). LoginForm offers Training/Testing and EN/VI. Continue constructs an immutable AppSession and opens MainForm modally while Login is hidden; closing MainForm returns to the same Login. This is an entry shell, not authentication. There are no copied credentials. MainForm explicitly states the selected mode is unavailable; its notice and Back button support EN/VI. Full UI localization is deferred.
+Program.Main (STA) -> Application.Run(LoginForm). LoginForm offers Training and EN/VI; Testing is described as unavailable and cannot be selected. Continue constructs an immutable AppSession and opens MainForm modally while Login is hidden; closing MainForm returns to Login. This is mode/language selection, not authentication. MainForm rejects AppMode.Testing.
 
-AppSession is instance-based selected mode/language state, not an exam session. The shell has no timer, SessionId, working-copy creation, persistence, grading result, or fake success behavior. The separate Word engine now handles a caller-supplied working-copy path. Empty scaffold directories are not tracked by Git; future phases create files as needed.
+AppSession is immutable instance-based mode/language state. MainForm owns the controller, current project, working path and task index. There is no timer, Testing state, grading result or fake success behavior. The constructor overload accepts a project root, workspace service, IWordController and optional dialog delegates for verification; normal construction always uses AppDomain.CurrentDomain.BaseDirectory/Projects and the standard Documents/MosWord2019 workspace.
+
+Go validates selected translations, saves/closes existing work, prepares through TrainingWorkspaceService, opens only the returned work.docx and selects Task 1. Navigation only updates the instruction panel. Save failures cancel switching/exit without closing live work. Confirmed Restart (default No) closes without saving, resets via the workspace service, reopens and selects Task 1. Manual document/application closure is detected through IsOpened; stale state is cleaned, a localized message is shown and Go can reopen saved work. Form close saves, closes and disposes on the same STA thread. Phase 2 extra-document preservation remains authoritative. Grade and Testing controls are absent.
 
 ## Excel inspection and reuse classification
 
@@ -53,7 +55,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. Phase 3 started at `c7bdf1affca9570d688b4e6dac7dc703ce7f1c7b`; its changes are uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent .gitignore or .git/info/exclude. Initial reference state and hash manifests are retained in ignored artifacts/. No Phase 3 commit or push was made.
+Word owns its .git, main branch, and dedicated origin. Phase 4 started at `43b515199ad7f207c3037a36862b0fc63524b0f1` with pre-existing WinForms csproj changes and untracked Projects/Word2019_P01; preserve these user changes. P01 is incomplete and omitted by validation. Phase 4 changes are uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Initial reference state and hash manifests are retained in ignored artifacts/. No commit or push was made during Phase 4.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -95,7 +97,7 @@ The disposable harness accessed private session state only to edit/externally cl
 
 ## Phase 3 package architecture
 
-The authoritative production source root is `MosWord2019.WinForms/Projects`. The WinForms project includes `Projects\**\*.*` as content with `PreserveNewest`, producing `AppDomain.CurrentDomain.BaseDirectory/Projects` at runtime. `Projects/README.md` documents the empty production root and verifies the copy rule. ProjectLoader receives that runtime root from its future caller; Phase 3 does not connect it to MainForm.
+The authoritative production source root is `MosWord2019.WinForms/Projects`. The WinForms project includes `Projects\**\*.*` as content with `PreserveNewest`, producing `AppDomain.CurrentDomain.BaseDirectory/Projects` at runtime. MainForm passes this runtime root to ProjectLoader and filters to .docx. Invalid/incomplete packages are omitted. With no available package, Go and all task actions are disabled.
 
 `ProjectMeta` contains ProjectId, OfficeVersion, Version and a Word default of `starter.docx`. `ProjectPackage` aggregates metadata, tasks, the selected language dictionary and an absolute package folder. DisplayName recognizes `Word2019_Pnn` and returns `Project n`. No Excel prefixes or workbook fields exist.
 
@@ -115,4 +117,8 @@ The ignored disposable `Word2019_P99` fixture was created outside the production
 
 `artifacts/phase3-runtime.log` records passes for valid EN/VI packages, extension-data retention, missing/invalid meta, missing starter/tasks, duplicate task ID, missing requested EN/VI, missing language key, missing assertionType, invalid project ID, Word-only discovery, deterministic ordering, display names, selected language, resolved folder, first-copy creation, second-copy preservation, reset, unchanged starter SHA-256, exact default Training root, and Phase 2 open/save/close/process cleanup. Initial and final WINWORD sets were empty. Debug and Release logs show zero errors and warnings. Both outputs contain the copied production-root README and Newtonsoft.Json assembly.
 
-No `Word2019_P01` directory, production starter, production task JSON, grading behavior, Training UI, Testing Mode, score, timeout, database or installer was created. Word lifecycle source, WordGradingService and the WinForms flow were unchanged.
+Phase 3 created no production content and did not change the WinForms flow. Phase 4 now provides Training orchestration; it still creates no production content, grading, Testing, score, timeout, database or installer. Word lifecycle, package/workspace services and WordGradingService remain unchanged.
+
+## Phase 4 verification handoff
+
+artifacts/phase4/runtime-final.log records zero failures across Tests A-K, focused lifecycle/package regressions, save-failure cancellation, missing runtime translation failure and .docm exclusion. The harness injected artifacts/phase4/fixtures/packages with Word2019_P98 and P99, Word-created starters, three explicitly non-MOS tasks and EN/VI dictionaries. Working files were also isolated under fixtures. Disposable fixtures and harness binaries/source were removed. Build logs and EN/VI form renders remain ignored. Initial/final Word PID sets were empty; a separate unsaved sentinel was preserved throughout the controller tests. The final corrected harness cleaned its own sentinel successfully. No production starter was edited or opened for learner work during verification.

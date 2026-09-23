@@ -8,13 +8,14 @@ Verified: 2026-09-23.
 - Phase 1: complete. Five classic C# .NET Framework 4.7.2 projects in MosWord2019.slnx and a minimal WinForms shell.
 - Phase 2: complete. Real Word lifecycle, explicit saving/discard, deliberate COM release, process ownership and deterministic disposal implemented and verified.
 - Phase 3: complete. Word package models, structural loading/validation, build-copy contract, and Training working-copy service are implemented and verified without production task content.
-- Phase 4+: not started. No Training UI workflow, grading, Testing Mode, database, installer, or release work.
+- Phase 4: complete. Bilingual Training entry, project selection, working-copy open, task navigation, save/close, switching, confirmed restart and manual Word closure recovery are implemented and verified.
+- Phase 5+: not started. No grading, Testing Mode, database, installer, or release work.
 
 ## Current architecture
 
 Core now owns Word-specific ProjectMeta, ProjectPackage, TaskDefinition, ValidationIssue and ValidationResult models. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory. No learner package exists yet.
 
-IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. WordGradingService remains an empty Phase 5 placeholder. The WinForms shell remains unchanged and does not invoke Word yet.
+IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. WordGradingService remains an empty Phase 5 placeholder. MainForm now orchestrates the existing package, workspace and Word services on the UI STA thread. Login permits Training only and stores en/vi in AppSession. No grading controls are exposed.
 
 ## Verification
 
@@ -57,10 +58,18 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Word started Phase 3 clean on main at `c7bdf1affca9570d688b4e6dac7dc703ce7f1c7b` (`Initial MOS Word 2019 solution skeleton`), tracking origin https://github.com/i-am-vietnam/Mos-Word-2019.git. Phase 3 changes remain local and uncommitted. No commit or push was performed during this phase.
+Phase 4 started on main at `43b515199ad7f207c3037a36862b0fc63524b0f1`, tracking origin https://github.com/i-am-vietnam/Mos-Word-2019.git. Pre-existing local changes were the WinForms project file and untracked Projects/Word2019_P01. These were preserved. That package has incomplete task metadata and is omitted by validation; no usable production package has been supplied. Phase 4 changes are uncommitted. No commit or push was performed.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
 ## Next recommended task
 
-Phase 4 — Training Mode foundation: Login -> language -> project selection -> working copy -> open Word -> task tabs -> Previous/Next -> Save/Close -> Restart. Do not implement grading yet.
+Phase 5 — Design Word grading architecture and the first small reusable assertion set against a real Word2019_P01 specification supplied by the user. Do not invent production MOS tasks.
+
+## Phase 4 verification
+
+Tests A-K passed in the disposable STA WinForms/real-Word harness: both Login languages, safe empty-root UI, injected discovery, Go opening work.docx, navigation and boundaries without reopening Word, save/switch/reopen persistence, Restart No, Restart Yes returning to Task 1, saved app exit and manual document/application closure recovery. An injected save failure cancels switching and exit without discarding the document. Missing runtime translations fail clearly; .docm packages are unavailable.
+
+Focused Phase 2 open/save/close, repeated cleanup, manual closure and owned-process checks passed. Focused Phase 3 loader, EN/VI validator, invalid tasks, first copy, preserve, reset and starter SHA-256 checks passed. Initial and final WINWORD PID sets were empty; a separate unsaved sentinel remained intact during controller tests and was then closed by the harness. The first harness run had a sentinel cleanup error; the corrected final run had zero failures. Phase 2/3 source and grading were untouched.
+
+Final Debug and Release rebuilds each have 0 errors and 0 warnings. EN/VI form renderings were inspected. Evidence remains in ignored artifacts/phase4; disposable fixture documents and harness sources/binaries were removed. Broad DPI/deployment acceptance is not claimed.

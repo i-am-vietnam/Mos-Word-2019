@@ -1,0 +1,18 @@
+{
+  "P01_T01_TITLE": "Task 1",
+  "P01_T01_INST": "Apply the Lines (Stylish) style set to the document.",
+  "P01_T02_TITLE": "Task 2",
+  "P01_T02_INST": "In the \"Rosa\" section, convert the five paragraphs starting with \"Banksianae\" to a bulleted list. Align the bullets with the left page margin. (Do not change the hanging indent distance.)",
+  "P01_T03_TITLE": "Task 3",
+  "P01_T03_INST": "In the \"Contact Us\" section, insert a footnote to the right of the heading. Enter the footnote text \"includes Address\".",
+  "P01_T04_TITLE": "Task 4",
+  "P01_T04_INST": "Display the Integral header on all pages of the document except page 1.",
+  "P01_T05_TITLE": "Task 5",
+  "P01_T05_INST": "In the \"About Us\" section, insert a lightning symbol before the phrase \"With the vision of sharing our knowledge...\". Use the Webdings font and character code \"126\" (the lightning bolt symbol).",
+  "P01_T06_TITLE": "Task 6",
+  "P01_T06_INST": "In the \"Rosa\" section, apply the Pencil Sketch artistic effect to the flowers picture.",
+  "P01_T07_TITLE": "Task 7",
+  "P01_T07_INST": "At the bottom of the first page, merge the cells in the first table row.",
+  "P01_T08_TITLE": "Task 8",
+  "P01_T08_INST": "In the \"Contact Us\" section, change the text wrapping for the picture to Square."
+}
