@@ -1,0 +1,11 @@
+.vs/
+[Bb]in/
+[Oo]bj/
+packages/
+artifacts/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+TestResults/
+*.nupkg

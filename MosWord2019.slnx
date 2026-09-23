@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="MosWord2019.Core/MosWord2019.Core.csproj" Id="81177daa-9487-42db-8881-3985e00981e4" />
+  <Project Path="MosWord2019.Data/MosWord2019.Data.csproj" Id="861aa214-3d5d-4166-9754-5ac7992fd270" />
+  <Project Path="MosWord2019.Word/MosWord2019.Word.csproj" Id="471c060f-2867-4946-867c-1e211315ee20" />
+  <Project Path="MosWord2019.Projects/MosWord2019.Projects.csproj" Id="db2edd39-5ee4-43ec-b4c9-8f960e99136f" />
+  <Project Path="MosWord2019.WinForms/MosWord2019.WinForms.csproj" Id="6d3746a1-7adc-44ec-b683-b7264098e21d" />
+</Solution>

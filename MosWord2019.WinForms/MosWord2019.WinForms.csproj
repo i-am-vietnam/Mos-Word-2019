@@ -1,0 +1,65 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{6D3746A1-7ADC-44EC-B683-B7264098E21D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>MosWord2019.WinForms</RootNamespace>
+    <AssemblyName>MosWord2019</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppMode.cs" />
+    <Compile Include="AppSession.cs" />
+    <Compile Include="LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MosWord2019.Core\MosWord2019.Core.csproj">
+      <Project>{81177DAA-9487-42DB-8881-3985E00981E4}</Project>
+      <Name>MosWord2019.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MosWord2019.Word\MosWord2019.Word.csproj">
+      <Project>{471C060F-2867-4946-867C-1E211315EE20}</Project>
+      <Name>MosWord2019.Word</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MosWord2019.Projects\MosWord2019.Projects.csproj">
+      <Project>{DB2EDD39-5EE4-43EC-B4C9-8F960E99136F}</Project>
+      <Name>MosWord2019.Projects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MosWord2019.Data\MosWord2019.Data.csproj">
+      <Project>{861AA214-3D5D-4166-9754-5AC7992FD270}</Project>
+      <Name>MosWord2019.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
