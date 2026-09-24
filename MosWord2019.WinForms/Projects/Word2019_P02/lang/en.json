@@ -4,7 +4,7 @@
   "P02_T02_TITLE": "Task 2",
   "P02_T02_INST": "Use a Word feature to replace all instances of \"Informatics Technology\" with \"Basic Informatics\".",
   "P02_T03_TITLE": "Task 3",
-  "P02_T03_INST": "In the \"Lecturers\" section, convert the tab-delimited text to a two-column table. Accept the default AutoFit behavior.",
+  "P02_T03_INST": "In the \"Lecturers\" section, convert the tab-delimited text to a three-column table. Accept the default AutoFit behavior.",
   "P02_T04_TITLE": "Task 4",
   "P02_T04_INST": "In the blank paragraph after the document title, insert a table of contents. Use the Automatic Table 1 style.",
   "P02_T05_TITLE": "Task 5",
