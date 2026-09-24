@@ -19,11 +19,15 @@ namespace MosWord2019.Core.Services
         private static readonly XNamespace Rel = "http://schemas.openxmlformats.org/package/2006/relationships";
         private static readonly XNamespace A = "http://schemas.openxmlformats.org/drawingml/2006/main";
         private static readonly XNamespace Wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
+        private static readonly XNamespace Mc = "http://schemas.openxmlformats.org/markup-compatibility/2006";
+        private static readonly XNamespace Wps = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
 
         private static readonly HashSet<string> Supported = new HashSet<string>(StringComparer.Ordinal)
         {
             "DocumentStyleSet", "BulletedList", "Footnote", "HeaderDifferentFirstPage",
-            "SymbolInserted", "PictureArtisticEffect", "TableCellsMerged", "PictureWrapType"
+            "SymbolInserted", "PictureArtisticEffect", "TableCellsMerged", "PictureWrapType",
+            "TextRemovedFromParagraph", "TextReplaceAll", "TextConvertedToTable", "AutomaticTableOfContents",
+            "TextBoxTextEquals", "CommentDeletedAtText", "ParagraphLineSpacingExact", "CharacterStyleAppliedToParagraph"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -51,6 +55,14 @@ namespace MosWord2019.Core.Services
                         case "PictureArtisticEffect": passed = CheckPictureEffect(package, task, out detail); break;
                         case "TableCellsMerged": passed = CheckMergedCells(package, task, out detail); break;
                         case "PictureWrapType": passed = CheckPictureWrap(package, task, out detail); break;
+                        case "TextRemovedFromParagraph": passed = CheckTextRemoved(package, task, out detail); break;
+                        case "TextReplaceAll": passed = CheckTextReplaceAll(package, task, out detail); break;
+                        case "TextConvertedToTable": passed = CheckTextConvertedToTable(package, task, out detail); break;
+                        case "AutomaticTableOfContents": passed = CheckAutomaticTableOfContents(package, task, out detail); break;
+                        case "TextBoxTextEquals": passed = CheckTextBoxText(package, task, out detail); break;
+                        case "CommentDeletedAtText": passed = CheckCommentDeleted(package, task, out detail); break;
+                        case "ParagraphLineSpacingExact": passed = CheckParagraphLineSpacing(package, task, out detail); break;
+                        case "CharacterStyleAppliedToParagraph": passed = CheckCharacterStyle(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -239,6 +251,250 @@ namespace MosWord2019.Core.Services
             return match;
         }
 
+        private static bool CheckTextRemoved(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string prefix = RequiredString(task, "targetParagraphStartsWith");
+            string removed = RequiredString(task, "removedText");
+            string expected = RequiredString(task, "expectedFinalText");
+            int expectedRemaining = RequiredInt(task, "expectedRemainingCount");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> candidates = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(p => ParagraphText(p).StartsWith(prefix, StringComparison.Ordinal)).ToList();
+            if (candidates.Count != 1) { detail = "The target paragraph was not found uniquely."; return false; }
+            if (!string.Equals(ParagraphText(candidates[0]), expected, StringComparison.Ordinal))
+            { detail = "The target paragraph contains additional or incorrect text changes."; return false; }
+            int remaining = CountOccurrences(VisibleText(document.Root), removed);
+            bool match = remaining == expectedRemaining;
+            detail = match ? "The requested text is removed and the target paragraph is otherwise unchanged."
+                : "The removed text still occurs an unexpected number of times.";
+            return match;
+        }
+
+        private static bool CheckTextReplaceAll(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string anchor = RequiredString(task, "tableAnchor");
+            string oldText = RequiredString(task, "oldText");
+            string newText = RequiredString(task, "newText");
+            int expectedCount = RequiredInt(task, "expectedOriginalCount");
+            string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
+            int anchorIndex = children.FindIndex(e => e.Name == W + "p" && ParagraphTextOutsideTextBoxes(e) == anchor);
+            XElement table = anchorIndex >= 0 ? children.Skip(anchorIndex + 1).FirstOrDefault(e => e.Name == W + "tbl" || e.Name == W + "p") : null;
+            if (table == null || table.Name != W + "tbl") { detail = "The target table was not found immediately after its heading."; return false; }
+            if (!TableRowsEqual(table, expectedRows))
+            { detail = "The target table content or structure differs beyond the requested replacement."; return false; }
+            string allText = VisibleText(document.Root);
+            bool match = CountOccurrences(allText, oldText) == 0 && CountOccurrences(allText, newText) == expectedCount;
+            detail = match ? "All requested occurrences are replaced and the target table is otherwise unchanged."
+                : "The old text remains or the replacement count is incorrect.";
+            return match;
+        }
+
+        private static bool CheckTextConvertedToTable(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string heading = RequiredString(task, "sectionHeading");
+            string intro = RequiredString(task, "introParagraph");
+            string following = RequiredString(task, "followingHeading");
+            int expectedColumns = RequiredInt(task, "expectedColumns");
+            int expectedRows = RequiredInt(task, "expectedRows");
+            string[][] expectedCells = RequiredStringMatrix(task, "expectedTableRows");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
+            int headingIndex = children.FindIndex(e => e.Name == W + "p" && ParagraphText(e) == heading);
+            int introIndex = children.FindIndex(headingIndex + 1, e => e.Name == W + "p" && ParagraphText(e) == intro);
+            int followingIndex = children.FindIndex(Math.Max(0, introIndex + 1), e => e.Name == W + "p" && ParagraphTextOutsideTextBoxes(e) == following);
+            if (headingIndex < 0 || introIndex != headingIndex + 1 || followingIndex < 0)
+            { detail = "The Lecturers section anchors are missing or out of order."; return false; }
+            List<XElement> between = children.Skip(introIndex + 1).Take(followingIndex - introIndex - 1).ToList();
+            List<XElement> tables = between.Where(e => e.Name == W + "tbl").ToList();
+            if (tables.Count != 1 || between.Any(e => e.Name == W + "p" && (ParagraphText(e).Contains("\t") || e.Descendants(W + "tab").Any())))
+            { detail = "The tab-delimited source block was not replaced by one table in the required section."; return false; }
+            XElement table = tables[0];
+            int columns = table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() ?? 0;
+            int rows = table.Elements(W + "tr").Count();
+            XElement width = table.Element(W + "tblPr")?.Element(W + "tblW");
+            XElement layout = table.Element(W + "tblPr")?.Element(W + "tblLayout");
+            if (columns != expectedColumns || rows != expectedRows || !TableRowsEqual(table, expectedCells) ||
+                (string)width?.Attribute(W + "type") != RequiredString(task, "expectedTableWidthType") ||
+                (string)layout?.Attribute(W + "type") != RequiredString(task, "expectedTableLayout"))
+            { detail = "The converted table does not match the verified Word two-column output."; return false; }
+            detail = "The complete tab-delimited block is the verified two-column Word table in the Lecturers section.";
+            return true;
+        }
+
+        private static bool CheckAutomaticTableOfContents(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string titleText = RequiredString(task, "documentTitle");
+            string gallery = RequiredString(task, "expectedGallery");
+            string headingText = RequiredString(task, "expectedHeadingText");
+            string fieldCode = RequiredString(task, "expectedFieldCode");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
+            int titleIndex = children.FindIndex(e => e.Name == W + "p" && ParagraphText(e) == titleText);
+            XElement sdt = titleIndex >= 0 && titleIndex + 1 < children.Count ? children[titleIndex + 1] : null;
+            if (sdt == null || sdt.Name != W + "sdt") { detail = "A Word table-of-contents building block is not immediately after the document title."; return false; }
+            XElement properties = sdt.Element(W + "sdtPr");
+            XElement galleryElement = properties?.Element(W + "docPartObj")?.Element(W + "docPartGallery");
+            bool unique = properties?.Element(W + "docPartObj")?.Element(W + "docPartUnique") != null;
+            XElement heading = sdt.Element(W + "sdtContent")?.Elements(W + "p").FirstOrDefault();
+            string headingStyle = (string)heading?.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val");
+            string actualField = sdt.Descendants(W + "instrText").Select(x => NormalizeFieldCode(x.Value))
+                .FirstOrDefault(x => x.StartsWith("TOC ", StringComparison.Ordinal)) ?? "";
+            bool hasComplexField = sdt.Descendants(W + "fldChar").Any(e => (string)e.Attribute(W + "fldCharType") == "begin") &&
+                                   sdt.Descendants(W + "fldChar").Any(e => (string)e.Attribute(W + "fldCharType") == "end");
+            bool match = string.Equals((string)galleryElement?.Attribute(W + "val"), gallery, StringComparison.Ordinal) && unique &&
+                         heading != null && ParagraphText(heading) == headingText && headingStyle == "TOCHeading" &&
+                         string.Equals(actualField, fieldCode, StringComparison.Ordinal) && hasComplexField;
+            detail = match ? "The verified Automatic Table 1 structure is immediately after the title."
+                : "The content is not the required Automatic Table 1 Word structure.";
+            return match;
+        }
+
+        private static bool CheckTextBoxText(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string anchor = RequiredString(task, "anchorText");
+            string fill = RequiredString(task, "fillColor");
+            string geometry = RequiredString(task, "shapeGeometry");
+            string expected = RequiredString(task, "expectedText");
+            XDocument document = package.Xml("word/document.xml");
+            var matches = new List<XElement>();
+            foreach (XElement choice in document.Descendants(Mc + "Choice"))
+            {
+                foreach (XElement shape in choice.Descendants(Wps + "wsp"))
+                {
+                    XElement outer = shape.Ancestors(W + "p").FirstOrDefault();
+                    XElement color = shape.Element(Wps + "spPr")?.Element(A + "solidFill")?.Element(A + "srgbClr");
+                    XElement preset = shape.Element(Wps + "spPr")?.Element(A + "prstGeom");
+                    if (outer != null && ParagraphTextOutsideTextBoxes(outer) == anchor &&
+                        string.Equals((string)color?.Attribute("val"), fill, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals((string)preset?.Attribute("prst"), geometry, StringComparison.OrdinalIgnoreCase)) matches.Add(shape);
+                }
+            }
+            if (matches.Count != 1) { detail = "The target dark-blue text box was not found uniquely."; return false; }
+            XElement textBox = matches[0].Element(Wps + "txbx")?.Element(W + "txbxContent");
+            bool match = textBox != null && string.Equals(VisibleText(textBox).TrimEnd(), expected, StringComparison.Ordinal);
+            detail = match ? "The target dark-blue text box contains the exact requested text."
+                : "The required exact text is missing from the target dark-blue text box.";
+            return match;
+        }
+
+        private static bool CheckCommentDeleted(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string expectedParagraph = RequiredString(task, "expectedParagraph");
+            string targetText = RequiredString(task, "targetText");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(p => ParagraphText(p) == expectedParagraph).ToList();
+            if (paragraphs.Count != 1) { detail = "The target paragraph or target word was changed."; return false; }
+            bool active = HasActiveCommentOnText(paragraphs[0], targetText);
+            detail = active ? "The comment attached to the target text is still active."
+                : "The target text is preserved and its attached comment is deleted.";
+            return !active;
+        }
+
+        private static bool CheckParagraphLineSpacing(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] prefixes = RequiredStrings(task, "targetParagraphStartsWith");
+            int line = RequiredInt(task, "expectedLineTwips");
+            string rule = RequiredString(task, "expectedLineRule");
+            JArray before = RequiredArray(task, "expectedBeforeTwips");
+            JArray after = RequiredArray(task, "expectedAfterTwips");
+            XDocument document = package.Xml("word/document.xml");
+            for (int i = 0; i < prefixes.Length; i++)
+            {
+                List<XElement> matches = document.Descendants(W + "body").Descendants(W + "p")
+                    .Where(p => ParagraphText(p).StartsWith(prefixes[i], StringComparison.Ordinal)).ToList();
+                if (matches.Count != 1) { detail = "A target paragraph was not found uniquely."; return false; }
+                XElement spacing = matches[0].Element(W + "pPr")?.Element(W + "spacing");
+                if (Twips(spacing, "line", -1) != line || (string)spacing?.Attribute(W + "lineRule") != rule ||
+                    !NullableTwipsEquals(spacing, "before", before, i) || !NullableTwipsEquals(spacing, "after", after, i))
+                { detail = "One or more target paragraphs do not use the exact verified spacing without changing before/after spacing."; return false; }
+            }
+            detail = "Both target paragraphs use Exactly 14 pt with their original before/after spacing.";
+            return true;
+        }
+
+        private static bool CheckCharacterStyle(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string expectedParagraph = RequiredString(task, "expectedParagraph");
+            string style = RequiredString(task, "characterStyleId");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(p => ParagraphText(p) == expectedParagraph).ToList();
+            if (paragraphs.Count != 1) { detail = "The target paragraph text is missing or changed."; return false; }
+            List<XElement> visibleText = paragraphs[0].Descendants(W + "t")
+                .Where(t => !t.Ancestors(W + "del").Any() && t.Value.Length > 0).ToList();
+            bool match = visibleText.Count > 0 && visibleText.All(t =>
+                string.Equals((string)t.Ancestors(W + "r").FirstOrDefault()?.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val"),
+                    style, StringComparison.Ordinal));
+            detail = match ? "The entire visible target paragraph uses the requested character style."
+                : "The requested character style is missing from part or all of the target paragraph.";
+            return match;
+        }
+
+        private static bool HasActiveCommentOnText(XElement paragraph, string targetText)
+        {
+            int targetStart = ParagraphText(paragraph).IndexOf(targetText, StringComparison.Ordinal);
+            if (targetStart < 0) return false;
+            int targetEnd = targetStart + targetText.Length;
+            int offset = 0;
+            var starts = new Dictionary<string, int>(StringComparer.Ordinal);
+            var ends = new Dictionary<string, int>(StringComparer.Ordinal);
+            var references = new HashSet<string>(StringComparer.Ordinal);
+            foreach (XElement element in paragraph.Descendants())
+            {
+                if (element.Name == W + "commentRangeStart") starts[(string)element.Attribute(W + "id") ?? ""] = offset;
+                else if (element.Name == W + "commentRangeEnd") ends[(string)element.Attribute(W + "id") ?? ""] = offset;
+                else if (element.Name == W + "commentReference") references.Add((string)element.Attribute(W + "id") ?? "");
+                else if (element.Name == W + "t" && !element.Ancestors(W + "del").Any()) offset += element.Value.Length;
+            }
+            return starts.Any(pair => references.Contains(pair.Key) && ends.ContainsKey(pair.Key) && pair.Value < targetEnd && ends[pair.Key] > targetStart);
+        }
+
+        private static bool TableRowsEqual(XElement table, string[][] expected)
+        {
+            List<XElement> rows = table.Elements(W + "tr").ToList();
+            if (rows.Count != expected.Length) return false;
+            for (int row = 0; row < rows.Count; row++)
+            {
+                List<string> cells = rows[row].Elements(W + "tc").Select(c => VisibleText(c).TrimEnd()).ToList();
+                if (cells.Count != expected[row].Length || cells.Where((cell, column) => !string.Equals(cell, expected[row][column], StringComparison.Ordinal)).Any()) return false;
+            }
+            return true;
+        }
+
+        private static string ParagraphText(XElement paragraph) { return VisibleText(paragraph).TrimEnd(); }
+
+        private static string ParagraphTextOutsideTextBoxes(XElement paragraph)
+        {
+            return string.Concat(paragraph.Descendants(W + "t")
+                .Where(t => !t.Ancestors(W + "txbxContent").Any() && !t.Ancestors(W + "del").Any()).Select(t => t.Value)).TrimEnd();
+        }
+
+        private static int CountOccurrences(string value, string text)
+        {
+            if (string.IsNullOrEmpty(text)) return 0;
+            int count = 0;
+            for (int index = 0; (index = value.IndexOf(text, index, StringComparison.Ordinal)) >= 0; index += text.Length) count++;
+            return count;
+        }
+
+        private static string NormalizeFieldCode(string value)
+        {
+            return string.Join(" ", (value ?? "").Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        private static bool NullableTwipsEquals(XElement spacing, string attribute, JArray expected, int index)
+        {
+            if (expected == null || index >= expected.Count) throw new InvalidDataException("Invalid spacing metadata: " + attribute);
+            string actual = (string)spacing?.Attribute(W + attribute);
+            return expected[index].Type == JTokenType.Null ? actual == null : actual == expected[index].ToString();
+        }
+
         private static XElement FindPictureDrawing(PackageSnapshot package, IEnumerable<string> expectedHashes)
         {
             var hashes = new HashSet<string>(expectedHashes, StringComparer.OrdinalIgnoreCase);
@@ -281,6 +537,28 @@ namespace MosWord2019.Core.Services
             string[] values = array?.Values<string>().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             if (values == null || values.Length == 0) throw new InvalidDataException("Missing grading metadata: " + name);
             return values;
+        }
+
+        private static JArray RequiredArray(TaskDefinition task, string name)
+        {
+            JToken token;
+            JArray array = task.Extra != null && task.Extra.TryGetValue(name, out token) ? token as JArray : null;
+            if (array == null || array.Count == 0) throw new InvalidDataException("Missing grading metadata: " + name);
+            return array;
+        }
+
+        private static string[][] RequiredStringMatrix(TaskDefinition task, string name)
+        {
+            JArray rows = RequiredArray(task, name);
+            var result = new List<string[]>();
+            foreach (JToken rowToken in rows)
+            {
+                JArray row = rowToken as JArray;
+                if (row == null || row.Count == 0 || row.Any(value => value.Type != JTokenType.String))
+                    throw new InvalidDataException("Invalid grading metadata matrix: " + name);
+                result.Add(row.Values<string>().ToArray());
+            }
+            return result.ToArray();
         }
 
         private static int RequiredInt(TaskDefinition task, string name)

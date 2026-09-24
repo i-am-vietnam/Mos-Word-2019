@@ -1,15 +1,111 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P02_T01_TITLE",
+    "instructionKey": "P02_T01_INST",
+    "assertionType": "TextRemovedFromParagraph",
+    "targetParagraphStartsWith": "With the vision of sharing our knowledge",
+    "removedText": "automatic",
+    "expectedRemainingCount": 0,
+    "expectedFinalText": "With the vision of sharing our knowledge of Information Technology in general and Informatic in specific, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own resources."
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P02_T02_TITLE",
+    "instructionKey": "P02_T02_INST",
+    "assertionType": "TextReplaceAll",
+    "tableAnchor": "CATEGORIES IN WEBSITE",
+    "oldText": "Informatics Technology",
+    "newText": "Basic Informatics",
+    "expectedOriginalCount": 1,
+    "expectedTableRows": [
+      ["Category", "Quantity", "Viewed", "Responses"],
+      ["Basic Informatics", "17", "129", "92"],
+      ["Fundamental", "28", "291", "197"],
+      ["Graphic", "20", "292", "201"],
+      ["Multimedia", "32", "392", "231"],
+      ["Web Technologies", "34", "128", "92"],
+      ["Application Programming", "32", "232", "192"],
+      ["Networking", "29", "262", "232"],
+      ["Windows-Mastery", "28", "382", "23"],
+      ["Smartphone", "19", "408", "231"],
+      ["MOS – IC3", "15", "123", "111"],
+      ["HOCICT: Studying – Exchanging - Sharing", "", "", ""]
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P02_T03_TITLE",
+    "instructionKey": "P02_T03_INST",
+    "assertionType": "TextConvertedToTable",
+    "sectionHeading": "Lecturers",
+    "introParagraph": "We are very proud to have the enthusiastic cooperation from lecturerrs:",
+    "followingHeading": "CONTACT US",
+    "expectedColumns": 2,
+    "expectedRows": 10,
+    "expectedTableWidthType": "auto",
+    "expectedTableLayout": "fixed",
+    "expectedTableRows": [
+      ["Instructor", "Certificate"],
+      ["Email", ""],
+      ["Ly Tran Thai Hoc, M.Sc. (I.T)", "MCT, MOS Master, IC3 GS4 Authorized Educator"],
+      ["hocict@gmail.com", ""],
+      ["Dang Thi Thuy Dung, M.E.M", "MOS Master"],
+      ["thuydungthqtk3@gmail.com", ""],
+      ["Nguyen Van Dung, BIT", "MOS Master"],
+      ["vandung0186@gmail.com", ""],
+      ["Le Anh Tuan, BIT", "MOS Master"],
+      ["hii_lat@hotmail.com", ""]
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P02_T04_TITLE",
+    "instructionKey": "P02_T04_INST",
+    "assertionType": "AutomaticTableOfContents",
+    "documentTitle": "HOCICT’s Website",
+    "expectedGallery": "Table of Contents",
+    "expectedHeadingText": "Contents",
+    "expectedFieldCode": "TOC \\o \"1-3\" \\h \\z \\u"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P02_T05_TITLE",
+    "instructionKey": "P02_T05_INST",
+    "assertionType": "TextBoxTextEquals",
+    "anchorText": "CONTACT US",
+    "shapeGeometry": "rect",
+    "fillColor": "002060",
+    "expectedText": "Anytime Account Access"
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P02_T06_TITLE",
+    "instructionKey": "P02_T06_INST",
+    "assertionType": "CommentDeletedAtText",
+    "targetText": "proud",
+    "expectedParagraph": "We are very proud to have the enthusiastic cooperation from lecturerrs:"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P02_T07_TITLE",
+    "instructionKey": "P02_T07_INST",
+    "assertionType": "ParagraphLineSpacingExact",
+    "targetParagraphStartsWith": [
+      "With the vision of sharing our knowledge",
+      "The website contains many literatures"
+    ],
+    "expectedLineTwips": 280,
+    "expectedLineRule": "exact",
+    "expectedBeforeTwips": [240, null],
+    "expectedAfterTwips": [null, null]
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P02_T08_TITLE",
+    "instructionKey": "P02_T08_INST",
+    "assertionType": "CharacterStyleAppliedToParagraph",
+    "characterStyleId": "IntenseEmphasis",
+    "expectedParagraph": "We are very proud to have the enthusiastic cooperation from lecturerrs:"
+  }
 ]

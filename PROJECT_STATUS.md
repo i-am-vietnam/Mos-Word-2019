@@ -11,11 +11,12 @@ Build repair: Core now explicitly lists its ten source files, including exactly 
 - Phase 2: complete. Real Word lifecycle, explicit saving/discard, deliberate COM release, process ownership and deterministic disposal implemented and verified.
 - Phase 3: complete. Word package models, structural loading/validation, build-copy contract, and Training working-copy service are implemented and verified without production task content.
 - Phase 4 including 4B: complete. Real P01 (eight tasks), bilingual Training entry, bottom-quarter task tabs, owned Word upper-area placement, internal save/close, switching, confirmed restart and manual closure recovery are verified. No Save buttons appear in the task panel.
-- Phase 5 — Project 1 grading: complete. Training grades the selected T01–T08 task from the saved final OOXML state and distinguishes Pass, Fail, and Error. Testing Mode, scoring, database, installer, and release work remain unimplemented.
+- Phase 5 — Project 1 grading: complete and committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`.
+- Phase 6 — Project 2 integration/grading: complete as local, uncommitted work. P02 validates in EN/VI, appears as Project 2, and grades all eight tasks from saved OOXML. Testing Mode, scoring, database, installer, and release work remain unimplemented.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without Link metadata or duplicate None entries. The supplied Word2019_P01 validates in EN/VI and appears as Project 1 with exactly eight tasks. Starter and language files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without Link metadata or duplicate None entries. The supplied P01 and P02 packages validate in EN/VI and appear deterministically as Project 1 and Project 2 with eight tasks each. Starter and language files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
@@ -60,7 +61,7 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed on `main` at checkpoint `cbabacab4644df07f6b13247e8546bed8bf0f49c` (`Cap hat phase 4B`) and is present on `origin/main`. Phase 5 starts from that clean checkpoint. Phase 5 work remains local until the user explicitly requests a commit or push.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; P02 resources are committed at starting checkpoint `0eb2b4742abef039a30b553317279c146b486e0a`. Phase 6 implementation remains local until the user explicitly requests a commit or push.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
@@ -74,7 +75,13 @@ Starter SHA-256 before/after: `3D906B8A4C7E2DA3272DEC63A30E38CB5354651290A29B8E1
 
 ## Next recommended task
 
-Phase 6 — extend reusable Word assertions only when another supplied project specification requires them, while retaining the P01 regression matrix. Testing Mode remains a later phase.
+Integrate the next user-supplied Word project through the same ground-truth and regression process. Testing Mode remains not started.
+
+## Phase 6 verification
+
+P02 `tasks.json` now declares eight generic assertion types: TextRemovedFromParagraph, TextReplaceAll, TextConvertedToTable, AutomaticTableOfContents, TextBoxTextEquals, CommentDeletedAtText, ParagraphLineSpacingExact and CharacterStyleAppliedToParagraph. Word 2019 ground truth established the 10x2 fixed-layout conversion, Automatic Table 1 SDT/field structure, DrawingML dark-blue text box, target comment range, exact 280-twip line spacing and run-level IntenseEmphasis serialization.
+
+P01/P02 EN/VI validation reports zero errors and warnings; discovery order is Project 1 then Project 2. Every P02 assertion passes its positive document and rejects baseline, negative and meaningful near-miss variants. Combined P02 and P01 answers each pass 8/8. P02 first-copy, preservation, reset and immutable starter SHA-256 checks pass. The real WinForms/Word smoke verifies EN/VI results, representative T01/T03/T04/T06/T08 fresh/correct states, restart, P01-to-P02 switching, same PID during grading, upper/lower placement and owned-process cleanup. Evidence remains ignored under `artifacts/phase6-p02`.
 
 ## Current Phase 4B acceptance
 

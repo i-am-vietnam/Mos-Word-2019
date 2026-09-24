@@ -2,7 +2,7 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4B are complete at checkpoint `cbabacab4644df07f6b13247e8546bed8bf0f49c`; Phase 5 Project 1 grading is complete as local, uncommitted work based on that checkpoint. The roadmap is background scope for later work and the current user request controls the authorized phase.
+Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4B are complete; Phase 5 Project 1 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`. P02 resources were committed at `0eb2b4742abef039a30b553317279c146b486e0a`; Phase 6 P02 integration/grading is complete as local, uncommitted work. The roadmap is background scope for later work and the current user request controls the authorized phase.
 
 Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBuild 18.10.1. All five projects use classic MSBuild format, C# 7.3, .NET Framework 4.7.2, AnyCPU. WinForms outputs MosWord2019.exe. Use Visual Studio MSBuild, not an assumed dotnet build workflow:
 
@@ -57,7 +57,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`; Phase 5 changes are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
+Word owns its .git, main branch, and dedicated origin. Phase 5 P01 grading and the P02 resource checkpoint are committed; Phase 6 code/package/documentation changes are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -99,7 +99,7 @@ The disposable harness accessed private session state only to edit/externally cl
 
 ## Phase 3 package architecture
 
-The authoritative production source root is `MosWord2019.WinForms/Projects`. The WinForms project includes `Projects\**\*.*` once as Content with PreserveNewest, without Link metadata or duplicate None items, producing AppDomain.CurrentDomain.BaseDirectory/Projects at runtime. MainForm passes this root to ProjectLoader and filters to .docx. P01 has exactly eight supplied tasks and is displayed as Project 1. Invalid packages are omitted; with none available, Go and task actions are disabled.
+The authoritative production source root is `MosWord2019.WinForms/Projects`. The WinForms project includes `Projects\**\*.*` once as Content with PreserveNewest, without Link metadata or duplicate None items, producing AppDomain.CurrentDomain.BaseDirectory/Projects at runtime. MainForm passes this root to ProjectLoader and filters to .docx. P01 and P02 each have eight supplied tasks and display as Project 1 and Project 2. Invalid packages are omitted; with none available, Go and task actions are disabled.
 
 `ProjectMeta` contains ProjectId, OfficeVersion, Version and a Word default of `starter.docx`. `ProjectPackage` aggregates metadata, tasks, the selected language dictionary and an absolute package folder. DisplayName recognizes `Word2019_Pnn` and returns `Project n`. No Excel prefixes or workbook fields exist.
 
@@ -119,7 +119,7 @@ The ignored disposable `Word2019_P99` fixture was created outside the production
 
 `artifacts/phase3-runtime.log` records passes for valid EN/VI packages, extension-data retention, missing/invalid meta, missing starter/tasks, duplicate task ID, missing requested EN/VI, missing language key, missing assertionType, invalid project ID, Word-only discovery, deterministic ordering, display names, selected language, resolved folder, first-copy creation, second-copy preservation, reset, unchanged starter SHA-256, exact default Training root, and Phase 2 open/save/close/process cleanup. Initial and final WINWORD sets were empty. Debug and Release logs show zero errors and warnings. Both outputs contain the copied production-root README and Newtonsoft.Json assembly.
 
-Phase 3 created no production content. Phase 4 provides Training orchestration; Phase 4B integrates the supplied P01 without inventing instructions. Package/workspace services, lifecycle cleanup and WordGradingService are unchanged. Only optional owned-window positioning was added to the Word layer. No grading, Testing, score, timeout, database or installer exists.
+At the Phase 3 checkpoint no production content or grading existed. Phase 4 added Training orchestration and Phase 4B integrated the supplied P01 without inventing instructions. Package/workspace services and lifecycle cleanup remain stable; later sections describe the P01/P02 grader. Testing, score, timeout, database and installer remain unimplemented.
 
 ## Phase 4B layout and P01 contract
 
@@ -133,7 +133,11 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the eight implemented types.
+`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the sixteen implemented P01/P02 types.
+
+## Phase 6 P02 grading architecture
+
+P02 adds generic text removal/replacement, text-to-table, automatic TOC, text-box content, targeted comment deletion, exact paragraph spacing and whole-paragraph character-style assertions. They route by AssertionType and TaskDefinition.Extra metadata, never by P02 task ID. Ground truth from Word 2019 is retained under ignored `artifacts/phase6-p02`: T03 produces a 10-row, 2-column table with `tblW` auto and fixed layout; T04 is a Table-of-Contents SDT with `TOC \\o "1-3" \\h \\z \\u`; T05 uses the DrawingML Choice shape at CONTACT US with rect geometry and fill 002060; T06 removes only the comment range on `proud`; T07 serializes 14 pt as line 280/exact; T08 applies the IntenseEmphasis character style to every visible run while tolerating run splitting and comment-reference runs without visible text.
 
 DocumentStyleSet hashes a curated, normalized semantic set of document styles and ignores change records, rsids, relationship IDs and other volatile IDs. HeaderDifferentFirstPage requires current `w:titlePg`, no first-page header reference, and a normalized Integral primary-header structural signature. BulletedList resolves numId to abstractNum/level and checks the exact consecutive paragraph block plus effective 0/360-twip geometry. Footnote, SymbolInserted and TableCellsMerged require exact anchors/content/structure. Picture assertions resolve drawing relationships to media bytes and identify the target by SHA-256 rather than shape order. Pencil Sketch is `a14:artisticPencilSketch`; Square is `wp:anchor/wp:wrapSquare`.
 
