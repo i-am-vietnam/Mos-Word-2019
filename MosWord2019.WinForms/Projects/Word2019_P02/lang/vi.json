@@ -1,0 +1,18 @@
+﻿{
+  "P02_T01_TITLE": "Nhiệm vụ 1",
+  "P02_T01_INST": "Tìm từ \"automatic\" và xóa từ đó khỏi tài liệu.",
+  "P02_T02_TITLE": "Nhiệm vụ 2",
+  "P02_T02_INST": "Sử dụng một tính năng của Word để thay thế tất cả các lần xuất hiện của \"Informatics Technology\" bằng \"Basic Informatics\".",
+  "P02_T03_TITLE": "Nhiệm vụ 3",
+  "P02_T03_INST": "Trong phần \"Lecturers\", chuyển văn bản được phân tách bằng dấu tab thành bảng hai cột. Chấp nhận thiết lập AutoFit mặc định.",
+  "P02_T04_TITLE": "Nhiệm vụ 4",
+  "P02_T04_INST": "Trong đoạn văn trống sau tiêu đề tài liệu, chèn mục lục. Sử dụng kiểu Automatic Table 1.",
+  "P02_T05_TITLE": "Nhiệm vụ 5",
+  "P02_T05_INST": "Trong phần \"Contact Us\", tại hộp văn bản màu xanh đậm, chèn nội dung \"Anytime Account Access\".",
+  "P02_T06_TITLE": "Nhiệm vụ 6",
+  "P02_T06_INST": "Trong phần \"Lecturers\", xóa nhận xét được gắn với từ \"proud\".",
+  "P02_T07_TITLE": "Nhiệm vụ 7",
+  "P02_T07_INST": "Trong phần \"Overview\", thay đổi giãn dòng của hai đoạn văn thành chính xác 14 pt.",
+  "P02_T08_TITLE": "Nhiệm vụ 8",
+  "P02_T08_INST": "Áp dụng kiểu Intense Emphasis cho đoạn văn ngay sau tiêu đề \"Lecturers\"."
+}

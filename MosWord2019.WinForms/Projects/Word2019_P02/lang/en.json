@@ -1,0 +1,18 @@
+{
+  "P02_T01_TITLE": "Task 1",
+  "P02_T01_INST": "Find the word \"automatic\" and delete it from the document.",
+  "P02_T02_TITLE": "Task 2",
+  "P02_T02_INST": "Use a Word feature to replace all instances of \"Informatics Technology\" with \"Basic Informatics\".",
+  "P02_T03_TITLE": "Task 3",
+  "P02_T03_INST": "In the \"Lecturers\" section, convert the tab-delimited text to a two-column table. Accept the default AutoFit behavior.",
+  "P02_T04_TITLE": "Task 4",
+  "P02_T04_INST": "In the blank paragraph after the document title, insert a table of contents. Use the Automatic Table 1 style.",
+  "P02_T05_TITLE": "Task 5",
+  "P02_T05_INST": "In the \"Contact Us\" section, in the dark blue text box, insert the text \"Anytime Account Access\".",
+  "P02_T06_TITLE": "Task 6",
+  "P02_T06_INST": "In the \"Lecturers\" section, delete the comment that is attached to the text \"proud\".",
+  "P02_T07_TITLE": "Task 7",
+  "P02_T07_INST": "In the \"Overview\" section, change the line spacing of the two paragraphs to exactly 14 pt.",
+  "P02_T08_TITLE": "Task 8",
+  "P02_T08_INST": "Apply the Intense Emphasis style to the paragraph after the \"Lecturers\" heading."
+}
