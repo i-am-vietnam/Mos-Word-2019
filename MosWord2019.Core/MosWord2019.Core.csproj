@@ -24,7 +24,18 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
-  <ItemGroup><Compile Include="**\*.cs" Exclude="bin\**;obj\**" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="Diagnostics\AppLogger.cs" />
+    <Compile Include="Interfaces\IWordController.cs" />
+    <Compile Include="Interfaces\IWordWindowLayout.cs" />
+    <Compile Include="Models\ProjectMeta.cs" />
+    <Compile Include="Models\ProjectPackage.cs" />
+    <Compile Include="Models\TaskDefinition.cs" />
+    <Compile Include="Models\ValidationIssue.cs" />
+    <Compile Include="Models\ValidationResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\WordGradingService.cs" />
+  </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,15 +1,11 @@
 
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  { "taskId": "T01", "titleKey": "P01_T01_TITLE", "instructionKey": "P01_T01_INST", "assertionType": "DocumentStyleSet" },
+  { "taskId": "T02", "titleKey": "P01_T02_TITLE", "instructionKey": "P01_T02_INST", "assertionType": "BulletedList" },
+  { "taskId": "T03", "titleKey": "P01_T03_TITLE", "instructionKey": "P01_T03_INST", "assertionType": "Footnote" },
+  { "taskId": "T04", "titleKey": "P01_T04_TITLE", "instructionKey": "P01_T04_INST", "assertionType": "HeaderDifferentFirstPage" },
+  { "taskId": "T05", "titleKey": "P01_T05_TITLE", "instructionKey": "P01_T05_INST", "assertionType": "SymbolInserted" },
+  { "taskId": "T06", "titleKey": "P01_T06_TITLE", "instructionKey": "P01_T06_INST", "assertionType": "PictureArtisticEffect" },
+  { "taskId": "T07", "titleKey": "P01_T07_TITLE", "instructionKey": "P01_T07_INST", "assertionType": "TableCellsMerged" },
+  { "taskId": "T08", "titleKey": "P01_T08_TITLE", "instructionKey": "P01_T08_INST", "assertionType": "PictureWrapType" }
 ]

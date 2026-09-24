@@ -8,6 +8,7 @@ using MosWord2019.Core.Interfaces;
 using MosWord2019.Core.Models;
 using MosWord2019.Projects;
 using MosWord2019.Word;
+using Microsoft.Win32;
 
 namespace MosWord2019
 {
@@ -23,15 +24,14 @@ namespace MosWord2019
         private readonly Button previous = new Button { Name = "Previous", AutoSize = true };
         private readonly Button next = new Button { Name = "Next", AutoSize = true };
         private readonly Button restart = new Button { Name = "Restart", AutoSize = true };
-        private readonly Button save = new Button { Name = "Save", AutoSize = true };
-        private readonly Label info = new Label { Name = "ProjectInfo", AutoSize = true };
-        private readonly Label title = new Label { Name = "TaskTitle", AutoSize = true };
-        private readonly TextBox instructions = new TextBox { Name = "Instructions", Multiline = true, ReadOnly = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical };
-        private readonly Label status = new Label { Name = "Status", AutoSize = true };
+        private readonly TabControl tabTasks = new TabControl { Name = "tabTasks", Dock = DockStyle.Fill, Visible = false, Multiline = true };
+        private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
         private ProjectPackage currentProject;
         private string currentWorkPath;
         private int taskIndex;
         private bool controllerDisposed;
+        private bool displayEventsSubscribed;
+        private bool arranging;
 
         public MainForm(AppSession session) : this(session,
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects"),
@@ -48,38 +48,45 @@ namespace MosWord2019
             this.confirmRestart = confirmRestart ?? (message => MessageBox.Show(this, message, Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes);
             this.notify = notify ?? (message => MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
-            Text = "MOS Word 2019 — " + T("Training", "Luyện tập");
-            StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(760, 480);
-            MinimumSize = new Size(640, 400);
+            Text = "MOS Word 2019";
+            StartPosition = FormStartPosition.Manual;
+            Font = new Font("Segoe UI", 9F);
+            BackColor = Color.WhiteSmoke;
+            MaximizeBox = false;
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(20), ColumnCount = 1, RowCount = 6 };
-            for (int i = 0; i < 6; i++) layout.RowStyles.Add(new RowStyle(i == 3 ? SizeType.Percent : SizeType.AutoSize, i == 3 ? 100 : 0));
-            var selection = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill };
-            selection.Controls.Add(new Label { Text = T("Project", "Dự án"), AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
+            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(4), ColumnCount = 1, RowCount = 3 };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            var selection = new FlowLayoutPanel { Name = "pnlTopBar", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), WrapContents = false };
+            selection.Controls.Add(new Label { Text = T("Project:", "Dự án:"), AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
             selection.Controls.Add(projects);
             go.Text = T("Go", "Bắt đầu");
             selection.Controls.Add(go);
             layout.Controls.Add(selection, 0, 0);
-            layout.Controls.Add(info, 0, 1);
-            layout.Controls.Add(title, 0, 2);
-            layout.Controls.Add(instructions, 0, 3);
-            var actions = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill };
-            previous.Text = T("Previous Task", "Tác vụ trước");
-            next.Text = T("Next Task", "Tác vụ tiếp");
+            layout.Controls.Add(tabTasks, 0, 1);
+            var actions = new TableLayoutPanel { Name = "pnlFooter", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), RowCount = 1, ColumnCount = 4 };
+            for (int i = 0; i < 3; i++) actions.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            previous.Text = "<<";
+            next.Text = ">>";
+            previous.MinimumSize = next.MinimumSize = new Size(50, 28);
+            go.MinimumSize = new Size(60, 28);
             restart.Text = T("Restart Project", "Làm lại dự án");
-            save.Text = T("Save", "Lưu");
-            var close = new Button { Name = "Close", Text = T("Save / Close", "Lưu / Đóng"), AutoSize = true };
-            actions.Controls.AddRange(new Control[] { previous, next, restart, save, close });
-            layout.Controls.Add(actions, 0, 4);
-            layout.Controls.Add(status, 0, 5);
+            restart.MinimumSize = new Size(120, 28);
+            actions.Controls.Add(previous, 0, 0);
+            actions.Controls.Add(next, 1, 0);
+            actions.Controls.Add(restart, 2, 0);
+            actions.Controls.Add(status, 3, 0);
+            layout.Controls.Add(actions, 0, 2);
             Controls.Add(layout);
             go.Click += (s, e) => Run(OpenSelectedProject);
             previous.Click += (s, e) => Run(() => ShowTask(taskIndex - 1));
             next.Click += (s, e) => Run(() => ShowTask(taskIndex + 1));
             restart.Click += (s, e) => Run(RestartProject);
-            save.Click += (s, e) => Run(() => { if (CheckDocument()) { word.Save(); AppLogger.Write("Training save " + currentWorkPath); status.Text = T("Saved", "Đã lưu"); } });
-            close.Click += (s, e) => Close();
+            tabTasks.SelectedIndexChanged += (s, e) => UpdateTaskNavigation();
             projects.SelectedIndexChanged += (s, e) => { go.Enabled = projects.SelectedItem != null; };
             ClearProject();
             Run(() =>
@@ -109,8 +116,10 @@ namespace MosWord2019
             AppLogger.Write("Training Word open " + path);
             currentProject = selected;
             currentWorkPath = path;
+            BuildTaskTabs();
             ShowTask(0);
             status.Text = T("Project opened", "Đã mở dự án");
+            ArrangeWorkspace();
         }
 
         private static void ValidateTranslations(ProjectPackage package)
@@ -128,14 +137,100 @@ namespace MosWord2019
         {
             if (currentProject == null || index < 0 || index >= currentProject.Tasks.Count) return;
             ValidateTranslations(currentProject);
-            taskIndex = index;
-            var task = currentProject.Tasks[index];
-            info.Text = currentProject.DisplayName + " — " + T("Task ", "Tác vụ ") + (index + 1) + " / " + currentProject.Tasks.Count;
-            title.Text = currentProject.Lang[task.TitleKey];
-            instructions.Text = currentProject.Lang[task.InstructionKey];
-            instructions.Enabled = restart.Enabled = save.Enabled = true;
-            previous.Enabled = index > 0;
-            next.Enabled = index < currentProject.Tasks.Count - 1;
+            tabTasks.SelectedIndex = index;
+            UpdateTaskNavigation();
+        }
+
+        private void BuildTaskTabs()
+        {
+            ClearTabs();
+            foreach (var task in currentProject.Tasks)
+            {
+                var page = new TabPage(currentProject.Lang[task.TitleKey]) { AutoScroll = true, BackColor = Color.White };
+                var instruction = new Label { AutoSize = true, Location = new Point(0, 0), Padding = new Padding(10),
+                    Font = new Font("Segoe UI", 10F), Text = currentProject.Lang[task.InstructionKey] };
+                page.Controls.Add(instruction);
+                // Wrapping plus scrolling preserves long instructions on small/high-DPI displays.
+                page.Resize += (s, e) => instruction.MaximumSize = new Size(Math.Max(1, page.ClientSize.Width - SystemInformation.VerticalScrollBarWidth), 0);
+                tabTasks.TabPages.Add(page);
+            }
+            tabTasks.Visible = true;
+            restart.Enabled = true;
+        }
+
+        private void UpdateTaskNavigation()
+        {
+            taskIndex = tabTasks.SelectedIndex;
+            bool active = currentProject != null && taskIndex >= 0;
+            previous.Enabled = active && taskIndex > 0;
+            next.Enabled = active && taskIndex < tabTasks.TabPages.Count - 1;
+            if (active) status.Text = T("Task ", "Nhiệm vụ ") + (taskIndex + 1) + "/" + tabTasks.TabPages.Count;
+        }
+
+        private void ClearTabs()
+        {
+            while (tabTasks.TabPages.Count > 0)
+            {
+                TabPage page = tabTasks.TabPages[0];
+                tabTasks.TabPages.Remove(page);
+                page.Dispose();
+            }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            ArrangeWorkspace();
+            SystemEvents.DisplaySettingsChanged += DisplayChanged;
+            SystemEvents.UserPreferenceChanged += PreferencesChanged;
+            displayEventsSubscribed = true;
+        }
+
+        private void DisplayChanged(object sender, EventArgs e) { QueueArrangement(); }
+        private void PreferencesChanged(object sender, UserPreferenceChangedEventArgs e) { QueueArrangement(); }
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            QueueArrangement();
+        }
+        private void QueueArrangement()
+        {
+            if (IsDisposed || Disposing || !IsHandleCreated) return;
+            try { BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) ArrangeWorkspace(); })); }
+            catch (InvalidOperationException) { /* Form closed while a system notification was queued. */ }
+        }
+
+        protected override void OnResizeEnd(EventArgs e)
+        {
+            base.OnResizeEnd(e);
+            ArrangeWorkspace();
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == 0x02E0) QueueArrangement(); // WM_DPICHANGED
+        }
+
+        private void ArrangeWorkspace()
+        {
+            if (arranging || IsDisposed || WindowState == FormWindowState.Minimized) return;
+            arranging = true;
+            try
+            {
+                Rectangle area = Screen.FromControl(this).WorkingArea;
+                int minimum = (int)Math.Ceiling(Font.Height * 12.5);
+                int height = Math.Min(area.Height, Math.Max(area.Height / 4, minimum));
+                Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
+                if (currentProject != null && word is IWordWindowLayout placement && word.IsOpened)
+                    placement.SetWindowBounds(area.Left, area.Top, area.Width, area.Height - height);
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Write("Training window placement failed", ex);
+                status.Text = T("Unable to arrange Word. You can move its window manually.", "Không thể sắp xếp Word. Bạn có thể tự di chuyển cửa sổ.");
+            }
+            finally { arranging = false; }
         }
 
         private bool CheckDocument()
@@ -175,9 +270,11 @@ namespace MosWord2019
             word.OpenDocument(path);
             currentProject = project;
             currentWorkPath = path;
+            BuildTaskTabs();
             ShowTask(0);
             AppLogger.Write("Training restart " + path);
             status.Text = T("Project restarted", "Đã làm lại dự án");
+            ArrangeWorkspace();
         }
 
         private void ClearProject()
@@ -185,8 +282,8 @@ namespace MosWord2019
             currentProject = null;
             currentWorkPath = null;
             taskIndex = 0;
-            info.Text = title.Text = instructions.Text = "";
-            instructions.Enabled = previous.Enabled = next.Enabled = restart.Enabled = save.Enabled = false;
+            ClearTabs();
+            tabTasks.Visible = previous.Enabled = next.Enabled = restart.Enabled = false;
         }
 
         private void Run(Action action)
@@ -221,6 +318,12 @@ namespace MosWord2019
 
         protected override void Dispose(bool disposing)
         {
+            if (disposing && displayEventsSubscribed)
+            {
+                SystemEvents.DisplaySettingsChanged -= DisplayChanged;
+                SystemEvents.UserPreferenceChanged -= PreferencesChanged;
+                displayEventsSubscribed = false;
+            }
             if (disposing && !controllerDisposed)
             {
                 SaveAndCloseDocument();

@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed class WordController : IWordController
+    public sealed class WordController : IWordController, IWordWindowLayout
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -111,6 +111,20 @@ namespace MosWord2019.Word
                 throw new InvalidOperationException("Could not open the Word working copy: " + path, ex);
             }
             finally { ReleaseCom(documents); }
+        }
+
+        public void SetWindowBounds(int left, int top, int width, int height)
+        {
+            EnsureUsable();
+            if (!IsOpened || session.Process == null)
+                throw new InvalidOperationException("No owned Word document is available for positioning.");
+            Wd.Window window = null;
+            try
+            {
+                window = session.Document.ActiveWindow;
+                session.Process.PositionWindow(new IntPtr(window.Hwnd), left, top, width, height);
+            }
+            finally { ReleaseCom(window); }
         }
 
         public void Save()

@@ -1,6 +1,8 @@
 # Project Status
 
-Verified: 2026-09-23.
+Verified: 2026-09-24.
+
+Build repair: Core now explicitly lists its ten source files, including exactly one Interfaces/IWordWindowLayout.cs entry. Namespace/import/Word-to-Core ProjectReference were already correct. Clean, standalone Core and Word builds, and full Debug/Release rebuilds each completed with zero errors/warnings. Visual Studio reloaded Core and successfully launched WinForms with F5; Login -> Training -> English -> Project 1 -> Go opened work.docx with eight tabs and upper/lower window placement. No UI, lifecycle or P01 source changes were made by this repair. Logs: artifacts/phase4b-repair.
 
 ## Phase state
 
@@ -8,12 +10,12 @@ Verified: 2026-09-23.
 - Phase 1: complete. Five classic C# .NET Framework 4.7.2 projects in MosWord2019.slnx and a minimal WinForms shell.
 - Phase 2: complete. Real Word lifecycle, explicit saving/discard, deliberate COM release, process ownership and deterministic disposal implemented and verified.
 - Phase 3: complete. Word package models, structural loading/validation, build-copy contract, and Training working-copy service are implemented and verified without production task content.
-- Phase 4: complete. Bilingual Training entry, project selection, working-copy open, task navigation, save/close, switching, confirmed restart and manual Word closure recovery are implemented and verified.
+- Phase 4 including 4B: complete. Real P01 (eight tasks), bilingual Training entry, bottom-quarter task tabs, owned Word upper-area placement, internal save/close, switching, confirmed restart and manual closure recovery are verified. No Save buttons appear in the task panel.
 - Phase 5+: not started. No grading, Testing Mode, database, installer, or release work.
 
 ## Current architecture
 
-Core now owns Word-specific ProjectMeta, ProjectPackage, TaskDefinition, ValidationIssue and ValidationResult models. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory. No learner package exists yet.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without Link metadata or duplicate None entries. The supplied Word2019_P01 validates in EN/VI and appears as Project 1 with exactly eight tasks. Starter and language files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. WordGradingService remains an empty Phase 5 placeholder. MainForm now orchestrates the existing package, workspace and Word services on the UI STA thread. Login permits Training only and stores en/vi in AppSession. No grading controls are exposed.
 
@@ -58,13 +60,23 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4 started on main at `43b515199ad7f207c3037a36862b0fc63524b0f1`, tracking origin https://github.com/i-am-vietnam/Mos-Word-2019.git. Pre-existing local changes were the WinForms project file and untracked Projects/Word2019_P01. These were preserved. That package has incomplete task metadata and is omitted by validation; no usable production package has been supplied. Phase 4 changes are uncommitted. No commit or push was performed.
+Phase 4B started clean on main at `c7ffaaa27f0cfe93914829fb39a385d2ff73667f`, tracking origin https://github.com/i-am-vietnam/Mos-Word-2019.git. Phase 4B changes remain local and uncommitted. No commit or push was performed.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
 ## Next recommended task
 
 Phase 5 — Design Word grading architecture and the first small reusable assertion set against a real Word2019_P01 specification supplied by the user. Do not invent production MOS tasks.
+
+## Current Phase 4B acceptance
+
+- P01 EN/VI structural validation and discovery pass with eight supplied schema identifiers; no assertions are implemented.
+- Real application Login -> Project 1 -> Go was observed with computer use. The task panel matches the Excel top-bar / tabs / footer concept; Save and Save/Close are removed, Grade and Testing absent. Normal switching/exit still save internally.
+- At actual 125% desktop scaling, working area was (0,0,1920,1020), trainer (0,765,1920,255), owned Word (0,0,1920,765). Layout uses Screen.FromControl.WorkingArea and recalculates for display/work-area/font changes and after moving between screens. A font-relative minimum height protects small/high-scale displays.
+- P01 real-Word checks passed: eight tabs, direct selection and button boundaries without reopening, persistence, Restart No/Yes, reset byte equality, saved exit, manual closure recovery, unchanged starter SHA-256 and final process-baseline restoration. A separate unsaved Word sentinel was neither moved nor closed; an attempted placement using its handle was rejected.
+- EN/VI layout renders at 100/125/150% equivalent font sizes pass. Actual OS scaling was 125%; other OS scaling settings and multi-monitor hardware were not changed. The 150% equivalent uses a 300px minimum trainer height on this working area to keep instructions readable.
+- Clean plus Rebuild Debug and Release: 0 errors, 0 warnings each. Visual Studio Error List was observed at 0 errors and 0 warnings, and Solution Explorer includes Projects/README.md normally.
+- Evidence: ignored artifacts/phase4b runtime-final.log, layout.log, build/clean logs and form renders. Test working copies and harness binaries/source were removed. Excel tracked hashes and the supplied P01 starter/language hashes were unchanged.
 
 ## Phase 4 verification
 

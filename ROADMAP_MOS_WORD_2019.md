@@ -45,5 +45,5 @@ No Excel source/controller/grader/assertion/package/starter/installer is copied.
 
 ## Completion checkpoint — 2026-09-23
 
-Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4 — complete. Phase 5+ — not started.
-Debug and Release each built with 0 errors and 0 warnings. Phase 4 Training Tests A-K, focused Phase 2/3 regressions, starter immutability and process-baseline restoration passed. No production MOS task content was fabricated; the existing user P01 draft remains incomplete and untouched. Next: Phase 5 grading architecture against a real user-supplied specification.
+Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4 including 4B — complete. Phase 5+ — not started.
+Clean/Rebuild Debug and Release each have 0 errors and 0 warnings. Supplied P01 now validates and runs with eight EN/VI task tabs, Excel-style bottom task panel, owned Word upper-area placement and internal safe saving. Real P01 restart/persistence, starter immutability, unrelated Word protection and process cleanup passed. No instruction content was fabricated or rewritten. Next: Phase 5 grading architecture for the supplied P01, only when authorized.

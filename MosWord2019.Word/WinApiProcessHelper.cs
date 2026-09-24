@@ -31,6 +31,10 @@ namespace MosWord2019.Word
         private static extern uint WaitForSingleObject(SafeProcessHandle process, uint milliseconds);
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool TerminateProcess(SafeProcessHandle process, uint exitCode);
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr window, int command);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
 
         internal static HashSet<int> SnapshotWordProcessIds()
         {
@@ -100,6 +104,22 @@ namespace MosWord2019.Word
             private readonly SafeProcessHandle handle;
             internal int Id { get; }
             internal OwnedProcess(int id, SafeProcessHandle handle) { Id = id; this.handle = handle; }
+
+            internal void PositionWindow(IntPtr window, int left, int top, int width, int height)
+            {
+                if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+                uint pid;
+                GetWindowThreadProcessId(window, out pid);
+                // The retained handle proves the original process is still alive (no PID reuse).
+                // The window comes from our held Document, never a global Word-window search.
+                if (window == IntPtr.Zero || pid != Id || WaitForExit(0))
+                    throw new InvalidOperationException("The document window is not owned by this live Word session.");
+                ShowWindow(window, 9); // Restore a maximized/minimized window before setting bounds.
+                GetWindowThreadProcessId(window, out pid);
+                if (pid != Id || WaitForExit(0)) throw new InvalidOperationException("Word window ownership changed.");
+                if (!SetWindowPos(window, IntPtr.Zero, left, top, width, height, 0x0004 | 0x0010))
+                    throw new Win32Exception(Marshal.GetLastWin32Error()); // No Z-order/focus change.
+            }
 
             internal bool WaitForExit(uint milliseconds)
             {
