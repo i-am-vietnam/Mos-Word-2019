@@ -45,5 +45,5 @@ No Excel source/controller/grader/assertion/package/starter/installer is copied.
 
 ## Completion checkpoint — 2026-09-23
 
-Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4 including 4B — complete. Phase 5+ — not started.
-Clean/Rebuild Debug and Release each have 0 errors and 0 warnings. Supplied P01 now validates and runs with eight EN/VI task tabs, Excel-style bottom task panel, owned Word upper-area placement and internal safe saving. Real P01 restart/persistence, starter immutability, unrelated Word protection and process cleanup passed. No instruction content was fabricated or rewritten. Next: Phase 5 grading architecture for the supplied P01, only when authorized.
+Phase 0 — complete. Phase 1 — complete. Phase 2 — complete. Phase 3 — complete. Phase 4 including 4B — complete. Phase 5 Project 1 grading — complete as local, uncommitted work. Phase 6+ — not started.
+Supplied P01 validates and runs with eight EN/VI task tabs, Excel-style bottom task panel, owned Word upper-area placement, internal safe saving and selected-task grading. Phase 5 implements the eight P01 assertions against saved final OOXML with Pass/Fail/Error outcomes. Positive, negative, near-miss, combined 8/8, UI EN/VI, starter immutability, unrelated Word protection and process cleanup checks pass. No instruction content was fabricated or rewritten.

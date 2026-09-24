@@ -23,6 +23,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diagnostics\AppLogger.cs" />
@@ -31,6 +35,8 @@
     <Compile Include="Models\ProjectMeta.cs" />
     <Compile Include="Models\ProjectPackage.cs" />
     <Compile Include="Models\TaskDefinition.cs" />
+    <Compile Include="Models\TaskGradeOutcome.cs" />
+    <Compile Include="Models\TaskGradeResult.cs" />
     <Compile Include="Models\ValidationIssue.cs" />
     <Compile Include="Models\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

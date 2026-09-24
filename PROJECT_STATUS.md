@@ -11,13 +11,13 @@ Build repair: Core now explicitly lists its ten source files, including exactly 
 - Phase 2: complete. Real Word lifecycle, explicit saving/discard, deliberate COM release, process ownership and deterministic disposal implemented and verified.
 - Phase 3: complete. Word package models, structural loading/validation, build-copy contract, and Training working-copy service are implemented and verified without production task content.
 - Phase 4 including 4B: complete. Real P01 (eight tasks), bilingual Training entry, bottom-quarter task tabs, owned Word upper-area placement, internal save/close, switching, confirmed restart and manual closure recovery are verified. No Save buttons appear in the task panel.
-- Phase 5+: not started. No grading, Testing Mode, database, installer, or release work.
+- Phase 5 — Project 1 grading: complete. Training grades the selected T01–T08 task from the saved final OOXML state and distinguishes Pass, Fail, and Error. Testing Mode, scoring, database, installer, and release work remain unimplemented.
 
 ## Current architecture
 
 Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without Link metadata or duplicate None entries. The supplied Word2019_P01 validates in EN/VI and appears as Project 1 with exactly eight tasks. Starter and language files are unchanged.
 
-IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. WordGradingService remains an empty Phase 5 placeholder. MainForm now orchestrates the existing package, workspace and Word services on the UI STA thread. Login permits Training only and stores en/vi in AppSession. No grading controls are exposed.
+IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
 ## Verification
 
@@ -60,17 +60,25 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B started clean on main at `c7ffaaa27f0cfe93914829fb39a385d2ff73667f`, tracking origin https://github.com/i-am-vietnam/Mos-Word-2019.git. Phase 4B changes remain local and uncommitted. No commit or push was performed.
+Phase 4B is committed on `main` at checkpoint `cbabacab4644df07f6b13247e8546bed8bf0f49c` (`Cap hat phase 4B`) and is present on `origin/main`. Phase 5 starts from that clean checkpoint. Phase 5 work remains local until the user explicitly requests a commit or push.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
+## Phase 5 verification
+
+Supported assertions: DocumentStyleSet, BulletedList, Footnote, HeaderDifferentFirstPage, SymbolInserted, PictureArtisticEffect, TableCellsMerged, and PictureWrapType. Word 2019 ground-truth copies established normalized signatures for Lines (Stylish) and Integral, Webdings F07E serialization, `a14:artisticPencilSketch`, exact list/footnote/table structures, and target-image Square wrapping. Each assertion passed positive, negative, and meaningful near-miss checks; one combined answer passed 8/8.
+
+The real WinForms/Word STA smoke passed English fresh T01 Incorrect, English combined T01/T03/T07/T08 Correct, Vietnamese T01 Đúng, current-task selection, safe Save-before-grade, technical Save-error routing, unchanged Word PID during each grade, upper/lower window placement, and owned-process cleanup. Initial and final unrelated WINWORD IDs were identical. Evidence is under ignored `artifacts/phase5`.
+
+Starter SHA-256 before/after: `3D906B8A4C7E2DA3272DEC63A30E38CB5354651290A29B8E199BFAA223F83FED`. Supplied EN/VI task text was not rewritten. The production starter already serializes the Contact Us target picture as Square, so fresh T08 is structurally Pass; Tight and wrong-picture-Square variants verify target-specific failure behavior.
+
 ## Next recommended task
 
-Phase 5 — Design Word grading architecture and the first small reusable assertion set against a real Word2019_P01 specification supplied by the user. Do not invent production MOS tasks.
+Phase 6 — extend reusable Word assertions only when another supplied project specification requires them, while retaining the P01 regression matrix. Testing Mode remains a later phase.
 
 ## Current Phase 4B acceptance
 
-- P01 EN/VI structural validation and discovery pass with eight supplied schema identifiers; no assertions are implemented.
+- P01 EN/VI structural validation and discovery pass with eight implemented assertion identifiers.
 - Real application Login -> Project 1 -> Go was observed with computer use. The task panel matches the Excel top-bar / tabs / footer concept; Save and Save/Close are removed, Grade and Testing absent. Normal switching/exit still save internally.
 - At actual 125% desktop scaling, working area was (0,0,1920,1020), trainer (0,765,1920,255), owned Word (0,0,1920,765). Layout uses Screen.FromControl.WorkingArea and recalculates for display/work-area/font changes and after moving between screens. A font-relative minimum height protects small/high-scale displays.
 - P01 real-Word checks passed: eight tabs, direct selection and button boundaries without reopening, persistence, Restart No/Yes, reset byte equality, saved exit, manual closure recovery, unchanged starter SHA-256 and final process-baseline restoration. A separate unsaved Word sentinel was neither moved nor closed; an attempted placement using its handle was rejected.

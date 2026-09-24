@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using MosWord2019.Core.Diagnostics;
 using MosWord2019.Core.Interfaces;
 using MosWord2019.Core.Models;
+using MosWord2019.Core.Services;
 using MosWord2019.Projects;
 using MosWord2019.Word;
 using Microsoft.Win32;
@@ -24,6 +25,8 @@ namespace MosWord2019
         private readonly Button previous = new Button { Name = "Previous", AutoSize = true };
         private readonly Button next = new Button { Name = "Next", AutoSize = true };
         private readonly Button restart = new Button { Name = "Restart", AutoSize = true };
+        private readonly Button grade = new Button { Name = "Grade", AutoSize = true };
+        private readonly WordGradingService grading = new WordGradingService();
         private readonly TabControl tabTasks = new TabControl { Name = "tabTasks", Dock = DockStyle.Fill, Visible = false, Multiline = true };
         private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
         private ProjectPackage currentProject;
@@ -67,8 +70,8 @@ namespace MosWord2019
             selection.Controls.Add(go);
             layout.Controls.Add(selection, 0, 0);
             layout.Controls.Add(tabTasks, 0, 1);
-            var actions = new TableLayoutPanel { Name = "pnlFooter", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), RowCount = 1, ColumnCount = 4 };
-            for (int i = 0; i < 3; i++) actions.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            var actions = new TableLayoutPanel { Name = "pnlFooter", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), RowCount = 1, ColumnCount = 5 };
+            for (int i = 0; i < 4; i++) actions.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             previous.Text = "<<";
             next.Text = ">>";
@@ -76,16 +79,20 @@ namespace MosWord2019
             go.MinimumSize = new Size(60, 28);
             restart.Text = T("Restart Project", "Làm lại dự án");
             restart.MinimumSize = new Size(120, 28);
+            grade.Text = T("Grade Project", "Kiểm tra");
+            grade.MinimumSize = new Size(110, 28);
             actions.Controls.Add(previous, 0, 0);
             actions.Controls.Add(next, 1, 0);
             actions.Controls.Add(restart, 2, 0);
-            actions.Controls.Add(status, 3, 0);
+            actions.Controls.Add(grade, 3, 0);
+            actions.Controls.Add(status, 4, 0);
             layout.Controls.Add(actions, 0, 2);
             Controls.Add(layout);
             go.Click += (s, e) => Run(OpenSelectedProject);
             previous.Click += (s, e) => Run(() => ShowTask(taskIndex - 1));
             next.Click += (s, e) => Run(() => ShowTask(taskIndex + 1));
             restart.Click += (s, e) => Run(RestartProject);
+            grade.Click += (s, e) => GradeCurrentTask();
             tabTasks.SelectedIndexChanged += (s, e) => UpdateTaskNavigation();
             projects.SelectedIndexChanged += (s, e) => { go.Enabled = projects.SelectedItem != null; };
             ClearProject();
@@ -156,6 +163,7 @@ namespace MosWord2019
             }
             tabTasks.Visible = true;
             restart.Enabled = true;
+            grade.Enabled = true;
         }
 
         private void UpdateTaskNavigation()
@@ -165,6 +173,7 @@ namespace MosWord2019
             previous.Enabled = active && taskIndex > 0;
             next.Enabled = active && taskIndex < tabTasks.TabPages.Count - 1;
             if (active) status.Text = T("Task ", "Nhiệm vụ ") + (taskIndex + 1) + "/" + tabTasks.TabPages.Count;
+            if (active) status.ForeColor = SystemColors.ControlText;
         }
 
         private void ClearTabs()
@@ -277,13 +286,55 @@ namespace MosWord2019
             ArrangeWorkspace();
         }
 
+        private void GradeCurrentTask()
+        {
+            if (!CheckDocument() || currentProject == null || taskIndex < 0 || taskIndex >= currentProject.Tasks.Count) return;
+            TaskDefinition task = currentProject.Tasks[taskIndex];
+            try
+            {
+                word.Save();
+                AppLogger.Write("Training grade save " + currentWorkPath + " task " + task.TaskId);
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Write("Training grade save failed " + currentWorkPath + " task " + task.TaskId, ex);
+                status.ForeColor = Color.Crimson;
+                status.Text = T("Grade error: unable to save the working document.", "Lỗi kiểm tra: không thể lưu tài liệu đang làm.");
+                notify(T("A technical error prevented grading because the document could not be saved. Keep Word open and recover your work there.",
+                    "Lỗi kỹ thuật ngăn việc kiểm tra vì không thể lưu tài liệu. Hãy giữ Word mở và khôi phục bài làm trong Word."));
+                return;
+            }
+
+            TaskGradeResult result = grading.CheckTask(currentWorkPath, task);
+            AppLogger.Write("Training grade " + task.TaskId + " " + result.Outcome + " " + result.Message);
+            if (result.Outcome == TaskGradeOutcome.Pass)
+            {
+                status.ForeColor = Color.DarkGreen;
+                status.Text = "PASS - " + task.TaskId;
+                notify(T("Correct", "Đúng"));
+            }
+            else if (result.Outcome == TaskGradeOutcome.Fail)
+            {
+                status.ForeColor = Color.Crimson;
+                status.Text = "FAIL - " + task.TaskId;
+                notify(T("Incorrect", "Sai"));
+            }
+            else
+            {
+                status.ForeColor = Color.Crimson;
+                status.Text = T("Grade error: ", "Lỗi kiểm tra: ") + result.Message;
+                notify(T("A technical error prevented grading. ", "Lỗi kỹ thuật ngăn việc kiểm tra. ") + result.Message);
+            }
+        }
+
         private void ClearProject()
         {
             currentProject = null;
             currentWorkPath = null;
             taskIndex = 0;
             ClearTabs();
-            tabTasks.Visible = previous.Enabled = next.Enabled = restart.Enabled = false;
+            tabTasks.Visible = previous.Enabled = next.Enabled = restart.Enabled = grade.Enabled = false;
+            status.ForeColor = SystemColors.ControlText;
         }
 
         private void Run(Action action)

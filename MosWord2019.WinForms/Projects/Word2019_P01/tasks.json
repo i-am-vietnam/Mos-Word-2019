@@ -1,11 +1,40 @@
-
 [
-  { "taskId": "T01", "titleKey": "P01_T01_TITLE", "instructionKey": "P01_T01_INST", "assertionType": "DocumentStyleSet" },
-  { "taskId": "T02", "titleKey": "P01_T02_TITLE", "instructionKey": "P01_T02_INST", "assertionType": "BulletedList" },
-  { "taskId": "T03", "titleKey": "P01_T03_TITLE", "instructionKey": "P01_T03_INST", "assertionType": "Footnote" },
-  { "taskId": "T04", "titleKey": "P01_T04_TITLE", "instructionKey": "P01_T04_INST", "assertionType": "HeaderDifferentFirstPage" },
-  { "taskId": "T05", "titleKey": "P01_T05_TITLE", "instructionKey": "P01_T05_INST", "assertionType": "SymbolInserted" },
-  { "taskId": "T06", "titleKey": "P01_T06_TITLE", "instructionKey": "P01_T06_INST", "assertionType": "PictureArtisticEffect" },
-  { "taskId": "T07", "titleKey": "P01_T07_TITLE", "instructionKey": "P01_T07_INST", "assertionType": "TableCellsMerged" },
-  { "taskId": "T08", "titleKey": "P01_T08_TITLE", "instructionKey": "P01_T08_INST", "assertionType": "PictureWrapType" }
+  {
+    "taskId": "T01", "titleKey": "P01_T01_TITLE", "instructionKey": "P01_T01_INST", "assertionType": "DocumentStyleSet",
+    "expectedStyleSet": "Lines (Stylish)",
+    "styleIds": ["Normal", "NoSpacing", "Title", "Subtitle", "Heading1", "Heading2", "Heading3", "Heading4", "Heading5", "Heading6", "Heading7", "Heading8", "Heading9", "Quote", "IntenseQuote", "BookTitle", "Emphasis", "Strong", "SubtleEmphasis", "IntenseEmphasis"],
+    "expectedStyleSignature": "D0DA39CC5A355EC26C4F52E8E5EAF70004096DB615C9ACA1523BF5042EBA47AC"
+  },
+  {
+    "taskId": "T02", "titleKey": "P01_T02_TITLE", "instructionKey": "P01_T02_INST", "assertionType": "BulletedList",
+    "targetParagraphs": ["Banksianae", "Bracteatae", "Caninae", "Carolinae", "Chinensis"],
+    "expectedBulletPositionTwips": 0, "expectedTextIndentTwips": 360
+  },
+  {
+    "taskId": "T03", "titleKey": "P01_T03_TITLE", "instructionKey": "P01_T03_INST", "assertionType": "Footnote",
+    "anchorText": "Contact Us", "expectedText": "includes Address"
+  },
+  {
+    "taskId": "T04", "titleKey": "P01_T04_TITLE", "instructionKey": "P01_T04_INST", "assertionType": "HeaderDifferentFirstPage",
+    "headerBuiltIn": "Integral", "differentFirstPage": true, "expectedHeaderSignature": "84D682DC1DF0CA533697B03A2C34912BDFE47B6D0BF1C4DB5D6D3C9DBF8D9BAE"
+  },
+  {
+    "taskId": "T05", "titleKey": "P01_T05_TITLE", "instructionKey": "P01_T05_INST", "assertionType": "SymbolInserted",
+    "anchorText": "With the vision of sharing our knowledge",
+    "expectedSentence": "With the vision of sharing our knowledge of Information Technology in general and Informatic in specific, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own resources.",
+    "symbolFont": "Webdings", "symbolCode": 126
+  },
+  {
+    "taskId": "T06", "titleKey": "P01_T06_TITLE", "instructionKey": "P01_T06_INST", "assertionType": "PictureArtisticEffect",
+    "targetImageSha256s": ["7FCD8807CD917EC4AD9952BDA7F8B3264062CE470C144D1C2EE43043DC0EA101", "1ACB454E732CB9B246F040ABB1B6CD04B0F201CFB95ABFF5FD6922815EF9631C"],
+    "expectedEffect": "Pencil Sketch", "expectedEffectElement": "artisticPencilSketch"
+  },
+  {
+    "taskId": "T07", "titleKey": "P01_T07_TITLE", "instructionKey": "P01_T07_INST", "assertionType": "TableCellsMerged",
+    "tableAnchor": "[COMPANY NAME]", "rowIndex": 1, "expectedColumnSpan": 2
+  },
+  {
+    "taskId": "T08", "titleKey": "P01_T08_TITLE", "instructionKey": "P01_T08_INST", "assertionType": "PictureWrapType",
+    "targetImageSha256": "3C1BF79EDE2CC7F21C06CFAD5105D069E3D20979E06A4F7592552D312CCD1264", "expectedWrapType": "Square"
+  }
 ]

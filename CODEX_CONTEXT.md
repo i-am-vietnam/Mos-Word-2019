@@ -2,7 +2,7 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4 are complete; Phase 5+ are not started. The roadmap is background scope for later work, not authorization to implement those phases now.
+Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4B are complete at checkpoint `cbabacab4644df07f6b13247e8546bed8bf0f49c`; Phase 5 Project 1 grading is complete as local, uncommitted work based on that checkpoint. The roadmap is background scope for later work and the current user request controls the authorized phase.
 
 Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBuild 18.10.1. All five projects use classic MSBuild format, C# 7.3, .NET Framework 4.7.2, AnyCPU. WinForms outputs MosWord2019.exe. Use Visual Studio MSBuild, not an assumed dotnet build workflow:
 
@@ -15,13 +15,13 @@ Core explicitly lists its source files. New Core source files must be added to i
 
 ## Dependencies and responsibilities
 
-- Core: no project references. IWordController defines the disposable document lifecycle. WordGradingService remains an empty Phase 5 placeholder with no grading behavior.
+- Core: no project references. IWordController defines the disposable document lifecycle. WordGradingService performs reusable OOXML grading and returns TaskGradeResult with Pass, Fail, or Error.
 - Word -> Core. WordController implements the lifecycle; WordSession stores owned COM/process state; WinApiProcessHelper verifies ownership and performs bounded process cleanup.
 - Projects -> Core. ProjectLoader, ProjectValidator and TrainingWorkspaceService implement package discovery, structure and file-copy responsibilities without Office COM.
 - Data: no project references. Reserved library, no database implementation or dependencies yet.
 - WinForms -> Core, Word, Projects, Data. MainForm orchestrates package loading, Training workspace preparation and the Word lifecycle. Core AppLogger writes best-effort infrastructure logs under LocalAppData/MosWord2019/Logs.
 
-Word has a COMReference to Microsoft.Office.Interop.Word, type library GUID 00020905-0000-0000-C000-000000000046, version 8.7, WrapperTool primary, EmbedInteropTypes true, Private false. MSBuild resolves the installed Word 16.0 object library's PIA version 15.0.0.0. Office Core type library 2.8 is also referenced with embedded types, for AutomationSecurity. A development machine must provide the registered libraries/PIAs. Phase 2 runtime was verified on Office ProPlus2019Retail x64 16.0.14026.20302. No assertions exist.
+Word has a COMReference to Microsoft.Office.Interop.Word, type library GUID 00020905-0000-0000-C000-000000000046, version 8.7, WrapperTool primary, EmbedInteropTypes true, Private false. MSBuild resolves the installed Word 16.0 object library's PIA version 15.0.0.0. Office Core type library 2.8 is also referenced with embedded types, for AutomationSecurity. A development machine must provide the registered libraries/PIAs. Runtime and grading ground truth were verified on Office ProPlus2019Retail x64 16.0.14026.20302.
 
 Core and Projects use Newtonsoft.Json 13.0.4 through packages.config and a repository-local ignored packages restore. SQLite/Dapper remain deferred until persistence is required. No references or linked source files point to Excel.
 
@@ -29,9 +29,9 @@ Core and Projects use Newtonsoft.Json 13.0.4 through packages.config and a repos
 
 Program.Main (STA) -> Application.Run(LoginForm). LoginForm offers Training and EN/VI; Testing is described as unavailable and cannot be selected. Continue constructs an immutable AppSession and opens MainForm modally while Login is hidden; closing MainForm returns to Login. This is mode/language selection, not authentication. MainForm rejects AppMode.Testing.
 
-AppSession is immutable instance-based mode/language state. MainForm owns the controller, current project, working path and task index. It uses a compact Excel-style top bar, localized TabControl and footer (<<, >>, Restart, status). Save/Close buttons are absent; saving is internal to switching and normal exit. There is no timer, Testing state, grading result or fake success behavior. The constructor overload accepts a project root, workspace service, IWordController and optional dialog delegates for verification; normal construction always uses AppDomain.CurrentDomain.BaseDirectory/Projects and the standard Documents/MosWord2019 workspace.
+AppSession is immutable instance-based mode/language state. MainForm owns the controller, current project, working path and task index. It uses a compact Excel-style top bar, localized TabControl and footer (<<, >>, Restart, Grade, status). Save/Close buttons are absent; saving is internal to switching, grading, and normal exit. There is no timer or Testing state. The constructor overload accepts a project root, workspace service, IWordController and optional dialog delegates for verification; normal construction always uses AppDomain.CurrentDomain.BaseDirectory/Projects and the standard Documents/MosWord2019 workspace.
 
-Go validates selected translations, saves/closes existing work, prepares through TrainingWorkspaceService, opens only the returned work.docx and selects Task 1. Navigation only updates the instruction panel. Save failures cancel switching/exit without closing live work. Confirmed Restart (default No) closes without saving, resets via the workspace service, reopens and selects Task 1. Manual document/application closure is detected through IsOpened; stale state is cleaned, a localized message is shown and Go can reopen saved work. Form close saves, closes and disposes on the same STA thread. Phase 2 extra-document preservation remains authoritative. Grade and Testing controls are absent.
+Go validates selected translations, saves/closes existing work, prepares through TrainingWorkspaceService, opens only the returned work.docx and selects Task 1. Navigation only updates the instruction panel. Grade saves the live document, snapshots work.docx, and grades the selected tab without closing, reopening, resetting, or moving Word. Save failures route to a technical Error message and keep Word open. Confirmed Restart (default No) closes without saving, resets via the workspace service, reopens and selects Task 1. Manual document/application closure is detected through IsOpened; stale state is cleaned, a localized message is shown and Go can reopen saved work. Form close saves, closes and disposes on the same STA thread. Phase 2 ownership protection remains authoritative. Testing controls are absent.
 
 ## Excel inspection and reuse classification
 
@@ -57,7 +57,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. Phase 4B started clean at `c7ffaaa27f0cfe93914829fb39a385d2ff73667f`; its edits are uncommitted. P01 is now valid for Training. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/. No commit or push was made during Phase 4B.
+Word owns its .git, main branch, and dedicated origin. Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`; Phase 5 changes are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -129,7 +129,17 @@ Screen.FromControl(this).WorkingArea is divided into the lower quarter for the t
 
 Core IWordWindowLayout is an optional placement contract separate from IWordController. WordController.SetWindowBounds obtains a short-lived Window from its held Document.ActiveWindow. WinApiProcessHelper.OwnedProcess.PositionWindow checks that its retained process handle is still alive and the HWND PID matches before restore/SetWindowPos (no Z-order/focus change). It never searches globally for an arbitrary Word window. The Window RCW is released in finally; no lifecycle ownership/cleanup rules were weakened.
 
-P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDifferentFirstPage, SymbolInserted, PictureArtisticEffect, TableCellsMerged and PictureWrapType. These are metadata only. Phase 5 has not started.
+P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDifferentFirstPage, SymbolInserted, PictureArtisticEffect, TableCellsMerged and PictureWrapType. Phase 5 implements all eight against generic TaskDefinition.Extra metadata.
+
+## Phase 5 grading architecture
+
+`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the eight implemented types.
+
+DocumentStyleSet hashes a curated, normalized semantic set of document styles and ignores change records, rsids, relationship IDs and other volatile IDs. HeaderDifferentFirstPage requires current `w:titlePg`, no first-page header reference, and a normalized Integral primary-header structural signature. BulletedList resolves numId to abstractNum/level and checks the exact consecutive paragraph block plus effective 0/360-twip geometry. Footnote, SymbolInserted and TableCellsMerged require exact anchors/content/structure. Picture assertions resolve drawing relationships to media bytes and identify the target by SHA-256 rather than shape order. Pencil Sketch is `a14:artisticPencilSketch`; Square is `wp:anchor/wp:wrapSquare`.
+
+Word 2019 ground-truth serialization came from disposable copies of the production starter. Lines (Stylish), Integral, Webdings 126 (`w:sym`/`F07E`), Pencil Sketch and Square were observed rather than inferred. Applying Pencil Sketch rewrites the source image to a deterministic PNG and adds an HD-photo layer, so T06 accepts the starter source fingerprint and the verified transformed fingerprint before checking the effect. The starter already has the T08 target in Square state; this is a confirmed package constraint, not a grader shortcut.
+
+Ignored `artifacts/phase5` evidence covers fresh, correct, incorrect and near-miss documents, combined 8/8 grading, English/Vietnamese UI results, Save-error routing, unchanged Word PID during grade, layout, starter integrity and process cleanup. No artifact is part of the production project tree.
 
 Phase 4B evidence is under ignored artifacts/phase4b. Real P01 EN/VI validation, runtime navigation/persistence/restart/save/cleanup, starter hash and unrelated-window rejection passed. Actual desktop 125% working-area bounds: 1920x1020; trainer 1920x255 at y=765; Word 1920x765 at y=0. Equivalent 100/125/150% font-layout tests passed; this is not a claim of testing other OS display settings or multi-monitor hardware. Visual Studio showed README in Solution Explorer and 0 errors/0 warnings. Test working copies/harness binaries/source were removed.
 
