@@ -1,0 +1,18 @@
+{
+  "P03_T01_TITLE": "Task 1",
+  "P03_T01_INST": "Check the document for accessibility issues. Correct the table-related issue reported in the inspection results by using the first recommended action.",
+  "P03_T02_TITLE": "Task 2",
+  "P03_T02_INST": "Change the orientation of only page 3 to Landscape.",
+  "P03_T03_TITLE": "Task 3",
+  "P03_T03_INST": "In the \"Introduce\" section, resize the table so that each column is \"1.57\\\"\" (\"3.98cm\") wide.",
+  "P03_T04_TITLE": "Task 4",
+  "P03_T04_INST": "In the \"Microsoft Office Specialist\" section, insert a new placeholder citation with the name \"MOS\" at the end of the second paragraph after the heading.",
+  "P03_T05_TITLE": "Task 5",
+  "P03_T05_INST": "Change the content display of the SmartArt graphic to list courses 1 through 8, from left to right. Do not change order of items in the text pane.",
+  "P03_T06_TITLE": "Task 6",
+  "P03_T06_INST": "In the \"MOS Version\" section, assign the alt text description \"Process flow\" to the SmartArt graphic. (Be sure to select the entire SmartArt graphic.)",
+  "P03_T07_TITLE": "Task 7",
+  "P03_T07_INST": "In the file properties, add \"hocict.edu.vn\" as a category.",
+  "P03_T08_TITLE": "Task 8",
+  "P03_T08_INST": "In the \"Microsoft Office Specialist\" section, copy the formatting of first paragraph and apply it to the second paragraph."
+}

@@ -1,0 +1,18 @@
+﻿{
+  "P03_T01_TITLE": "Nhiệm vụ 1",
+  "P03_T01_INST": "Kiểm tra tài liệu để tìm các vấn đề về khả năng truy nhập. Khắc phục vấn đề liên quan đến bảng được báo cáo trong kết quả kiểm tra bằng cách sử dụng hành động được đề xuất đầu tiên.",
+  "P03_T02_TITLE": "Nhiệm vụ 2",
+  "P03_T02_INST": "Chỉ thay đổi hướng trang của trang 3 sang Landscape.",
+  "P03_T03_TITLE": "Nhiệm vụ 3",
+  "P03_T03_INST": "Trong phần \"Introduce\", thay đổi kích thước bảng để mỗi cột có chiều rộng \"1.57\\\"\" (\"3.98cm\").",
+  "P03_T04_TITLE": "Nhiệm vụ 4",
+  "P03_T04_INST": "Trong phần \"Microsoft Office Specialist\", chèn một trích dẫn giữ chỗ mới có tên \"MOS\" ở cuối đoạn văn thứ hai sau tiêu đề.",
+  "P03_T05_TITLE": "Nhiệm vụ 5",
+  "P03_T05_INST": "Thay đổi cách hiển thị nội dung của đồ họa SmartArt để liệt kê các khóa học từ 1 đến 8, từ trái sang phải. Không thay đổi thứ tự các mục trong ngăn văn bản.",
+  "P03_T06_TITLE": "Nhiệm vụ 6",
+  "P03_T06_INST": "Trong phần \"MOS Version\", gán mô tả văn bản thay thế \"Process flow\" cho đồ họa SmartArt. (Đảm bảo chọn toàn bộ đồ họa SmartArt.)",
+  "P03_T07_TITLE": "Nhiệm vụ 7",
+  "P03_T07_INST": "Trong thuộc tính tệp, thêm \"hocict.edu.vn\" làm danh mục.",
+  "P03_T08_TITLE": "Nhiệm vụ 8",
+  "P03_T08_INST": "Trong phần \"Microsoft Office Specialist\", sao chép định dạng của đoạn văn thứ nhất và áp dụng định dạng đó cho đoạn văn thứ hai."
+}
