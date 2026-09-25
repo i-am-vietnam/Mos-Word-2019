@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Xml.Linq;
 using MosWord2019.Core.Models;
 using Newtonsoft.Json.Linq;
@@ -84,18 +83,34 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckDocumentStyleSet(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string[] styleIds = RequiredStrings(task, "styleIds");
-            string expected = RequiredString(task, "expectedStyleSignature");
+            JArray requirements = RequiredArray(task, "semanticStyleRequirements");
             XDocument styles = package.Xml("word/styles.xml");
             var byId = styles.Root.Elements(W + "style").Where(s => s.Attribute(W + "styleId") != null)
                 .ToDictionary(s => (string)s.Attribute(W + "styleId"), StringComparer.Ordinal);
-            string[] missing = styleIds.Where(id => !byId.ContainsKey(id)).ToArray();
-            if (missing.Length > 0) { detail = "Required document styles are missing: " + string.Join(", ", missing); return false; }
-            string actual = HashText(string.Join("\n", styleIds.OrderBy(x => x, StringComparer.Ordinal)
-                .Select(id => id + "=" + Canonical(byId[id]))));
-            bool match = string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase);
-            detail = match ? "The document style-set signature matches." : "Style-set signature mismatch. Actual: " + actual;
-            return match;
+            foreach (JToken requirementToken in requirements)
+            {
+                JObject requirement = requirementToken as JObject;
+                if (requirement == null) throw new InvalidDataException("Invalid semantic style requirement.");
+                string styleId = RequiredObjectString(requirement, "styleId");
+                string path = RequiredObjectString(requirement, "path");
+                XElement style;
+                if (!byId.TryGetValue(styleId, out style))
+                { detail = "Required document style is missing: " + styleId; return false; }
+                XElement property = style;
+                foreach (string segment in path.Split('/'))
+                {
+                    property = property?.Element(W + segment);
+                    if (property == null) break;
+                }
+                if (property == null)
+                { detail = "The " + styleId + " style is missing required semantic property " + path + "."; return false; }
+                JObject attributes = requirement["attributes"] as JObject;
+                if (attributes != null && attributes.Properties().Any(attribute =>
+                    !string.Equals((string)property.Attribute(W + attribute.Name), (string)attribute.Value, StringComparison.Ordinal)))
+                { detail = "The " + styleId + " style property " + path + " does not match the requested style set."; return false; }
+            }
+            detail = "The document styles match the semantic properties of the requested style set.";
+            return true;
         }
 
         private static bool CheckBulletedList(PackageSnapshot package, TaskDefinition task, out string detail)
@@ -176,16 +191,31 @@ namespace MosWord2019.Core.Services
             XDocument document = package.Xml("word/document.xml");
             XElement section = document.Root?.Element(W + "body")?.Element(W + "sectPr");
             if (section?.Element(W + "titlePg") == null) { detail = "Different First Page is not enabled."; return false; }
-            if (section.Elements(W + "headerReference").Any(h => (string)h.Attribute(W + "type") == "first"))
-            { detail = "A first-page header is present; page 1 must remain without Integral."; return false; }
+            XElement first = section.Elements(W + "headerReference").SingleOrDefault(h => (string)h.Attribute(W + "type") == "first");
+            string firstPart = package.RelatedPart("word/document.xml", (string)first?.Attribute(R + "id"));
+            if (!string.IsNullOrEmpty(firstPart) && HeaderHasVisibleContent(package.Xml(firstPart).Root))
+            { detail = "The first-page header contains visible content; page 1 must remain without Integral."; return false; }
             XElement primary = section.Elements(W + "headerReference").SingleOrDefault(h => ((string)h.Attribute(W + "type") ?? "default") == "default");
             string part = package.RelatedPart("word/document.xml", (string)primary?.Attribute(R + "id"));
             if (string.IsNullOrEmpty(part)) { detail = "The primary header is missing."; return false; }
-            string expected = RequiredString(task, "expectedHeaderSignature");
-            string actual = HashText(Canonical(package.Xml(part).Root));
-            bool match = string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase);
-            detail = match ? "Different First Page and the Integral header signature match."
-                : "The primary header is not the required Integral structure. Actual: " + actual;
+            XElement header = package.Xml(part).Root;
+            int expectedColumns = RequiredInt(task, "expectedHeaderTableColumns");
+            string fill = RequiredString(task, "expectedHeaderFillColor");
+            string themeFill = RequiredString(task, "expectedHeaderThemeFill");
+            string alias = RequiredString(task, "expectedTitleControlAlias");
+            XElement table = header?.Elements(W + "tbl").SingleOrDefault();
+            XElement tableProperties = table?.Element(W + "tblPr");
+            XElement shading = tableProperties?.Element(W + "shd");
+            XElement titleControl = table?.Descendants(W + "sdt").SingleOrDefault(sdt =>
+                string.Equals((string)sdt.Element(W + "sdtPr")?.Element(W + "alias")?.Attribute(W + "val"), alias, StringComparison.Ordinal));
+            bool titleBinding = titleControl?.Element(W + "sdtPr")?.Element(W + "dataBinding")?.Attribute(W + "xpath")?.Value
+                .IndexOf("coreProperties", StringComparison.Ordinal) >= 0;
+            bool match = table != null && table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() == expectedColumns &&
+                         string.Equals((string)shading?.Attribute(W + "fill"), fill, StringComparison.OrdinalIgnoreCase) &&
+                         string.Equals((string)shading?.Attribute(W + "themeFill"), themeFill, StringComparison.Ordinal) &&
+                         titleControl != null && titleBinding;
+            detail = match ? "Different First Page is enabled, page 1 is empty, and the primary header has the required Integral structure."
+                : "The primary header is not the required Integral structure.";
             return match;
         }
 
@@ -315,13 +345,9 @@ namespace MosWord2019.Core.Services
             XElement table = tables[0];
             int columns = table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() ?? 0;
             int rows = table.Elements(W + "tr").Count();
-            XElement width = table.Element(W + "tblPr")?.Element(W + "tblW");
-            XElement layout = table.Element(W + "tblPr")?.Element(W + "tblLayout");
-            if (columns != expectedColumns || rows != expectedRows || !TableRowsEqual(table, expectedCells) ||
-                (string)width?.Attribute(W + "type") != RequiredString(task, "expectedTableWidthType") ||
-                (string)layout?.Attribute(W + "type") != RequiredString(task, "expectedTableLayout"))
-            { detail = "The converted table does not match the verified Word two-column output."; return false; }
-            detail = "The complete tab-delimited block is the verified two-column Word table in the Lecturers section.";
+            if (columns != expectedColumns || rows != expectedRows || !TableRowsEqual(table, expectedCells))
+            { detail = "The converted table does not match the verified Word table structure and content."; return false; }
+            detail = "The complete tab-delimited block is the verified Word table in the Lecturers section.";
             return true;
         }
 
@@ -360,6 +386,7 @@ namespace MosWord2019.Core.Services
             string fill = RequiredString(task, "fillColor");
             string geometry = RequiredString(task, "shapeGeometry");
             string expected = RequiredString(task, "expectedText");
+            bool allowAutomaticUppercase = OptionalBool(task, "allowAutomaticUppercase", false);
             XDocument document = package.Xml("word/document.xml");
             var matches = new List<XElement>();
             foreach (XElement choice in document.Descendants(Mc + "Choice"))
@@ -376,10 +403,21 @@ namespace MosWord2019.Core.Services
             }
             if (matches.Count != 1) { detail = "The target dark-blue text box was not found uniquely."; return false; }
             XElement textBox = matches[0].Element(Wps + "txbx")?.Element(W + "txbxContent");
-            bool match = textBox != null && string.Equals(VisibleText(textBox).TrimEnd(), expected, StringComparison.Ordinal);
+            string actual = textBox == null ? null : VisibleText(textBox).TrimEnd();
+            bool match = string.Equals(actual, expected, StringComparison.Ordinal) ||
+                         (allowAutomaticUppercase && string.Equals(actual, expected.ToUpperInvariant(), StringComparison.Ordinal));
             detail = match ? "The target dark-blue text box contains the exact requested text."
                 : "The required exact text is missing from the target dark-blue text box.";
             return match;
+        }
+
+        private static bool HeaderHasVisibleContent(XElement header)
+        {
+            if (header == null) return false;
+            if (header.Descendants(W + "t").Any(text => !string.IsNullOrWhiteSpace(text.Value))) return true;
+            return header.Descendants().Any(element => element.Name == W + "tbl" || element.Name == W + "drawing" ||
+                element.Name == W + "pict" || element.Name == W + "object" || element.Name == W + "sym" ||
+                element.Name == W + "fldChar" || element.Name == W + "instrText");
         }
 
         private static bool CheckCommentDeleted(PackageSnapshot package, TaskDefinition task, out string detail)
@@ -570,39 +608,24 @@ namespace MosWord2019.Core.Services
             return value;
         }
 
-        private static string HashText(string value) { return HashBytes(Encoding.UTF8.GetBytes(value)); }
+        private static string RequiredObjectString(JObject value, string name)
+        {
+            string result = (string)value[name];
+            if (string.IsNullOrWhiteSpace(result)) throw new InvalidDataException("Missing grading metadata: " + name);
+            return result;
+        }
+
+        private static bool OptionalBool(TaskDefinition task, string name, bool defaultValue)
+        {
+            JToken token;
+            bool value;
+            return task.Extra != null && task.Extra.TryGetValue(name, out token) && bool.TryParse(token.ToString(), out value)
+                ? value : defaultValue;
+        }
+
         private static string HashBytes(byte[] value)
         {
             using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(value)).Replace("-", "");
-        }
-
-        private static string Canonical(XElement element)
-        {
-            var builder = new StringBuilder();
-            AppendCanonical(builder, element);
-            return builder.ToString();
-        }
-
-        private static void AppendCanonical(StringBuilder builder, XElement element)
-        {
-            if (element.Name == W + "rPrChange" || element.Name == W + "pPrChange" || element.Name == W + "sectPrChange") return;
-            builder.Append('<').Append(element.Name.NamespaceName).Append('|').Append(element.Name.LocalName);
-            foreach (XAttribute attribute in element.Attributes().Where(a => !a.IsNamespaceDeclaration && !IsVolatile(a))
-                .OrderBy(a => a.Name.NamespaceName, StringComparer.Ordinal).ThenBy(a => a.Name.LocalName, StringComparer.Ordinal))
-                builder.Append(' ').Append(attribute.Name.NamespaceName).Append('|').Append(attribute.Name.LocalName).Append('=').Append(attribute.Value);
-            builder.Append('>');
-            if (!element.HasElements && !(element.Name == W + "t" && element.Ancestors(W + "sdtContent").Any()))
-                builder.Append(element.Value);
-            foreach (XElement child in element.Elements()) AppendCanonical(builder, child);
-            builder.Append("</").Append(element.Name.NamespaceName).Append('|').Append(element.Name.LocalName).Append('>');
-        }
-
-        private static bool IsVolatile(XAttribute attribute)
-        {
-            string name = attribute.Name.LocalName;
-            return name.StartsWith("rsid", StringComparison.OrdinalIgnoreCase) || name == "paraId" || name == "textId" ||
-                   name == "anchorId" || name == "editId" || name == "date" || name == "author" || name == "id" ||
-                   attribute.Name.NamespaceName == R.NamespaceName;
         }
 
         private sealed class PackageSnapshot : IDisposable

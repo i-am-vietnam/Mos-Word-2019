@@ -12,7 +12,7 @@ Build repair: Core now explicitly lists its ten source files, including exactly 
 - Phase 3: complete. Word package models, structural loading/validation, build-copy contract, and Training working-copy service are implemented and verified without production task content.
 - Phase 4 including 4B: complete. Real P01 (eight tasks), bilingual Training entry, bottom-quarter task tabs, owned Word upper-area placement, internal save/close, switching, confirmed restart and manual closure recovery are verified. No Save buttons appear in the task panel.
 - Phase 5 — Project 1 grading: complete and committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`.
-- Phase 6 — Project 2 integration/grading: complete as local, uncommitted work. P02 validates in EN/VI, appears as Project 2, and grades all eight tasks from saved OOXML. Testing Mode, scoring, database, installer, and release work remain unimplemented.
+- Phase 6 — Project 2 integration/grading: complete and committed at `e57d22d9a57401b0f1e3c3930679bb8c30dc7265`; the supplied EN/VI wording correction is committed at current HEAD `a5bec9aacdcf50069d9fabd07eac97e45bee6d9b`. P02 validates in EN/VI, appears as Project 2, and grades all eight tasks from saved OOXML. Testing Mode, scoring, database, installer, and release work remain unimplemented.
 
 ## Current architecture
 
@@ -61,17 +61,17 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; P02 resources are committed at starting checkpoint `0eb2b4742abef039a30b553317279c146b486e0a`. Phase 6 implementation remains local until the user explicitly requests a commit or push.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; P02 resources are committed at `0eb2b4742abef039a30b553317279c146b486e0a`; Phase 6 is committed at `e57d22d9a57401b0f1e3c3930679bb8c30dc7265`; and the supplied P02 wording correction is committed at current HEAD `a5bec9aacdcf50069d9fabd07eac97e45bee6d9b`. The four focused grading fixes described below are local and uncommitted until the user explicitly requests a commit or push.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
 ## Phase 5 verification
 
-Supported assertions: DocumentStyleSet, BulletedList, Footnote, HeaderDifferentFirstPage, SymbolInserted, PictureArtisticEffect, TableCellsMerged, and PictureWrapType. Word 2019 ground-truth copies established normalized signatures for Lines (Stylish) and Integral, Webdings F07E serialization, `a14:artisticPencilSketch`, exact list/footnote/table structures, and target-image Square wrapping. Each assertion passed positive, negative, and meaningful near-miss checks; one combined answer passed 8/8.
+Supported assertions: DocumentStyleSet, BulletedList, Footnote, HeaderDifferentFirstPage, SymbolInserted, PictureArtisticEffect, TableCellsMerged, and PictureWrapType. Word 2019 ground-truth copies establish semantic properties for Lines (Stylish) and Integral, Webdings F07E serialization, `a14:artisticPencilSketch`, exact list/footnote/table structures, and target-image Square wrapping. Each assertion passed positive, negative, and meaningful near-miss checks; one combined answer passed 8/8.
 
 The real WinForms/Word STA smoke passed English fresh T01 Incorrect, English combined T01/T03/T07/T08 Correct, Vietnamese T01 Đúng, current-task selection, safe Save-before-grade, technical Save-error routing, unchanged Word PID during each grade, upper/lower window placement, and owned-process cleanup. Initial and final unrelated WINWORD IDs were identical. Evidence is under ignored `artifacts/phase5`.
 
-Starter SHA-256 before/after: `3D906B8A4C7E2DA3272DEC63A30E38CB5354651290A29B8E199BFAA223F83FED`. Supplied EN/VI task text was not rewritten. The production starter already serializes the Contact Us target picture as Square, so fresh T08 is structurally Pass; Tight and wrong-picture-Square variants verify target-specific failure behavior.
+The Phase 5 starter SHA-256 was `3D906B8A4C7E2DA3272DEC63A30E38CB5354651290A29B8E199BFAA223F83FED`. The later supplied starter committed in `e57d22d` has SHA-256 `0A86091C0B58E39D7CDCC9D7F19919AA7182467794927FAEB11F620D75D151E4` and changes the T08 target from Square to Tight, so the current fresh T08 correctly grades Fail. An OOXML audit found this task-state change plus view/revision metadata; `styles.xml` is unchanged. The current starter remains authoritative and was not reverted.
 
 ## Next recommended task
 
@@ -79,7 +79,11 @@ Integrate the next user-supplied Word project through the same ground-truth and 
 
 ## Phase 6 verification
 
-P02 `tasks.json` now declares eight generic assertion types: TextRemovedFromParagraph, TextReplaceAll, TextConvertedToTable, AutomaticTableOfContents, TextBoxTextEquals, CommentDeletedAtText, ParagraphLineSpacingExact and CharacterStyleAppliedToParagraph. Word 2019 ground truth established the 10x2 fixed-layout conversion, Automatic Table 1 SDT/field structure, DrawingML dark-blue text box, target comment range, exact 280-twip line spacing and run-level IntenseEmphasis serialization.
+P02 `tasks.json` declares eight generic assertion types: TextRemovedFromParagraph, TextReplaceAll, TextConvertedToTable, AutomaticTableOfContents, TextBoxTextEquals, CommentDeletedAtText, ParagraphLineSpacingExact and CharacterStyleAppliedToParagraph. Focused Word 2019 ground truth corrects T03 to the instructed 5-row, 3-column table and confirms T05 stores the entered text under automatic caps formatting. T01 Lines grading now checks selected semantic style properties instead of a full canonical XML hash. T04 accepts an absent or semantically empty first-page header while requiring the semantic Integral primary-header structure. T05 accepts the exact mixed-case text or its all-uppercase representation only when `allowAutomaticUppercase` is enabled.
+
+The focused correction matrix passes: P01 T01 repeated apply/save/reopen/unrelated-task positives and starter/other-set/manual-heading negatives; P01 T04 correct, empty-first-header and reopen positives plus no-different-first/custom/visible-first-header negatives; P02 T03 correct/reopen 5x3 positives plus 2-column, 4-column, missing-cell, wrong-order and plain-text negatives; and P02 T05 mixed-case/all-uppercase positives plus lowercase, wrong-case, punctuation, missing-word, wrong-textbox and body-text negatives. Combined P01 and P02 answers remain 8/8.
+
+Visual Studio `/RunExit` launched the production WinForms startup project. Login -> Training -> English -> Project 1 -> P01 T01/T04 -> Project 2 -> P02 T03/T05 displayed `Correct` for all requested real-Word states. Each grade kept the same owned WINWORD PID; project switching reused it; normal exit removed it; the unrelated PID set was unchanged. Existing Documents/MosWord2019 work copies were backed up and restored byte-for-byte after the smoke run. Final Debug and Release rebuilds report 0 errors and 0 warnings. Production starter hashes remain P01 `0A86091C0B58E39D7CDCC9D7F19919AA7182467794927FAEB11F620D75D151E4` and P02 `63A40EAD1EAB7BD4AAF5ECA672B36C784D07A7E3A912C0F4D2C8BB862308F23C`.
 
 P01/P02 EN/VI validation reports zero errors and warnings; discovery order is Project 1 then Project 2. Every P02 assertion passes its positive document and rejects baseline, negative and meaningful near-miss variants. Combined P02 and P01 answers each pass 8/8. P02 first-copy, preservation, reset and immutable starter SHA-256 checks pass. The real WinForms/Word smoke verifies EN/VI results, representative T01/T03/T04/T06/T08 fresh/correct states, restart, P01-to-P02 switching, same PID during grading, upper/lower placement and owned-process cleanup. Evidence remains ignored under `artifacts/phase6-p02`.
 

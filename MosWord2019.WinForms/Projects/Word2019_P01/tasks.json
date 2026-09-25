@@ -2,8 +2,20 @@
   {
     "taskId": "T01", "titleKey": "P01_T01_TITLE", "instructionKey": "P01_T01_INST", "assertionType": "DocumentStyleSet",
     "expectedStyleSet": "Lines (Stylish)",
-    "styleIds": ["Normal", "NoSpacing", "Title", "Subtitle", "Heading1", "Heading2", "Heading3", "Heading4", "Heading5", "Heading6", "Heading7", "Heading8", "Heading9", "Quote", "IntenseQuote", "BookTitle", "Emphasis", "Strong", "SubtleEmphasis", "IntenseEmphasis"],
-    "expectedStyleSignature": "D0DA39CC5A355EC26C4F52E8E5EAF70004096DB615C9ACA1523BF5042EBA47AC"
+    "semanticStyleRequirements": [
+      { "styleId": "Heading1", "path": "pPr/pBdr/bottom", "attributes": { "val": "single", "sz": "4", "space": "2", "themeColor": "accent2" } },
+      { "styleId": "Heading1", "path": "pPr/spacing", "attributes": { "before": "360", "after": "120", "line": "240", "lineRule": "auto" } },
+      { "styleId": "Heading1", "path": "rPr/color", "attributes": { "val": "262626", "themeColor": "text1", "themeTint": "D9" } },
+      { "styleId": "Heading1", "path": "rPr/sz", "attributes": { "val": "40" } },
+      { "styleId": "Heading2", "path": "pPr/spacing", "attributes": { "before": "120", "after": "0", "line": "240", "lineRule": "auto" } },
+      { "styleId": "Heading2", "path": "rPr/color", "attributes": { "val": "2683C6", "themeColor": "accent2" } },
+      { "styleId": "Heading2", "path": "rPr/sz", "attributes": { "val": "36" } },
+      { "styleId": "IntenseQuote", "path": "pPr/pBdr/top", "attributes": { "val": "single", "sz": "24", "space": "4", "themeColor": "accent2" } },
+      { "styleId": "IntenseQuote", "path": "pPr/ind", "attributes": { "left": "936", "right": "936" } },
+      { "styleId": "IntenseEmphasis", "path": "rPr/b" },
+      { "styleId": "IntenseEmphasis", "path": "rPr/i" },
+      { "styleId": "IntenseEmphasis", "path": "rPr/color", "attributes": { "val": "2683C6", "themeColor": "accent2" } }
+    ]
   },
   {
     "taskId": "T02", "titleKey": "P01_T02_TITLE", "instructionKey": "P01_T02_INST", "assertionType": "BulletedList",
@@ -16,7 +28,11 @@
   },
   {
     "taskId": "T04", "titleKey": "P01_T04_TITLE", "instructionKey": "P01_T04_INST", "assertionType": "HeaderDifferentFirstPage",
-    "headerBuiltIn": "Integral", "differentFirstPage": true, "expectedHeaderSignature": "84D682DC1DF0CA533697B03A2C34912BDFE47B6D0BF1C4DB5D6D3C9DBF8D9BAE"
+    "headerBuiltIn": "Integral", "differentFirstPage": true,
+    "expectedHeaderTableColumns": 2,
+    "expectedHeaderFillColor": "2683C6",
+    "expectedHeaderThemeFill": "accent2",
+    "expectedTitleControlAlias": "Title"
   },
   {
     "taskId": "T05", "titleKey": "P01_T05_TITLE", "instructionKey": "P01_T05_INST", "assertionType": "SymbolInserted",

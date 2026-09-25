@@ -41,21 +41,14 @@
     "sectionHeading": "Lecturers",
     "introParagraph": "We are very proud to have the enthusiastic cooperation from lecturerrs:",
     "followingHeading": "CONTACT US",
-    "expectedColumns": 2,
-    "expectedRows": 10,
-    "expectedTableWidthType": "auto",
-    "expectedTableLayout": "fixed",
+    "expectedColumns": 3,
+    "expectedRows": 5,
     "expectedTableRows": [
-      ["Instructor", "Certificate"],
-      ["Email", ""],
-      ["Ly Tran Thai Hoc, M.Sc. (I.T)", "MCT, MOS Master, IC3 GS4 Authorized Educator"],
-      ["hocict@gmail.com", ""],
-      ["Dang Thi Thuy Dung, M.E.M", "MOS Master"],
-      ["thuydungthqtk3@gmail.com", ""],
-      ["Nguyen Van Dung, BIT", "MOS Master"],
-      ["vandung0186@gmail.com", ""],
-      ["Le Anh Tuan, BIT", "MOS Master"],
-      ["hii_lat@hotmail.com", ""]
+      ["Instructor", "Certificate", "Email"],
+      ["Ly Tran Thai Hoc, M.Sc. (I.T)", "MCT, MOS Master, IC3 GS4 Authorized Educator", "hocict@gmail.com"],
+      ["Dang Thi Thuy Dung, M.E.M", "MOS Master", "thuydungthqtk3@gmail.com"],
+      ["Nguyen Van Dung, BIT", "MOS Master", "vandung0186@gmail.com"],
+      ["Le Anh Tuan, BIT", "MOS Master", "hii_lat@hotmail.com"]
     ]
   },
   {
@@ -76,7 +69,8 @@
     "anchorText": "CONTACT US",
     "shapeGeometry": "rect",
     "fillColor": "002060",
-    "expectedText": "Anytime Account Access"
+    "expectedText": "Anytime Account Access",
+    "allowAutomaticUppercase": true
   },
   {
     "taskId": "T06",
