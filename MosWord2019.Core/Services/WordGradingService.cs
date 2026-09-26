@@ -20,13 +20,20 @@ namespace MosWord2019.Core.Services
         private static readonly XNamespace Wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
         private static readonly XNamespace Mc = "http://schemas.openxmlformats.org/markup-compatibility/2006";
         private static readonly XNamespace Wps = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
+        private static readonly XNamespace V = "urn:schemas-microsoft-com:vml";
+        private static readonly XNamespace Dgm = "http://schemas.openxmlformats.org/drawingml/2006/diagram";
+        private static readonly XNamespace Cp = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties";
+        private static readonly XNamespace B = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
 
         private static readonly HashSet<string> Supported = new HashSet<string>(StringComparer.Ordinal)
         {
             "DocumentStyleSet", "BulletedList", "Footnote", "HeaderDifferentFirstPage",
             "SymbolInserted", "PictureArtisticEffect", "TableCellsMerged", "PictureWrapType",
             "TextRemovedFromParagraph", "TextReplaceAll", "TextConvertedToTable", "AutomaticTableOfContents",
-            "TextBoxTextEquals", "CommentDeletedAtText", "ParagraphLineSpacingExact", "CharacterStyleAppliedToParagraph"
+            "TextBoxTextEquals", "CommentDeletedAtText", "ParagraphLineSpacingExact", "CharacterStyleAppliedToParagraph",
+            "TableFirstRowIsHeader", "SectionOrientationByAnchor", "TableColumnWidthsEqual",
+            "CitationPlaceholderAtParagraphEnd", "SmartArtDirectionEquals", "SmartArtAltTextDescriptionEquals",
+            "CorePropertyEquals", "ParagraphFormattingMatches"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -62,6 +69,14 @@ namespace MosWord2019.Core.Services
                         case "CommentDeletedAtText": passed = CheckCommentDeleted(package, task, out detail); break;
                         case "ParagraphLineSpacingExact": passed = CheckParagraphLineSpacing(package, task, out detail); break;
                         case "CharacterStyleAppliedToParagraph": passed = CheckCharacterStyle(package, task, out detail); break;
+                        case "TableFirstRowIsHeader": passed = CheckTableFirstRowHeader(package, task, out detail); break;
+                        case "SectionOrientationByAnchor": passed = CheckSectionOrientation(package, task, out detail); break;
+                        case "TableColumnWidthsEqual": passed = CheckTableColumnWidths(package, task, out detail); break;
+                        case "CitationPlaceholderAtParagraphEnd": passed = CheckCitationPlaceholder(package, task, out detail); break;
+                        case "SmartArtDirectionEquals": passed = CheckSmartArtDirection(package, task, out detail); break;
+                        case "SmartArtAltTextDescriptionEquals": passed = CheckSmartArtAltText(package, task, out detail); break;
+                        case "CorePropertyEquals": passed = CheckCoreProperty(package, task, out detail); break;
+                        case "ParagraphFormattingMatches": passed = CheckParagraphFormatting(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -388,27 +403,68 @@ namespace MosWord2019.Core.Services
             string expected = RequiredString(task, "expectedText");
             bool allowAutomaticUppercase = OptionalBool(task, "allowAutomaticUppercase", false);
             XDocument document = package.Xml("word/document.xml");
-            var matches = new List<XElement>();
-            foreach (XElement choice in document.Descendants(Mc + "Choice"))
-            {
-                foreach (XElement shape in choice.Descendants(Wps + "wsp"))
-                {
-                    XElement outer = shape.Ancestors(W + "p").FirstOrDefault();
-                    XElement color = shape.Element(Wps + "spPr")?.Element(A + "solidFill")?.Element(A + "srgbClr");
-                    XElement preset = shape.Element(Wps + "spPr")?.Element(A + "prstGeom");
-                    if (outer != null && ParagraphTextOutsideTextBoxes(outer) == anchor &&
-                        string.Equals((string)color?.Attribute("val"), fill, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals((string)preset?.Attribute("prst"), geometry, StringComparison.OrdinalIgnoreCase)) matches.Add(shape);
-                }
-            }
+            List<TextBoxCandidate> matches = TextBoxCandidates(document)
+                .Where(candidate => candidate.OuterParagraph != null &&
+                    ParagraphTextOutsideTextBoxes(candidate.OuterParagraph) == anchor &&
+                    string.Equals(NormalizeColor(candidate.FillColor), NormalizeColor(fill), StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(candidate.Geometry, geometry, StringComparison.OrdinalIgnoreCase)).ToList();
             if (matches.Count != 1) { detail = "The target dark-blue text box was not found uniquely."; return false; }
-            XElement textBox = matches[0].Element(Wps + "txbx")?.Element(W + "txbxContent");
+            XElement textBox = matches[0].TextBox;
             string actual = textBox == null ? null : VisibleText(textBox).TrimEnd();
             bool match = string.Equals(actual, expected, StringComparison.Ordinal) ||
                          (allowAutomaticUppercase && string.Equals(actual, expected.ToUpperInvariant(), StringComparison.Ordinal));
             detail = match ? "The target dark-blue text box contains the exact requested text."
                 : "The required exact text is missing from the target dark-blue text box.";
             return match;
+        }
+
+        private static IEnumerable<TextBoxCandidate> TextBoxCandidates(XDocument document)
+        {
+            foreach (XElement alternate in document.Descendants(Mc + "AlternateContent"))
+            {
+                XElement outer = alternate.Ancestors(W + "p").FirstOrDefault();
+                List<TextBoxCandidate> drawing = alternate.Elements(Mc + "Choice")
+                    .SelectMany(choice => choice.Descendants(Wps + "wsp"))
+                    .Select(shape => DrawingTextBoxCandidate(shape, outer))
+                    .Where(candidate => candidate != null).ToList();
+                if (drawing.Count > 0)
+                {
+                    foreach (TextBoxCandidate candidate in drawing) yield return candidate;
+                    continue;
+                }
+
+                XElement fallback = alternate.Element(Mc + "Fallback");
+                if (fallback == null) continue;
+                foreach (XElement shape in fallback.Descendants().Where(element => element.Name == V + "rect" || element.Name == V + "shape"))
+                {
+                    TextBoxCandidate candidate = VmlTextBoxCandidate(shape, outer);
+                    if (candidate != null) yield return candidate;
+                }
+            }
+        }
+
+        private static TextBoxCandidate DrawingTextBoxCandidate(XElement shape, XElement outer)
+        {
+            XElement properties = shape.Element(Wps + "spPr");
+            XElement textBox = shape.Element(Wps + "txbx")?.Element(W + "txbxContent");
+            if (properties == null || textBox == null) return null;
+            return new TextBoxCandidate(outer, textBox,
+                (string)properties.Element(A + "prstGeom")?.Attribute("prst"),
+                (string)properties.Element(A + "solidFill")?.Element(A + "srgbClr")?.Attribute("val"));
+        }
+
+        private static TextBoxCandidate VmlTextBoxCandidate(XElement shape, XElement outer)
+        {
+            XElement textBox = shape.Descendants(W + "txbxContent").FirstOrDefault();
+            if (textBox == null) return null;
+            string geometry = shape.Name == V + "rect" || string.Equals((string)shape.Attribute("type"), "#_x0000_t202", StringComparison.OrdinalIgnoreCase)
+                ? "rect" : shape.Name.LocalName;
+            return new TextBoxCandidate(outer, textBox, geometry, (string)shape.Attribute("fillcolor"));
+        }
+
+        private static string NormalizeColor(string value)
+        {
+            return (value ?? "").Trim().TrimStart('#');
         }
 
         private static bool HeaderHasVisibleContent(XElement header)
@@ -472,6 +528,253 @@ namespace MosWord2019.Core.Services
             detail = match ? "The entire visible target paragraph uses the requested character style."
                 : "The requested character style is missing from part or all of the target paragraph.";
             return match;
+        }
+
+        private static bool CheckTableFirstRowHeader(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] header = RequiredStrings(task, "targetHeaderRow");
+            string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> tables = FindTablesByHeader(document, header);
+            if (tables.Count != 1 || !TableRowsEqual(tables[0], expectedRows))
+            { detail = "The target table is missing or its content was changed."; return false; }
+            List<XElement> rows = tables[0].Elements(W + "tr").ToList();
+            bool match = IsOn(rows[0].Element(W + "trPr")?.Element(W + "tblHeader")) &&
+                rows.Skip(1).All(row => !IsOn(row.Element(W + "trPr")?.Element(W + "tblHeader")));
+            detail = match ? "The target table uses its first row, and only its first row, as the repeating header."
+                : "The target table's first row is not marked as its header.";
+            return match;
+        }
+
+        private static bool CheckSectionOrientation(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string anchor = RequiredString(task, "anchorText");
+            int expectedCount = RequiredInt(task, "expectedSectionCount");
+            string expected = RequiredString(task, "expectedOrientation");
+            bool requireOtherPortrait = OptionalBool(task, "requireOtherSectionsPortrait", false);
+            List<DocumentSection> sections = DocumentSections(package.Xml("word/document.xml"));
+            if (sections.Count != expectedCount)
+            { detail = "The document section count differs from the verified structure."; return false; }
+            List<DocumentSection> targets = sections.Where(section => section.Content
+                .Any(element => element.Name == W + "p" && ParagraphTextOutsideCitations(element) == anchor)).ToList();
+            if (targets.Count != 1)
+            { detail = "The target page section was not found uniquely from its content anchor."; return false; }
+            bool targetMatch = IsOrientation(targets[0].Properties, expected);
+            bool othersMatch = !requireOtherPortrait || sections.Where(section => section != targets[0])
+                .All(section => IsOrientation(section.Properties, "portrait"));
+            bool match = targetMatch && othersMatch;
+            detail = match ? "Only the section containing the target page is Landscape; all other sections remain Portrait."
+                : "The target page orientation or another section orientation is incorrect.";
+            return match;
+        }
+
+        private static bool CheckTableColumnWidths(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] header = RequiredStrings(task, "targetHeaderRow");
+            string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
+            int expectedWidth = RequiredInt(task, "expectedWidthTwips");
+            int tolerance = RequiredInt(task, "widthToleranceTwips");
+            bool noRowHeight = OptionalBool(task, "requireNoExplicitRowHeight", false);
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> tables = FindTablesByHeader(document, header);
+            if (tables.Count != 1 || !TableRowsEqual(tables[0], expectedRows))
+            { detail = "The target table is missing or its content was changed."; return false; }
+            List<int> widths = tables[0].Element(W + "tblGrid")?.Elements(W + "gridCol")
+                .Select(column => Twips(column, "w", -1)).ToList() ?? new List<int>();
+            bool widthsMatch = widths.Count == header.Length && widths.All(width => Math.Abs(width - expectedWidth) <= tolerance);
+            bool rowsMatch = !noRowHeight || tables[0].Elements(W + "tr")
+                .All(row => row.Element(W + "trPr")?.Element(W + "trHeight") == null);
+            bool match = widthsMatch && rowsMatch;
+            detail = match ? "Every column in the target table has the verified 1.57-inch width and row heights remain unchanged."
+                : "One or more target table columns have the wrong width, or row height was changed.";
+            return match;
+        }
+
+        private static bool CheckCitationPlaceholder(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string targetText = RequiredString(task, "targetParagraph");
+            string tag = RequiredString(task, "placeholderTag");
+            string fieldCode = RequiredString(task, "expectedFieldCode");
+            bool placeholderOnly = OptionalBool(task, "requirePlaceholderOnlySource", true);
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(item => ParagraphTextOutsideCitations(item) == targetText).ToList();
+            if (paragraphs.Count != 1)
+            { detail = "The target paragraph is missing or its text was changed."; return false; }
+            XElement paragraph = paragraphs[0];
+            List<XElement> citations = paragraph.Elements(W + "sdt")
+                .Where(value => value.Element(W + "sdtPr")?.Element(W + "citation") != null).ToList();
+            if (citations.Count != 1 || paragraph.Elements().LastOrDefault() != citations[0])
+            { detail = "The required citation placeholder is missing from the end of the target paragraph."; return false; }
+            XElement citation = citations[0];
+            string actualField = NormalizeFieldCode(string.Concat(citation.Descendants(W + "instrText").Select(value => value.Value)));
+            bool complexField = citation.Descendants(W + "fldChar").Any(value => (string)value.Attribute(W + "fldCharType") == "begin") &&
+                citation.Descendants(W + "fldChar").Any(value => (string)value.Attribute(W + "fldCharType") == "end");
+            var sources = new List<XElement>();
+            foreach (string part in package.EntryNames.Where(name => name.StartsWith("customXml/item", StringComparison.OrdinalIgnoreCase) &&
+                name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) && name.IndexOf("itemProps", StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                XDocument sourcePart;
+                if (!package.TryXml(part, out sourcePart)) continue;
+                sources.AddRange(sourcePart.Descendants(B + "Source").Where(source =>
+                    string.Equals((string)source.Element(B + "Tag"), tag, StringComparison.Ordinal)));
+            }
+            bool sourceMatch = sources.Count == 1 && (!placeholderOnly || sources[0].Elements()
+                .All(element => element.Name == B + "Tag" || element.Name == B + "RefOrder"));
+            bool match = string.Equals(actualField, fieldCode, StringComparison.Ordinal) && complexField && sourceMatch;
+            detail = match ? "The MOS placeholder citation is a real Word placeholder at the end of the target paragraph."
+                : "The citation field or bibliography source is not the required MOS placeholder.";
+            return match;
+        }
+
+        private static bool CheckSmartArtDirection(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string anchor = RequiredString(task, "anchorText");
+            string direction = RequiredString(task, "expectedDirection");
+            string[] expectedText = RequiredStrings(task, "expectedTextItems");
+            List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
+            if (smartArts.Count != 1)
+            { detail = "The target SmartArt was not found uniquely."; return false; }
+            XDocument data = package.Xml(smartArts[0].DataPart);
+            string actualDirection = (string)data.Descendants(Dgm + "dir").FirstOrDefault()?.Attribute("val");
+            string[] actualText = data.Descendants(A + "t").Select(value => value.Value).ToArray();
+            bool match = string.Equals(actualDirection, direction, StringComparison.Ordinal) && actualText.SequenceEqual(expectedText);
+            detail = match ? "The target SmartArt is in the verified Right-to-Left state without changing its data items."
+                : "The target SmartArt direction or its data-item order/text is incorrect.";
+            return match;
+        }
+
+        private static bool CheckSmartArtAltText(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string anchor = RequiredString(task, "anchorText");
+            string expected = RequiredString(task, "expectedDescription");
+            List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
+            if (smartArts.Count != 1)
+            { detail = "The target SmartArt was not found uniquely."; return false; }
+            XElement properties = smartArts[0].Container.Element(Wp + "docPr");
+            bool match = string.Equals((string)properties?.Attribute("descr"), expected, StringComparison.Ordinal) &&
+                string.IsNullOrEmpty((string)properties?.Attribute("title"));
+            detail = match ? "The entire target SmartArt has the exact requested alt-text description."
+                : "The requested description is missing, differs, or was placed in the title field.";
+            return match;
+        }
+
+        private static bool CheckCoreProperty(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string property = RequiredString(task, "propertyName");
+            string expected = RequiredString(task, "expectedValue");
+            XDocument core = package.Xml("docProps/core.xml");
+            string actual = (string)core.Root?.Element(Cp + property);
+            bool match = string.Equals(actual, expected, StringComparison.Ordinal);
+            detail = match ? "The requested built-in file property has the exact value."
+                : "The requested value is missing from the correct built-in file property.";
+            return match;
+        }
+
+        private static bool CheckParagraphFormatting(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string sourceText = RequiredString(task, "sourceParagraph");
+            string destinationText = RequiredString(task, "destinationParagraph");
+            string alignment = RequiredString(task, "expectedAlignment");
+            string style = RequiredString(task, "expectedCharacterStyle");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> source = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(paragraph => ParagraphTextOutsideCitations(paragraph) == sourceText).ToList();
+            List<XElement> destination = document.Descendants(W + "body").Descendants(W + "p")
+                .Where(paragraph => ParagraphTextOutsideCitations(paragraph) == destinationText).ToList();
+            if (source.Count != 1 || destination.Count != 1)
+            { detail = "The source or destination paragraph text was changed."; return false; }
+            bool match = ParagraphUsesFormatting(source[0], alignment, style) && ParagraphUsesFormatting(destination[0], alignment, style);
+            detail = match ? "The destination paragraph has the verified full Format Painter result while preserving its text."
+                : "The destination paragraph has only partial or incorrect copied formatting.";
+            return match;
+        }
+
+        private static List<XElement> FindTablesByHeader(XDocument document, string[] header)
+        {
+            return document.Descendants(W + "body").Descendants(W + "tbl").Where(table =>
+            {
+                XElement first = table.Elements(W + "tr").FirstOrDefault();
+                return first != null && first.Elements(W + "tc").Select(cell => VisibleText(cell).TrimEnd()).SequenceEqual(header);
+            }).ToList();
+        }
+
+        private static bool IsOn(XElement value)
+        {
+            if (value == null) return false;
+            string setting = (string)value.Attribute(W + "val");
+            return string.IsNullOrEmpty(setting) || setting == "1" || setting == "true" || setting == "on";
+        }
+
+        private static bool IsOrientation(XElement section, string expected)
+        {
+            XElement size = section?.Element(W + "pgSz");
+            int width = Twips(size, "w", -1);
+            int height = Twips(size, "h", -1);
+            string orientation = (string)size?.Attribute(W + "orient");
+            if (string.Equals(expected, "landscape", StringComparison.OrdinalIgnoreCase))
+                return width > height && string.Equals(orientation, "landscape", StringComparison.OrdinalIgnoreCase);
+            return width < height && (string.IsNullOrEmpty(orientation) || string.Equals(orientation, "portrait", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static List<DocumentSection> DocumentSections(XDocument document)
+        {
+            XElement body = document.Root?.Element(W + "body");
+            var sections = new List<DocumentSection>();
+            var content = new List<XElement>();
+            foreach (XElement element in body?.Elements() ?? Enumerable.Empty<XElement>())
+            {
+                if (element.Name == W + "sectPr")
+                {
+                    sections.Add(new DocumentSection(content, element));
+                    content = new List<XElement>();
+                    continue;
+                }
+                content.Add(element);
+                XElement properties = element.Name == W + "p" ? element.Element(W + "pPr")?.Element(W + "sectPr") : null;
+                if (properties != null)
+                {
+                    sections.Add(new DocumentSection(content, properties));
+                    content = new List<XElement>();
+                }
+            }
+            return sections;
+        }
+
+        private static List<SmartArtReference> FindSmartArts(PackageSnapshot package, string anchor)
+        {
+            XDocument document = package.Xml("word/document.xml");
+            var result = new List<SmartArtReference>();
+            foreach (XElement data in document.Descendants(A + "graphicData")
+                .Where(value => string.Equals((string)value.Attribute("uri"), Dgm.NamespaceName, StringComparison.Ordinal)))
+            {
+                XElement paragraph = data.Ancestors(W + "p").FirstOrDefault();
+                if (paragraph == null || ParagraphTextOutsideCitations(paragraph) != anchor) continue;
+                XElement container = data.Ancestors().FirstOrDefault(value => value.Name == Wp + "anchor" || value.Name == Wp + "inline");
+                string relationshipId = (string)data.Element(Dgm + "relIds")?.Attribute(R + "dm");
+                string part = package.RelatedPart("word/document.xml", relationshipId);
+                if (container != null && !string.IsNullOrWhiteSpace(part)) result.Add(new SmartArtReference(container, part));
+            }
+            return result;
+        }
+
+        private static string ParagraphTextOutsideCitations(XElement paragraph)
+        {
+            return string.Concat(paragraph.Descendants(W + "t").Where(text => !text.Ancestors(W + "del").Any() &&
+                !text.Ancestors(W + "sdt").Any(value => value.Element(W + "sdtPr")?.Element(W + "citation") != null))
+                .Select(text => text.Value)).TrimEnd();
+        }
+
+        private static bool ParagraphUsesFormatting(XElement paragraph, string alignment, string style)
+        {
+            XElement properties = paragraph.Element(W + "pPr");
+            if (!string.Equals((string)properties?.Element(W + "jc")?.Attribute(W + "val"), alignment, StringComparison.Ordinal) ||
+                !string.Equals((string)properties?.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val"), style, StringComparison.Ordinal))
+                return false;
+            List<XElement> visibleRuns = paragraph.Descendants(W + "r").Where(run => run.Descendants(W + "t")
+                .Any(text => text.Value.Length > 0 && !text.Ancestors(W + "sdt").Any(value => value.Element(W + "sdtPr")?.Element(W + "citation") != null))).ToList();
+            return visibleRuns.Count > 0 && visibleRuns.All(run => string.Equals(
+                (string)run.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val"), style, StringComparison.Ordinal));
         }
 
         private static bool HasActiveCommentOnText(XElement paragraph, string targetText)
@@ -628,6 +931,46 @@ namespace MosWord2019.Core.Services
             using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(value)).Replace("-", "");
         }
 
+        private sealed class TextBoxCandidate
+        {
+            public TextBoxCandidate(XElement outerParagraph, XElement textBox, string geometry, string fillColor)
+            {
+                OuterParagraph = outerParagraph;
+                TextBox = textBox;
+                Geometry = geometry;
+                FillColor = fillColor;
+            }
+
+            public XElement OuterParagraph { get; }
+            public XElement TextBox { get; }
+            public string Geometry { get; }
+            public string FillColor { get; }
+        }
+
+        private sealed class DocumentSection
+        {
+            public DocumentSection(List<XElement> content, XElement properties)
+            {
+                Content = content;
+                Properties = properties;
+            }
+
+            public List<XElement> Content { get; }
+            public XElement Properties { get; }
+        }
+
+        private sealed class SmartArtReference
+        {
+            public SmartArtReference(XElement container, string dataPart)
+            {
+                Container = container;
+                DataPart = dataPart;
+            }
+
+            public XElement Container { get; }
+            public string DataPart { get; }
+        }
+
         private sealed class PackageSnapshot : IDisposable
         {
             private readonly MemoryStream memory;
@@ -658,6 +1001,20 @@ namespace MosWord2019.Core.Services
                 byte[] bytes;
                 if (!entries.TryGetValue(Normalize(part), out bytes)) throw new InvalidDataException("Required OOXML part is missing: " + part);
                 using (var stream = new MemoryStream(bytes, false)) return XDocument.Load(stream, LoadOptions.PreserveWhitespace);
+            }
+
+            public IEnumerable<string> EntryNames { get { return entries.Keys; } }
+
+            public bool TryXml(string part, out XDocument document)
+            {
+                byte[] bytes;
+                if (!entries.TryGetValue(Normalize(part), out bytes)) { document = null; return false; }
+                try
+                {
+                    using (var stream = new MemoryStream(bytes, false)) document = XDocument.Load(stream, LoadOptions.PreserveWhitespace);
+                    return true;
+                }
+                catch (System.Xml.XmlException) { document = null; return false; }
             }
 
             public string Hash(string part)

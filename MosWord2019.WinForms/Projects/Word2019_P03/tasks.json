@@ -1,15 +1,91 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P03_T01_TITLE",
+    "instructionKey": "P03_T01_INST",
+    "assertionType": "TableFirstRowIsHeader",
+    "targetHeaderRow": ["TOPIC", "Quantity", "Viewed", "Feedback"],
+    "expectedTableRows": [
+      ["TOPIC", "Quantity", "Viewed", "Feedback"],
+      ["Microsoft Office Specialist", "15", "129", "92"],
+      ["Internet Computing Core Certification", "35", "153", "135"]
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P03_T02_TITLE",
+    "instructionKey": "P03_T02_INST",
+    "assertionType": "SectionOrientationByAnchor",
+    "anchorText": "MOS Version",
+    "expectedSectionCount": 5,
+    "expectedOrientation": "landscape",
+    "requireOtherSectionsPortrait": true
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P03_T03_TITLE",
+    "instructionKey": "P03_T03_INST",
+    "assertionType": "TableColumnWidthsEqual",
+    "targetHeaderRow": ["TOPIC", "Quantity", "Viewed", "Feedback"],
+    "expectedWidthTwips": 2261,
+    "widthToleranceTwips": 8,
+    "requireNoExplicitRowHeight": true,
+    "expectedTableRows": [
+      ["TOPIC", "Quantity", "Viewed", "Feedback"],
+      ["Microsoft Office Specialist", "15", "129", "92"],
+      ["Internet Computing Core Certification", "35", "153", "135"]
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P03_T04_TITLE",
+    "instructionKey": "P03_T04_INST",
+    "assertionType": "CitationPlaceholderAtParagraphEnd",
+    "targetParagraph": "MOS is the only justification that validates your skills in using Microsoft Office and is directly certified by the CEO of the Microsoft Corporation.",
+    "placeholderTag": "MOS",
+    "expectedFieldCode": "CITATION MOS \\l 1033",
+    "requirePlaceholderOnlySource": true
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P03_T05_TITLE",
+    "instructionKey": "P03_T05_INST",
+    "assertionType": "SmartArtDirectionEquals",
+    "anchorText": "MOS Version",
+    "expectedDirection": "rev",
+    "expectedTextItems": [
+      "Office 2007",
+      "Office 2010",
+      "Office 2013",
+      "Office 2016",
+      "Office 2019",
+      "Microsoft 365 Apps"
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P03_T06_TITLE",
+    "instructionKey": "P03_T06_INST",
+    "assertionType": "SmartArtAltTextDescriptionEquals",
+    "anchorText": "MOS Version",
+    "expectedDescription": "Process flow"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P03_T07_TITLE",
+    "instructionKey": "P03_T07_INST",
+    "assertionType": "CorePropertyEquals",
+    "propertyName": "category",
+    "expectedValue": "hocict.edu.vn"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P03_T08_TITLE",
+    "instructionKey": "P03_T08_INST",
+    "assertionType": "ParagraphFormattingMatches",
+    "sourceParagraph": "MOS is an acronym for Microsoft Office Specialist which is the most widely used office computing skills test in the world with over 1 million tests taken annually. The MOS test was created by Microsoft and performed by Certiport (USA). The exam is conducted online, with more than 25 languages ​​built, including Vietnamese.",
+    "destinationParagraph": "MOS is the only justification that validates your skills in using Microsoft Office and is directly certified by the CEO of the Microsoft Corporation.",
+    "expectedAlignment": "both",
+    "expectedCharacterStyle": "IntenseEmphasis"
+  }
 ]
