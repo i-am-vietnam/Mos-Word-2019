@@ -1,0 +1,18 @@
+﻿{
+  "P04_T01_TITLE": "Nhiệm vụ 1",
+  "P04_T01_INST": "Trong phần \"MOS 2019\", sắp xếp dữ liệu trong bảng theo \"Date\" (tăng dần), sau đó theo \"Score\" (tăng dần).",
+  "P04_T02_TITLE": "Nhiệm vụ 2",
+  "P04_T02_INST": "Trong phần \"IC3 Certification\", thay đổi cấp độ danh sách của mục \"Internet Computing Core Certification - Global Standard 5\" thành Level 3.",
+  "P04_T03_TITLE": "Nhiệm vụ 3",
+  "P04_T03_INST": "Trong phần \"IC3 Certification\", tại đoạn văn trống ở cuối trang, sử dụng tính năng 3D Models để chèn mô hình Glasses từ thư mục 3D Objects. Đặt mô hình ở chế độ In Line with Text.",
+  "P04_T04_TITLE": "Nhiệm vụ 4",
+  "P04_T04_INST": "Trong phần \"IC3 Certification\", áp dụng hiệu ứng nghệ thuật Pencil Sketch cho hình ảnh chứng chỉ.",
+  "P04_T05_TITLE": "Nhiệm vụ 5",
+  "P04_T05_INST": "Chèn ngắt phần Continuous tại đầu tiêu đề \"MOS 2019\".",
+  "P04_T06_TITLE": "Nhiệm vụ 6",
+  "P04_T06_INST": "Thiết lập bảng để hàng đầu tiên tự động được lặp lại ở đầu mỗi trang dưới dạng hàng tiêu đề.",
+  "P04_T07_TITLE": "Nhiệm vụ 7",
+  "P04_T07_INST": "Trong phần \"MOS Level\", áp dụng hiệu ứng hình khối Bevel kiểu Soft Round cho đồ họa SmartArt. (Đảm bảo chọn toàn bộ đồ họa SmartArt.)",
+  "P04_T08_TITLE": "Nhiệm vụ 8",
+  "P04_T08_INST": "Trong phần \"MOS Certification\", thay đổi chế độ ngắt dòng của hình ảnh thành Square."
+}

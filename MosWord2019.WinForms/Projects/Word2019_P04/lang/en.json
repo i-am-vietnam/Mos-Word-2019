@@ -1,0 +1,18 @@
+{
+  "P04_T01_TITLE": "Task 1",
+  "P04_T01_INST": "In the \"MOS 2019\" section, sort the table data by \"Date\" (Ascending) and then by \"Score\" (Ascending).",
+  "P04_T02_TITLE": "Task 2",
+  "P04_T02_INST": "In the \"IC3 Certification\" section, change the list level for \"Internet Computing Core Certification - Global Standard 5\" to Level 3.",
+  "P04_T03_TITLE": "Task 3",
+  "P04_T03_INST": "In the \"IC3 Certification\" section, in the blank paragraph at the end of the page, use the 3D Models feature to insert the Glasses model from the 3D Objects folder. Position the model In Line with Text.",
+  "P04_T04_TITLE": "Task 4",
+  "P04_T04_INST": "In the \"IC3 Certification\" section, apply the Pencil Sketch artistic effect to the certificate image.",
+  "P04_T05_TITLE": "Task 5",
+  "P04_T05_INST": "Insert a Continuous section break at the beginning of the \"MOS 2019\" heading.",
+  "P04_T06_TITLE": "Task 6",
+  "P04_T06_INST": "Configure the table so that the first row is automatically repeated at the top of each page as the header row.",
+  "P04_T07_TITLE": "Task 7",
+  "P04_T07_INST": "In the \"MOS Level\" section, apply the Soft Round bevel shape effect to the SmartArt graphic. (Be sure to select the entire SmartArt graphic.)",
+  "P04_T08_TITLE": "Task 8",
+  "P04_T08_INST": "In the \"MOS Certification\" section, change the text wrapping for the picture to Square."
+}
