@@ -1,15 +1,111 @@
 
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P04_T01_TITLE",
+    "instructionKey": "P04_T01_INST",
+    "assertionType": "TableRowsEqual",
+    "targetHeaderRow": ["Date", "Name", "Exam", "Score"],
+    "expectedTableRows": [
+      ["Date", "Name", "Exam", "Score"],
+      ["11/09/2022", "Pham Nguyen Hoang Long", "MO-200: Excel 2019", "750"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-100: Word 2019", "925"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-200: Excel 2019", "943"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-300: PowerPoint 2019", "970"],
+      ["12/02/2023", "Nguyen Thi Ngoc Quyen", "MO-200: Excel 2019", "887"],
+      ["12/02/2023", "Nguyen Cao Ngan The", "MO-200: Excel 2019", "975"],
+      ["19/03/2023", "Nguyen Thi Kim Phung", "MO-100: Word 2019", "800"],
+      ["19/03/2023", "Le Tran Nhat Vy", "MO-100: Word 2019", "800"],
+      ["19/03/2023", "Tran Thi Thanh Vy", "MO-300: PowerPoint 2019", "925"],
+      ["02/04/2023", "Le Nhu Ngoc", "MO-100: Word 2019", "750"],
+      ["02/04/2023", "Huynh Tuyet Nga", "MO-100: Word 2019", "767"],
+      ["02/04/2023", "Vu Thi Quynh Anh", "MO-100: Word 2019", "786"],
+      ["02/04/2023", "Tran Thi Thanh Vy", "MO-300: PowerPoint 2019", "880"],
+      ["02/04/2023", "Nguyen Thi Ngoc Thanh Hang", "MO-100: Word 2019", "884"],
+      ["02/04/2023", "Nguyen Nhat Anh", "MO-200: Excel 2019", "962"]
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P04_T02_TITLE",
+    "instructionKey": "P04_T02_INST",
+    "assertionType": "ListLevelEquals",
+    "targetParagraph": "Internet Computing Core Certification – Global Standard 5",
+    "expectedParagraphLevels": [
+      { "text": "Internet Computing Core Certification – Global Standard 3", "level": 3 },
+      { "text": "Internet Computing Core Certification – Global Standard 4", "level": 3 },
+      { "text": "Internet Computing Core Certification – Global Standard 5", "level": 3 }
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P04_T03_TITLE",
+    "instructionKey": "P04_T03_INST",
+    "assertionType": "InlineModel3D",
+    "precedingParagraph": "Your survey must be completed and sent to Certiport by November 21, 2014.",
+    "followingHeading": "Instructors",
+    "expectedModelSha256": "44741A42017FC0A5DE7641E3D2FC3216AEC751D3576C00F5E1D2AF69FB2FB323"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P04_T04_TITLE",
+    "instructionKey": "P04_T04_INST",
+    "assertionType": "PictureArtisticEffect",
+    "targetImageSha256s": [
+      "AAB8D874FEE499BBDE52B95A5243F6E95F66CA9ACEA1F27A6A58A521DB5F09D9",
+      "A2192BE2E8C3C9D963CDBABAED7CCFD86B5517C6BEA940359C2E191AB85C98B5"
+    ],
+    "expectedEffect": "Pencil Sketch",
+    "expectedEffectElement": "artisticPencilSketch"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P04_T05_TITLE",
+    "instructionKey": "P04_T05_INST",
+    "assertionType": "ContinuousSectionBreakBeforeHeading",
+    "targetHeading": "MOS 2019",
+    "expectedSectionCount": 4
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P04_T06_TITLE",
+    "instructionKey": "P04_T06_INST",
+    "assertionType": "TableFirstRowIsHeader",
+    "targetHeaderRow": ["Date", "Name", "Exam", "Score"],
+    "ignoreDataRowOrder": true,
+    "expectedTableRows": [
+      ["Date", "Name", "Exam", "Score"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-100: Word 2019", "925"],
+      ["11/09/2022", "Pham Nguyen Hoang Long", "MO-200: Excel 2019", "750"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-200: Excel 2019", "943"],
+      ["11/09/2022", "Le Tien Phuoc", "MO-300: PowerPoint 2019", "970"],
+      ["12/02/2023", "Nguyen Cao Ngan The", "MO-200: Excel 2019", "975"],
+      ["12/02/2023", "Nguyen Thi Ngoc Quyen", "MO-200: Excel 2019", "887"],
+      ["19/03/2023", "Tran Thi Thanh Vy", "MO-300: PowerPoint 2019", "925"],
+      ["19/03/2023", "Nguyen Thi Kim Phung", "MO-100: Word 2019", "800"],
+      ["19/03/2023", "Le Tran Nhat Vy", "MO-100: Word 2019", "800"],
+      ["02/04/2023", "Vu Thi Quynh Anh", "MO-100: Word 2019", "786"],
+      ["02/04/2023", "Nguyen Thi Ngoc Thanh Hang", "MO-100: Word 2019", "884"],
+      ["02/04/2023", "Huynh Tuyet Nga", "MO-100: Word 2019", "767"],
+      ["02/04/2023", "Le Nhu Ngoc", "MO-100: Word 2019", "750"],
+      ["02/04/2023", "Nguyen Nhat Anh", "MO-200: Excel 2019", "962"],
+      ["02/04/2023", "Tran Thi Thanh Vy", "MO-300: PowerPoint 2019", "880"]
+    ]
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P04_T07_TITLE",
+    "instructionKey": "P04_T07_INST",
+    "assertionType": "SmartArtAllNodesBevelEquals",
+    "expectedTextItems": ["Expert", "Specialist"],
+    "expectedBevelPreset": "softRound"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P04_T08_TITLE",
+    "instructionKey": "P04_T08_INST",
+    "assertionType": "PictureWrapType",
+    "targetImageSha256": "24C412F8B467E02FF890D1F3E1D451F6F2566D51666F10A061053F5556A1C384",
+    "expectedWrapType": "Square"
+  }
 ]

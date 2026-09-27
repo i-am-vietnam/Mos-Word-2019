@@ -2,7 +2,7 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4B are complete; Phase 5 Project 1 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 integration/grading and its focused correction are committed through `a969f5c592ab92b3e551c68a8242f114dd283f75`; the supplied P03 draft is committed at current HEAD `230e8bf2e62a313f83c6a90b82554232dc282785`. P02 T05 serialization hardening and Phase 7 P03 grading are complete locally and uncommitted. The roadmap is background scope for later work and the current user request controls the authorized phase.
+Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 4B are complete; P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; P02 integration/grading and its focused correction are committed through `a969f5c592ab92b3e551c68a8242f114dd283f75`; current HEAD `23804ff875982f9935d4b12aae4aee7898c4bbb7` contains the supplied P04 resources. Corrected P03 T01/T05 grading and complete P04 grading are local and uncommitted. The roadmap is background scope for later work and the current user request controls the authorized phase.
 
 Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBuild 18.10.1. All five projects use classic MSBuild format, C# 7.3, .NET Framework 4.7.2, AnyCPU. WinForms outputs MosWord2019.exe. Use Visual Studio MSBuild, not an assumed dotnet build workflow:
 
@@ -57,7 +57,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. Phase 5 P01 grading, Phase 6 P02 grading/corrections and the supplied P03 draft are committed. P02 T05 serialization hardening and complete P03 grading are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
+Word owns its .git, main branch, and dedicated origin. P01/P02 grading and the supplied P03/P04 resources are committed. Corrected P03 T01/T05 grading and complete P04 grading are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -99,7 +99,7 @@ The disposable harness accessed private session state only to edit/externally cl
 
 ## Phase 3 package architecture
 
-The authoritative production source root is `MosWord2019.WinForms/Projects`. The classic WinForms project explicitly includes each supplied project file once with PreserveNewest, without Link metadata or duplicate build items, producing AppDomain.CurrentDomain.BaseDirectory/Projects at runtime. MainForm passes this root to ProjectLoader and filters to .docx. P01, P02 and P03 each have eight supplied tasks and display as Project 1, Project 2 and Project 3. Invalid packages are omitted; with none available, Go and task actions are disabled.
+The authoritative production source root is `MosWord2019.WinForms/Projects`. The classic WinForms project explicitly includes each supplied project file once with PreserveNewest, without Link metadata or duplicate build items, producing AppDomain.CurrentDomain.BaseDirectory/Projects at runtime. MainForm passes this root to ProjectLoader and filters to .docx. P01 through P04 each have eight supplied tasks and display deterministically as Project 1 through Project 4. Invalid packages are omitted; with none available, Go and task actions are disabled.
 
 `ProjectMeta` contains ProjectId, OfficeVersion, Version and a Word default of `starter.docx`. `ProjectPackage` aggregates metadata, tasks, the selected language dictionary and an absolute package folder. DisplayName recognizes `Word2019_Pnn` and returns `Project n`. No Excel prefixes or workbook fields exist.
 
@@ -119,7 +119,7 @@ The ignored disposable `Word2019_P99` fixture was created outside the production
 
 `artifacts/phase3-runtime.log` records passes for valid EN/VI packages, extension-data retention, missing/invalid meta, missing starter/tasks, duplicate task ID, missing requested EN/VI, missing language key, missing assertionType, invalid project ID, Word-only discovery, deterministic ordering, display names, selected language, resolved folder, first-copy creation, second-copy preservation, reset, unchanged starter SHA-256, exact default Training root, and Phase 2 open/save/close/process cleanup. Initial and final WINWORD sets were empty. Debug and Release logs show zero errors and warnings. Both outputs contain the copied production-root README and Newtonsoft.Json assembly.
 
-At the Phase 3 checkpoint no production content or grading existed. Phase 4 added Training orchestration and Phase 4B integrated the supplied P01 without inventing instructions. Package/workspace services and lifecycle cleanup remain stable; later sections describe the P01/P02/P03 grader. Testing, score, timeout, database and installer remain unimplemented.
+At the Phase 3 checkpoint no production content or grading existed. Phase 4 added Training orchestration and Phase 4B integrated the supplied P01 without inventing instructions. Package/workspace services and lifecycle cleanup remain stable; later sections describe the P01–P04 grader. Testing, score, timeout, database and installer remain unimplemented.
 
 ## Phase 4B layout and P01 contract
 
@@ -133,7 +133,7 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the 24 implemented P01/P02/P03 types.
+`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the 30 implemented P01–P04 assertion types.
 
 ## Phase 6 P02 grading architecture
 
@@ -149,15 +149,23 @@ Ignored `artifacts/phase5` evidence covers fresh, correct, incorrect and near-mi
 
 ## Phase 7 P03 grading architecture
 
-P03 adds eight generic assertions routed by AssertionType and TaskDefinition.Extra: TableFirstRowIsHeader, SectionOrientationByAnchor, TableColumnWidthsEqual, CitationPlaceholderAtParagraphEnd, SmartArtDirectionEquals, SmartArtAltTextDescriptionEquals, CorePropertyEquals and ParagraphFormattingMatches. Target selection uses semantic table rows, section content anchors, diagram relationships, exact core-property names and exact paragraph text. No assertion routes by ProjectId or TaskId.
+P03 uses eight generic assertions routed by AssertionType and TaskDefinition.Extra: TableAccessibilityFirstRow, SectionOrientationByAnchor, TableColumnWidthsEqual, CitationPlaceholderAtParagraphEnd, SmartArtDirectionEquals, SmartArtAltTextDescriptionEquals, CorePropertyEquals and ParagraphFormattingMatches. Target selection uses semantic table rows, section content anchors, diagram relationships, exact core-property names and exact paragraph text. No assertion routes by ProjectId or TaskId.
 
-Word 2019 ground truth shows: T01 Accessibility Checker reports `No header row (1)` for the table whose first row is `TOPIC|Quantity|Viewed|Feedback`; fixing it writes `w:tblHeader` on that row. T02 changes only the existing section containing `MOS Version` to landscape. T03 writes grid widths near 2261 twips for 1.57 inches without explicit row heights. T04 creates a citation SDT at the paragraph end with field `CITATION MOS \\l 1033` and a placeholder-only bibliography Source. T05 uses diagram data `dgm:dir val="rev"`. T06 writes `wp:docPr descr="Process flow"`. T07 is `docProps/core.xml` `cp:category`. T08 applies `IntenseEmphasis` to all visible paragraph runs plus justified paragraph/paragraph-mark formatting. Citation runs are excluded from T08's visible-body formatting check.
+Word 2019 ground truth shows: P03 T01 Accessibility `Use first row as header` sets `w:tblLook` first-row semantics on the target table and is distinct from the `w:tblHeader` Repeat Header Rows command. T02 changes only the existing section containing `MOS Version` to landscape. T03 writes grid widths near 2261 twips for 1.57 inches without explicit row heights. T04 creates a citation SDT at the paragraph end with field `CITATION MOS \\l 1033` and a placeholder-only bibliography Source. P03 T05 Right-to-Left is the diagram-data state without `dgm:dir val="rev"`; the starter's `rev` state is opposite. T06 writes `wp:docPr descr="Process flow"`. T07 is `docProps/core.xml` `cp:category`. T08 applies `IntenseEmphasis` to all visible paragraph runs plus justified paragraph/paragraph-mark formatting. Citation runs are excluded from T08's visible-body formatting check.
 
-The supplied P03 starter is already in the requested T05 SmartArt direction, so fresh T05 grades Pass. This is a confirmed starter limitation and the starter was not changed to manufacture a failure. Wrong direction and changed SmartArt-data variants fail.
+The supplied P03 starter is in the opposite T05 SmartArt direction, so fresh T05 grades Fail. The user-supplied answer and fresh Word ground truth grade Pass; changed SmartArt data remains a failure.
 
 P02 T05 now treats one `mc:AlternateContent` as one logical shape: it prefers readable DrawingML Choice and uses the VML fallback only when Choice has no usable textbox. Text is concatenated across every `w:t`; exact mixed-case, mixed-case rendered with `w:caps`, and explicit uppercase are accepted only under the task's `allowAutomaticUppercase` metadata. Lowercase without caps, punctuation, extra text, wrong fill/geometry/anchor, body text and another textbox fail. The original reported failure used a stale pre-fix Debug binary; final production F5 loaded the rebuilt Core and returned Correct/Đúng before and after reopen/resave.
 
 Ignored evidence under `artifacts/phase7-p03` contains Word-created ground truth, negative/near-miss variants, 8/8 combined grading, package/workspace checks, production F5 EN/VI results, switching, restart, layout and lifecycle logs. Ignored `artifacts/p02-t05-real` contains the exact P02 split-run/caps diagnostic and production F5 regression. Production starters were not modified.
+
+## Phase 8 P04 grading architecture
+
+P04 adds TableRowsEqual, ListLevelEquals, InlineModel3D, ContinuousSectionBreakBeforeHeading and SmartArtAllNodesBevelEquals, and it reuses PictureArtisticEffect, TableFirstRowIsHeader and PictureWrapType. TableAccessibilityFirstRow was added for the corrected P03 T01. The total supported set is 30 assertions. All dispatch remains metadata-driven; there are no P03/P04 task-ID branches.
+
+P04 Word 2019 ground truth establishes: T01 exact Date-then-Score row order and unchanged cells; T02 zero-based `w:ilvl=2` within the same real numbering definition; T03 a unique `am3d:model3d` in an `mc:Choice` and `wp:inline`, related to a `.glb` whose SHA-256 is `44741A42017FC0A5DE7641E3D2FC3216AEC751D3576C00F5E1D2AF69FB2FB323`, in the blank paragraph before `Instructors`; T04 Pencil Sketch on the fingerprinted IC3 certificate picture; T05 a Continuous boundary immediately before `MOS 2019` with four sections; T06 `w:tblHeader` on only the first row of the MOS table; T07 `a:bevelT prst="softRound"` on every text-bearing node of the target SmartArt data part; and T08 Square wrapping on the fingerprinted MOS Certification picture.
+
+The supplied P04 starter already satisfies T05, so fresh T05 passes; this immutable-content limitation is explicit. Next Page and duplicate-section variants fail. Baseline/positive/negative/near-miss checks pass for all assertions, P04 combined grades 8/8, and combined P01/P02/corrected-P03 remain 8/8. Production Visual Studio F5 verifies EN/VI grading, all tabs, Restart, project switching, unchanged owned PID during grading, layout, absent Save controls and final process cleanup. Evidence is ignored under `artifacts/phase8-p04`.
 
 Phase 4B evidence is under ignored artifacts/phase4b. Real P01 EN/VI validation, runtime navigation/persistence/restart/save/cleanup, starter hash and unrelated-window rejection passed. Actual desktop 125% working-area bounds: 1920x1020; trainer 1920x255 at y=765; Word 1920x765 at y=0. Equivalent 100/125/150% font-layout tests passed; this is not a claim of testing other OS display settings or multi-monitor hardware. Visual Studio showed README in Solution Explorer and 0 errors/0 warnings. Test working copies/harness binaries/source were removed.
 

@@ -3,7 +3,7 @@
     "taskId": "T01",
     "titleKey": "P03_T01_TITLE",
     "instructionKey": "P03_T01_INST",
-    "assertionType": "TableFirstRowIsHeader",
+    "assertionType": "TableAccessibilityFirstRow",
     "targetHeaderRow": ["TOPIC", "Quantity", "Viewed", "Feedback"],
     "expectedTableRows": [
       ["TOPIC", "Quantity", "Viewed", "Feedback"],
@@ -52,7 +52,7 @@
     "instructionKey": "P03_T05_INST",
     "assertionType": "SmartArtDirectionEquals",
     "anchorText": "MOS Version",
-    "expectedDirection": "rev",
+    "expectedReverse": false,
     "expectedTextItems": [
       "Office 2007",
       "Office 2010",

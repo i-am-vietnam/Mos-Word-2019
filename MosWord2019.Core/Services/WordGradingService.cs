@@ -19,6 +19,7 @@ namespace MosWord2019.Core.Services
         private static readonly XNamespace A = "http://schemas.openxmlformats.org/drawingml/2006/main";
         private static readonly XNamespace Wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
         private static readonly XNamespace Mc = "http://schemas.openxmlformats.org/markup-compatibility/2006";
+        private static readonly XNamespace Am3d = "http://schemas.microsoft.com/office/drawing/2017/model3d";
         private static readonly XNamespace Wps = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
         private static readonly XNamespace V = "urn:schemas-microsoft-com:vml";
         private static readonly XNamespace Dgm = "http://schemas.openxmlformats.org/drawingml/2006/diagram";
@@ -33,7 +34,9 @@ namespace MosWord2019.Core.Services
             "TextBoxTextEquals", "CommentDeletedAtText", "ParagraphLineSpacingExact", "CharacterStyleAppliedToParagraph",
             "TableFirstRowIsHeader", "SectionOrientationByAnchor", "TableColumnWidthsEqual",
             "CitationPlaceholderAtParagraphEnd", "SmartArtDirectionEquals", "SmartArtAltTextDescriptionEquals",
-            "CorePropertyEquals", "ParagraphFormattingMatches"
+            "CorePropertyEquals", "ParagraphFormattingMatches", "TableAccessibilityFirstRow",
+            "TableRowsEqual", "ListLevelEquals", "InlineModel3D", "ContinuousSectionBreakBeforeHeading",
+            "SmartArtAllNodesBevelEquals"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -77,6 +80,12 @@ namespace MosWord2019.Core.Services
                         case "SmartArtAltTextDescriptionEquals": passed = CheckSmartArtAltText(package, task, out detail); break;
                         case "CorePropertyEquals": passed = CheckCoreProperty(package, task, out detail); break;
                         case "ParagraphFormattingMatches": passed = CheckParagraphFormatting(package, task, out detail); break;
+                        case "TableAccessibilityFirstRow": passed = CheckTableAccessibilityFirstRow(package, task, out detail); break;
+                        case "TableRowsEqual": passed = CheckTableRows(package, task, out detail); break;
+                        case "ListLevelEquals": passed = CheckListLevels(package, task, out detail); break;
+                        case "InlineModel3D": passed = CheckInlineModel3D(package, task, out detail); break;
+                        case "ContinuousSectionBreakBeforeHeading": passed = CheckContinuousSectionBreak(package, task, out detail); break;
+                        case "SmartArtAllNodesBevelEquals": passed = CheckSmartArtNodeBevel(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -530,13 +539,171 @@ namespace MosWord2019.Core.Services
             return match;
         }
 
-        private static bool CheckTableFirstRowHeader(PackageSnapshot package, TaskDefinition task, out string detail)
+        private static bool CheckTableAccessibilityFirstRow(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             XDocument document = package.Xml("word/document.xml");
             List<XElement> tables = FindTablesByHeader(document, header);
             if (tables.Count != 1 || !TableRowsEqual(tables[0], expectedRows))
+            { detail = "The target table is missing or its content was changed."; return false; }
+            XElement look = tables[0].Element(W + "tblPr")?.Element(W + "tblLook");
+            string explicitValue = (string)look?.Attribute(W + "firstRow");
+            int flags;
+            bool flagValue = look != null && int.TryParse((string)look.Attribute(W + "val"), NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture, out flags) && (flags & 0x20) != 0;
+            bool explicitValueOn = explicitValue == null ? flagValue : explicitValue == "1" ||
+                string.Equals(explicitValue, "true", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(explicitValue, "on", StringComparison.OrdinalIgnoreCase);
+            bool match = explicitValueOn && flagValue;
+            detail = match ? "The target table designates its first row as the accessibility header row."
+                : "The target table does not designate its first row as the accessibility header row.";
+            return match;
+        }
+
+        private static bool CheckTableRows(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] header = RequiredStrings(task, "targetHeaderRow");
+            string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
+            List<XElement> tables = FindTablesByHeader(package.Xml("word/document.xml"), header);
+            bool match = tables.Count == 1 && TableRowsEqual(tables[0], expectedRows);
+            detail = match ? "The target table has the exact required row order and unchanged content."
+                : "The target table row order or content is incorrect.";
+            return match;
+        }
+
+        private static bool CheckListLevels(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string target = RequiredString(task, "targetParagraph");
+            JArray expectations = RequiredArray(task, "expectedParagraphLevels");
+            XDocument document = package.Xml("word/document.xml");
+            XDocument numberingDefinitions = package.Xml("word/numbering.xml");
+            var numberMap = numberingDefinitions.Root.Elements(W + "num").Where(number => number.Attribute(W + "numId") != null)
+                .ToDictionary(number => (string)number.Attribute(W + "numId"),
+                    number => (string)number.Element(W + "abstractNumId")?.Attribute(W + "val"), StringComparer.Ordinal);
+            var abstractNumbers = numberingDefinitions.Root.Elements(W + "abstractNum")
+                .Where(number => number.Attribute(W + "abstractNumId") != null)
+                .ToDictionary(number => (string)number.Attribute(W + "abstractNumId"), StringComparer.Ordinal);
+            var numberIds = new HashSet<string>(StringComparer.Ordinal);
+            bool targetSeen = false;
+            foreach (JToken token in expectations)
+            {
+                JObject expectation = token as JObject;
+                if (expectation == null) throw new InvalidDataException("Invalid grading metadata: expectedParagraphLevels");
+                string text = RequiredObjectString(expectation, "text");
+                int level;
+                if (!int.TryParse((string)expectation["level"], NumberStyles.Integer, CultureInfo.InvariantCulture, out level) || level < 1)
+                    throw new InvalidDataException("Invalid grading metadata: expectedParagraphLevels.level");
+                List<XElement> matches = document.Descendants(W + "body").Descendants(W + "p")
+                    .Where(paragraph => ParagraphText(paragraph) == text).ToList();
+                if (matches.Count != 1) { detail = "A required list paragraph is missing or changed."; return false; }
+                XElement numbering = matches[0].Element(W + "pPr")?.Element(W + "numPr");
+                int actualLevel = Twips(numbering?.Element(W + "ilvl"), "val", -1) + 1;
+                string numberId = (string)numbering?.Element(W + "numId")?.Attribute(W + "val");
+                if (actualLevel != level || string.IsNullOrWhiteSpace(numberId))
+                { detail = "A required paragraph does not use the requested real list level."; return false; }
+                string abstractId;
+                XElement abstractNumber;
+                if (!numberMap.TryGetValue(numberId, out abstractId) || string.IsNullOrWhiteSpace(abstractId) ||
+                    !abstractNumbers.TryGetValue(abstractId, out abstractNumber) ||
+                    !abstractNumber.Elements(W + "lvl").Any(candidate =>
+                        Twips(candidate, "ilvl", 0) == level - 1))
+                { detail = "A required paragraph is not connected to a valid numbering definition at the requested level."; return false; }
+                numberIds.Add(numberId);
+                if (text == target) targetSeen = true;
+            }
+            bool match = targetSeen && numberIds.Count == 1;
+            detail = match ? "The target item uses Level 3 and its peer list items retain their verified levels."
+                : "The target or peer items do not belong to the same verified multilevel list.";
+            return match;
+        }
+
+        private static bool CheckInlineModel3D(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string precedingText = RequiredString(task, "precedingParagraph");
+            string followingText = RequiredString(task, "followingHeading");
+            string expectedHash = RequiredString(task, "expectedModelSha256");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
+            int precedingIndex = children.FindIndex(element => element.Name == W + "p" && ParagraphText(element) == precedingText);
+            int followingIndex = children.FindIndex(element => element.Name == W + "p" && ParagraphText(element) == followingText);
+            if (precedingIndex < 0 || followingIndex != precedingIndex + 2 || children[precedingIndex + 1].Name != W + "p")
+            { detail = "The required blank paragraph location in the IC3 section was not preserved."; return false; }
+            XElement targetParagraph = children[precedingIndex + 1];
+            List<XElement> allModels = document.Descendants(Am3d + "model3d").ToList();
+            List<XElement> targetModels = targetParagraph.Descendants(Mc + "Choice")
+                .Where(choice => ((string)choice.Attribute("Requires") ?? "").Split(' ').Contains("am3d"))
+                .SelectMany(choice => choice.Descendants(Am3d + "model3d")).ToList();
+            XElement model = targetModels.Count == 1 ? targetModels[0] : null;
+            if (model == null || allModels.Count != 1 || !model.Ancestors(Wp + "inline").Any())
+            { detail = "The supplied 3D model is missing, is not unique, or is not In Line with Text at the required location."; return false; }
+            XElement graphicData = model.Ancestors(A + "graphicData").FirstOrDefault();
+            string relationshipId = (string)model.Attribute(R + "embed");
+            string part = package.RelatedPart("word/document.xml", relationshipId);
+            bool match = string.Equals((string)graphicData?.Attribute("uri"), Am3d.NamespaceName, StringComparison.Ordinal) &&
+                !string.IsNullOrWhiteSpace(part) && part.EndsWith(".glb", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(package.Hash(part), expectedHash, StringComparison.OrdinalIgnoreCase) &&
+                string.IsNullOrEmpty(ParagraphText(targetParagraph));
+            detail = match ? "The verified Glasses 3D model is inline in the required IC3 paragraph."
+                : "The model content, format, or insertion position is incorrect.";
+            return match;
+        }
+
+        private static bool CheckContinuousSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string heading = RequiredString(task, "targetHeading");
+            int expectedCount = RequiredInt(task, "expectedSectionCount");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
+            List<int> headingIndexes = children.Select((element, index) => new { element, index })
+                .Where(item => item.element.Name == W + "p" && ParagraphText(item.element) == heading)
+                .Select(item => item.index).ToList();
+            if (headingIndexes.Count != 1 || headingIndexes[0] == 0)
+            { detail = "The target heading was not found uniquely."; return false; }
+            XElement preceding = children[headingIndexes[0] - 1];
+            XElement section = preceding.Name == W + "p" ? preceding.Element(W + "pPr")?.Element(W + "sectPr") : null;
+            string type = (string)section?.Element(W + "type")?.Attribute(W + "val");
+            bool match = section != null && string.IsNullOrEmpty(ParagraphText(preceding)) &&
+                string.Equals(type, "continuous", StringComparison.Ordinal) && DocumentSections(document).Count == expectedCount;
+            detail = match ? "A single verified Continuous section boundary occurs immediately before the target heading."
+                : "The required Continuous section boundary is missing, duplicated, or in the wrong position.";
+            return match;
+        }
+
+        private static bool CheckSmartArtNodeBevel(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] expectedText = RequiredStrings(task, "expectedTextItems");
+            string preset = RequiredString(task, "expectedBevelPreset");
+            var matches = new List<XDocument>();
+            foreach (SmartArtReference reference in AllSmartArts(package))
+            {
+                XDocument data = package.Xml(reference.DataPart);
+                string[] text = data.Descendants(Dgm + "pt").Select(point =>
+                    string.Concat(point.Descendants(A + "t").Select(value => value.Value)))
+                    .Where(value => value.Length > 0).ToArray();
+                if (text.SequenceEqual(expectedText)) matches.Add(data);
+            }
+            if (matches.Count != 1) { detail = "The target SmartArt was not found uniquely or its data text changed."; return false; }
+            List<XElement> nodes = matches[0].Descendants(Dgm + "pt")
+                .Where(point => point.Descendants(A + "t").Any(value => value.Value.Length > 0)).ToList();
+            bool match = nodes.Count == expectedText.Length && nodes.All(point => string.Equals(
+                (string)point.Element(Dgm + "spPr")?.Element(A + "sp3d")?.Element(A + "bevelT")?.Attribute("prst"),
+                preset, StringComparison.Ordinal));
+            detail = match ? "Every content node in the target SmartArt uses the requested bevel."
+                : "The requested bevel is missing from part or all of the target SmartArt.";
+            return match;
+        }
+
+        private static bool CheckTableFirstRowHeader(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] header = RequiredStrings(task, "targetHeaderRow");
+            string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> tables = FindTablesByHeader(document, header);
+            bool ignoreOrder = OptionalBool(task, "ignoreDataRowOrder", false);
+            if (tables.Count != 1 || !(ignoreOrder ? TableRowsEqualIgnoringDataOrder(tables[0], expectedRows) : TableRowsEqual(tables[0], expectedRows)))
             { detail = "The target table is missing or its content was changed."; return false; }
             List<XElement> rows = tables[0].Elements(W + "tr").ToList();
             bool match = IsOn(rows[0].Element(W + "trPr")?.Element(W + "tblHeader")) &&
@@ -630,7 +797,7 @@ namespace MosWord2019.Core.Services
         private static bool CheckSmartArtDirection(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             string anchor = RequiredString(task, "anchorText");
-            string direction = RequiredString(task, "expectedDirection");
+            bool expectedReverse = RequiredBool(task, "expectedReverse");
             string[] expectedText = RequiredStrings(task, "expectedTextItems");
             List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
             if (smartArts.Count != 1)
@@ -638,7 +805,9 @@ namespace MosWord2019.Core.Services
             XDocument data = package.Xml(smartArts[0].DataPart);
             string actualDirection = (string)data.Descendants(Dgm + "dir").FirstOrDefault()?.Attribute("val");
             string[] actualText = data.Descendants(A + "t").Select(value => value.Value).ToArray();
-            bool match = string.Equals(actualDirection, direction, StringComparison.Ordinal) && actualText.SequenceEqual(expectedText);
+            bool validDirection = string.IsNullOrEmpty(actualDirection) || string.Equals(actualDirection, "rev", StringComparison.Ordinal);
+            bool actualReverse = string.Equals(actualDirection, "rev", StringComparison.Ordinal);
+            bool match = validDirection && actualReverse == expectedReverse && actualText.SequenceEqual(expectedText);
             detail = match ? "The target SmartArt is in the verified Right-to-Left state without changing its data items."
                 : "The target SmartArt direction or its data-item order/text is incorrect.";
             return match;
@@ -758,6 +927,21 @@ namespace MosWord2019.Core.Services
             return result;
         }
 
+        private static List<SmartArtReference> AllSmartArts(PackageSnapshot package)
+        {
+            XDocument document = package.Xml("word/document.xml");
+            var result = new List<SmartArtReference>();
+            foreach (XElement data in document.Descendants(A + "graphicData")
+                .Where(value => string.Equals((string)value.Attribute("uri"), Dgm.NamespaceName, StringComparison.Ordinal)))
+            {
+                XElement container = data.Ancestors().FirstOrDefault(value => value.Name == Wp + "anchor" || value.Name == Wp + "inline");
+                string relationshipId = (string)data.Element(Dgm + "relIds")?.Attribute(R + "dm");
+                string part = package.RelatedPart("word/document.xml", relationshipId);
+                if (container != null && !string.IsNullOrWhiteSpace(part)) result.Add(new SmartArtReference(container, part));
+            }
+            return result;
+        }
+
         private static string ParagraphTextOutsideCitations(XElement paragraph)
         {
             return string.Concat(paragraph.Descendants(W + "t").Where(text => !text.Ancestors(W + "del").Any() &&
@@ -806,6 +990,21 @@ namespace MosWord2019.Core.Services
                 if (cells.Count != expected[row].Length || cells.Where((cell, column) => !string.Equals(cell, expected[row][column], StringComparison.Ordinal)).Any()) return false;
             }
             return true;
+        }
+
+        private static bool TableRowsEqualIgnoringDataOrder(XElement table, string[][] expected)
+        {
+            List<string[]> actual = table.Elements(W + "tr").Select(row => row.Elements(W + "tc")
+                .Select(cell => VisibleText(cell).TrimEnd()).ToArray()).ToList();
+            if (actual.Count != expected.Length || actual.Count == 0 || !actual[0].SequenceEqual(expected[0])) return false;
+            var remaining = expected.Skip(1).Select(row => row.ToArray()).ToList();
+            foreach (string[] row in actual.Skip(1))
+            {
+                int index = remaining.FindIndex(candidate => candidate.SequenceEqual(row));
+                if (index < 0) return false;
+                remaining.RemoveAt(index);
+            }
+            return remaining.Count == 0;
         }
 
         private static string ParagraphText(XElement paragraph) { return VisibleText(paragraph).TrimEnd(); }
@@ -924,6 +1123,15 @@ namespace MosWord2019.Core.Services
             bool value;
             return task.Extra != null && task.Extra.TryGetValue(name, out token) && bool.TryParse(token.ToString(), out value)
                 ? value : defaultValue;
+        }
+
+        private static bool RequiredBool(TaskDefinition task, string name)
+        {
+            JToken token;
+            bool value;
+            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || !bool.TryParse(token.ToString(), out value))
+                throw new InvalidDataException("Missing grading metadata: " + name);
+            return value;
         }
 
         private static string HashBytes(byte[] value)
