@@ -1,0 +1,18 @@
+﻿{
+  "P06_T01_TITLE": "Tác vụ 1",
+  "P06_T01_INST": "Áp dụng hiệu ứng nghệ thuật Pencil Sketch cho hình ảnh logo nằm ở góc trên bên phải.",
+  "P06_T02_TITLE": "Tác vụ 2",
+  "P06_T02_INST": "Thêm đường viền trang kiểu Box, màu Dark Blue, Accent 1, độ dày 3 pt cho toàn bộ tài liệu.",
+  "P06_T03_TITLE": "Tác vụ 3",
+  "P06_T03_INST": "Chỉnh sửa danh sách để sử dụng dấu đầu dòng tùy chỉnh. Sử dụng phông Segoe UI Emoji và mã ký tự 25B8 (RIGHT-POINTING BLACK TRIANGLE).",
+  "P06_T04_TITLE": "Tác vụ 4",
+  "P06_T04_INST": "Trong thuộc tính của tệp, thêm \"bikes\" làm Category.",
+  "P06_T05_TITLE": "Tác vụ 5",
+  "P06_T05_INST": "Sử dụng một tính năng trong Word để thay thế tất cả các lần xuất hiện của từ \"community\" bằng \"connectivity\".",
+  "P06_T06_TITLE": "Tác vụ 6",
+  "P06_T06_INST": "Thêm siêu liên kết cho hình ảnh logo, liên kết đến \"https://www.facebook.com/hocict.edu.vn\".",
+  "P06_T07_TITLE": "Tác vụ 7",
+  "P06_T07_INST": "Xóa toàn bộ định dạng khỏi cụm từ \"awarded to\".",
+  "P06_T08_TITLE": "Tác vụ 8",
+  "P06_T08_INST": "Lưu một bản sao của tài liệu dưới dạng mẫu Word 2019 có tên \"Cert\", tương thích với các tính năng Word mới nhất và không hỗ trợ macro. Lưu tệp mẫu tại vị trí mặc định."
+}

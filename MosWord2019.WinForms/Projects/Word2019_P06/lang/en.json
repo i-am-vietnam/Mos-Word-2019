@@ -1,0 +1,18 @@
+{
+  "P06_T01_TITLE": "Task 1",
+  "P06_T01_INST": "Apply the Pencil Sketch artistic effect to the logo image located at the top-right corner.",
+  "P06_T02_TITLE": "Task 2",
+  "P06_T02_INST": "Add a 3 pt Dark Blue, Accent 1 Box page border to the whole document.",
+  "P06_T03_TITLE": "Task 3",
+  "P06_T03_INST": "Modify the list to use a custom bullet. Use the Segoe UI Emoji font and character code 25B8 (RIGHT-POINTING BLACK TRIANGLE).",
+  "P06_T04_TITLE": "Task 4",
+  "P06_T04_INST": "In the file properties, add \"bikes\" as a category.",
+  "P06_T05_TITLE": "Task 5",
+  "P06_T05_INST": "Using a feature in Word, replace all occurrences of \"community\" with \"connectivity\".",
+  "P06_T06_TITLE": "Task 6",
+  "P06_T06_INST": "Add a hyperlink to the logo image that links to \"https://www.facebook.com/hocict.edu.vn\".",
+  "P06_T07_TITLE": "Task 7",
+  "P06_T07_INST": "Clear all formatting from the phrase \"awarded to\".",
+  "P06_T08_TITLE": "Task 8",
+  "P06_T08_INST": "Save a copy of the document as a Word 2019 template named \"Cert\" that is compatible with the latest Word features and does not support macros. Save the template file in the default location."
+}
