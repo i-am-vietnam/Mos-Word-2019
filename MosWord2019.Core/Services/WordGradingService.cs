@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Linq;
 using MosWord2019.Core.Models;
 using Newtonsoft.Json.Linq;
@@ -23,7 +24,10 @@ namespace MosWord2019.Core.Services
         private static readonly XNamespace Wps = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
         private static readonly XNamespace V = "urn:schemas-microsoft-com:vml";
         private static readonly XNamespace Dgm = "http://schemas.openxmlformats.org/drawingml/2006/diagram";
+        private static readonly XNamespace W14 = "http://schemas.microsoft.com/office/word/2010/wordml";
+        private static readonly XNamespace W15 = "http://schemas.microsoft.com/office/word/2012/wordml";
         private static readonly XNamespace Cp = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties";
+        private static readonly XNamespace Dc = "http://purl.org/dc/elements/1.1/";
         private static readonly XNamespace B = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
 
         private static readonly HashSet<string> Supported = new HashSet<string>(StringComparer.Ordinal)
@@ -36,7 +40,9 @@ namespace MosWord2019.Core.Services
             "CitationPlaceholderAtParagraphEnd", "SmartArtDirectionEquals", "SmartArtAltTextDescriptionEquals",
             "CorePropertyEquals", "ParagraphFormattingMatches", "TableAccessibilityFirstRow",
             "TableRowsEqual", "ListLevelEquals", "InlineModel3D", "ContinuousSectionBreakBeforeHeading",
-            "SmartArtAllNodesBevelEquals"
+            "SmartArtAllNodesBevelEquals", "DocumentParagraphLineSpacingMultiple", "ContinuedNumberingSequence",
+            "ParagraphBlockColumns", "ParagraphBlockKeepWithNext", "CommentResolved",
+            "ShapeWithTextWrapAndPosition", "HeadersFootersWatermarksRemovedByState"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -86,6 +92,13 @@ namespace MosWord2019.Core.Services
                         case "InlineModel3D": passed = CheckInlineModel3D(package, task, out detail); break;
                         case "ContinuousSectionBreakBeforeHeading": passed = CheckContinuousSectionBreak(package, task, out detail); break;
                         case "SmartArtAllNodesBevelEquals": passed = CheckSmartArtNodeBevel(package, task, out detail); break;
+                        case "DocumentParagraphLineSpacingMultiple": passed = CheckDocumentParagraphLineSpacingMultiple(package, task, out detail); break;
+                        case "ContinuedNumberingSequence": passed = CheckContinuedNumberingSequence(package, task, out detail); break;
+                        case "ParagraphBlockColumns": passed = CheckParagraphBlockColumns(package, task, out detail); break;
+                        case "ParagraphBlockKeepWithNext": passed = CheckParagraphBlockKeepWithNext(package, task, out detail); break;
+                        case "CommentResolved": passed = CheckCommentResolved(package, task, out detail); break;
+                        case "ShapeWithTextWrapAndPosition": passed = CheckShapeWithTextWrapAndPosition(package, task, out detail); break;
+                        case "HeadersFootersWatermarksRemovedByState": passed = CheckHeadersFootersWatermarksRemoved(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -653,7 +666,6 @@ namespace MosWord2019.Core.Services
         private static bool CheckContinuousSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             string heading = RequiredString(task, "targetHeading");
-            int expectedCount = RequiredInt(task, "expectedSectionCount");
             XDocument document = package.Xml("word/document.xml");
             XElement body = document.Root?.Element(W + "body");
             List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
@@ -662,13 +674,244 @@ namespace MosWord2019.Core.Services
                 .Select(item => item.index).ToList();
             if (headingIndexes.Count != 1 || headingIndexes[0] == 0)
             { detail = "The target heading was not found uniquely."; return false; }
-            XElement preceding = children[headingIndexes[0] - 1];
-            XElement section = preceding.Name == W + "p" ? preceding.Element(W + "pPr")?.Element(W + "sectPr") : null;
-            string type = (string)section?.Element(W + "type")?.Attribute(W + "val");
-            bool match = section != null && string.IsNullOrEmpty(ParagraphText(preceding)) &&
-                string.Equals(type, "continuous", StringComparison.Ordinal) && DocumentSections(document).Count == expectedCount;
-            detail = match ? "A single verified Continuous section boundary occurs immediately before the target heading."
-                : "The required Continuous section boundary is missing, duplicated, or in the wrong position.";
+            int boundaryIndex = headingIndexes[0] - 1;
+            int boundaries = 0;
+            bool match = true;
+            while (boundaryIndex >= 0)
+            {
+                XElement paragraph = children[boundaryIndex];
+                XElement section = paragraph.Name == W + "p" && string.IsNullOrEmpty(ParagraphText(paragraph))
+                    ? paragraph.Element(W + "pPr")?.Element(W + "sectPr") : null;
+                if (section == null) break;
+                boundaries++;
+                string type = (string)section.Element(W + "type")?.Attribute(W + "val");
+                if (!string.Equals(type, "continuous", StringComparison.Ordinal)) match = false;
+                boundaryIndex--;
+            }
+            match = match && boundaries > 0;
+            detail = match ? "A real Continuous section boundary occurs at the local boundary immediately before the target heading."
+                : "The closest section boundary immediately before the target heading is missing or is not Continuous.";
+            return match;
+        }
+
+        private static bool CheckDocumentParagraphLineSpacingMultiple(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            int expectedLine = RequiredInt(task, "expectedLineTwips");
+            string expectedRule = RequiredString(task, "expectedLineRule");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Root?.Element(W + "body")?.Descendants(W + "p")
+                .Where(paragraph => !paragraph.Ancestors(W + "txbxContent").Any()).ToList() ?? new List<XElement>();
+            if (paragraphs.Count == 0) { detail = "The main document story contains no paragraphs."; return false; }
+            bool match = paragraphs.All(paragraph =>
+            {
+                XElement spacing = paragraph.Element(W + "pPr")?.Element(W + "spacing");
+                return Twips(spacing, "line", -1) == expectedLine &&
+                    string.Equals((string)spacing?.Attribute(W + "lineRule"), expectedRule, StringComparison.Ordinal);
+            });
+            detail = match ? "Every paragraph in the main document story uses the verified Multiple 1.4 line spacing."
+                : "One or more main-story paragraphs do not use Multiple 1.4 line spacing.";
+            return match;
+        }
+
+        private static bool CheckContinuedNumberingSequence(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] expectedText = RequiredStrings(task, "expectedParagraphs");
+            int expectedLevel = RequiredInt(task, "expectedLevel");
+            string expectedFormat = RequiredString(task, "expectedNumberFormat");
+            string expectedLevelText = RequiredString(task, "expectedLevelText");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> bodyParagraphs = document.Root?.Element(W + "body")?.Descendants(W + "p").ToList() ?? new List<XElement>();
+            var targetSet = new HashSet<string>(expectedText, StringComparer.Ordinal);
+            List<XElement> targets = bodyParagraphs.Where(paragraph => targetSet.Contains(ParagraphText(paragraph))).ToList();
+            if (targets.Count != expectedText.Length || !targets.Select(ParagraphText).SequenceEqual(expectedText) ||
+                expectedText.Any(text => bodyParagraphs.Count(paragraph => ParagraphText(paragraph) == text) != 1))
+            { detail = "The numbered list item text or order was changed."; return false; }
+
+            string numberId = null;
+            foreach (XElement paragraph in targets)
+            {
+                XElement properties = paragraph.Element(W + "pPr")?.Element(W + "numPr");
+                string currentId = (string)properties?.Element(W + "numId")?.Attribute(W + "val");
+                int level = Twips(properties?.Element(W + "ilvl"), "val", -1);
+                if (string.IsNullOrEmpty(currentId) || level != expectedLevel ||
+                    (numberId != null && !string.Equals(numberId, currentId, StringComparison.Ordinal)))
+                { detail = "The six items are not one continued Word numbering sequence."; return false; }
+                numberId = currentId;
+            }
+
+            XDocument numbering = package.Xml("word/numbering.xml");
+            XElement number = numbering.Root?.Elements(W + "num")
+                .SingleOrDefault(value => (string)value.Attribute(W + "numId") == numberId);
+            string abstractId = (string)number?.Element(W + "abstractNumId")?.Attribute(W + "val");
+            XElement levelDefinition = numbering.Root?.Elements(W + "abstractNum")
+                .SingleOrDefault(value => (string)value.Attribute(W + "abstractNumId") == abstractId)?
+                .Elements(W + "lvl").SingleOrDefault(value => Twips(value, "ilvl", -1) == expectedLevel);
+            bool hasOverride = number?.Elements(W + "lvlOverride").Any(value => Twips(value, "ilvl", -1) == expectedLevel) == true;
+            bool match = !hasOverride && Twips(levelDefinition?.Element(W + "start"), "val", -1) == 1 &&
+                string.Equals((string)levelDefinition?.Element(W + "numFmt")?.Attribute(W + "val"), expectedFormat, StringComparison.Ordinal) &&
+                string.Equals((string)levelDefinition?.Element(W + "lvlText")?.Attribute(W + "val"), expectedLevelText, StringComparison.Ordinal);
+            detail = match ? "The six target items are one real Word numbering sequence from 1 through 6."
+                : "The shared numbering definition does not match the verified continued sequence.";
+            return match;
+        }
+
+        private static bool CheckParagraphBlockColumns(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string[] expectedText = RequiredStrings(task, "targetParagraphs");
+            int expectedColumns = RequiredInt(task, "expectedColumns");
+            int expectedSpacing = RequiredInt(task, "expectedColumnSpacingTwips");
+            XDocument document = package.Xml("word/document.xml");
+            XElement body = document.Root?.Element(W + "body");
+            List<XElement> directParagraphs = body?.Elements(W + "p").ToList() ?? new List<XElement>();
+            List<XElement> targets = expectedText.Select(text => directParagraphs.SingleOrDefault(paragraph => ParagraphText(paragraph) == text)).ToList();
+            if (targets.Any(value => value == null) || targets.Distinct().Count() != expectedText.Length)
+            { detail = "The four target paragraphs were not found uniquely."; return false; }
+
+            List<DocumentSection> sections = DocumentSections(document);
+            List<int> containing = targets.Select(target => sections.FindIndex(section => section.Content.Contains(target))).ToList();
+            if (containing.Any(index => index < 0) || containing.Distinct().Count() != 1)
+            { detail = "The four target paragraphs do not form one section block."; return false; }
+            int sectionIndex = containing[0];
+            DocumentSection targetSection = sections[sectionIndex];
+            string[] sectionText = targetSection.Content.Where(element => element.Name == W + "p" && ParagraphText(element).Length > 0)
+                .Select(ParagraphText).ToArray();
+            XElement columns = targetSection.Properties?.Element(W + "cols");
+            bool neighborsSingle = (sectionIndex == 0 || ColumnCount(sections[sectionIndex - 1].Properties) == 1) &&
+                                   (sectionIndex == sections.Count - 1 || ColumnCount(sections[sectionIndex + 1].Properties) == 1);
+            bool match = sectionText.SequenceEqual(expectedText) && ColumnCount(targetSection.Properties) == expectedColumns &&
+                Twips(columns, "space", -1) == expectedSpacing && neighborsSingle;
+            detail = match ? "Exactly the four target paragraphs form the verified two-column block with 0.4-inch spacing."
+                : "The paragraph block, column count, column spacing, or surrounding one-column layout is incorrect.";
+            return match;
+        }
+
+        private static bool CheckParagraphBlockKeepWithNext(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string headingText = RequiredString(task, "headingText");
+            string[] directParagraphs = RequiredStrings(task, "directKeepWithNextParagraphs");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Root?.Element(W + "body")?.Descendants(W + "p")
+                .Where(paragraph => !paragraph.Ancestors(W + "txbxContent").Any()).ToList() ?? new List<XElement>();
+            XElement heading = paragraphs.SingleOrDefault(paragraph => ParagraphTextOutsideCitations(paragraph) == headingText);
+            if (heading == null || directParagraphs.Any(text => paragraphs.Count(paragraph => ParagraphTextOutsideCitations(paragraph) == text) != 1))
+            { detail = "The Founder Information block text was changed."; return false; }
+
+            string styleId = (string)heading.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val");
+            XDocument styles = package.Xml("word/styles.xml");
+            XElement style = styles.Root?.Elements(W + "style").SingleOrDefault(value =>
+                (string)value.Attribute(W + "styleId") == styleId);
+            bool headingKeeps = IsOn(heading.Element(W + "pPr")?.Element(W + "keepNext")) ||
+                IsOn(style?.Element(W + "pPr")?.Element(W + "keepNext"));
+            bool directKeep = directParagraphs.All(text => IsOn(paragraphs.Single(paragraph => ParagraphTextOutsideCitations(paragraph) == text)
+                .Element(W + "pPr")?.Element(W + "keepNext")));
+            bool match = headingKeeps && directKeep;
+            detail = match ? "The verified Founder Information paragraph block uses Keep with next."
+                : "Keep with next is missing from part of the verified paragraph block.";
+            return match;
+        }
+
+        private static bool CheckCommentResolved(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string targetParagraph = RequiredString(task, "targetParagraph");
+            string expectedComment = RequiredString(task, "expectedCommentText");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> paragraphs = document.Root?.Element(W + "body")?.Descendants(W + "p")
+                .Where(paragraph => ParagraphText(paragraph) == targetParagraph).ToList() ?? new List<XElement>();
+            if (paragraphs.Count != 1) { detail = "The target comment paragraph was changed or is not unique."; return false; }
+            List<string> ids = ActiveCommentIds(paragraphs[0], targetParagraph);
+            if (ids.Count != 1) { detail = "The target comment was deleted or its range/reference was changed."; return false; }
+
+            XDocument comments;
+            XDocument extended;
+            if (!package.TryXml("word/comments.xml", out comments) || !package.TryXml("word/commentsExtended.xml", out extended))
+            { detail = "The target comment or its resolved-state metadata is missing."; return false; }
+            XElement comment = comments.Root?.Elements(W + "comment")
+                .SingleOrDefault(value => (string)value.Attribute(W + "id") == ids[0]);
+            if (comment == null || !string.Equals(VisibleText(comment), expectedComment, StringComparison.Ordinal))
+            { detail = "The expected comment content is missing or another comment was changed instead."; return false; }
+            string paraId = (string)comment.Descendants(W + "p").LastOrDefault()?.Attribute(W14 + "paraId");
+            XElement commentEx = extended.Root?.Elements(W15 + "commentEx")
+                .SingleOrDefault(value => (string)value.Attribute(W15 + "paraId") == paraId);
+            bool match = commentEx != null && string.Equals((string)commentEx.Attribute(W15 + "done"), "1", StringComparison.Ordinal);
+            detail = match ? "The target comment is retained and marked resolved by Word."
+                : "The target comment remains unresolved.";
+            return match;
+        }
+
+        private static bool CheckShapeWithTextWrapAndPosition(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string geometry = RequiredString(task, "shapeGeometry");
+            string expectedText = RequiredString(task, "expectedText");
+            string horizontal = RequiredString(task, "horizontalAlignment");
+            string vertical = RequiredString(task, "verticalAlignment");
+            string relativeFrom = RequiredString(task, "relativeFrom");
+            string afterParagraph = RequiredString(task, "afterParagraph");
+            XDocument document = package.Xml("word/document.xml");
+            List<XElement> matches = document.Descendants(Wp + "anchor").Where(anchor =>
+                string.Equals((string)anchor.Descendants(Wps + "spPr").Elements(A + "prstGeom").FirstOrDefault()?.Attribute("prst"), geometry, StringComparison.Ordinal) &&
+                string.Equals(VisibleText(anchor.Descendants(Wps + "txbx").FirstOrDefault()).TrimEnd(), expectedText, StringComparison.Ordinal)).ToList();
+            if (matches.Count != 1) { detail = "The exact requested Word shape and text were not found uniquely."; return false; }
+            XElement match = matches[0];
+            bool placement = match.Element(Wp + "wrapSquare") != null &&
+                string.Equals((string)match.Element(Wp + "positionH")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
+                string.Equals((string)match.Element(Wp + "positionH")?.Element(Wp + "align"), horizontal, StringComparison.Ordinal) &&
+                string.Equals((string)match.Element(Wp + "positionV")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
+                string.Equals((string)match.Element(Wp + "positionV")?.Element(Wp + "align"), vertical, StringComparison.Ordinal);
+            XElement outerParagraph = match.Ancestors(W + "p").FirstOrDefault();
+            string anchorText = outerParagraph == null ? null : ParagraphTextOutsideTextBoxes(outerParagraph);
+            bool matchAll = placement && string.Equals(anchorText, afterParagraph, StringComparison.Ordinal);
+            detail = matchAll ? "The Horizontal Scroll shape has exact text, Square wrapping, and page-bottom centered positioning."
+                : "The target shape has the wrong wrap, page-relative position, or anchor region.";
+            return matchAll;
+        }
+
+        private static bool CheckHeadersFootersWatermarksRemoved(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string expectedBodyHash = RequiredString(task, "expectedMainBodyTextSha256");
+            string targetCommentParagraph = RequiredString(task, "targetCommentParagraph");
+            string expectedCommentText = RequiredString(task, "expectedCommentText");
+            string sourceTag = RequiredString(task, "requiredBibliographySourceTag");
+            string sourceTitle = RequiredString(task, "requiredBibliographySourceTitle");
+            string creator = RequiredString(task, "requiredCreator");
+            XDocument document = package.Xml("word/document.xml");
+
+            foreach (XElement reference in document.Descendants(W + "sectPr")
+                .SelectMany(section => section.Elements().Where(value => value.Name == W + "headerReference" || value.Name == W + "footerReference")))
+            {
+                string related = package.RelatedPart("word/document.xml", (string)reference.Attribute(R + "id"));
+                XDocument part;
+                if (string.IsNullOrWhiteSpace(related) || !package.TryXml(related, out part) || HeaderHasVisibleContent(part.Root))
+                { detail = "An active header, footer, or watermark still contains visible content."; return false; }
+            }
+
+            string bodyHash = HashBytes(Encoding.UTF8.GetBytes(MainBodySemanticText(document)));
+            if (!string.Equals(bodyHash, expectedBodyHash, StringComparison.OrdinalIgnoreCase))
+            { detail = "Main document text changed while removing inspection results."; return false; }
+
+            XElement targetParagraph = document.Root?.Element(W + "body")?.Descendants(W + "p")
+                .SingleOrDefault(paragraph => ParagraphText(paragraph) == targetCommentParagraph);
+            List<string> commentIds = targetParagraph == null ? new List<string>() : ActiveCommentIds(targetParagraph, targetCommentParagraph);
+            XDocument comments;
+            bool commentPreserved = commentIds.Count == 1 && package.TryXml("word/comments.xml", out comments) &&
+                comments.Root.Elements(W + "comment").Any(value => (string)value.Attribute(W + "id") == commentIds[0] &&
+                    string.Equals(VisibleText(value), expectedCommentText, StringComparison.Ordinal));
+            if (!commentPreserved) { detail = "The target comment was removed with another Inspector category."; return false; }
+
+            bool sourcePreserved = false;
+            foreach (string partName in package.EntryNames.Where(name => name.StartsWith("customXml/item", StringComparison.OrdinalIgnoreCase) &&
+                name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) && name.IndexOf("itemProps", StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                XDocument sourcePart;
+                if (!package.TryXml(partName, out sourcePart)) continue;
+                sourcePreserved |= sourcePart.Descendants(B + "Source").Any(source =>
+                    string.Equals((string)source.Element(B + "Tag"), sourceTag, StringComparison.Ordinal) &&
+                    string.Equals((string)source.Element(B + "Title"), sourceTitle, StringComparison.Ordinal));
+            }
+            XDocument core = package.Xml("docProps/core.xml");
+            bool creatorPreserved = string.Equals((string)core.Root?.Element(Dc + "creator"), creator, StringComparison.Ordinal);
+            bool match = sourcePreserved && creatorPreserved;
+            detail = match ? "Active headers, footers, and watermarks are empty while protected document data remains."
+                : "A protected bibliography source or core document property was removed.";
             return match;
         }
 
@@ -789,8 +1032,8 @@ namespace MosWord2019.Core.Services
             bool sourceMatch = sources.Count == 1 && (!placeholderOnly || sources[0].Elements()
                 .All(element => element.Name == B + "Tag" || element.Name == B + "RefOrder"));
             bool match = string.Equals(actualField, fieldCode, StringComparison.Ordinal) && complexField && sourceMatch;
-            detail = match ? "The MOS placeholder citation is a real Word placeholder at the end of the target paragraph."
-                : "The citation field or bibliography source is not the required MOS placeholder.";
+            detail = match ? "The requested placeholder citation is a real Word placeholder at the end of the target paragraph."
+                : "The citation field or bibliography source is not the required placeholder.";
             return match;
         }
 
@@ -949,6 +1192,14 @@ namespace MosWord2019.Core.Services
                 .Select(text => text.Value)).TrimEnd();
         }
 
+        private static string ParagraphTextOutsideCitationsAndTextBoxes(XElement paragraph)
+        {
+            return string.Concat(paragraph.Descendants(W + "t").Where(text => !text.Ancestors(W + "del").Any() &&
+                !text.Ancestors(W + "txbxContent").Any() &&
+                !text.Ancestors(W + "sdt").Any(value => value.Element(W + "sdtPr")?.Element(W + "citation") != null))
+                .Select(text => text.Value)).TrimEnd();
+        }
+
         private static bool ParagraphUsesFormatting(XElement paragraph, string alignment, string style)
         {
             XElement properties = paragraph.Element(W + "pPr");
@@ -963,8 +1214,13 @@ namespace MosWord2019.Core.Services
 
         private static bool HasActiveCommentOnText(XElement paragraph, string targetText)
         {
+            return ActiveCommentIds(paragraph, targetText).Count > 0;
+        }
+
+        private static List<string> ActiveCommentIds(XElement paragraph, string targetText)
+        {
             int targetStart = ParagraphText(paragraph).IndexOf(targetText, StringComparison.Ordinal);
-            if (targetStart < 0) return false;
+            if (targetStart < 0) return new List<string>();
             int targetEnd = targetStart + targetText.Length;
             int offset = 0;
             var starts = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -977,7 +1233,23 @@ namespace MosWord2019.Core.Services
                 else if (element.Name == W + "commentReference") references.Add((string)element.Attribute(W + "id") ?? "");
                 else if (element.Name == W + "t" && !element.Ancestors(W + "del").Any()) offset += element.Value.Length;
             }
-            return starts.Any(pair => references.Contains(pair.Key) && ends.ContainsKey(pair.Key) && pair.Value < targetEnd && ends[pair.Key] > targetStart);
+            return starts.Where(pair => references.Contains(pair.Key) && ends.ContainsKey(pair.Key) &&
+                pair.Value < targetEnd && ends[pair.Key] > targetStart).Select(pair => pair.Key).ToList();
+        }
+
+        private static int ColumnCount(XElement sectionProperties)
+        {
+            XElement columns = sectionProperties?.Element(W + "cols");
+            return Twips(columns, "num", 1);
+        }
+
+        private static string MainBodySemanticText(XDocument document)
+        {
+            XElement body = document.Root?.Element(W + "body");
+            if (body == null) return "";
+            return string.Join("\n", body.Descendants(W + "p")
+                .Where(paragraph => !paragraph.Ancestors(W + "txbxContent").Any())
+                .Select(ParagraphTextOutsideCitationsAndTextBoxes).Where(value => value.Length > 0));
         }
 
         private static bool TableRowsEqual(XElement table, string[][] expected)
@@ -1059,7 +1331,8 @@ namespace MosWord2019.Core.Services
 
         private static string VisibleText(XElement element)
         {
-            return string.Concat(element.Descendants(W + "t").Where(t => !t.Ancestors(W + "del").Any()).Select(t => t.Value));
+            return element == null ? "" : string.Concat(element.Descendants(W + "t")
+                .Where(t => !t.Ancestors(W + "del").Any()).Select(t => t.Value));
         }
 
         private static string RequiredString(TaskDefinition task, string name)

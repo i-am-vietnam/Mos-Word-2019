@@ -117,6 +117,8 @@ namespace MosWord2019
             AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
             SaveAndCloseDocument();
             status.Text = T("Opening project...", "Đang mở dự án...");
+            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected))
+                AppLogger.Write("Training project asset available " + stagedAsset);
             string path = workspace.PrepareWorkingCopy(selected);
             AppLogger.Write("Training working copy prepared " + path);
             word.OpenDocument(path);
@@ -275,6 +277,8 @@ namespace MosWord2019
             var project = currentProject;
             word.CloseDocument(); // Explicit confirmed discard; do not save.
             ClearProject();
+            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
+                AppLogger.Write("Training project asset available after restart " + stagedAsset);
             string path = workspace.ResetWorkingCopy(project);
             word.OpenDocument(path);
             currentProject = project;
@@ -343,11 +347,24 @@ namespace MosWord2019
             catch (Exception ex)
             {
                 AppLogger.Write("Training operation failed", ex);
-                status.Text = ex is InvalidDataException
-                    ? T("Required task translations are missing. Correct the project language file before continuing.",
-                        "Thiếu bản dịch tác vụ bắt buộc. Hãy sửa tệp ngôn ngữ của dự án trước khi tiếp tục.")
-                    : T("Unable to complete the operation. Check Word and document access, then retry. If saving failed, keep Word open and recover your changes there.",
-                    "Không thể hoàn tất thao tác. Kiểm tra Word và quyền truy cập rồi thử lại. Nếu lưu thất bại, hãy giữ Word mở để khôi phục nội dung.");
+                var assetConflict = ex as ProjectAssetConflictException;
+                if (assetConflict != null)
+                {
+                    status.Text = string.Format(T(
+                        "Documents already contains a different file named {0}. Move or rename it, then try again.",
+                        "Documents đã có tệp khác tên {0}. Hãy di chuyển hoặc đổi tên tệp đó rồi thử lại."),
+                        assetConflict.AssetFileName);
+                }
+                else if (ex is InvalidDataException)
+                {
+                    status.Text = T("Required task translations are missing. Correct the project language file before continuing.",
+                        "Thiếu bản dịch tác vụ bắt buộc. Hãy sửa tệp ngôn ngữ của dự án trước khi tiếp tục.");
+                }
+                else
+                {
+                    status.Text = T("Unable to complete the operation. Check Word and document access, then retry. If saving failed, keep Word open and recover your changes there.",
+                        "Không thể hoàn tất thao tác. Kiểm tra Word và quyền truy cập rồi thử lại. Nếu lưu thất bại, hãy giữ Word mở để khôi phục nội dung.");
+                }
                 notify(status.Text);
             }
         }

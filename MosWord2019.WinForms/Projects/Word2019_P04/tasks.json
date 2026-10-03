@@ -63,8 +63,7 @@
     "titleKey": "P04_T05_TITLE",
     "instructionKey": "P04_T05_INST",
     "assertionType": "ContinuousSectionBreakBeforeHeading",
-    "targetHeading": "MOS 2019",
-    "expectedSectionCount": 4
+    "targetHeading": "MOS 2019"
   },
   {
     "taskId": "T06",

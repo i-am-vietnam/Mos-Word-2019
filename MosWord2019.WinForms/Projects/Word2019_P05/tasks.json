@@ -1,15 +1,97 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P05_T01_TITLE",
+    "instructionKey": "P05_T01_INST",
+    "assertionType": "DocumentParagraphLineSpacingMultiple",
+    "expectedLineTwips": 336,
+    "expectedLineRule": "auto"
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P05_T02_TITLE",
+    "instructionKey": "P05_T02_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": [
+      "Informatics Technology",
+      "Fundamental",
+      "Graphic",
+      "Multimedia",
+      "Web Technologies",
+      "Application Programming"
+    ],
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1."
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P05_T03_TITLE",
+    "instructionKey": "P05_T03_INST",
+    "assertionType": "ParagraphBlockColumns",
+    "targetParagraphs": [
+      "Welcome to website http://www.hocict.edu.vn. This website is used for sharing document, lecture, reference material without using storage device. The creators’ purpose is for studying, exchanging and sharing knowledge with positive construction not for profit.",
+      "Moreover, students can check studying schedule, exam report, grade, etc. The website’ main contain covers lecture slides, curriculum, exercise is constructed by website owner and his colleagues.",
+      "With the vision of sharing our knowledge of Information Technology in general and Informatic in special, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own resources.",
+      "The website contains many literatures in different categories which have smaller groups so it is more convenience for readers. Besides, there are sections for top read articles, new articles, etc."
+    ],
+    "expectedColumns": 2,
+    "expectedColumnSpacingTwips": 576
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P05_T04_TITLE",
+    "instructionKey": "P05_T04_INST",
+    "assertionType": "ParagraphBlockKeepWithNext",
+    "headingText": "founder information",
+    "directKeepWithNextParagraphs": [
+      "Ly Tran Thai Hoc, M.Sc. (I.T)",
+      "Microsoft Certified Trainer – IC3 GS4 Authorized Educator",
+      "YouTube: HOCICT Official Channel",
+      "Skype: hocict – Yahoo: hocict",
+      "Signature by:"
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P05_T05_TITLE",
+    "instructionKey": "P05_T05_INST",
+    "assertionType": "CitationPlaceholderAtParagraphEnd",
+    "targetParagraph": "Signature by:",
+    "placeholderTag": "Signature1",
+    "expectedFieldCode": "CITATION Signature1 \\l 1033",
+    "requirePlaceholderOnlySource": true
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P05_T06_TITLE",
+    "instructionKey": "P05_T06_INST",
+    "assertionType": "CommentResolved",
+    "targetParagraph": "founder information",
+    "expectedCommentText": "Beginning of the second page"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P05_T07_TITLE",
+    "instructionKey": "P05_T07_INST",
+    "assertionType": "ShapeWithTextWrapAndPosition",
+    "shapeGeometry": "horizontalScroll",
+    "expectedText": "Congratulation!",
+    "horizontalAlignment": "center",
+    "verticalAlignment": "bottom",
+    "relativeFrom": "page",
+    "afterParagraph": "[Insert Built-in Bibliography Here]"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P05_T08_TITLE",
+    "instructionKey": "P05_T08_INST",
+    "assertionType": "HeadersFootersWatermarksRemovedByState",
+    "expectedMainBodyTextSha256": "75CBC827DBE7C897FCF9B0C88DF9237C63C4EC473B14D2621F2AC687F0C00EF9",
+    "targetCommentParagraph": "founder information",
+    "expectedCommentText": "Beginning of the second page",
+    "requiredBibliographySourceTag": "LTTH",
+    "requiredBibliographySourceTitle": "Preparing for the exam international information",
+    "requiredCreator": "LY TRAN THAI HOC"
+  }
 ]

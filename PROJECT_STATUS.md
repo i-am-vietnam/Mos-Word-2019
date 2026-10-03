@@ -1,6 +1,6 @@
 # Project Status
 
-Verified: 2026-09-26.
+Verified: 2026-09-27.
 
 Build repair: Core now explicitly lists its ten source files, including exactly one Interfaces/IWordWindowLayout.cs entry. Namespace/import/Word-to-Core ProjectReference were already correct. Clean, standalone Core and Word builds, and full Debug/Release rebuilds each completed with zero errors/warnings. Visual Studio reloaded Core and successfully launched WinForms with F5; Login -> Training -> English -> Project 1 -> Go opened work.docx with eight tabs and upper/lower window placement. No UI, lifecycle or P01 source changes were made by this repair. Logs: artifacts/phase4b-repair.
 
@@ -13,12 +13,13 @@ Build repair: Core now explicitly lists its ten source files, including exactly 
 - Phase 4 including 4B: complete. Real P01 (eight tasks), bilingual Training entry, bottom-quarter task tabs, owned Word upper-area placement, internal save/close, switching, confirmed restart and manual closure recovery are verified. No Save buttons appear in the task panel.
 - Phase 5 — Project 1 grading: complete and committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`.
 - Phase 6 — Project 2 integration/grading: complete and committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. P02 validates in EN/VI, appears as Project 2, and grades all eight tasks from saved OOXML. Testing Mode, scoring, database, installer, and release work remain unimplemented.
-- Phase 7 — Project 3 integration/grading: complete locally and uncommitted, including the corrected Accessibility-header and SmartArt Right-to-Left semantics supplied by the user. P03 validates in EN/VI and its combined answer grades 8/8.
-- Phase 8 — Project 4 integration/grading: complete locally and uncommitted. P04 validates in EN/VI, appears as Project 4, and grades all eight tasks from saved OOXML. P01, P02, P03 and P04 combined answers each grade 8/8. Testing Mode, scoring, database, installer, and release work remain unimplemented.
+- Phase 7 — Project 3 integration/grading: complete in the current committed baseline, including the corrected Accessibility-header and SmartArt Right-to-Left semantics supplied by the user. P03 validates in EN/VI and its combined answer grades 8/8.
+- Phase 8 — Project 4 integration/grading: complete in the current committed baseline. The local P04 follow-up stages `Glasses.obj` safely to Documents and fixes T05 to grade the local Continuous boundary instead of a global section count.
+- Phase 9 — Project 5 integration/grading: complete locally and uncommitted. P05 validates in EN/VI, appears as Project 5, and grades all eight tasks from saved OOXML. Combined P01 through P05 answers each grade 8/8. Testing Mode, scoring, database, installer, and release work remain unimplemented.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, and TrainingWorkspaceService. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. The supplied P01 through P04 packages validate in EN/VI and appear deterministically as Project 1 through Project 4 with eight tasks each. Starter and language files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, and safe top-level asset staging to Documents. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. The supplied P01 through P05 packages validate in EN/VI and appear deterministically as Project 1 through Project 5 with eight tasks each. Starter files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
@@ -63,7 +64,7 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`; and current HEAD `23804ff875982f9935d4b12aae4aee7898c4bbb7` contains the supplied P04 resources. The P03 T01/T05 corrections and complete P04 grading work are local and uncommitted until the user explicitly requests a commit or push.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current HEAD `6a524a8ba872864a5f04fc6e134913cc27463c1e` contains the supplied P03–P05 resources and the committed P03/P04 baseline. The P04 follow-up and complete P05 grading work are local and uncommitted until the user explicitly requests a commit or push.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 
@@ -77,7 +78,7 @@ The Phase 5 starter SHA-256 was `3D906B8A4C7E2DA3272DEC63A30E38CB5354651290A29B8
 
 ## Next recommended task
 
-Integrate the next user-supplied Word project through the same ground-truth and regression process. Testing Mode remains not started.
+Integrate the next user-supplied Word project through the same Word-ground-truth and regression process. Testing Mode remains not started.
 
 ## Phase 8 Project 4 verification
 
@@ -85,11 +86,21 @@ P03 T01 now distinguishes the Accessibility Checker action from Repeat Header Ro
 
 This work adds six reusable assertion types: TableAccessibilityFirstRow for corrected P03 T01, plus TableRowsEqual, ListLevelEquals, InlineModel3D, ContinuousSectionBreakBeforeHeading and SmartArtAllNodesBevelEquals for P04. P04 also reuses PictureArtisticEffect, TableFirstRowIsHeader and PictureWrapType. The total supported assertion set is 30. Real Word 2019 ground truth confirms the exact two-key table order, real list level and resolved numbering definition, `am3d:model3d` inline GLB relationship/hash and location, Pencil Sketch, Continuous section boundary, repeating `w:tblHeader`, Soft Round on every SmartArt content node, and Square wrapping on the fingerprinted picture.
 
-All P04 assertion baseline/positive/negative/near-miss checks pass. The supplied P04 starter already contains the requested Continuous section break before `MOS 2019`, so fresh T05 correctly passes; Next Page and duplicated-section variants fail. P04 combined passes 8/8. Combined P01, P02 and corrected P03 remain 8/8, with focused negative regressions retained.
+All P04 assertion baseline/positive/negative/near-miss checks pass. The supplied P04 starter already contains the requested Continuous section break before `MOS 2019`, so fresh T05 correctly passes. The user-supplied `Project 04-Fix.docx` and a fresh Word 2019 answer both pass after changing the assertion to the closest local boundary; adjacent blank Continuous boundary paragraphs are accepted. Next Page and a Continuous break elsewhere while the closest boundary is not Continuous fail. P04 combined passes 8/8. Combined P01, P02 and corrected P03 remain 8/8, with focused negative regressions retained.
 
 P01–P04 EN/VI validation reports zero errors and warnings; discovery order is Project 1, Project 2, Project 3, Project 4. P04 first-copy, preserve, reset and immutable starter checks pass. Production Visual Studio F5 shows all eight P04 tabs, grades all eight English tasks `Correct` and representative Vietnamese tasks `Đúng`, keeps the same owned Word PID while grading and switching, restores the starter on Restart, preserves upper/lower placement, and has no Save or Save/Close buttons. The initial and final WINWORD PID sets match.
 
 Final starter SHA-256 values are P01 `0A86091C0B58E39D7CDCC9D7F19919AA7182467794927FAEB11F620D75D151E4`, P02 `63A40EAD1EAB7BD4AAF5ECA672B36C784D07A7E3A912C0F4D2C8BB862308F23C`, P03 `8491694AE5872FAA5D82D045D5D173DB3656C2652BE4C0E6CB6CC692B032AE05`, and P04 `696015203B45BAD814B60F45047A7F51B0B4B25580246E8E26F2AB32BC5BE95E`. The supplied/production Glasses.obj hash is `6FAE672E7A49AB67A0F091F94FEFE8780EB5049B0FE8FF7C7AFD2A0804E919D8`. Debug and Release rebuilds both report zero errors and warnings. Evidence remains ignored under `artifacts/phase8-p04`.
+
+## Phase 9 Project 5 verification
+
+P05 adds seven generic assertions and reuses `CitationPlaceholderAtParagraphEnd`: document-wide Multiple line spacing, a real continued numbering sequence, an exact paragraph block in a two-column section, Keep with next across a verified paragraph block, resolved-comment state, a shape with exact text/wrap/page-relative placement, and Inspector-clean headers/footers/watermarks while protected categories remain. The total supported assertion set is 37. All routing remains metadata-driven.
+
+Word 2019 ground truth confirms T01 `w:line=336` with `lineRule=auto`; T02 one `numId` and no level override for the 1–6 sequence; T03 exactly four paragraphs between Continuous boundaries with two columns and 576-twip spacing; T04 direct `keepNext` on the five following paragraphs while the Heading 1 style supplies it for the heading; T05 the real `CITATION Signature1 \\l 1033` placeholder; T06 the only supplied comment is on `founder information` and Resolve changes `commentsExtended.xml` `w15:done` from 0 to 1 while preserving the comment; T07 a `horizontalScroll` DrawingML shape with Square wrap and page center/bottom alignment; and T08 leaves no visible content in active headers/footers/watermarks while preserving the resolved comment, bibliography source, core creator, body text and inserted shape.
+
+Every P05 baseline fails, every Word-created positive passes, and the focused negative/near-miss matrix rejects partial/wrong spacing, separate or typed numbering, wrong columns/spacing, partial Keep with next/Keep lines together, typed or wrong-case citation, deleted comment, wrong shape/position, and removal of the comment category. A Word-created combined answer passes 8/8. P01–P04 regression remains 8/8. P01–P05 EN/VI validation reports zero errors/warnings and deterministic discovery shows Project 1 through Project 5.
+
+The real WinForms/Word smoke passes Login EN/VI, P05 eight tabs, all eight `Correct`/`Đúng` results, Restart returning to Task 1, P04 `Project 04-Fix.docx` T05 `Correct`, P04↔P05 switching with the same owned Word PID, upper/lower window placement, absent Save controls, and final owned-process cleanup. P04 opening staged the exact package `Glasses.obj` at `%USERPROFILE%\Documents\Glasses.obj`; Word 2019 inserted that staged file into a disposable starter copy as an inline 3D model and P04 T03 graded Pass. The test-created staged copy was removed afterward. Starter hashes P01–P05 remain unchanged; P05 is `3ACBFD8450BA4EF6A2F619377E2F115437009EBB818D594BF3358DDB9AA32D0B`. Evidence remains ignored under `artifacts/phase9-p05`.
 
 ## Phase 7 verification
 
