@@ -46,6 +46,7 @@
     <Compile Include="Services\WordGradingService.PackageAssertions.cs" />
     <Compile Include="Services\TemplateOutputLocation.cs" />
     <Compile Include="Services\WordGradingService.LegacyProjectAssertions.cs" />
+    <Compile Include="Services\WordGradingService.DocumentAssertions.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

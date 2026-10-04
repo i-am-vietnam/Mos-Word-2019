@@ -1,15 +1,395 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P08_T01_TITLE",
+    "instructionKey": "P08_T01_INST",
+    "assertionType": "Footnote",
+    "anchorText": "With the vision of sharing our knowledge of Information Technology in general and Informatic in specific, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own sources. ",
+    "expectedText": "Free resources",
+    "referenceAfterText": "With the vision of sharing our knowledge of Information Technology in general and Informatic in specific, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own sources",
+    "precedingHeading": "OVERVIEW"
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P08_T02_TITLE",
+    "instructionKey": "P08_T02_INST",
+    "assertionType": "DocumentMarginsEquals",
+    "topTwips": 1080,
+    "bottomTwips": 1080,
+    "leftTwips": 720,
+    "rightTwips": 720
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P08_T03_TITLE",
+    "instructionKey": "P08_T03_INST",
+    "assertionType": "TableAccessibilityFirstRow",
+    "targetHeaderRow": [
+      "No.",
+      "Categories",
+      "Quantity",
+      "Viewed",
+      "Responses"
+    ],
+    "expectedTableRows": [
+      [
+        "No.",
+        "Categories",
+        "Quantity",
+        "Viewed",
+        "Responses"
+      ],
+      [
+        "",
+        "Basic Informatics",
+        "17",
+        "129",
+        "92"
+      ],
+      [
+        "",
+        "Fundamental Computer",
+        "28",
+        "291",
+        "197"
+      ],
+      [
+        "",
+        "Graphic Computer",
+        "20",
+        "292",
+        "201"
+      ],
+      [
+        "",
+        "Multimedia",
+        "32",
+        "392",
+        "231"
+      ],
+      [
+        "",
+        "Web Technologies",
+        "34",
+        "128",
+        "92"
+      ],
+      [
+        "",
+        "Application Programming",
+        "32",
+        "232",
+        "192"
+      ],
+      [
+        "",
+        "Networking",
+        "29",
+        "262",
+        "232"
+      ],
+      [
+        "",
+        "Windows Mastery",
+        "28",
+        "382",
+        "23"
+      ],
+      [
+        "",
+        "Smart Phone",
+        "19",
+        "408",
+        "231"
+      ],
+      [
+        "",
+        "MOS – IC3",
+        "15",
+        "123",
+        "111"
+      ]
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P08_T04_TITLE",
+    "instructionKey": "P08_T04_INST",
+    "assertionType": "TextRangeFormattingEquals",
+    "targetParagraph": "MOS is the only justification that validates your skills in using Microsoft Office and is directly certified by the CEO of the Microsoft Corporation",
+    "targetText": "MOS is the only justification that validates your skills in using Microsoft Office and is directly certified by the CEO of the Microsoft Corporation",
+    "expectedFormatting": {
+      "font.ascii": "Calibri",
+      "font.hAnsi": "Calibri",
+      "szCs": "val=22",
+      "sz": "val=24"
+    },
+    "expectedAlignment": "left"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P08_T05_TITLE",
+    "instructionKey": "P08_T05_INST",
+    "assertionType": "TableCellSpacingEquals",
+    "targetHeaderRow": [
+      "No.",
+      "Categories",
+      "Quantity",
+      "Viewed",
+      "Responses"
+    ],
+    "expectedRows": [
+      [
+        "No.",
+        "Categories",
+        "Quantity",
+        "Viewed",
+        "Responses"
+      ],
+      [
+        "",
+        "Basic Informatics",
+        "17",
+        "129",
+        "92"
+      ],
+      [
+        "",
+        "Fundamental Computer",
+        "28",
+        "291",
+        "197"
+      ],
+      [
+        "",
+        "Graphic Computer",
+        "20",
+        "292",
+        "201"
+      ],
+      [
+        "",
+        "Multimedia",
+        "32",
+        "392",
+        "231"
+      ],
+      [
+        "",
+        "Web Technologies",
+        "34",
+        "128",
+        "92"
+      ],
+      [
+        "",
+        "Application Programming",
+        "32",
+        "232",
+        "192"
+      ],
+      [
+        "",
+        "Networking",
+        "29",
+        "262",
+        "232"
+      ],
+      [
+        "",
+        "Windows Mastery",
+        "28",
+        "382",
+        "23"
+      ],
+      [
+        "",
+        "Smart Phone",
+        "19",
+        "408",
+        "231"
+      ],
+      [
+        "",
+        "MOS – IC3",
+        "15",
+        "123",
+        "111"
+      ]
+    ],
+    "expectedSpacingTwips": 14
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P08_T06_TITLE",
+    "instructionKey": "P08_T06_INST",
+    "assertionType": "CommentResolved",
+    "targetParagraph": "MOS 2013 (Office 2013)",
+    "expectedCommentText": "MOS 2013 suite retired on July 13. 2023"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P08_T07_TITLE",
+    "instructionKey": "P08_T07_INST",
+    "assertionType": "PictureBorderColorEquals",
+    "targetImageSha256s": [
+      "63CEBB5CBC338E97A6F27A29C012C2718D9ECB691BFC7BD34EE186430B9C18DA"
+    ],
+    "anchorParagraph": "Welcome to website http://www.hocict.edu.vn. This website is used for sharing document, lecture, reference material without using storage device.",
+    "expectedSchemeColor": "accent1",
+    "expectedThemeRgb": "4472C4",
+    "expectedLumMod": 75000,
+    "expectedWidthEmu": 9525,
+    "expectedDash": "solid",
+    "pictureGeometry": {
+      "anchorParagraph": "Welcome to website http://www.hocict.edu.vn. This website is used for sharing document, lecture, reference material without using storage device.",
+      "cx": "2852420",
+      "cy": "1604010",
+      "horizontalRelativeFrom": "margin",
+      "horizontalOffset": null,
+      "verticalRelativeFrom": "paragraph",
+      "verticalOffset": "74114",
+      "wrapElement": "wrapSquare"
+    }
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P08_T08_TITLE",
+    "instructionKey": "P08_T08_INST",
+    "assertionType": "TrackedChangesDisposition",
+    "expectedBodyParagraphs": [
+      "HOCICT – Information and Communication Technologies",
+      "Contents",
+      "Welcome to website http://www.hocict.edu.vn. This website is used for sharing document, lecture, reference material without using storage device.",
+      "Moreover, students can check studying schedule, exam report, grade, etc. The website’ main contain covers lecture slides, curriculum, exercise is constructed by website owner and his colleagues.",
+      "The creators’ purpose is for studying, exchanging and sharing knowledge with positive construction not for profit.",
+      "OVERVIEW",
+      "With the vision of sharing our knowledge of Information Technology in general and Informatic in specific, we create website HOCICT-Information Communications and Technologies to collect and rearrange educational materials and our own sources.",
+      "The website contains many literatures in different categories which have smaller groups so it is more convenience for readers. Besides, there are sections for top read articles, new articles, etc.",
+      "LIST OF TOPICS",
+      "The following table shows the inspection results – update Oct 2023:",
+      "MOS INTRODUCE",
+      "MOS is an acronym for Microsoft Office Specialist which is the most widely used office computing skills test in the world with over 1 million tests taken annually.",
+      "The MOS test was created by Microsoft and performed by Certiport (USA). The exam is conducted online, with more than 25 languages ​​built, including Vietnamese.",
+      "MOS is the only justification that validates your skills in using Microsoft Office and is directly certified by the CEO of the Microsoft Corporation",
+      "MOS Level",
+      "MOS Version",
+      "MOS 2013 (Office 2013)",
+      "MOS 2016 (Office 2016)",
+      "MOS 2019 (Office 2019)",
+      "For more information, please visit fan page: https://www.facebook.com/hocict.edu.vn."
+    ],
+    "protectedTables": [
+      {
+        "header": [
+          "No.",
+          "Categories",
+          "Quantity",
+          "Viewed",
+          "Responses"
+        ],
+        "rows": [
+          [
+            "No.",
+            "Categories",
+            "Quantity",
+            "Viewed",
+            "Responses"
+          ],
+          [
+            "",
+            "Basic Informatics",
+            "17",
+            "129",
+            "92"
+          ],
+          [
+            "",
+            "Fundamental Computer",
+            "28",
+            "291",
+            "197"
+          ],
+          [
+            "",
+            "Graphic Computer",
+            "20",
+            "292",
+            "201"
+          ],
+          [
+            "",
+            "Multimedia",
+            "32",
+            "392",
+            "231"
+          ],
+          [
+            "",
+            "Web Technologies",
+            "34",
+            "128",
+            "92"
+          ],
+          [
+            "",
+            "Application Programming",
+            "32",
+            "232",
+            "192"
+          ],
+          [
+            "",
+            "Networking",
+            "29",
+            "262",
+            "232"
+          ],
+          [
+            "",
+            "Windows Mastery",
+            "28",
+            "382",
+            "23"
+          ],
+          [
+            "",
+            "Smart Phone",
+            "19",
+            "408",
+            "231"
+          ],
+          [
+            "",
+            "MOS – IC3",
+            "15",
+            "123",
+            "111"
+          ]
+        ]
+      },
+      {
+        "header": [
+          "",
+          ""
+        ],
+        "rows": [
+          [
+            "",
+            ""
+          ],
+          [
+            "",
+            ""
+          ]
+        ]
+      }
+    ],
+    "protectedComments": [
+      {
+        "paragraph": "MOS 2013 (Office 2013)",
+        "text": "MOS 2013 suite retired on July 13. 2023"
+      }
+    ]
+  }
 ]

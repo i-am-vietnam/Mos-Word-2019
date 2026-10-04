@@ -1,0 +1,18 @@
+{
+  "P09_T01_TITLE": "Task 1",
+  "P09_T01_INST": "At the end of the document, locate the paragraph that begins with \"If, during an assignment or a supervised check\". Add a bookmark named \"Cheating\" at the beginning of the paragraph.",
+  "P09_T02_TITLE": "Task 2",
+  "P09_T02_INST": "In the \"Rating\" section, in the empty paragraph, insert a table with six rows and two columns. In the first row of the table, insert \"Rating\" in the left cell and \"Rating range\" in the right cell. Then adjust the size of the table to its contents.",
+  "P09_T03_TITLE": "Task 3",
+  "P09_T03_INST": "In the \"Prerequisites\" section, start the numbered list at \"111\".",
+  "P09_T04_TITLE": "Task 4",
+  "P09_T04_INST": "Change the content display of the SmartArt graphic to list courses 1 through 8, from left to right. Do not change the order of items in the Text Pane.",
+  "P09_T05_TITLE": "Task 5",
+  "P09_T05_INST": "Apply the Centered style set to the document.",
+  "P09_T06_TITLE": "Task 6",
+  "P09_T06_INST": "In the \"Office 2016\" section, resize the table so that each column is 3.2\" (8.1 cm) wide.",
+  "P09_T07_TITLE": "Task 7",
+  "P09_T07_INST": "In the \"Necessary equipment\" section, edit the list by choosing custom bullets. Use the Segoe UI Emoji font and character code \"25B8\" (the special RIGHT-POINTING BLACK TRIANGLE character).",
+  "P09_T08_TITLE": "Task 8",
+  "P09_T08_INST": "Save a copy of the document in your Documents folder as a plain-text file named \"Memo\"."
+}

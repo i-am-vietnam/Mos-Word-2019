@@ -296,6 +296,8 @@ namespace MosWord2019.Core.Services
                     offset += length;
                 }
             match &= covered == target.Length;
+            if (match && task.Extra.ContainsKey("expectedAlignment"))
+                match = EffectiveParagraphAlignment(package, paragraphs[0]) == RequiredString(task, "expectedAlignment");
             detail = match ? "Every character of the unchanged target range has the verified effective formatting."
                 : "The target text changed or one or more characters retain incorrect effective formatting.";
             return match;

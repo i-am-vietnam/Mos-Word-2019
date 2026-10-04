@@ -46,7 +46,8 @@ namespace MosWord2019.Core.Services
             "DocumentPageBorder", "CustomBulletList", "BodyTextReplaceAll", "PictureHyperlink",
             "TextRangeFormattingEquals", "SavedWordTemplate", "FileExistsInCustomOfficeTemplates",
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
-            "TableOfContentsLevels", "FootnotesConvertedToEndnotes"
+            "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
+            "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -132,6 +133,10 @@ namespace MosWord2019.Core.Services
                         case "BookmarkAtParagraphStart": passed = CheckBookmarkStart(package, task, out detail); break;
                         case "TableOfContentsLevels": passed = CheckTocLevels(package, task, out detail); break;
                         case "FootnotesConvertedToEndnotes": passed = CheckEndnoteConversion(package, task, out detail); break;
+                        case "DocumentMarginsEquals": passed = CheckDocumentMargins(package, task, out detail); break;
+                        case "TableCellSpacingEquals": passed = CheckTableCellSpacing(package, task, out detail); break;
+                        case "PictureBorderColorEquals": passed = CheckPictureBorderColor(package, task, out detail); break;
+                        case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -237,22 +242,34 @@ namespace MosWord2019.Core.Services
             string anchor = RequiredString(task, "anchorText");
             string expected = RequiredString(task, "expectedText");
             XDocument document = package.Xml("word/document.xml");
-            XDocument footnotes = package.Xml("word/footnotes.xml");
+            XDocument footnotes;
+            if (!package.TryXml("word/footnotes.xml", out footnotes))
+            { detail = "No user footnotes exist in the saved document."; return false; }
             List<XElement> candidates = document.Descendants(W + "p").Where(p => VisibleText(p) == anchor).ToList();
-            if (candidates.Count != 1) { detail = "The exact footnote anchor heading was not found uniquely."; return false; }
+            if (candidates.Count != 1) { detail = "The exact footnote anchor paragraph was not found uniquely."; return false; }
             XElement paragraph = candidates[0];
-            XElement reference = paragraph.Descendants(W + "footnoteReference").SingleOrDefault();
-            if (reference == null) { detail = "No footnote reference follows the target heading."; return false; }
+            var references = paragraph.Descendants(W + "footnoteReference").Where(e => !e.Ancestors(W + "del").Any()).ToList();
+            XElement reference = references.Count == 1 ? references[0] : null;
+            if (reference == null) { detail = "Exactly one footnote reference is required in the target paragraph."; return false; }
             string id = (string)reference.Attribute(W + "id");
-            XElement footnote = footnotes.Root.Elements(W + "footnote").SingleOrDefault(f => (string)f.Attribute(W + "id") == id);
+            var notes = footnotes.Root.Elements(W + "footnote").Where(f => (string)f.Attribute(W + "id") == id && f.Attribute(W + "type") == null).ToList();
+            XElement footnote = notes.Count == 1 ? notes[0] : null;
             if (footnote == null || VisibleText(footnote).TrimStart() != expected)
             { detail = "The target footnote text does not match exactly."; return false; }
-            List<XElement> ordered = paragraph.Descendants().Where(e => e.Name == W + "t" || e.Name == W + "footnoteReference").ToList();
+            List<XElement> ordered = paragraph.Descendants().Where(e => !e.Ancestors(W + "del").Any() && (e.Name == W + "t" || e.Name == W + "footnoteReference")).ToList();
             int referenceIndex = ordered.IndexOf(reference);
             string before = string.Concat(ordered.Take(referenceIndex).Where(e => e.Name == W + "t").Select(e => e.Value));
-            if (before != anchor || ordered.Skip(referenceIndex + 1).Any(e => e.Name == W + "t" && e.Value.Length > 0))
-            { detail = "The footnote reference is not immediately after the target heading."; return false; }
-            detail = "The exact footnote is attached immediately after the target heading.";
+            string expectedBefore = task.Extra != null && task.Extra.ContainsKey("referenceAfterText") ? RequiredString(task, "referenceAfterText") : anchor;
+            string after = string.Concat(ordered.Skip(referenceIndex + 1).Where(e => e.Name == W + "t").Select(e => e.Value));
+            if (!anchor.StartsWith(expectedBefore, StringComparison.Ordinal) || before != expectedBefore || after != anchor.Substring(expectedBefore.Length))
+            { detail = "The footnote reference is not at the required logical text position."; return false; }
+            if (task.Extra != null && task.Extra.ContainsKey("precedingHeading"))
+            {
+                XElement previous = paragraph.ElementsBeforeSelf().LastOrDefault();
+                if (previous?.Name != W + "p" || ParagraphText(previous) != RequiredString(task, "precedingHeading"))
+                { detail = "The footnote is not in the first paragraph immediately below the required heading."; return false; }
+            }
+            detail = "The exact footnote is attached at the required logical text position in the unchanged paragraph.";
             return true;
         }
 

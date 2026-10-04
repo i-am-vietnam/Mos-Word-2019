@@ -2,9 +2,23 @@
 
 Verified: 2026-10-04. Earlier phase evidence below retains its historical dates.
 
-## Current Project 6 corrections and Project 7 acceptance
+## Current Project 8 state
 
-Verified on 2026-10-04 against main HEAD 9fbf1ba762e3f4a43e4476d3a67b01e8cf909a2a. Starting worktree was clean. P06 grading was committed in b6e3d36; current P06 corrections and P07 implementation are local/uncommitted. No commit or push was performed.
+Verified 2026-10-04 on main HEAD `f1615f23fe24610f781f0aebb7988a508ed10eb9`; starting status clean. P01-P07 are committed; P08 changes remain local/uncommitted. No commit or push.
+
+P08 has exactly eight tasks. P01-P08 EN/VI source and actual Debug/Release output validate with 0 errors/0 warnings; discovery is Project 1-8. Four new metadata-driven OOXML assertions bring the supported set to 53. Footnote adds optional logical reference location/preceding heading; text-range formatting adds optional inherited paragraph alignment. Existing P01-P07 metadata, UI and Word lifecycle source are unchanged.
+
+Real Word 2019 16.0.14026 saved/reopened positives pass all eight P08 assertions. All 32 baseline/positive/negative/near-miss checks pass, combined P08 is 8/8, 18 supplemental semantic cases pass, and Word-created tracked-format/section-layout Reject passes while Accept fails. Established combined P01-P05 remain 8/8; the real EN/VI form harness verifies P06/P07 8/8 with real Cert/Notes Save As, P07 legacy Convert/Restart, P07-P08 persistence, P08 baseline/combined/Restart, same PID grading and normal template cleanup. The final harness has zero failures. An independent unsaved Word sentinel and the user Word process survive owned cleanup.
+
+Production Visual Studio F5 verifies EN/VI login, P08 work.docx/eight tabs, upper Word/lower trainer layout, no Save controls, native Resolve Comment and insertion/deletion acceptance with Correct, VI Sai/Đúng, and native Header Row correction with Đúng. Owned Word exits on normal form close. **Remaining acceptance item:** the initial disposable native Accessibility Checker reported No header row with Use first row as header first; later production F5 Checker reported No accessibility issues found even with Header Row unchecked. Its cause is not established. The grader was not weakened; recommended-action UI reproduction in production remains a concrete verification item. Therefore full P08 classroom/UI acceptance is partial, although grading/package/regression checks above pass.
+
+The starter contains no formatting/layout revision. Combined ground truth handles supplied text revisions first and stops tracking before other task edits; rejecting new tracked formatting afterward can undo those edits. The generic disposition assertion was separately verified against real Word tracked Bold and section-margin revisions.
+
+Debug/Release Clean/Rebuild: 0 errors, 0 warnings. All eight starter hashes and all 185 tracked Excel-reference file hashes are unchanged. Evidence: ignored artifacts/phase12-p08. Testing Mode remains not started.
+
+## Previous Project 6 corrections and Project 7 acceptance
+
+P06 corrections and P07 acceptance below are historical verification; they are now committed in the current baseline f1615f23fe24610f781f0aebb7988a508ed10eb9. No historical evidence is reclassified as a new test.
 
 P01–P07 each have eight tasks and validate EN/VI with zero errors/warnings. Discovery is Project 1–7. Core routes 49 generic assertion identifiers (including retained SavedWordTemplate compatibility); production P06/P07 T08 now uses FileExistsInCustomOfficeTemplates.
 
@@ -38,12 +52,12 @@ Projects build repair: TemplateOutputCleanupService already existed with the cor
 - Phase 7 — Project 3 integration/grading: complete in the current committed baseline, including the corrected Accessibility-header and SmartArt Right-to-Left semantics supplied by the user. P03 validates in EN/VI and its combined answer grades 8/8.
 - Phase 8 — Project 4 integration/grading: complete in the current committed baseline. The committed P04 follow-up stages `Glasses.obj` safely to Documents and fixes T05 to grade the local Continuous boundary instead of a global section count.
 - Phase 9 — Project 5 integration/grading: complete and committed in b703bf5/current baseline. P05 validates in EN/VI, appears as Project 5, and grades all eight tasks from saved OOXML. Combined P01 through P05 answers each grade 8/8. Testing Mode, scoring, database, installer, and release work remain unimplemented.
-- Project 6 integration/grading: complete; the earlier implementation is committed and the authorized T02/T08 corrections are local/uncommitted.
-- Project 7 integration/grading: complete, local/uncommitted; real legacy input, eight tasks and combined EN/VI 8/8 verified.
+- Project 6 integration/grading: complete; the earlier implementation is committed and the authorized T02/T08 corrections are committed in the current baseline.
+- Project 7 integration/grading: complete and committed; real legacy input, eight tasks and combined EN/VI 8/8 verified.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01–P07 validate in EN/VI and appear deterministically as Project 1–7 with eight tasks each. Starter files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P08 validate in EN/VI and appear deterministically as Project 1-8 with eight tasks each. Starter files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx or legacy .doc working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
@@ -88,7 +102,7 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current main HEAD is `9fbf1ba762e3f4a43e4476d3a67b01e8cf909a2a`, containing committed P01–P06 grading and supplied P07 resources. Current P06 corrections/P07 implementation are local/uncommitted; no commit or push was performed.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current main HEAD is `f1615f23fe24610f781f0aebb7988a508ed10eb9`, containing committed P01-P07 work and supplied P08 resources. Current P08 implementation is local/uncommitted; no commit or push was performed.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 

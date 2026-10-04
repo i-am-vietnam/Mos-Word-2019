@@ -1,0 +1,18 @@
+﻿{
+  "P09_T01_TITLE": "Tác vụ 1",
+  "P09_T01_INST": "Ở cuối tài liệu, tìm đoạn văn bắt đầu bằng \"If, during an assignment or a supervised check\". Thêm bookmark có tên \"Cheating\" tại đầu đoạn văn.",
+  "P09_T02_TITLE": "Tác vụ 2",
+  "P09_T02_INST": "Trong phần \"Rating\", tại đoạn trống, chèn một bảng gồm 6 hàng và 2 cột. Ở hàng đầu tiên của bảng, nhập \"Rating\" vào ô bên trái và \"Rating range\" vào ô bên phải. Sau đó điều chỉnh kích thước bảng vừa với nội dung.",
+  "P09_T03_TITLE": "Tác vụ 3",
+  "P09_T03_INST": "Trong phần \"Prerequisites\", đặt danh sách đánh số bắt đầu từ \"111\".",
+  "P09_T04_TITLE": "Tác vụ 4",
+  "P09_T04_INST": "Thay đổi cách hiển thị nội dung của đồ họa SmartArt để liệt kê các khóa học từ 1 đến 8 theo hướng từ trái sang phải. Không thay đổi thứ tự các mục trong Text Pane.",
+  "P09_T05_TITLE": "Tác vụ 5",
+  "P09_T05_INST": "Áp dụng bộ kiểu Centered cho tài liệu.",
+  "P09_T06_TITLE": "Tác vụ 6",
+  "P09_T06_INST": "Trong phần \"Office 2016\", thay đổi kích thước bảng để mỗi cột rộng 3,2 inch (8,1 cm).",
+  "P09_T07_TITLE": "Tác vụ 7",
+  "P09_T07_INST": "Trong phần \"Necessary equipment\", chỉnh sửa danh sách bằng cách chọn dấu đầu dòng tùy chỉnh. Sử dụng phông Segoe UI Emoji và mã ký tự \"25B8\" (ký tự đặc biệt RIGHT-POINTING BLACK TRIANGLE).",
+  "P09_T08_TITLE": "Tác vụ 8",
+  "P09_T08_INST": "Lưu một bản sao của tài liệu trong thư mục Documents dưới dạng tệp văn bản thuần có tên \"Memo\"."
+}

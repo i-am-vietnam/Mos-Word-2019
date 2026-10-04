@@ -2,9 +2,31 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product on main HEAD 9fbf1ba762e3f4a43e4476d3a67b01e8cf909a2a. P01–P06 implementation is committed; the authorized P06 corrections and P07 grading are complete locally and uncommitted. Current source controls behavior. Testing Mode is not implemented.
+Independent MOS Word 2019 product on main HEAD f1615f23fe24610f781f0aebb7988a508ed10eb9. P01-P07 including P06 corrections are committed; current P08 implementation is local/uncommitted. Current source controls behavior. Testing Mode is not implemented.
 
-## Current package grading and legacy Training
+## Project 8 package and saved-state grading
+
+P01-P08 validate/load with eight tasks each in EN/VI; production roots and build-copy strategy are unchanged. Core now explicitly includes Services/WordGradingService.DocumentAssertions.cs. There are 53 supported identifiers. P08 reuses Footnote, TableAccessibilityFirstRow, TextRangeFormattingEquals and CommentResolved, and adds DocumentMarginsEquals, TableCellSpacingEquals, PictureBorderColorEquals and TrackedChangesDisposition. No ProjectId/TaskId branches or grading COM were added.
+
+T01 references the first paragraph immediately after OVERVIEW, immediately after sources and before the final period; unchanged full paragraph and exact Free resources footnote text are checked. Word's leading note-marker delimiter retains the existing TrimStart contract. Optional referenceAfterText and precedingHeading preserve P01's original end-of-heading default. Missing user-footnote parts return Fail; duplicates cannot throw SingleOrDefault.
+
+T02 checks all active sections' top/bottom=1080 and left/right=720 twips; historical sectPrChange is ignored. Mirror/book-fold layouts fail; header/footer distances and gutter are irrelevant.
+
+T03 ground truth is native No header row -> Use first row as header (first), then Mark as layout table (second), targeting the exact No./Categories/Quantity/Viewed/Responses table. Current tblLook is val=04A0/firstRow=1, compared with baseline 0480/firstRow=0; this differs from Repeat Header Rows. Later F5 Checker did not reproduce the original error; see KNOWN_ISSUES and do not claim that UI repetition passed.
+
+T04 unchanged complete MOS is the only justification... paragraph resolves to Calibri 12pt, complex-script 11pt, no effective bold/italic/explicit color, inherited left alignment. Optional expectedAlignment resolves paragraph-style inheritance without changing P06's contract. Split runs pass.
+
+T05 native Table Options Allow spacing 0.02 inch saves tblCellSpacing w:w=14/type=dxa on table and rows; reopened dialog remains 0.02 inch and COM Table.Spacing=1.4pt. Do not substitute the mathematical full-gap 29 twips or cell margins. Original table content must remain unchanged.
+
+T06 preserves the MOS 2013 (Office 2013) range/comment and maps comments.xml to commentsExtended.xml done=1. Exact comment text is MOS 2013 suite[NBSP]retired on July 13. 2023.
+
+T07 page-1 laptop picture anchored to Welcome to website... is fingerprinted as 63CEBB5CBC338E97A6F27A29C012C2718D9ECB691BFC7BD34EE186430B9C18DA. Native Blue, Accent 1, Darker 25% produces a:ln/a:solidFill/a:schemeClr val=accent1 with a:lumMod val=75000; theme accent1=4472C4, observed effective RGB=2F5497. Adding color to starter No Outline adds Word's default solid 0.75pt line (width omitted/default 9525 EMU), not an invented pre-existing visible line. Geometry/anchor/wrap are preserved; effect extents may change with the actual new outline.
+
+T08 Word reports two revisions: insertion of The following table shows the inspection results – update Oct 2023: plus paragraph mark, and deletion of The following table shows the results of article statistics by topic published on the website http://www.hocict.edu.vn. XML contains two ins nodes/one del node and no PrChange. The assertion rejects pending revisions and checks unchanged non-generated body paragraphs, tables and comment; optional rejectedFormattingRanges/rejectedMargins verify real tracked-format/layout fixtures. TOC generated results are excluded; unrelated SDT text is included. Actual combined handles old text revisions first and disables further tracking before other edits.
+
+P08 starter SHA-256: E1D8C71849C49B16243376FDFEFC0576F69283D4AE38F7705E19DFFB2F623776. All P01-P08 starters remain immutable. Combined P08 8/8 and P01-P07 8/8 regression verified; UI/workspace tests and limitations are in PROJECT_STATUS.md. Evidence is ignored under artifacts/phase12-p08. No lifecycle, MainForm, template cleanup, package inclusion or earlier task metadata changed.
+
+## Established package grading and legacy Training
 
 P01–P07 have eight tasks each, EN/VI validation 0/0 and deterministic discovery. WordGradingService has 49 supported identifiers. Existing P01–P05 task metadata remains unchanged. Six new generic identifiers are FileExistsInCustomOfficeTemplates, ModernWordDocumentFormat, HeaderTextEffectEquals, BookmarkAtParagraphStart, TableOfContentsLevels and FootnotesConvertedToEndnotes. P07 also reuses PictureWrapType and BodyTextReplaceAll; the latter has optional expectedBodyParagraphs metadata without changing its P06 contract. New pure OOXML code is in Core/Services/WordGradingService.LegacyProjectAssertions.cs.
 
@@ -77,7 +99,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. P01–P06 grading and supplied P07 resources are committed at the starting HEAD. P06 corrections and P07 integration/grading are local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
+Word owns its .git, main branch, and dedicated origin. P01-P07 implementation and supplied P08 resources are committed at the starting HEAD. P08 integration/grading is local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Reference/hash manifests are retained in ignored artifacts/.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -153,7 +175,7 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` recognizes 49 implemented identifiers; production P06 DocumentPageBorder has confirmed color metadata.
+`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` recognizes 53 implemented identifiers; production P06 DocumentPageBorder has confirmed color metadata.
 
 ## Phase 6 P02 grading architecture
 
