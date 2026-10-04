@@ -31,6 +31,7 @@ namespace MosWord2019
         private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
         private ProjectPackage currentProject;
         private string currentWorkPath;
+        private readonly TemplateOutputCleanupService templateOutputs = new TemplateOutputCleanupService();
         private int taskIndex;
         private bool controllerDisposed;
         private bool displayEventsSubscribed;
@@ -99,7 +100,8 @@ namespace MosWord2019
             Run(() =>
             {
                 var available = new ProjectLoader().LoadAll(projectRoot, session.Language)
-                    .Where(p => string.Equals(Path.GetExtension(p.Meta.Starter), ".docx", StringComparison.OrdinalIgnoreCase)).ToArray();
+                    .Where(p => string.Equals(Path.GetExtension(p.Meta.Starter), ".docx", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(Path.GetExtension(p.Meta.Starter), ".doc", StringComparison.OrdinalIgnoreCase)).ToArray();
                 projects.Items.AddRange(available);
                 if (available.Length > 0) projects.SelectedIndex = 0;
                 go.Enabled = available.Length > 0;
@@ -114,6 +116,7 @@ namespace MosWord2019
             var selected = projects.SelectedItem as ProjectPackage;
             if (selected == null) return;
             ValidateTranslations(selected);
+            templateOutputs.Register(selected); // Retain exact targets even after switching projects.
             AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
             SaveAndCloseDocument();
             status.Text = T("Opening project...", "Đang mở dự án...");
@@ -299,8 +302,12 @@ namespace MosWord2019
             TrainingGradeContext context;
             try
             {
-                word.Save();
-                PreserveSaveAsWork();
+                // File-existence tasks inspect only their declared output; grading does not save/alter that template.
+                if (task.AssertionType != TemplateOutputLocation.AssertionType)
+                {
+                    word.Save();
+                    PreserveSaveAsWork();
+                }
                 var documentState = word as IWordDocumentState;
                 savedPath = documentState?.CurrentDocumentPath ?? currentWorkPath;
                 context = documentState == null ? null : new TrainingGradeContext
@@ -308,7 +315,7 @@ namespace MosWord2019
                     DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState.DefaultTemplateFolder : null,
                     SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase)
                 };
-                AppLogger.Write("Training grade save " + currentWorkPath + " task " + task.TaskId);
+                AppLogger.Write("Training grade source " + savedPath + " task " + task.TaskId);
             }
             catch (Exception ex)
             {
@@ -395,6 +402,7 @@ namespace MosWord2019
                 SaveAndCloseDocument();
                 word.Dispose();
                 controllerDisposed = true;
+                templateOutputs.Cleanup();
                 AppLogger.Write("Training session closed");
                 completed = true;
             });
@@ -415,6 +423,7 @@ namespace MosWord2019
                 SaveAndCloseDocument();
                 word.Dispose();
                 controllerDisposed = true;
+                templateOutputs.Cleanup();
             }
             base.Dispose(disposing);
         }

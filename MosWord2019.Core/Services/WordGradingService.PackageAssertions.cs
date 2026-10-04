@@ -28,6 +28,7 @@ namespace MosWord2019.Core.Services
                 {
                     var b = borders.Element(W + edge);
                     return b != null && (string)b.Attribute(W + "val") == style && Twips(b, "sz", -1) == size &&
+                        (!task.Extra.ContainsKey("expectedThemeColor") || (string)b.Attribute(W + "themeColor") == (string)task.Extra["expectedThemeColor"]) &&
                         !new[] { "1", "true", "on" }.Contains((string)b.Attribute(W + "shadow")) &&
                         !new[] { "1", "true", "on" }.Contains((string)b.Attribute(W + "frame")) &&
                         ResolveColor(package, b, "color", "themeColor", "themeTint", "themeShade") == color.ToUpperInvariant();
@@ -52,6 +53,21 @@ namespace MosWord2019.Core.Services
             string all = string.Join("\n", paragraphs.Select(ParagraphText));
             bool match = paragraphs.Count(p => ParagraphText(p) == expected) == 1 && CountOccurrences(all, oldText) == 0 &&
                 CountOccurrences(all, replacement) == RequiredInt(task, "expectedReplacementCount");
+            if (task.Extra.ContainsKey("expectedBodyParagraphs"))
+            {
+                var body = paragraphs.FirstOrDefault()?.Ancestors(W + "body").FirstOrDefault();
+                if (body == null) match = false;
+                else
+                {
+                    // Generated TOC results may legitimately change in another task. Compare the
+                    // remaining visible main-body paragraphs exactly, including their order/count.
+                    var generated = new HashSet<XElement>(BodyFields(body)
+                        .Where(f => System.Text.RegularExpressions.Regex.IsMatch(f.Code.ToString(), @"^\s*TOC\b",
+                            System.Text.RegularExpressions.RegexOptions.IgnoreCase)).SelectMany(f => f.ResultParagraphs));
+                    match &= paragraphs.Where(p => !generated.Contains(p)).Select(ParagraphTextOutsideTextBoxes)
+                        .Where(t => !string.IsNullOrWhiteSpace(t)).SequenceEqual(RequiredStrings(task, "expectedBodyParagraphs"));
+                }
+            }
             detail = match ? "Every target occurrence is replaced; the target paragraph is otherwise unchanged."
                 : "A source occurrence remains, the replacement count is wrong, or surrounding text changed.";
             return match;

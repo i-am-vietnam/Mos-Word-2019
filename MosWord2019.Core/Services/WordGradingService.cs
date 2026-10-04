@@ -44,7 +44,9 @@ namespace MosWord2019.Core.Services
             "ParagraphBlockColumns", "ParagraphBlockKeepWithNext", "CommentResolved",
             "ShapeWithTextWrapAndPosition", "HeadersFootersWatermarksRemovedByState",
             "DocumentPageBorder", "CustomBulletList", "BodyTextReplaceAll", "PictureHyperlink",
-            "TextRangeFormattingEquals", "SavedWordTemplate"
+            "TextRangeFormattingEquals", "SavedWordTemplate", "FileExistsInCustomOfficeTemplates",
+            "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
+            "TableOfContentsLevels", "FootnotesConvertedToEndnotes"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -63,6 +65,19 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task.AssertionType == TemplateOutputLocation.AssertionType)
+                {
+                    string output = TemplateOutputLocation.Resolve(RequiredString(task, "expectedFileName"));
+                    return new TaskGradeResult(File.Exists(output) ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
+                        "The exact declared template file must exist in Documents/Custom Office Templates.", task.AssertionType, task.TaskId);
+                }
+                if (string.Equals(Path.GetExtension(documentPath), ".doc", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!File.Exists(documentPath)) return Error(task, "The working document does not exist.");
+                    return task.AssertionType == "ModernWordDocumentFormat"
+                        ? new TaskGradeResult(TaskGradeOutcome.Fail, "The document is still in legacy .doc format.", task.AssertionType, task.TaskId)
+                        : Error(task, "Convert the legacy document with File > Info > Convert, then save before grading this OOXML task.");
+                }
                 using (var package = PackageSnapshot.Open(documentPath))
                 {
                     bool passed;
@@ -112,6 +127,11 @@ namespace MosWord2019.Core.Services
                         case "PictureHyperlink": passed = CheckPictureHyperlink(package, task, out detail); break;
                         case "TextRangeFormattingEquals": passed = CheckTextRangeFormatting(package, task, out detail); break;
                         case "SavedWordTemplate": passed = CheckSavedTemplate(package, documentPath, task, context, out detail); break;
+                        case "ModernWordDocumentFormat": passed = CheckModernWordFormat(package, documentPath, task, out detail); break;
+                        case "HeaderTextEffectEquals": passed = CheckHeaderTextEffect(package, task, out detail); break;
+                        case "BookmarkAtParagraphStart": passed = CheckBookmarkStart(package, task, out detail); break;
+                        case "TableOfContentsLevels": passed = CheckTocLevels(package, task, out detail); break;
+                        case "FootnotesConvertedToEndnotes": passed = CheckEndnoteConversion(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,

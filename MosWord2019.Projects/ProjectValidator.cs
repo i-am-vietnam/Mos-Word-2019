@@ -13,7 +13,7 @@ namespace MosWord2019.Projects
         private static readonly Regex ProjectIdPattern =
             new Regex(@"^Word2019_P\d{2,}$", RegexOptions.CultureInvariant);
         private static readonly HashSet<string> SupportedStarterExtensions =
-            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".docx", ".docm" };
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".docx", ".docm", ".doc" };
 
         public ValidationResult Validate(string projectFolderPath, string requestedLanguageCode = "en")
         {
@@ -71,7 +71,7 @@ namespace MosWord2019.Projects
                 return;
             }
             if (!SupportedStarterExtensions.Contains(Path.GetExtension(starter)))
-                AddError(result, "STARTER_EXTENSION_UNSUPPORTED", projectId, "", "starter must use .docx or .docm.");
+                AddError(result, "STARTER_EXTENSION_UNSUPPORTED", projectId, "", "starter must use .docx, .docm or .doc.");
             if (!File.Exists(Path.Combine(projectFolderPath, starter)))
                 AddError(result, "STARTER_MISSING", projectId, "", "Declared starter does not exist: " + starter);
         }

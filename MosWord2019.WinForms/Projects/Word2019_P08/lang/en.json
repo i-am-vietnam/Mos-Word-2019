@@ -1,0 +1,18 @@
+{
+  "P08_T01_TITLE": "Task 1",
+  "P08_T01_INST": "In the first paragraph below the heading \"Overview\", insert the footnote \"Free resources\" after the word \"sources\".",
+  "P08_T02_TITLE": "Task 2",
+  "P08_T02_INST": "Modify the document page margins. Set top and bottom margins to 0.75\" (1.9 cm) and left and right margins to 0.5\" (1.27 cm).",
+  "P08_T03_TITLE": "Task 3",
+  "P08_T03_INST": "Check if the document has accessibility issues. Correct the issues reported in the inspection results by performing the first recommended action.",
+  "P08_T04_TITLE": "Task 4",
+  "P08_T04_INST": "In the \"MOS Introduce\" section, delete all formatting from the paragraph that begins with \"MOS is the only justification\".",
+  "P08_T05_TITLE": "Task 5",
+  "P08_T05_INST": "In the first table, set the cell spacing to 0.02 inches (0.05 cm).",
+  "P08_T06_TITLE": "Task 6",
+  "P08_T06_INST": "In the \"MOS Version\" section, resolve the comment.",
+  "P08_T07_TITLE": "Task 7",
+  "P08_T07_INST": "On page 1, change the border color of the image to Blue, Accent 1, Darker 25%.",
+  "P08_T08_TITLE": "Task 8",
+  "P08_T08_INST": "Accept all insertions and deletions in the document, then reject all layout changes."
+}

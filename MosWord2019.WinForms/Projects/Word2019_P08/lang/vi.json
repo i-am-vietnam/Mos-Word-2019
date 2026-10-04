@@ -1,0 +1,18 @@
+﻿{
+  "P08_T01_TITLE": "Tác vụ 1",
+  "P08_T01_INST": "Trong đoạn văn đầu tiên bên dưới tiêu đề \"Overview\", chèn chú thích cuối trang \"Free resources\" sau từ \"sources\".",
+  "P08_T02_TITLE": "Tác vụ 2",
+  "P08_T02_INST": "Điều chỉnh lề trang của tài liệu. Đặt lề trên và lề dưới là 0,75 inch (1,9 cm), lề trái và lề phải là 0,5 inch (1,27 cm).",
+  "P08_T03_TITLE": "Tác vụ 3",
+  "P08_T03_INST": "Kiểm tra tài liệu có vấn đề về khả năng truy cập hay không. Sửa các vấn đề được báo cáo trong kết quả kiểm tra bằng cách thực hiện hành động được đề xuất đầu tiên.",
+  "P08_T04_TITLE": "Tác vụ 4",
+  "P08_T04_INST": "Trong phần \"MOS Introduce\", xóa toàn bộ định dạng khỏi đoạn văn bắt đầu bằng \"MOS is the only justification\".",
+  "P08_T05_TITLE": "Tác vụ 5",
+  "P08_T05_INST": "Trong bảng đầu tiên, đặt khoảng cách giữa các ô là 0,02 inch (0,05 cm).",
+  "P08_T06_TITLE": "Tác vụ 6",
+  "P08_T06_INST": "Trong phần \"MOS Version\", giải quyết bình luận.",
+  "P08_T07_TITLE": "Tác vụ 7",
+  "P08_T07_INST": "Trên trang 1, đổi màu đường viền của hình ảnh thành Blue, Accent 1, Darker 25%.",
+  "P08_T08_TITLE": "Tác vụ 8",
+  "P08_T08_INST": "Chấp nhận tất cả các thay đổi chèn và xóa trong tài liệu, sau đó từ chối tất cả các thay đổi bố cục."
+}

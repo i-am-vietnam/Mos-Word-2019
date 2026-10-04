@@ -24,7 +24,7 @@ namespace MosWord2019.Projects
         private static readonly Regex ProjectIdPattern =
             new Regex(@"^Word2019_P\d{2,}$", RegexOptions.CultureInvariant);
         private static readonly HashSet<string> SupportedExtensions =
-            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".docx", ".docm" };
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".docx", ".docm", ".doc" };
         private readonly string workingRootPath;
         private readonly string documentsRootPath;
 
@@ -104,6 +104,13 @@ namespace MosWord2019.Projects
         {
             PackagePaths paths = GetPackagePaths(package);
             Directory.CreateDirectory(paths.WorkingDirectory);
+            // Only a learner-created modern checkpoint takes precedence over legacy work.
+            // This never converts a starter or completes the learner's Convert task.
+            if (paths.Extension == ".doc")
+            {
+                string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
+                if (File.Exists(converted)) return converted;
+            }
             if (!File.Exists(paths.WorkingPath))
             {
                 File.Copy(paths.StarterPath, paths.WorkingPath, false);
@@ -131,6 +138,11 @@ namespace MosWord2019.Projects
                 else
                     File.Move(temporaryPath, paths.WorkingPath);
                 MakeWritable(paths.WorkingPath);
+                if (paths.Extension == ".doc")
+                {
+                    string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
+                    if (File.Exists(converted)) File.Delete(converted); // Exact owned checkpoint; caller closed Word.
+                }
                 return paths.WorkingPath;
             }
             finally
@@ -157,7 +169,7 @@ namespace MosWord2019.Projects
                 throw new ArgumentException("Starter must be a file name in the package root.", nameof(package));
             string extension = Path.GetExtension(starterName);
             if (!SupportedExtensions.Contains(extension))
-                throw new NotSupportedException("Training working copies support .docx and .docm starters.");
+                throw new NotSupportedException("Training working copies support .docx, .docm and .doc starters.");
 
             string starterPath = Path.GetFullPath(Path.Combine(packageRoot, starterName));
             EnsureContained(packageRoot, starterPath, "Starter path escapes the package root.");

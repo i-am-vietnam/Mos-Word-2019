@@ -275,10 +275,11 @@ namespace MosWord2019.Word
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("A document path is required.", nameof(filePath));
             string path = Path.GetFullPath(filePath);
-            if (!string.Equals(Path.GetExtension(path), ".docx", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("Only existing .docx working copies are supported.", nameof(filePath));
-            if (string.Equals(Path.GetFileName(path), "starter.docx", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("Never open starter.docx for editing. Supply a separate working copy.", nameof(filePath));
+            if (!string.Equals(Path.GetExtension(path), ".docx", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(Path.GetExtension(path), ".doc", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Only existing .docx or legacy .doc working copies are supported.", nameof(filePath));
+            if (string.Equals(Path.GetFileNameWithoutExtension(path), "starter", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Never open a starter for editing. Supply a separate working copy.", nameof(filePath));
             if (!File.Exists(path)) throw new FileNotFoundException("The Word working copy does not exist.", path);
             if ((File.GetAttributes(path) & FileAttributes.ReadOnly) != 0) throw new IOException("The working copy is read-only.");
             // Fail before startup on locked files; Word's ReadOnly property also guards an open-time race.

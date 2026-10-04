@@ -18,6 +18,9 @@ namespace MosWord2019.Projects
         {
             PackagePaths paths = GetPackagePaths(package);
             string saved = Path.GetFullPath(savedDocumentPath);
+            // Legacy work stays binary until the learner converts it. Never put OOXML into work.doc.
+            if (paths.Extension == ".doc" && !string.Equals(saved, paths.WorkingPath, StringComparison.OrdinalIgnoreCase))
+                paths.WorkingPath = Path.ChangeExtension(paths.WorkingPath, ".docx");
             if (string.Equals(saved, paths.WorkingPath, StringComparison.OrdinalIgnoreCase)) return;
             string extension = Path.GetExtension(saved);
             if (!string.Equals(extension, ".docx", StringComparison.OrdinalIgnoreCase) &&

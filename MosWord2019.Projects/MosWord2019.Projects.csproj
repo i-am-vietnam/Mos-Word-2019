@@ -27,7 +27,14 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
-  <ItemGroup><Compile Include="**\*.cs" Exclude="bin\**;obj\**" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="ProjectLoader.cs" />
+    <Compile Include="ProjectValidator.cs" />
+    <Compile Include="TemplateOutputCleanupService.cs" />
+    <Compile Include="TrainingWorkspaceService.cs" />
+    <Compile Include="TrainingWorkspaceService.SavedCopy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
   <ItemGroup><ProjectReference Include="..\MosWord2019.Core\MosWord2019.Core.csproj"><Project>{81177DAA-9487-42DB-8881-3985E00981E4}</Project><Name>MosWord2019.Core</Name></ProjectReference></ItemGroup>
 

@@ -1,15 +1,130 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P07_T01_TITLE",
+    "instructionKey": "P07_T01_INST",
+    "assertionType": "ModernWordDocumentFormat",
+    "minimumCompatibilityMode": 15,
+    "allowedMainContentTypes": [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml"
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P07_T02_TITLE",
+    "instructionKey": "P07_T02_INST",
+    "assertionType": "HeaderTextEffectEquals",
+    "headerType": "default",
+    "headerText": "MO-100: MICROSOFT WORD (OFFICE 2019)",
+    "expectedColor": "4472C4",
+    "shadowAttributes": [
+      {
+        "blurRad": "38100",
+        "dist": "25400",
+        "dir": "5400000",
+        "sx": "100000",
+        "sy": "100000",
+        "kx": "0",
+        "ky": "0",
+        "algn": "ctr"
+      }
+    ],
+    "shadowColor": "6E747A",
+    "shadowAlpha": "57000"
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P07_T03_TITLE",
+    "instructionKey": "P07_T03_INST",
+    "assertionType": "PictureWrapType",
+    "targetImageSha256": "89B466727AF8F8FE74D70061617B931B9CE29F3655A063ADEAA33DD3802E4EFC"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P07_T04_TITLE",
+    "instructionKey": "P07_T04_INST",
+    "assertionType": "BookmarkAtParagraphStart",
+    "bookmarkName": "Ico",
+    "targetParagraph": "Internal use – refers to items for use in a project. This document is for internal use only and not to be distributed in any way."
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P07_T05_TITLE",
+    "instructionKey": "P07_T05_INST",
+    "assertionType": "TableOfContentsLevels",
+    "headingRange": "1-1",
+    "expectedEntryTitles": [
+      "About MOS 2019 Course",
+      "Author",
+      "Contact"
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P07_T06_TITLE",
+    "instructionKey": "P07_T06_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "lytranthaihoc",
+    "newText": "ltthoc",
+    "expectedReplacementCount": 1,
+    "expectedParagraph": "I always appreciate your valuable feedback to improve the quality of this book via email ltthoc@hocict.edu.vn.",
+    "expectedBodyParagraphs": [
+      "BEST DOCUMENTS FOR MOS WORD 2019 CERTIFICATE EXAMINATION",
+      "USED FOR NTT CENTER FOR INFORMATICS AND INTERNAL CIRCULATION ONLY",
+      "DO NOT COPY OR REDISTRIBUTE",
+      "About MOS 2019 Course",
+      "Text editing is a very regular job for anyone working in the office. This book to reinforce your knowledges and skills as well as Microsoft Office Word 2019 Specialist certification exam.",
+      "The specialized materials of appropriated skills will be tested and evaluated in Exam MO-100: Microsoft Word (Office 2019) published by Microsoft. Besides, the author has complied 10 simulator projects so that learners can self-assess their abilities after the review process before taking the exam to get Microsoft Office Specialist Certification.",
+      "To use this book, learners need to be proficient in using computer (Windows, keyboard, mouse) and already have a basic knowledge of Microsoft Word.",
+      "I always appreciate your valuable feedback to improve the quality of this book via email ltthoc@hocict.edu.vn.",
+      "Due care and diligence have been taken while editing or printing the book, the author of the book hold any responsibility for any mistake that may have inadvertently crept in.",
+      "Ly Tran Thai Hoc, M.Sc. (I.T)(MCT, IC3 Authorized Educator)",
+      "NTT Center for InformaticsNguyen Tat Thanh University",
+      "Related Books",
+      "Microsoft Excel 2019",
+      "Microsoft PowerPoint 2019",
+      "Microsoft Outlook 2019",
+      "Microsoft Word 2019 Expert",
+      "Microsoft Excel 2019 Expert",
+      "Microsoft Access 2019 Expert",
+      "Author",
+      "Ly Tran Thai Hoc, M.Sc. (I.T)",
+      "Microsoft Certified Trainer - IC3 Global Standard 4 Authorized Educator",
+      "MOS 2019 Expert - MOS 2016 Master – MOS 2013 Master – MOS 2010 Master",
+      "Ly Tran Thai Hoc was born in Long An, Vietnam. He received Master degree of Information Technology (2018) from Ho Chi Minh City University of Technology (HUTECH), Vietnam. He has been working at the NTT Center for Informatics - Nguyen Tat Thanh University, HCMC, Vietnam as a lecturer since 2014 until now.",
+      "He is also the founder, manager, and leader of the administration team of fan page hocict.edu.vn and the HOCICT channel on YouTube. All his compiled materials are freely available to the community.",
+      "Internal use – refers to items for use in a project. This document is for internal use only and not to be distributed in any way.",
+      "Contact",
+      "HOCICT - Information and Communication Technologies",
+      "Website: http://www.hocict.edu.vn",
+      "Email: mos@hocict.edu.vn",
+      "YouTube: HOCICT Official Channel – HOCICT Education",
+      "Fan page: @hocict.edu.vn",
+      "Copyright[symbol] 2014 HOCICT. All rights reserved."
+    ]
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P07_T07_TITLE",
+    "instructionKey": "P07_T07_INST",
+    "assertionType": "FootnotesConvertedToEndnotes",
+    "expectedNotes": [
+      {
+        "text": "https://learn.microsoft.com/en-us/certifications/exams/mo-100/",
+        "referenceAfter": "Exam MO-100: Microsoft Word (Office 2019)"
+      },
+      {
+        "text": "https://www.youtube.com/@hocicteducation",
+        "referenceAfter": "YouTube: HOCICT Official Channel – HOCICT Education"
+      }
+    ]
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P07_T08_TITLE",
+    "instructionKey": "P07_T08_INST",
+    "assertionType": "FileExistsInCustomOfficeTemplates",
+    "expectedFileName": "Notes.dotx"
+  }
 ]

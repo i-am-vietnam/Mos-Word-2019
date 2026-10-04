@@ -2,7 +2,7 @@
 
 ## Current supplied-project checkpoint — 2026-10-04
 
-P01–P05 and the P04 follow-up are committed in main HEAD f5940759dd305e2191e511d9466463c0a6e5527d (P05 checkpoint b703bf5). Current P06 work is local/uncommitted and partial: valid eight-task EN/VI package, seven tasks verified with Word 2019, Save As tracking/persistence and regression implemented. T02's Dark Blue, Accent 1 wording conflicts with Gallery's red Accent 1; confirmation and the corresponding final T02/combined 8/8 are pending. This supplied-project milestone does not start future Testing Mode. PROJECT_STATUS.md records current evidence; the original plan and earlier checkpoint below remain historical.
+P01–P06 grading is committed in main HEAD 9fbf1ba762e3f4a43e4476d3a67b01e8cf909a2a. The authorized P06 Red/Accent 1 and template-contract corrections plus P07 legacy-input integration/grading are complete locally/uncommitted. P01–P07 each validate with eight EN/VI tasks; corrected P06 and P07 combined answers pass 8/8, and P01–P05 regression remains 8/8. These supplied-project milestones do not start Testing Mode. PROJECT_STATUS.md records current evidence; the original plan and earlier checkpoints below remain historical.
 
 ## Scope and initial checkpoint
 
