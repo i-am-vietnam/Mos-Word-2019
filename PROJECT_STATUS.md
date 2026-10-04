@@ -1,6 +1,22 @@
 # Project Status
 
-Verified: 2026-09-27.
+Verified: 2026-10-04. Earlier phase evidence below retains its historical dates.
+
+## Current Project 6 acceptance
+
+Main HEAD is f5940759dd305e2191e511d9466463c0a6e5527d. P01–P05 and the P04 follow-up are committed in this baseline (P05 checkpoint b703bf5). The current P06 implementation is local/uncommitted and **partial: seven tasks verified, T02 awaiting expected-color confirmation**. No commit or push was performed.
+
+P01–P06 packages each have eight tasks, validate EN/VI with zero errors/warnings and appear as Project 1–6. Six generic assertion types extend the existing picture-effect/property assertions, for 43 supported identifiers. Production DocumentPageBorder deliberately returns Error until its color metadata is confirmed; no P06 8/8 completion is claimed.
+
+Word 2019 Version 16.0 / Build 16.0.14026 generated disposable answers. Combined T01/T03/T04/T05/T06/T07 pass; T08 passes on Cert.dotx exported from that document, and independently on a template exported from baseline content without T01–T07. Pencil Sketch and the image hyperlink remain compatible after save/reopen/resave. The 50-case matrix passes baseline, wrong-state, near-miss and equivalent-formatting/split-run checks, including conditional border structure probes. XML mutants are supplementary tests, never Word ground-truth evidence.
+
+Production Visual Studio F5 verified EN baseline T01 Incorrect, correct T01 Correct, Save As -> T08 Correct, VI reopen -> T06 Đúng, eight tabs and Word upper/trainer lower layout without Save controls. Real-form/Word tests additionally verify EN/VI seven-task combined results, unchanged owned PID during grade/Save As/switch, P05↔P06 persistence, Restart No/Yes, Task 1/reset, template preservation and manual-close recovery. Initial/final WINWORD sets are empty. Documents test work/template were removed without overwriting personal files. P01–P05 combined regression remains 8/8 each; focused picture-effect/replacement/comment negatives also pass.
+
+Save As uses the held document's live FullName through IWordDocumentState. Grade reads that saved file; workspace checkpointing preserves its content as nonmacro work.docx before switching/exit. T08 requires current live Save As provenance, correct path/name, modern nonmacro content type, root officeDocument relationship and P06 identity. Existing Cert.dotx alone cannot pass; reopening work.docx or Restart requires another Save As for T08. Grade never creates Cert.dotx and Restart never deletes personal/exported templates. Verified default location is Documents/Custom Office Templates, honoring Word's PersonalTemplates setting.
+
+T02 blocker: unchanged Gallery Accent 1 is red B71E42, but the task requests Dark Blue, Accent 1. Word's actual palette agrees with the theme; standard Dark Blue is a different choice. Four-edge Box/Whole document/3 pt serialization is verified (single, sz=24, themeColor=accent1 for the red probe). Production expectedColor is unset and colorExpectationConfirmed=false; confirmation and a corresponding final T02/combined answer are required.
+
+Final Debug/Release Clean/Rebuild each have 0 errors and 0 warnings. P01–P06 starter/reference hashes are unchanged. Evidence and fixtures remain ignored under artifacts/phase10-p06. Testing Mode remains not started.
 
 Build repair: Core now explicitly lists its ten source files, including exactly one Interfaces/IWordWindowLayout.cs entry. Namespace/import/Word-to-Core ProjectReference were already correct. Clean, standalone Core and Word builds, and full Debug/Release rebuilds each completed with zero errors/warnings. Visual Studio reloaded Core and successfully launched WinForms with F5; Login -> Training -> English -> Project 1 -> Go opened work.docx with eight tabs and upper/lower window placement. No UI, lifecycle or P01 source changes were made by this repair. Logs: artifacts/phase4b-repair.
 
@@ -14,12 +30,13 @@ Build repair: Core now explicitly lists its ten source files, including exactly 
 - Phase 5 — Project 1 grading: complete and committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`.
 - Phase 6 — Project 2 integration/grading: complete and committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. P02 validates in EN/VI, appears as Project 2, and grades all eight tasks from saved OOXML. Testing Mode, scoring, database, installer, and release work remain unimplemented.
 - Phase 7 — Project 3 integration/grading: complete in the current committed baseline, including the corrected Accessibility-header and SmartArt Right-to-Left semantics supplied by the user. P03 validates in EN/VI and its combined answer grades 8/8.
-- Phase 8 — Project 4 integration/grading: complete in the current committed baseline. The local P04 follow-up stages `Glasses.obj` safely to Documents and fixes T05 to grade the local Continuous boundary instead of a global section count.
-- Phase 9 — Project 5 integration/grading: complete locally and uncommitted. P05 validates in EN/VI, appears as Project 5, and grades all eight tasks from saved OOXML. Combined P01 through P05 answers each grade 8/8. Testing Mode, scoring, database, installer, and release work remain unimplemented.
+- Phase 8 — Project 4 integration/grading: complete in the current committed baseline. The committed P04 follow-up stages `Glasses.obj` safely to Documents and fixes T05 to grade the local Continuous boundary instead of a global section count.
+- Phase 9 — Project 5 integration/grading: complete and committed in b703bf5/current baseline. P05 validates in EN/VI, appears as Project 5, and grades all eight tasks from saved OOXML. Combined P01 through P05 answers each grade 8/8. Testing Mode, scoring, database, installer, and release work remain unimplemented.
+- Project 6 integration/grading: partial, local/uncommitted; seven verified tasks and confirmed T02 wording/theme conflict as described above.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, and safe top-level asset staging to Documents. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. The supplied P01 through P05 packages validate in EN/VI and appear deterministically as Project 1 through Project 5 with eight tasks each. Starter files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01–P06 validate in EN/VI and appear deterministically as Project 1–6 with eight tasks each. Starter files are unchanged; P06 T02's grading expectation remains unresolved.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
@@ -64,7 +81,7 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current HEAD `6a524a8ba872864a5f04fc6e134913cc27463c1e` contains the supplied P03–P05 resources and the committed P03/P04 baseline. The P04 follow-up and complete P05 grading work are local and uncommitted until the user explicitly requests a commit or push.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current main HEAD is `f5940759dd305e2191e511d9466463c0a6e5527d`, containing committed P01–P05 grading, the P04 follow-up and supplied P06 resources. Current P06 implementation changes are local/uncommitted; no commit or push was performed.
 
 Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Starting parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Final verification: all 185 tracked Excel files and the existing installer archive retained their hashes; parent HEAD, tracked diff and status are unchanged. No Excel file or parent Git configuration was edited. Do not edit parent Git settings or ignore rules.
 

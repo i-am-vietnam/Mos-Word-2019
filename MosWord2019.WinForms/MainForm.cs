@@ -263,6 +263,7 @@ namespace MosWord2019
             if (currentProject == null) return;
             if (!CheckDocument()) return;
             word.Save(); // Failure cancels switching/exit and preserves live learner work.
+            PreserveSaveAsWork();
             AppLogger.Write("Training save " + currentWorkPath);
             word.CloseDocument();
             AppLogger.Write("Training document close " + currentWorkPath);
@@ -294,9 +295,19 @@ namespace MosWord2019
         {
             if (!CheckDocument() || currentProject == null || taskIndex < 0 || taskIndex >= currentProject.Tasks.Count) return;
             TaskDefinition task = currentProject.Tasks[taskIndex];
+            string savedPath;
+            TrainingGradeContext context;
             try
             {
                 word.Save();
+                PreserveSaveAsWork();
+                var documentState = word as IWordDocumentState;
+                savedPath = documentState?.CurrentDocumentPath ?? currentWorkPath;
+                context = documentState == null ? null : new TrainingGradeContext
+                {
+                    DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState.DefaultTemplateFolder : null,
+                    SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase)
+                };
                 AppLogger.Write("Training grade save " + currentWorkPath + " task " + task.TaskId);
             }
             catch (Exception ex)
@@ -309,7 +320,7 @@ namespace MosWord2019
                 return;
             }
 
-            TaskGradeResult result = grading.CheckTask(currentWorkPath, task);
+            TaskGradeResult result = grading.CheckTask(savedPath, task, context);
             AppLogger.Write("Training grade " + task.TaskId + " " + result.Outcome + " " + result.Message);
             if (result.Outcome == TaskGradeOutcome.Pass)
             {
@@ -339,6 +350,13 @@ namespace MosWord2019
             ClearTabs();
             tabTasks.Visible = previous.Enabled = next.Enabled = restart.Enabled = grade.Enabled = false;
             status.ForeColor = SystemColors.ControlText;
+        }
+
+        private void PreserveSaveAsWork()
+        {
+            var state = word as IWordDocumentState;
+            if (state != null && currentProject != null)
+                workspace.PreserveSavedWorkingCopy(currentProject, state.CurrentDocumentPath);
         }
 
         private void Run(Action action)

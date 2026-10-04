@@ -1,15 +1,130 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P06_T01_TITLE",
+    "instructionKey": "P06_T01_INST",
+    "assertionType": "PictureArtisticEffect",
+    "targetImageSha256s": [
+      "C3E3563FD72D2D7C8EE2A2C5775284D050E0D6A1A0687F1F994B967C75B6BC40",
+      "CA9536677F0EF90E94FF58A7DEF7482F52E2E41B06D0D5AE71CE827F7D4AA804",
+      "AF2F35087C3CD2FE4572AED659824BF108934B2B9BEDB6F482A952FA7F409F2B"
+    ],
+    "expectedEffectElement": "artisticPencilSketch",
+    "pictureGeometry": {
+      "anchorParagraph": "Certificate",
+      "cx": "2453005",
+      "cy": "893445",
+      "horizontalRelativeFrom": "column",
+      "horizontalOffset": "6114415",
+      "verticalRelativeFrom": "paragraph",
+      "verticalOffset": "-1447165",
+      "wrapElement": "wrapNone"
+    }
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P06_T02_TITLE",
+    "instructionKey": "P06_T02_INST",
+    "assertionType": "DocumentPageBorder",
+    "colorExpectationConfirmed": false,
+    "expectedColor": null,
+    "expectedStyle": "single",
+    "expectedSizeEighthPoints": 24,
+    "verificationNote": "Gallery palette shows Red, Accent 1; supplied Dark Blue, Accent 1 requires user confirmation.",
+    "observedAccent1Color": "B71E42"
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P06_T03_TITLE",
+    "instructionKey": "P06_T03_INST",
+    "assertionType": "CustomBulletList",
+    "precedingParagraph": "Now you can:",
+    "targetParagraphs": [
+      "Update knowledge for free",
+      "Free using Office 365 for 1 year",
+      "Unlimited access to HOCICT's OneDrive resources"
+    ],
+    "expectedGlyph": "▸",
+    "expectedBulletFont": "Segoe UI Emoji"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P06_T04_TITLE",
+    "instructionKey": "P06_T04_INST",
+    "assertionType": "CorePropertyEquals",
+    "propertyName": "category",
+    "expectedValue": "bikes"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P06_T05_TITLE",
+    "instructionKey": "P06_T05_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "community",
+    "newText": "connectivity",
+    "expectedReplacementCount": 1,
+    "expectedParagraph": "your fashion, dedication, connectivity, and sharing."
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P06_T06_TITLE",
+    "instructionKey": "P06_T06_INST",
+    "assertionType": "PictureHyperlink",
+    "targetImageSha256s": [
+      "C3E3563FD72D2D7C8EE2A2C5775284D050E0D6A1A0687F1F994B967C75B6BC40",
+      "CA9536677F0EF90E94FF58A7DEF7482F52E2E41B06D0D5AE71CE827F7D4AA804",
+      "AF2F35087C3CD2FE4572AED659824BF108934B2B9BEDB6F482A952FA7F409F2B"
+    ],
+    "expectedUrl": "https://www.facebook.com/hocict.edu.vn",
+    "pictureGeometry": {
+      "anchorParagraph": "Certificate",
+      "cx": "2453005",
+      "cy": "893445",
+      "horizontalRelativeFrom": "column",
+      "horizontalOffset": "6114415",
+      "verticalRelativeFrom": "paragraph",
+      "verticalOffset": "-1447165",
+      "wrapElement": "wrapNone"
+    }
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P06_T07_TITLE",
+    "instructionKey": "P06_T07_INST",
+    "assertionType": "TextRangeFormattingEquals",
+    "targetParagraph": "awarded to",
+    "targetText": "awarded to",
+    "expectedFormatting": {
+      "font.ascii": "Gill Sans MT",
+      "font.hAnsi": "Gill Sans MT",
+      "font.eastAsia": "Times New Roman",
+      "font.cs": "Georgia",
+      "i": "1",
+      "iCs": "1",
+      "color": "B71E42",
+      "sz": "val=28",
+      "szCs": "val=28"
+    }
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P06_T08_TITLE",
+    "instructionKey": "P06_T08_INST",
+    "assertionType": "SavedWordTemplate",
+    "expectedFileName": "Cert.dotx",
+    "identityParagraphs": [
+      "Certificate",
+      "the best member of the quarter",
+      "Name of Recipient",
+      "in recognition of",
+      "Now you can:",
+      "Name/Title of Presenter",
+      "Date"
+    ],
+    "targetImageSha256s": [
+      "C3E3563FD72D2D7C8EE2A2C5775284D050E0D6A1A0687F1F994B967C75B6BC40",
+      "CA9536677F0EF90E94FF58A7DEF7482F52E2E41B06D0D5AE71CE827F7D4AA804",
+      "AF2F35087C3CD2FE4572AED659824BF108934B2B9BEDB6F482A952FA7F409F2B"
+    ]
+  }
 ]

@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed class WordController : IWordController, IWordWindowLayout
+    public sealed class WordController : IWordController, IWordWindowLayout, IWordDocumentState
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -18,6 +18,33 @@ namespace MosWord2019.Word
 
         // Diagnostics only; callers never receive a COM object or a process handle.
         public int? OwnedProcessId { get { return session?.Process?.Id; } }
+
+        public string CurrentDocumentPath
+        {
+            get
+            {
+                EnsureUsable();
+                if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
+                return session.Document.FullName;
+            }
+        }
+
+        public string DefaultTemplateFolder
+        {
+            get
+            {
+                EnsureUsable();
+                if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
+                // Word's personal-template setting is independent of Normal.dotm/UserTemplatesPath.
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Office\" + session.Application.Version + @"\Word\Options"))
+                {
+                    string configured = key?.GetValue("PersonalTemplates") as string;
+                    if (!string.IsNullOrWhiteSpace(configured)) return Path.GetFullPath(Environment.ExpandEnvironmentVariables(configured));
+                }
+                // Verified Word 2019 Save As fallback when PersonalTemplates is unset.
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Custom Office Templates");
+            }
+        }
 
         public bool IsOpened
         {

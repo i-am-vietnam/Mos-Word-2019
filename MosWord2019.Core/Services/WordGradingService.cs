@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MosWord2019.Core.Services
 {
-    public sealed class WordGradingService
+    public sealed partial class WordGradingService
     {
         private static readonly XNamespace W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private static readonly XNamespace R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
@@ -42,7 +42,9 @@ namespace MosWord2019.Core.Services
             "TableRowsEqual", "ListLevelEquals", "InlineModel3D", "ContinuousSectionBreakBeforeHeading",
             "SmartArtAllNodesBevelEquals", "DocumentParagraphLineSpacingMultiple", "ContinuedNumberingSequence",
             "ParagraphBlockColumns", "ParagraphBlockKeepWithNext", "CommentResolved",
-            "ShapeWithTextWrapAndPosition", "HeadersFootersWatermarksRemovedByState"
+            "ShapeWithTextWrapAndPosition", "HeadersFootersWatermarksRemovedByState",
+            "DocumentPageBorder", "CustomBulletList", "BodyTextReplaceAll", "PictureHyperlink",
+            "TextRangeFormattingEquals", "SavedWordTemplate"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -51,6 +53,11 @@ namespace MosWord2019.Core.Services
         }
 
         public TaskGradeResult CheckTask(string documentPath, TaskDefinition task)
+        {
+            return CheckTask(documentPath, task, null);
+        }
+
+        public TaskGradeResult CheckTask(string documentPath, TaskDefinition task, TrainingGradeContext context)
         {
             if (task == null) return Error(null, "Task metadata is missing.");
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
@@ -99,6 +106,12 @@ namespace MosWord2019.Core.Services
                         case "CommentResolved": passed = CheckCommentResolved(package, task, out detail); break;
                         case "ShapeWithTextWrapAndPosition": passed = CheckShapeWithTextWrapAndPosition(package, task, out detail); break;
                         case "HeadersFootersWatermarksRemovedByState": passed = CheckHeadersFootersWatermarksRemoved(package, task, out detail); break;
+                        case "DocumentPageBorder": passed = CheckPageBorder(package, task, out detail); break;
+                        case "CustomBulletList": passed = CheckCustomBullet(package, task, out detail); break;
+                        case "BodyTextReplaceAll": passed = CheckBodyReplacement(package, task, out detail); break;
+                        case "PictureHyperlink": passed = CheckPictureHyperlink(package, task, out detail); break;
+                        case "TextRangeFormattingEquals": passed = CheckTextRangeFormatting(package, task, out detail); break;
+                        case "SavedWordTemplate": passed = CheckSavedTemplate(package, documentPath, task, context, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -282,7 +295,7 @@ namespace MosWord2019.Core.Services
             XElement drawing = FindPictureDrawing(package, RequiredStrings(task, "targetImageSha256s"));
             if (drawing == null) { detail = "The target picture cannot be identified by its source fingerprint."; return false; }
             string effect = RequiredString(task, "expectedEffectElement");
-            bool match = drawing.Descendants().Any(e => e.Name.LocalName == effect && e.Name.NamespaceName == "http://schemas.microsoft.com/office/drawing/2010/main");
+            bool match = PictureGeometryMatches(drawing, task) && drawing.Descendants().Any(e => e.Name.LocalName == effect && e.Name.NamespaceName == "http://schemas.microsoft.com/office/drawing/2010/main");
             detail = match ? "The target picture has the required artistic effect." : "The target picture does not have the required artistic effect.";
             return match;
         }
@@ -1313,9 +1326,16 @@ namespace MosWord2019.Core.Services
             XDocument document = package.Xml("word/document.xml");
             foreach (XElement blip in document.Descendants(A + "blip"))
             {
-                string part = package.RelatedPart("word/document.xml", (string)blip.Attribute(R + "embed"));
-                if (!string.IsNullOrEmpty(part) && hashes.Contains(package.Hash(part)))
-                    return blip.Ancestors(W + "drawing").FirstOrDefault();
+                // Word retains an HD source layer when it renders an artistic effect. Its
+                // fingerprint survives regeneration of the displayed bitmap during Save.
+                XNamespace a14 = "http://schemas.microsoft.com/office/drawing/2010/main";
+                foreach (string id in new[] { (string)blip.Attribute(R + "embed") }
+                    .Concat(blip.Descendants(a14 + "imgLayer").Select(e => (string)e.Attribute(R + "embed"))))
+                {
+                    string part = package.RelatedPart("word/document.xml", id);
+                    if (!string.IsNullOrEmpty(part) && hashes.Contains(package.Hash(part)))
+                        return blip.Ancestors(W + "drawing").FirstOrDefault();
+                }
             }
             return null;
         }

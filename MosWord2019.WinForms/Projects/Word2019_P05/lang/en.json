@@ -9,7 +9,7 @@
     "P05_T04_INST": "Set the paragraph options so that the heading \"Founder Information\" and following text always be on the same page.",
     "P05_T05_TITLE": "Task 5",
     "P05_T05_INST": "In the \"Founder Information\" section, insert a new placeholder citation with the name \"Signature1\" at the end of the section after the phrase \"Signature by:\".",
-    "P05_T06_TITLE": "Task 6",
+    "P05_T06_TITLE": "Task 6",  
     "P05_T06_INST": "In the \"Founder Information\" section, resolve the comment.",
     "P05_T07_TITLE": "Task 7",
     "P05_T07_INST": "In the blank space at the bottom of page 2, insert a Horizontal Scroll shape that contains the text \"Congratulation!\". Position the shape in the bottom center of the page, with Square text wrapping. The exact size and position does not matter.",

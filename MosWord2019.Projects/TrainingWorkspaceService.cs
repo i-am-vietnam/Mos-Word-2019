@@ -19,7 +19,7 @@ namespace MosWord2019.Projects
         public string AssetFileName { get; private set; }
     }
 
-    public sealed class TrainingWorkspaceService
+    public sealed partial class TrainingWorkspaceService
     {
         private static readonly Regex ProjectIdPattern =
             new Regex(@"^Word2019_P\d{2,}$", RegexOptions.CultureInvariant);

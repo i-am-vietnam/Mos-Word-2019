@@ -1,5 +1,9 @@
 # MOS Word 2019 Roadmap
 
+## Current supplied-project checkpoint — 2026-10-04
+
+P01–P05 and the P04 follow-up are committed in main HEAD f5940759dd305e2191e511d9466463c0a6e5527d (P05 checkpoint b703bf5). Current P06 work is local/uncommitted and partial: valid eight-task EN/VI package, seven tasks verified with Word 2019, Save As tracking/persistence and regression implemented. T02's Dark Blue, Accent 1 wording conflicts with Gallery's red Accent 1; confirmation and the corresponding final T02/combined 8/8 are pending. This supplied-project milestone does not start future Testing Mode. PROJECT_STATUS.md records current evidence; the original plan and earlier checkpoint below remain historical.
+
 ## Scope and initial checkpoint
 
 At task start: Phase 0 — in progress; Phase 1 — in progress; Phase 2+ — not started.

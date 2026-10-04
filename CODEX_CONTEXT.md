@@ -2,7 +2,21 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through Phase 8 are complete in the committed baseline at HEAD `6a524a8ba872864a5f04fc6e134913cc27463c1e`. The P04 asset/T05 follow-up and complete P05 integration/grading are local and uncommitted. The roadmap is background scope for later work and the current user request controls the authorized phase.
+Independent MOS Word 2019 product. Read AGENTS.md and PROJECT_STATUS.md before work. Phase 0 through P05 grading and the P04 follow-up are complete in main HEAD f5940759dd305e2191e511d9466463c0a6e5527d (P05 checkpoint b703bf5). P06 work is local/uncommitted and partial: seven tasks verified, T02 color expectation awaiting confirmation. The roadmap is background scope for later work and the current user request controls the authorized phase.
+
+## Project 6 grading and Save As
+
+P06 uses PictureArtisticEffect with optional geometry checks, DocumentPageBorder, CustomBulletList, CorePropertyEquals, BodyTextReplaceAll, PictureHyperlink, TextRangeFormattingEquals and SavedWordTemplate. Six new generic assertions live in Core/Services/WordGradingService.PackageAssertions.cs, with no Office COM. Routing is metadata-driven; there are 43 supported identifiers. Existing P01–P05 metadata/contracts are unchanged and combined regression passes 8/8 each.
+
+The shared picture finder recognizes verified HD source-layer fingerprints as well as displayed images, tolerating preview regeneration by Word. Custom bullets resolve paragraph/style numPr through num/abstractNum/current level/overrides, then check U+25B8 and Segoe UI Emoji on all three unchanged paragraphs. Body replacement supports split runs and exact target paragraph/occurrence counts. Image hyperlink checks the logo's owning-part External relationship and exact URL. Clear-format grading merges docDefaults, paragraph/character style chains and direct properties, resolves theme fonts/colors and checks the entire range's effective visual properties. Word's clear result retains Normal's italic, accent1 B71E42 and 14 pt; black 11 pt or an empty rPr requirement would be incorrect.
+
+IWordDocumentState exposes live CurrentDocumentPath and DefaultTemplateFolder without COM objects. WordController reads its already held Document.FullName and the PersonalTemplates setting; F12 verified the default fallback Documents/Custom Office Templates. MainForm saves/grades the live path. TrainingWorkspaceService.PreserveSavedWorkingCopy checkpoints supported nonmacro .docx/.dotx Save As output to authoritative work.docx by changing only the checkpoint's main content type. It never writes the exported template; copy failure cancels switching/exit and keeps Word open. Normal Go remains .docx-only.
+
+TrainingGradeContext comes from runtime ownership, never task JSON. T08 requires current live Save As from the working document, Cert.dotx at the default location, real modern nonmacro template type/root relationship and P06 identity. A stale output cannot pass fresh work. Switching/reopen uses work.docx, so T08 requires another Save As. Restart leaves exported/personal templates intact and invalidates live export provenance. Grade never creates Cert.dotx or starts another Word application.
+
+P06 T02 remains unresolved: Gallery Accent 1 is red B71E42, conflicting with Dark Blue, Accent 1 wording. Production expectedColor=null/colorExpectationConfirmed=false gives Error instead of learner Fail. A separate real Word probe confirms four-edge Box, sz=24 for 3 pt and whole-document scope; hypothetical confirmed-color unit tests do not complete the task. Do not silently set the flag or change the starter theme.
+
+Word ground truth used Version 16.0/Build 16.0.14026 and disposable copies with save/close/reopen/resave. Ignored artifacts/phase10-p06 holds the 50-case matrix, EN/VI real-form Save As/restart/manual-close tests, F5 screenshots, P01–P05 combined/critical regression, build logs and hash manifests. Seven P06 tasks pass; no P06 8/8 claim. Testing remains out of scope; no commit/push.
 
 Solution: MosWord2019.slnx, supported by local Visual Studio Community 18 / MSBuild 18.10.1. All five projects use classic MSBuild format, C# 7.3, .NET Framework 4.7.2, AnyCPU. WinForms outputs MosWord2019.exe. Use Visual Studio MSBuild, not an assumed dotnet build workflow:
 
@@ -31,7 +45,7 @@ Program.Main (STA) -> Application.Run(LoginForm). LoginForm offers Training and 
 
 AppSession is immutable instance-based mode/language state. MainForm owns the controller, current project, working path and task index. It uses a compact Excel-style top bar, localized TabControl and footer (<<, >>, Restart, Grade, status). Save/Close buttons are absent; saving is internal to switching, grading, and normal exit. There is no timer or Testing state. The constructor overload accepts a project root, workspace service, IWordController and optional dialog delegates for verification; normal construction always uses AppDomain.CurrentDomain.BaseDirectory/Projects and the standard Documents/MosWord2019 workspace.
 
-Go validates selected translations, saves/closes existing work, prepares through TrainingWorkspaceService, opens only the returned work.docx and selects Task 1. Navigation only updates the instruction panel. Grade saves the live document, snapshots work.docx, and grades the selected tab without closing, reopening, resetting, or moving Word. Save failures route to a technical Error message and keep Word open. Confirmed Restart (default No) closes without saving, resets via the workspace service, reopens and selects Task 1. Manual document/application closure is detected through IsOpened; stale state is cleaned, a localized message is shown and Go can reopen saved work. Form close saves, closes and disposes on the same STA thread. Phase 2 ownership protection remains authoritative. Testing controls are absent.
+Go validates selected translations, saves/closes existing work, prepares through TrainingWorkspaceService, opens only the returned work.docx and selects Task 1. Navigation only updates the instruction panel. Grade saves the live document, checkpoints supported Save As output to work.docx, snapshots the live FullName, and grades the selected tab without closing, reopening, resetting, or moving Word. Save/copy failures route to a technical Error message and keep Word open. Confirmed Restart (default No) closes without saving, resets via the workspace service, reopens and selects Task 1. Manual document/application closure is detected through IsOpened; stale state is cleaned, a localized message is shown and Go can reopen saved work. Form close saves, closes and disposes on the same STA thread. Phase 2 ownership protection remains authoritative. Testing controls are absent.
 
 ## Excel inspection and reuse classification
 
@@ -133,7 +147,7 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved `.docx` into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` returns true only for the 37 implemented P01–P05 assertion types.
+`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` recognizes 43 implemented identifiers; P06 DocumentPageBorder additionally requires confirmed color metadata.
 
 ## Phase 6 P02 grading architecture
 
