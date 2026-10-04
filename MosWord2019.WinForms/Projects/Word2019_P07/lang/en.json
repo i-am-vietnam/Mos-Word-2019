@@ -1,0 +1,18 @@
+{
+  "P07_T01_TITLE": "Task 1",
+  "P07_T01_INST": "Modify the document to take it out of Compatibility Mode.",
+  "P07_T02_TITLE": "Task 2",
+  "P07_T02_INST": "In the document header, apply the text effect Fill: Blue, Accent 1; Shadow.",
+  "P07_T03_TITLE": "Task 3",
+  "P07_T03_INST": "In the \"Author\" section, change the text wrapping of the image to Square.",
+  "P07_T04_TITLE": "Task 4",
+  "P07_T04_INST": "At the end of the document, locate the paragraph that begins with \"Internal use – refers to items for use in a project.\" Add a bookmark named \"Ico\" at the beginning of the paragraph.",
+  "P07_T05_TITLE": "Task 5",
+  "P07_T05_INST": "Regenerate the table of contents to display only level 1 headings.",
+  "P07_T06_TITLE": "Task 6",
+  "P07_T06_INST": "Use a Word feature to replace all instances of \"lytranthaihoc\" with \"ltthoc\".",
+  "P07_T07_TITLE": "Task 7",
+  "P07_T07_INST": "Convert all footnotes to endnotes.",
+  "P07_T08_TITLE": "Task 8",
+  "P07_T08_INST": "Save a copy of the document as a Word 2019 template named \"Notes\" that is compatible with the latest Word features and does not support macros. Save the template file in the default location."
+}

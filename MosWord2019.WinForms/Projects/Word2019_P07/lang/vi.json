@@ -1,0 +1,18 @@
+﻿{
+  "P07_T01_TITLE": "Tác vụ 1",
+  "P07_T01_INST": "Chỉnh sửa tài liệu để đưa tài liệu ra khỏi Compatibility Mode.",
+  "P07_T02_TITLE": "Tác vụ 2",
+  "P07_T02_INST": "Trong phần đầu trang của tài liệu, áp dụng hiệu ứng văn bản Fill: Blue, Accent 1; Shadow.",
+  "P07_T03_TITLE": "Tác vụ 3",
+  "P07_T03_INST": "Trong phần \"Author\", thay đổi kiểu ngắt dòng văn bản của hình ảnh thành Square.",
+  "P07_T04_TITLE": "Tác vụ 4",
+  "P07_T04_INST": "Ở cuối tài liệu, tìm đoạn văn bắt đầu bằng \"Internal use – refers to items for use in a project.\" Thêm bookmark có tên \"Ico\" tại đầu đoạn văn.",
+  "P07_T05_TITLE": "Tác vụ 5",
+  "P07_T05_INST": "Tạo lại mục lục để chỉ hiển thị các tiêu đề cấp 1.",
+  "P07_T06_TITLE": "Tác vụ 6",
+  "P07_T06_INST": "Sử dụng một tính năng trong Word để thay thế tất cả các lần xuất hiện của \"lytranthaihoc\" bằng \"ltthoc\".",
+  "P07_T07_TITLE": "Tác vụ 7",
+  "P07_T07_INST": "Chuyển đổi tất cả footnote thành endnote.",
+  "P07_T08_TITLE": "Tác vụ 8",
+  "P07_T08_INST": "Lưu một bản sao của tài liệu dưới dạng mẫu Word 2019 có tên \"Notes\", tương thích với các tính năng Word mới nhất và không hỗ trợ macro. Lưu tệp mẫu tại vị trí mặc định."
+}
