@@ -144,7 +144,7 @@ namespace MosWord2019.Projects
                     string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
                     if (File.Exists(converted)) File.Delete(converted); // Exact owned checkpoint; caller closed Word.
                 }
-                if (RequiresExportCheckpoint(package))
+                if (RequiresExportCheckpoint(package) || RequiresLegacyCheckpoint(package))
                 {
                     string checkpoint = GetExportCheckpointPath(package);
                     if (File.Exists(checkpoint)) File.Delete(checkpoint); // Exact workspace checkpoint; never the TXT output.
@@ -180,6 +180,18 @@ namespace MosWord2019.Projects
             string starterPath = Path.GetFullPath(Path.Combine(packageRoot, starterName));
             EnsureContained(packageRoot, starterPath, "Starter path escapes the package root.");
             if (!File.Exists(starterPath)) throw new FileNotFoundException("Starter document does not exist.", starterPath);
+
+            string prepared = (package.Meta.PreparedStarter ?? "").Trim();
+            if (prepared.Length > 0)
+            {
+                if (Path.IsPathRooted(prepared) || prepared != Path.GetFileName(prepared) ||
+                    !string.Equals(Path.GetExtension(prepared), extension, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Prepared starter must be a package-root file with the original starter's format.");
+                starterPath = Path.GetFullPath(Path.Combine(packageRoot, prepared));
+                EnsureContained(packageRoot, starterPath, "Prepared starter escapes the package root.");
+                if (!File.Exists(starterPath) || (File.GetAttributes(starterPath) & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidDataException("Verified prerequisite baseline is missing or is not a regular file.");
+            }
 
             string workingDirectory = Path.GetFullPath(Path.Combine(workingRootPath, projectId));
             EnsureContained(workingRootPath, workingDirectory, "Working path escapes the Training root.");

@@ -246,6 +246,8 @@
     <None Include="Projects\Word2019_P11\starter.docx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Projects\Word2019_P11\prepared-starter.docx"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
+    <Content Include="Projects\Word2019_P11\preparation.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <None Include="Projects\Word2019_P11\tasks.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

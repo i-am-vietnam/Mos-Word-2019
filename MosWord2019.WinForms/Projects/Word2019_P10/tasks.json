@@ -310,20 +310,23 @@
     "titleKey": "P10_T11_TITLE",
     "instructionKey": "P10_T11_INST",
     "assertionType": "CustomBulletList",
-    "precedingParagraph": "He is also the founder, manager, and leader of the administration team of fan page hocict.edu.vn and the HOCICT Official Channel on YouTube. All his compiled materials are freely available to the community.",
     "targetParagraphs": [
-      "Website: http://www.hocict.edu.vn",
-      "Fanpage: https://www.facebook.com/hocict.edu.vm",
-      "Email: lytranthaihoc@hocict.edu.vn",
-      "YouTube: HOCICT Official Channel",
-      "Skype: hocict – Yahoo: hocict"
+      "Microsoft Certified Trainer - IC3 Global Standard 4 Authorized Educator",
+      "MOS 2019 Masder Expert - MOS 2016 Master – MOS 2013 Master – MOS 2010 Master"
     ],
     "expectedGlyph": "✈",
     "expectedBulletFont": "Segoe UI Emoji",
     "paragraphTextAlternatives": {
-      "Email: lytranthaihoc@hocict.edu.vn": [
-        "Email: mos@hocict.edu.vn"
+      "MOS 2019 Masder Expert - MOS 2016 Master – MOS 2013 Master – MOS 2010 Master": [
+        "MOS 2019 Expert - MOS 2016 Master – MOS 2013 Master – MOS 2010 Master"
       ]
+    },
+    "sectionHeading": "About Author",
+    "followingHeading": "Manage Documents",
+    "optionalInlineSymbol": {
+      "afterText": "Microsoft Certified Trainer",
+      "font": "Webdings",
+      "code": 38
     }
   },
   {

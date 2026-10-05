@@ -20,7 +20,7 @@
   "P10_T10_TITLE": "Tác vụ 10",
   "P10_T10_INST": "Trong phần \"What is MOS Certification?\", thay đổi giãn dòng của các đoạn văn thành Exactly 14 pt.",
   "P10_T11_TITLE": "Tác vụ 11",
-  "P10_T11_INST": "Trong phần \"About Author\", thay các dấu đầu dòng hình vuông đặc bằng dấu đầu dòng tùy chỉnh. Sử dụng ký hiệu máy bay của phông Segoe UI Emoji và mã ký tự \"2708\".",
+  "P10_T11_INST": "Trong About Author, áp dụng dấu đầu dòng máy bay thật (Segoe UI Emoji, mã ký tự 2708) cho hai đoạn chứng chỉ bắt đầu bằng “Microsoft Certified Trainer” và “MOS 2019”.",
   "P10_T12_TITLE": "Tác vụ 12",
   "P10_T12_INST": "Trong đoạn văn đầu tiên sau tiêu đề \"What is MOS Certification?\", chèn chú thích cuối trang với nội dung \"Certiport is dedicated to helping people succeed through certification. Our globally recognized credentials are aimed at enhancing individual productivity, marketability, and value.\" tại cuối từ \"Certiport\".",
   "P10_T13_TITLE": "Tác vụ 13",

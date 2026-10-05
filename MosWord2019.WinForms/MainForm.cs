@@ -59,7 +59,7 @@ namespace MosWord2019
                     BeginInvoke((Action)(() =>
                     {
                         if (IsDisposed || Disposing) return;
-                        status.Text = T("Save cancelled: unable to preserve formatted work.", "Đã hủy lưu: không thể giữ bản làm việc có định dạng.");
+                        status.Text = T("Unable to preserve formatted work; keep Word open and recover your document.", "Không thể giữ bản có định dạng; hãy giữ Word mở và khôi phục tài liệu.");
                         notify(status.Text);
                     }));
                 };
@@ -144,6 +144,7 @@ namespace MosWord2019
             ShowTask(0);
             status.Text = T("Project opened", "Đã mở dự án");
             ArrangeWorkspace();
+            ShowPreparationContext();
         }
 
         private static void ValidateTranslations(ProjectPackage package)
@@ -191,6 +192,12 @@ namespace MosWord2019
             next.Enabled = active && taskIndex < tabTasks.TabPages.Count - 1;
             if (active) status.Text = T("Task ", "Nhiệm vụ ") + (taskIndex + 1) + "/" + tabTasks.TabPages.Count;
             if (active) status.ForeColor = SystemColors.ControlText;
+        }
+
+        private void ShowPreparationContext()
+        {
+            string key = currentProject?.Meta.PreparationContextKey;
+            if (!string.IsNullOrEmpty(key)) notify(currentProject.Lang[key]);
         }
 
         private void ClearTabs()
@@ -279,8 +286,14 @@ namespace MosWord2019
             if (!CheckDocument()) return;
             word.Save(); // Failure cancels switching/exit and preserves live learner work.
             PreserveSaveAsWork();
+            var project = currentProject;
+            string retained = TrainingWorkspaceService.RequiresLegacyCheckpoint(project)
+                ? ((IWordLegacyCheckpoint)word).GetPreservedFormattedPath() : null;
             AppLogger.Write("Training save " + currentWorkPath);
             word.CloseDocument();
+            // Word can retain the original work.docx lock even after Save As .doc.
+            // Commit the confirmed formatted checkpoint only after the owned document closes.
+            if (retained != null) workspace.PreserveSavedWorkingCopy(project, retained);
             AppLogger.Write("Training document close " + currentWorkPath);
             ClearProject();
         }
@@ -305,6 +318,7 @@ namespace MosWord2019
             AppLogger.Write("Training restart " + path);
             status.Text = T("Project restarted", "Đã làm lại dự án");
             ArrangeWorkspace();
+            ShowPreparationContext();
         }
 
         private void GradeCurrentTask()
@@ -329,9 +343,12 @@ namespace MosWord2019
                     savedPath = currentWorkPath; // Grade the retained Word working copy, never a lossy external output.
                 if (!externalOutput && TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
                     savedPath = ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
-                context = documentState == null ? null : new TrainingGradeContext
+                if (!externalOutput && TrainingWorkspaceService.RequiresLegacyCheckpoint(currentProject))
+                    savedPath = ((IWordLegacyCheckpoint)word).GetPreservedFormattedPath();
+                context = new TrainingGradeContext
                 {
-                    DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState.DefaultTemplateFolder : null,
+                    DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState?.DefaultTemplateFolder : null,
+                    DefaultSaveAsFolder = Path.GetDirectoryName(currentWorkPath),
                     SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase)
                 };
                 AppLogger.Write("Training grade source " + savedPath + " task " + task.TaskId);
@@ -380,6 +397,13 @@ namespace MosWord2019
 
         private void PreserveSaveAsWork()
         {
+            if (TrainingWorkspaceService.RequiresLegacyCheckpoint(currentProject))
+            {
+                // Confirm preservation without replacing work.docx while Word may still lock it.
+                // Switching/shutdown commits it after CloseDocument; grading reads it directly.
+                ((IWordLegacyCheckpoint)word).GetPreservedFormattedPath();
+                return;
+            }
             if (TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
             {
                 ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
@@ -393,6 +417,13 @@ namespace MosWord2019
 
         private void ConfigureExportCheckpoint()
         {
+            if (TrainingWorkspaceService.RequiresLegacyCheckpoint(currentProject))
+            {
+                var legacy = word as IWordLegacyCheckpoint;
+                if (legacy == null) throw new NotSupportedException("The Word controller cannot preserve formatted work before a legacy export.");
+                legacy.ConfigureLegacyCheckpoint(workspace.GetExportCheckpointPath(currentProject));
+                return;
+            }
             if (!TrainingWorkspaceService.RequiresExportCheckpoint(currentProject)) return;
             var checkpoint = word as IWordExportCheckpoint;
             if (checkpoint == null) throw new NotSupportedException("The Word controller cannot safely preserve a lossy export.");

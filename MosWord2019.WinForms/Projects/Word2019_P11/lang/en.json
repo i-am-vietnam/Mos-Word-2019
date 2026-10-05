@@ -10,7 +10,7 @@
   "P11_T05_TITLE": "Task 5",
   "P11_T05_INST": "In the \"Office 2010\" section, convert the tab-delimited text to a five-column table. Accept the default AutoFit behavior.",
   "P11_T06_TITLE": "Task 6",
-  "P11_T06_INST": "Below the \"Basic Informatic\" heading, format the paragraphs as a numbered list that has a parenthesis after each number.",
+  "P11_T06_INST": "Below the \"About MOS\" heading, format the paragraphs as a numbered list that has a parenthesis after each number.",
   "P11_T07_TITLE": "Task 7",
   "P11_T07_INST": "In the \"About Author\" section, copy the formatting of the italicized paragraph and apply it to the next paragraph.",
   "P11_T08_TITLE": "Task 8",
@@ -36,5 +36,6 @@
   "P11_T18_TITLE": "Task 18",
   "P11_T18_INST": "In the file properties, add \"First Version\" as the status.",
   "P11_T19_TITLE": "Task 19",
-  "P11_T19_INST": "Save a copy of the document as a Word document named \"OlderVersion\" that is compatible with an earlier version. Save the document file in the default location."
+  "P11_T19_INST": "Save the document as OlderVersion using Word 97–2003 Document (*.doc) in the default location offered by Word.",
+  "P11_PREPARATION_CONTEXT": "Training setup: the three About Course paragraphs are already in two columns and the Office 2013 5-column, 10-row table is supplied. Office 2010 conversion (Task 5) and sorting (Task 15) remain your tasks. Setup is applied only to new or restarted work; existing work is preserved."
 }

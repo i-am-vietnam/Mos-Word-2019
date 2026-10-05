@@ -1,0 +1,16 @@
+{
+  "wordVersion": "16.0",
+  "wordBuild": "16.0.14026",
+  "sourceSha256": "264F72C018D122A97DAD38DFD7D328FE25BEBADD5DA46274F3CC5124BB97E7D3",
+  "preparedSha256": "C83FE6DB78EBEE29F2ADD5E45840C2077591D8C705EE9FA3BB34D2B08E4AE6C8",
+  "operations": [
+    "Native Insert Table dialog 5 columns / 10 rows / AutoFit Window; two header labels entered; native Layout AutoFit Window; save/reopen",
+    "Native Layout Columns Two applied only to three About Course paragraphs; save/reopen"
+  ],
+  "notCompleted": [
+    "No column break",
+    "No 1.32-inch widths",
+    "Office 2010 still tab-delimited",
+    "No other P11 task applied"
+  ]
+}

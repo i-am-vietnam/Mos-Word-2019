@@ -2,9 +2,29 @@
 
 Verified: 2026-10-05. Earlier phase evidence below retains its historical dates.
 
-## Current Project 10 implementation and Project 9 correction
+## Current P10 repairs and P11 integration
 
-Verified on main HEAD `bc2f90b1b591281700c1d0c035e51b57c4691a04`, dedicated Word origin, starting worktree clean. P01-P09 implementation is committed in that baseline. The P09 T08 correction and P10 implementation described here remain local/uncommitted. No commit or push.
+Verified starting main HEAD `be8af56be98a92d8544b14be614ed94a5b6e9b7a` (Bo sung project 11), dedicated Word origin, clean starting worktree. The earlier P09 correction/P10 implementation is committed in this baseline. Current P10 corrections and P11 integration remain local/uncommitted. No commit or push; Excel was neither modified nor built.
+
+P01-P09 have eight tasks each, P10 seventeen and P11 nineteen. P11 package metadata is implemented for eighteen identifiable tasks. T06 cannot be finalized: the supplied starter contains no Basic Informatic heading/block. Its declared generic TaskSpecificationUnavailable assertion reports a technical Error rather than fabricated Correct/Incorrect. P11 therefore remains partial, not 19/19 complete.
+
+P10 T08 accepts the two observed native AutoFit Window serializations (tblW pct 4995/5000, automatic layout, compatible preferred cell widths), including inherited table properties. It continues to reject fixed/contents sizing, contradictory cell widths, wrong dimensions/location/labels and merges. Production F5 native Insert Table 5x10/AutoFit Window returns Correct. P10 T11 now targets the two About Author certification paragraphs, real U+2708/Segoe UI Emoji bullets, with the declared Masder deletion and Webdings medal combinations. Production native Define New Bullet selection returns Correct; VI returns Đúng. Font-changing automation in the Symbol dialog still has a focus gap; it is not claimed as passed.
+
+P11 uses an explicitly disclosed prepared-starter.docx only for first preparation/reset: a 5x10 Office 2013 AutoFit Window table and exactly three About Course paragraphs in two columns. Existing work is preserved. The production starter.docx is unchanged; preparation.json records source/prepared hashes, Word build and exact prerequisite actions. No Office 2010 conversion, column break, requested widths or other answer is automatically supplied.
+
+Word 2019 16.0.14026 produced cumulative native saved/reopened P11 answers, including exact Stock/Online Surface Pro - Platinum insertion. Known combined result is eighteen Pass plus the T06 technical Error. The 73-case baseline/positive/negative/near-miss matrix and 28 supplemental semantic cases have zero mismatches. Synthetic negatives/equivalent serializations are supplementary, not native ground truth. Seven workspace checks pass, including first/preserve/reset and newer-work protection against old export checkpoints.
+
+Native P11 F12 Word 97-2003 Save As produces genuine OlderVersion.doc in the current working folder, SaveFormat 0/CompatibilityMode 11. Conversion removes modern SmartArt/3D/citation features from the live legacy state. A verified owned pre-save snapshot retains the modern state; T01-T18 grade that snapshot, while T19 uses a read-only binary Word reader. Word can retain work.docx's lock after Save As, so switching/exit commits the snapshot only after CloseDocument. Production F5 verifies T19 Correct, T01 Correct before/after export, same PID 5232 across P11-P10-P11 switching, prepared Restart Yes/Task1 and Restart No preservation. OlderVersion.doc is not automatically deleted.
+
+Fresh established P01-P09 combined fixtures regrade 8/8 under their current contracts; no previous metadata was weakened. Controlled external-file verification protects existing personal outputs. A separate injected EN/VI real-form harness finishes with zero failures for P06-P08, corrected P10 (17/17), P11 (18 Pass plus T06 Error), legacy conversion/restart and real template Save As/exact cleanup; this is distinct from production F5 native acceptance. Evidence/logs are ignored under artifacts/phase15-p11.
+
+Additional production F5 native checks pass: cancellation of the F12 Save As dialog retains the modern work.docx path/format; column break T10, citation T04, keyboard Copy/Paste Formatting T07 and File Info Status T18 all return Correct. Two Ribbon Format Painter mouse-drag attempts did not apply formatting and correctly returned Incorrect; mouse-path acceptance remains open. A separate owned-Word harness reproduces a real backing-file save failure, preserves unsaved content, recovers through Save As and protects an independent unsaved Word sentinel. This is not a production F5 save-failure check. Debug/Release Clean/Rebuild each have 0 errors/0 warnings; source and both output roots validate EN/VI 0/0, all 58 package files match source bytes, and all eleven starter hashes are unchanged. Normal production close saves work and leaves no WINWORD process.
+
+Remaining acceptance: user clarification for T06, complete isolated-per-task native positives (current P11 native ground truth is cumulative), full production F5 feature-family coverage including Ribbon Format Painter, production F5 save-failure coverage, fresh P09 native Plain Text regression (historical native evidence is retained), and the existing P08 Accessibility Checker reproduction gap. These items must not be represented as complete. Testing Mode is not started.
+
+## Historical Project 10 implementation and Project 9 correction
+
+Verified on main HEAD `bc2f90b1b591281700c1d0c035e51b57c4691a04`, dedicated Word origin, starting worktree clean. P01-P09 implementation is committed in that baseline. The P09 T08 correction and P10 implementation described here were local during these historical checks; they are committed in the current be8af56 starting baseline. No commit or push.
 
 P01-P09 have eight tasks each; P10 intentionally has seventeen. Source and actual Debug/Release output packages validate EN/VI with 0 errors/0 warnings and deterministic Project 1-10 discovery. Core routes 59 generic assertion identifiers. Three additions are FileExistsInDocuments, InsertedTableAutoFitWindow and TableRowCharacterStyle. Optional after-text symbol placement, native symbol resave equivalence, Tight shape wrapping and declared combined-task text alternatives preserve earlier contracts. No grading branch uses project/task IDs.
 
@@ -74,12 +94,13 @@ Projects build repair: TemplateOutputCleanupService already existed with the cor
 - Project 7 integration/grading: complete and committed; real legacy input, eight tasks and combined EN/VI 8/8 verified.
 
 - Project 8 grading/package: committed; combined 8/8 regression passes, with the documented Accessibility Checker UI reproduction item still open.
-- Project 9 grading: committed in the starting baseline; current T08 simplified-existence correction is local/uncommitted and verified.
-- Project 10 grading/package: local/uncommitted, seventeen tasks and combined 17/17 verified; full manual ribbon/dialog acceptance remains partial as stated above.
+- Project 9 grading and simplified T08 contract: committed in the current starting baseline.
+- Project 10 grading/package: committed baseline; current T08/T11 corrections are local. Seventeen tasks and combined 17/17 verified; complete manual UI acceptance remains partial.
+- Project 11 integration: local/partial, nineteen definitions, eighteen verified task positives; T06 awaits supplied-target clarification.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P10 validate in EN/VI and appear deterministically as Project 1-10; P01-P09 have eight tasks each and P10 has seventeen. Starter files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P11 packages are structurally validated in EN/VI and discovered as Project 1-11; counts are eight for P01-P09, seventeen for P10 and nineteen for P11. Structural validation does not imply that missing P11 T06 content is resolved. Starter files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx or legacy .doc working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves before selected saved-document tasks, bypasses saving for declared external-existence tasks, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 

@@ -5,5 +5,6 @@ namespace MosWord2019.Core.Models
     {
         public string DefaultTemplateFolder { get; set; }
         public bool SavedFromCurrentWorkingDocument { get; set; }
+        public string DefaultSaveAsFolder { get; set; }
     }
 }

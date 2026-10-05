@@ -79,25 +79,70 @@ namespace MosWord2019.Core.Services
         {
             var paragraphs = MainParagraphs(package);
             string[] expected = RequiredStrings(task, "targetParagraphs");
-            int anchor = paragraphs.FindIndex(p => ParagraphText(p) == RequiredString(task, "precedingParagraph"));
+            JToken scope;
+            bool scoped = task.Extra.TryGetValue("sectionHeading", out scope);
+            int anchor = scoped ? paragraphs.FindIndex(p => ParagraphTextOutsideTextBoxes(p) == (string)scope)
+                : paragraphs.FindIndex(p => ParagraphText(p) == RequiredString(task, "precedingParagraph"));
             string glyph = RequiredString(task, "expectedGlyph"), font = RequiredString(task, "expectedBulletFont");
-            var targets = paragraphs.Skip(anchor + 1).Take(expected.Length).Select(ParagraphText).ToArray();
-            bool match = anchor >= 0 && targets.Length == expected.Length;
             JToken alternatives;
             var variants = task.Extra.TryGetValue("paragraphTextAlternatives", out alternatives) ? alternatives as JObject : null;
-            for (int i = 0; match && i < expected.Length; i++)
-                match &= targets[i] == expected[i] || (variants?[expected[i]] is JArray && ((JArray)variants[expected[i]]).Values<string>().Contains(targets[i]));
+            var targets = new List<XElement>();
+            bool match = anchor >= 0;
+            var candidates = scoped ? paragraphs.Skip(anchor + 1).TakeWhile(p => ParagraphTextOutsideTextBoxes(p) != RequiredString(task, "followingHeading")).ToList()
+                : paragraphs.Skip(anchor + 1).Take(expected.Length).ToList();
+            Func<XElement, string> text = p => scoped ? BulletParagraphText(p, task) : ParagraphText(p);
             for (int i = 0; match && i < expected.Length; i++)
             {
-                XElement level = EffectiveNumberingLevel(package, paragraphs[anchor + 1 + i], new HashSet<string>());
+                Func<XElement, bool> accepts = p => text(p) == expected[i] ||
+                    (variants?[expected[i]] is JArray && ((JArray)variants[expected[i]]).Values<string>().Contains(text(p)));
+                var found = scoped ? candidates.Where(accepts).ToList() : candidates.Skip(i).Take(1).Where(accepts).ToList();
+                match = found.Count == 1 && (targets.Count == 0 || candidates.IndexOf(found[0]) > candidates.IndexOf(targets.Last()));
+                if (match) targets.Add(found[0]);
+            }
+            for (int i = 0; match && i < expected.Length; i++)
+            {
+                XElement level = EffectiveNumberingLevel(package, targets[i], new HashSet<string>());
                 XElement fonts = level?.Element(W + "rPr")?.Element(W + "rFonts");
+                string ascii = (string)fonts?.Attribute(W + "ascii"), highAnsi = (string)fonts?.Attribute(W + "hAnsi");
                 match = (string)level?.Element(W + "numFmt")?.Attribute(W + "val") == "bullet" &&
                     (string)level?.Element(W + "lvlText")?.Attribute(W + "val") == glyph &&
-                    (string)fonts?.Attribute(W + "ascii") == font && (string)fonts?.Attribute(W + "hAnsi") == font;
+                    level?.Element(W + "lvlPicBulletId") == null &&
+                    (ascii == font || highAnsi == font) && (ascii == null || ascii == font) && (highAnsi == null || highAnsi == font);
             }
             detail = match ? "The unchanged target paragraphs use real custom bullets with the required glyph and font."
                 : "One or more target paragraphs lack the required real bullet glyph/font or their content/order changed.";
             return match;
+        }
+
+        private static string BulletParagraphText(XElement paragraph, TaskDefinition task)
+        {
+            // Optional symbols are narrowly declared, including their exact logical insertion position.
+            string value = ParagraphTextOutsideTextBoxes(paragraph);
+            JToken token;
+            if (!task.Extra.TryGetValue("optionalInlineSymbol", out token)) return value;
+            string after = (string)token["afterText"], font = (string)token["font"];
+            int code = (int)token["code"];
+            var symbols = paragraph.Descendants(W + "sym").ToList();
+            if (symbols.Count > 1) return "\0";
+            foreach (var symbol in symbols)
+            {
+                int parsed;
+                if ((string)symbol.Attribute(W + "font") != font ||
+                    !int.TryParse((string)symbol.Attribute(W + "char"), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out parsed) || parsed % 4096 != code ||
+                    string.Concat(paragraph.Descendants(W + "t").Where(t => XNode.DocumentOrderComparer.Compare(t, symbol) < 0).Select(t => t.Value)) != after)
+                    return "\0";
+            }
+            // Native Word also serializes legacy-font symbols as a private-use text run.
+            string privateUse = char.ConvertFromUtf32(0xF000 + code);
+            int position = value.IndexOf(privateUse, StringComparison.Ordinal);
+            if (position >= 0)
+            {
+                var runs = paragraph.Descendants(W + "r").Where(r => VisibleText(r).Contains(privateUse)).ToList();
+                if (symbols.Count != 0 || value.LastIndexOf(privateUse, StringComparison.Ordinal) != position || position != after.Length || runs.Count != 1 ||
+                    (string)runs[0].Element(W + "rPr")?.Element(W + "rFonts")?.Attribute(W + "ascii") != font) return "\0";
+                value = value.Remove(position, privateUse.Length);
+            }
+            return value;
         }
 
         private static XElement EffectiveNumberingLevel(PackageSnapshot package, XElement paragraph, HashSet<string> visited)
@@ -119,7 +164,6 @@ namespace MosWord2019.Core.Services
             if (numId == null || numId == "0" || !visited.Add(numId + "/" + ilvl)) return null;
             var num = numbering.Elements(W + "num").SingleOrDefault(n => (string)n.Attribute(W + "numId") == numId);
             var over = num?.Elements(W + "lvlOverride").SingleOrDefault(n => (string)n.Attribute(W + "ilvl") == ilvl)?.Element(W + "lvl");
-            if (over != null) return over;
             string abstractId = (string)num?.Element(W + "abstractNumId")?.Attribute(W + "val");
             var definition = numbering.Elements(W + "abstractNum").SingleOrDefault(n => (string)n.Attribute(W + "abstractNumId") == abstractId);
             string link = (string)definition?.Element(W + "numStyleLink")?.Attribute(W + "val");
@@ -127,9 +171,23 @@ namespace MosWord2019.Core.Services
             {
                 var style = StyleChain(styles, link).Select(s => s.Element(W + "pPr")?.Element(W + "numPr")?.Element(W + "numId"))
                     .LastOrDefault(e => e != null);
-                return NumberingLevel(numbering, styles, (string)style?.Attribute(W + "val"), ilvl, visited);
+                var linked = NumberingLevel(numbering, styles, (string)style?.Attribute(W + "val"), ilvl, visited);
+                return MergeNumberingLevel(linked, over);
             }
-            return definition?.Elements(W + "lvl").SingleOrDefault(n => (string)n.Attribute(W + "ilvl") == ilvl);
+            return MergeNumberingLevel(definition?.Elements(W + "lvl").SingleOrDefault(n => (string)n.Attribute(W + "ilvl") == ilvl), over);
+        }
+
+        private static XElement MergeNumberingLevel(XElement basis, XElement over)
+        {
+            if (over == null) return basis;
+            var result = basis == null ? new XElement(W + "lvl") : new XElement(basis);
+            foreach (var e in over.Elements())
+            {
+                if (e.Name == W + "rPr" && result.Element(e.Name) != null)
+                    foreach (var property in e.Elements()) { result.Element(e.Name).Elements(property.Name).Remove(); result.Element(e.Name).Add(new XElement(property)); }
+                else { result.Elements(e.Name).Remove(); result.Add(new XElement(e)); }
+            }
+            return result;
         }
 
         private static bool CheckPictureHyperlink(PackageSnapshot package, TaskDefinition task, out string detail)

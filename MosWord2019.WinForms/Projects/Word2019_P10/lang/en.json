@@ -20,7 +20,7 @@
   "P10_T10_TITLE": "Task 10",
   "P10_T10_INST": "In the \"What is MOS Certification?\" section, change the line spacing of the paragraphs to exactly 14 pt.",
   "P10_T11_TITLE": "Task 11",
-  "P10_T11_INST": "In the \"About Author\" section, change the filled square bullet points to custom ones. Use the airplane symbol from the Segoe UI Emoji font and character code \"2708\".",
+  "P10_T11_INST": "In About Author, apply real airplane bullets (Segoe UI Emoji, character code 2708) to the two certification paragraphs beginning “Microsoft Certified Trainer” and “MOS 2019”.",
   "P10_T12_TITLE": "Task 12",
   "P10_T12_INST": "In the first paragraph after the \"What is MOS Certification?\" heading, insert the footnote text \"Certiport is dedicated to helping people succeed through certification. Our globally recognized credentials are aimed at enhancing individual productivity, marketability, and value.\" at the end of the word \"Certiport\".",
   "P10_T13_TITLE": "Task 13",
