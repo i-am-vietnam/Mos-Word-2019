@@ -309,21 +309,25 @@ namespace MosWord2019
 
         private void GradeCurrentTask()
         {
-            if (!CheckDocument() || currentProject == null || taskIndex < 0 || taskIndex >= currentProject.Tasks.Count) return;
+            if (currentProject == null || taskIndex < 0 || taskIndex >= currentProject.Tasks.Count) return;
             TaskDefinition task = currentProject.Tasks[taskIndex];
+            bool externalOutput = ExternalOutputLocation.IsExistenceAssertion(task.AssertionType);
+            if (!externalOutput && !CheckDocument()) return;
             string savedPath;
             TrainingGradeContext context;
             try
             {
                 // File-existence tasks inspect only their declared output; grading does not save/alter that template.
-                if (task.AssertionType != TemplateOutputLocation.AssertionType)
+                if (!externalOutput)
                 {
                     word.Save();
                     PreserveSaveAsWork();
                 }
-                var documentState = word as IWordDocumentState;
+                var documentState = externalOutput ? null : word as IWordDocumentState;
                 savedPath = documentState?.CurrentDocumentPath ?? currentWorkPath;
-                if (TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
+                if (ExternalOutputLocation.IsDeclaredDocumentsOutput(currentProject, savedPath))
+                    savedPath = currentWorkPath; // Grade the retained Word working copy, never a lossy external output.
+                if (!externalOutput && TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
                     savedPath = ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
                 context = documentState == null ? null : new TrainingGradeContext
                 {
@@ -382,7 +386,8 @@ namespace MosWord2019
                 return;
             }
             var state = word as IWordDocumentState;
-            if (state != null && currentProject != null)
+            if (state != null && currentProject != null &&
+                !ExternalOutputLocation.IsDeclaredDocumentsOutput(currentProject, state.CurrentDocumentPath))
                 workspace.PreserveSavedWorkingCopy(currentProject, state.CurrentDocumentPath);
         }
 

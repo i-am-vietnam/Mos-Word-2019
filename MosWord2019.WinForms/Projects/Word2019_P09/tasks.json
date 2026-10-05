@@ -274,28 +274,7 @@
     "taskId": "T08",
     "titleKey": "P09_T08_TITLE",
     "instructionKey": "P09_T08_INST",
-    "assertionType": "PlainTextDocumentExport",
-    "expectedFileName": "Memo.txt",
-    "requiredTextSegments": [
-      "Course MO-100, How to pass MOS Word Assosicate 2019 Exam?",
-      "Academic Integrity",
-      "The following table illustrates how your final grade is calculated.",
-      "77-725: Word 2016",
-      "77-730: Access 2016",
-      "ltthoc@hocict.edu.vn",
-      "Necessary equipment",
-      "Computer or Laptop"
-    ],
-    "textSegmentAlternatives": [
-      [
-        "MOS Word 2019 Associate",
-        "MOS WORD 2019 ASSOCIATE"
-      ],
-      [
-        "If, during an assignment or a supervised check, you are found to cheat, falsify data or plagiarism the work of another student, you will be assigned a zero for this assignment or proctored check.",
-        "IF, DURING AN ASSIGNMENT OR A SUPERVISED CHECK, YOU ARE FOUND TO CHEAT, FALSIFY DATA OR PLAGIARISM THE WORK OF ANOTHER STUDENT, YOU WILL BE ASSIGNED A ZERO FOR THIS ASSIGNMENT OR PROCTORED CHECK."
-      ]
-    ],
-    "minimumCharacters": 4000
+    "assertionType": "FileExistsInDocuments",
+    "expectedFileName": "Memo.txt"
   }
 ]

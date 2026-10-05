@@ -53,6 +53,8 @@ namespace MosWord2019.Core.Services
             string all = string.Join("\n", paragraphs.Select(ParagraphText));
             bool match = paragraphs.Count(p => ParagraphText(p) == expected) == 1 && CountOccurrences(all, oldText) == 0 &&
                 CountOccurrences(all, replacement) == RequiredInt(task, "expectedReplacementCount");
+            if (task.Extra.ContainsKey("expectedReplacementParagraphs"))
+                match &= RequiredStrings(task, "expectedReplacementParagraphs").All(text => paragraphs.Count(p => ParagraphText(p) == text) == 1);
             if (task.Extra.ContainsKey("expectedBodyParagraphs"))
             {
                 var body = paragraphs.FirstOrDefault()?.Ancestors(W + "body").FirstOrDefault();
@@ -79,7 +81,12 @@ namespace MosWord2019.Core.Services
             string[] expected = RequiredStrings(task, "targetParagraphs");
             int anchor = paragraphs.FindIndex(p => ParagraphText(p) == RequiredString(task, "precedingParagraph"));
             string glyph = RequiredString(task, "expectedGlyph"), font = RequiredString(task, "expectedBulletFont");
-            bool match = anchor >= 0 && paragraphs.Skip(anchor + 1).Take(expected.Length).Select(ParagraphText).SequenceEqual(expected);
+            var targets = paragraphs.Skip(anchor + 1).Take(expected.Length).Select(ParagraphText).ToArray();
+            bool match = anchor >= 0 && targets.Length == expected.Length;
+            JToken alternatives;
+            var variants = task.Extra.TryGetValue("paragraphTextAlternatives", out alternatives) ? alternatives as JObject : null;
+            for (int i = 0; match && i < expected.Length; i++)
+                match &= targets[i] == expected[i] || (variants?[expected[i]] is JArray && ((JArray)variants[expected[i]]).Values<string>().Contains(targets[i]));
             for (int i = 0; match && i < expected.Length; i++)
             {
                 XElement level = EffectiveNumberingLevel(package, paragraphs[anchor + 1 + i], new HashSet<string>());

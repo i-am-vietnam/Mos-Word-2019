@@ -1,15 +1,415 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P10_T01_TITLE",
+    "instructionKey": "P10_T01_INST",
+    "assertionType": "TextRemovedFromParagraph",
+    "targetParagraphStartsWith": "MOS 2019 ",
+    "removedText": "Masder",
+    "expectedFinalText": "MOS 2019 Expert - MOS 2016 Master – MOS 2013 Master – MOS 2010 Master",
+    "expectedRemainingCount": 0
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P10_T02_TITLE",
+    "instructionKey": "P10_T02_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "lytranthaihoc",
+    "newText": "mos",
+    "expectedParagraph": "I always appreciate your valuable feedback to improve the quality of this book via email mos@hocict.edu.vn.",
+    "expectedReplacementParagraphs": [
+      "I always appreciate your valuable feedback to improve the quality of this book via email mos@hocict.edu.vn.",
+      "Email: mos@hocict.edu.vn"
+    ],
+    "expectedReplacementCount": 2
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P10_T03_TITLE",
+    "instructionKey": "P10_T03_INST",
+    "assertionType": "TableCellSpacingEquals",
+    "targetHeaderRow": [
+      "Exam",
+      "Question",
+      "Minutes",
+      "Max Score",
+      "Require Score"
+    ],
+    "expectedRows": [
+      [
+        "Exam",
+        "Question",
+        "Minutes",
+        "Max Score",
+        "Require Score"
+      ],
+      [
+        "MO-100: Microsof Word (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-200: Microsof Excel (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-300: Microsoft PowerPoint (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-400: Microsoft Outlook (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-101: Microsoft Word Expert (Office 2019)",
+        "25",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-102: Microsoft Excel Expert (Office 2019)",
+        "25",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-103: Microsoft Access Expert (Office 2019)",
+        "31",
+        "50",
+        "1000",
+        "700"
+      ]
+    ],
+    "expectedSpacingTwips": 21
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P10_T04_TITLE",
+    "instructionKey": "P10_T04_INST",
+    "assertionType": "SymbolInserted",
+    "anchorText": "Microsoft Certified Trainer",
+    "expectedSentence": "Microsoft Certified Trainer - IC3 Global Standard 4 Authorized Educator",
+    "symbolFont": "Webdings",
+    "symbolCode": 38,
+    "placement": "after",
+    "referenceText": "Microsoft Certified Trainer"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P10_T05_TITLE",
+    "instructionKey": "P10_T05_INST",
+    "assertionType": "CommentResolved",
+    "targetParagraph": "He is also the founder, manager, and leader of the administration team of fan page hocict.edu.vn and the HOCICT Official Channel on YouTube. All his compiled materials are freely available to the community.",
+    "expectedCommentText": "Italic Formatting"
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P10_T06_TITLE",
+    "instructionKey": "P10_T06_INST",
+    "assertionType": "SmartArtAllNodesBevelEquals",
+    "expectedTextItems": [
+      "Expert",
+      "Specialist"
+    ],
+    "expectedBevelPreset": "softRound"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P10_T07_TITLE",
+    "instructionKey": "P10_T07_INST",
+    "assertionType": "PictureWrapType",
+    "targetImageSha256": "89B466727AF8F8FE74D70061617B931B9CE29F3655A063ADEAA33DD3802E4EFC"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P10_T08_TITLE",
+    "instructionKey": "P10_T08_INST",
+    "assertionType": "InsertedTableAutoFitWindow",
+    "precedingHeading": "Office 2013",
+    "expectedTableRows": [
+      [
+        "Exam",
+        "",
+        "",
+        "",
+        "Require Score"
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "taskId": "T09",
+    "titleKey": "P10_T09_TITLE",
+    "instructionKey": "P10_T09_INST",
+    "assertionType": "TableRowCharacterStyle",
+    "targetHeaderRow": [
+      "Exam",
+      "Question",
+      "Minutes",
+      "Max Score",
+      "Require Score"
+    ],
+    "expectedTableRows": [
+      [
+        "Exam",
+        "Question",
+        "Minutes",
+        "Max Score",
+        "Require Score"
+      ],
+      [
+        "MO-100: Microsof Word (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-200: Microsof Excel (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-300: Microsoft PowerPoint (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-400: Microsoft Outlook (Office 2019)",
+        "35",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-101: Microsoft Word Expert (Office 2019)",
+        "25",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-102: Microsoft Excel Expert (Office 2019)",
+        "25",
+        "50",
+        "1000",
+        "700"
+      ],
+      [
+        "MO-103: Microsoft Access Expert (Office 2019)",
+        "31",
+        "50",
+        "1000",
+        "700"
+      ]
+    ],
+    "rowIndex": 0,
+    "characterStyleId": "SubtleEmphasis"
+  },
+  {
+    "taskId": "T10",
+    "titleKey": "P10_T10_TITLE",
+    "instructionKey": "P10_T10_INST",
+    "assertionType": "ParagraphLineSpacingExact",
+    "targetParagraphStartsWith": [
+      "MOS is an abbreviation",
+      "MOS is the only justification"
+    ],
+    "expectedLineTwips": 280,
+    "expectedLineRule": "exact",
+    "expectedBeforeTwips": [
+      null,
+      null
+    ],
+    "expectedAfterTwips": [
+      null,
+      null
+    ]
+  },
+  {
+    "taskId": "T11",
+    "titleKey": "P10_T11_TITLE",
+    "instructionKey": "P10_T11_INST",
+    "assertionType": "CustomBulletList",
+    "precedingParagraph": "He is also the founder, manager, and leader of the administration team of fan page hocict.edu.vn and the HOCICT Official Channel on YouTube. All his compiled materials are freely available to the community.",
+    "targetParagraphs": [
+      "Website: http://www.hocict.edu.vn",
+      "Fanpage: https://www.facebook.com/hocict.edu.vm",
+      "Email: lytranthaihoc@hocict.edu.vn",
+      "YouTube: HOCICT Official Channel",
+      "Skype: hocict – Yahoo: hocict"
+    ],
+    "expectedGlyph": "✈",
+    "expectedBulletFont": "Segoe UI Emoji",
+    "paragraphTextAlternatives": {
+      "Email: lytranthaihoc@hocict.edu.vn": [
+        "Email: mos@hocict.edu.vn"
+      ]
+    }
+  },
+  {
+    "taskId": "T12",
+    "titleKey": "P10_T12_TITLE",
+    "instructionKey": "P10_T12_INST",
+    "assertionType": "Footnote",
+    "anchorText": "MOS is an abbreviation for Microsoft Office Specialist; it is a certification for advance proficiency skill of each application is Microsoft Office suite. This examination was created by Microsoft and implemented by Certiport (United States) worldwide. ",
+    "precedingHeading": "What is MOS Certification?",
+    "referenceAfterText": "MOS is an abbreviation for Microsoft Office Specialist; it is a certification for advance proficiency skill of each application is Microsoft Office suite. This examination was created by Microsoft and implemented by Certiport",
+    "expectedText": "Certiport is dedicated to helping people succeed through certification. Our globally recognized credentials are aimed at enhancing individual productivity, marketability, and value."
+  },
+  {
+    "taskId": "T13",
+    "titleKey": "P10_T13_TITLE",
+    "instructionKey": "P10_T13_INST",
+    "assertionType": "TextRangeFormattingEquals",
+    "targetParagraph": "Base on my own professional experiences and personal encounters, I will summarize several important topics to keep in mind when studying as well as taking exam for MOS certification.",
+    "targetText": "Base on my own professional experiences and personal encounters, I will summarize several important topics to keep in mind when studying as well as taking exam for MOS certification.",
+    "expectedFormatting": {
+      "font.ascii": "Open Sans",
+      "font.hAnsi": "Open Sans",
+      "sz": "val=22",
+      "szCs": "val=22"
+    },
+    "expectedAlignment": "both"
+  },
+  {
+    "taskId": "T14",
+    "titleKey": "P10_T14_TITLE",
+    "instructionKey": "P10_T14_INST",
+    "assertionType": "ShapeWithTextWrapAndPosition",
+    "shapeGeometry": "horizontalScroll",
+    "expectedText": "Thank You!",
+    "horizontalAlignment": "center",
+    "verticalAlignment": "bottom",
+    "relativeFrom": "page",
+    "afterParagraph": "",
+    "expectedWrap": "tight",
+    "requireLastBodyParagraph": true,
+    "anchorPrecedingParagraph": "Manage change tracking"
+  },
+  {
+    "taskId": "T15",
+    "titleKey": "P10_T15_TITLE",
+    "instructionKey": "P10_T15_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": [
+      "77-725: Word 2016",
+      "77-727: Excel 2016",
+      "77-729: PowerPoint 2016",
+      "77-730: Access 2016",
+      "77-726: Word 2016 Expert",
+      "77-727: Excel 2016 Expert"
+    ],
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1."
+  },
+  {
+    "taskId": "T16",
+    "titleKey": "P10_T16_TITLE",
+    "instructionKey": "P10_T16_INST",
+    "assertionType": "TableOfContentsLevels",
+    "headingRange": "1-1",
+    "expectedEntryTitles": [
+      "About Course",
+      "About MOS",
+      "About Author",
+      "Manage Documents",
+      "Manage Tables and Lists",
+      "Create and Manage References",
+      "Manage Document Collaboration"
+    ]
+  },
+  {
+    "taskId": "T17",
+    "titleKey": "P10_T17_TITLE",
+    "instructionKey": "P10_T17_INST",
+    "assertionType": "ParagraphBlockColumns",
+    "targetParagraphs": [
+      "Text editing is a very regular job for anyone working in the office. This book to reinforce your knowledges and skills as well as Microsoft Office Word 2016 Specialist certification exam.",
+      "The specialized materials of appropriated skills will be tested and evaluated in Exam 77-725: Microsoft Word 2016 Core published by Microsoft. Besides, the author has complied 10 simulator projects so that learners can self-assess their abilities after the review process before taking the exam to get Microsoft Office Specialist Certification.",
+      "To use this book, learners need to be proficient in using computer (Windows, keyboard, mouse) and already have a basic knowledge of Microsoft Word."
+    ],
+    "expectedColumns": 2,
+    "expectedColumnSpacingTwips": 720
+  }
 ]

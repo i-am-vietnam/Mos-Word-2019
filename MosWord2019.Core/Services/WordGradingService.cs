@@ -47,8 +47,8 @@ namespace MosWord2019.Core.Services
             "TextRangeFormattingEquals", "SavedWordTemplate", "FileExistsInCustomOfficeTemplates",
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
-            "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
-            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport"
+            "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -67,6 +67,12 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task.AssertionType == ExternalOutputLocation.DocumentsAssertionType)
+                {
+                    bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName")));
+                    return new TaskGradeResult(exists ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
+                        "The exact task-declared file must exist in Documents.", task.AssertionType, task.TaskId);
+                }
                 if (task.AssertionType == "PlainTextDocumentExport")
                 {
                     string detail;
@@ -141,6 +147,8 @@ namespace MosWord2019.Core.Services
                         case "TableOfContentsLevels": passed = CheckTocLevels(package, task, out detail); break;
                         case "FootnotesConvertedToEndnotes": passed = CheckEndnoteConversion(package, task, out detail); break;
                         case "DocumentMarginsEquals": passed = CheckDocumentMargins(package, task, out detail); break;
+                        case "InsertedTableAutoFitWindow": passed = CheckInsertedWindowTable(package, task, out detail); break;
+                        case "TableRowCharacterStyle": passed = CheckTableRowCharacterStyle(package, task, out detail); break;
                         case "TableCellSpacingEquals": passed = CheckTableCellSpacing(package, task, out detail); break;
                         case "PictureBorderColorEquals": passed = CheckPictureBorderColor(package, task, out detail); break;
                         case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
@@ -322,17 +330,43 @@ namespace MosWord2019.Core.Services
             int code = RequiredInt(task, "symbolCode");
             string expectedChar = (0xF000 + code).ToString("X4", CultureInfo.InvariantCulture);
             XDocument document = package.Xml("word/document.xml");
-            List<XElement> paragraphs = document.Descendants(W + "p").Where(p => VisibleText(p).StartsWith(anchor, StringComparison.Ordinal)).ToList();
-            if (paragraphs.Count != 1 || VisibleText(paragraphs[0]) != RequiredString(task, "expectedSentence"))
+            List<XElement> paragraphs = document.Descendants(W + "p").Where(p => VisibleText(p).Contains(anchor)).ToList();
+            if (paragraphs.Count != 1)
             { detail = "The exact target sentence is missing or changed."; return false; }
-            List<XElement> ordered = paragraphs[0].Descendants().Where(e => e.Name == W + "sym" || e.Name == W + "t").ToList();
-            int textIndex = ordered.FindIndex(e => e.Name == W + "t" && e.Value.StartsWith(anchor, StringComparison.Ordinal));
-            XElement symbol = textIndex > 0 ? ordered[textIndex - 1] : null;
-            bool match = symbol != null && symbol.Name == W + "sym" &&
-                string.Equals((string)symbol.Attribute(W + "font"), font, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals((string)symbol.Attribute(W + "char"), expectedChar, StringComparison.OrdinalIgnoreCase);
-            detail = match ? "The required symbol is immediately before the unchanged sentence."
-                : "The required Webdings symbol is missing, incorrect, or in the wrong position.";
+            string placement = task.Extra.ContainsKey("placement") ? RequiredString(task, "placement") : "before";
+            if (placement != "before" && placement != "after") throw new InvalidDataException("Invalid symbol placement.");
+            string reference = task.Extra.ContainsKey("referenceText") ? RequiredString(task, "referenceText") : anchor;
+            var text = new StringBuilder();
+            var symbols = new List<Tuple<int, string, string>>();
+            foreach (var element in paragraphs[0].Descendants().Where(e => e.Name == W + "sym" || e.Name == W + "t"))
+            {
+                if (element.Name == W + "sym")
+                {
+                    symbols.Add(Tuple.Create(text.Length, (string)element.Attribute(W + "font"), (string)element.Attribute(W + "char")));
+                    continue;
+                }
+                var run = element.Ancestors(W + "r").FirstOrDefault();
+                var formatting = run == null ? null : EffectiveRunFormatting(package, paragraphs[0], run);
+                string runFont = null;
+                if (formatting != null) formatting.TryGetValue("font.ascii", out runFont);
+                foreach (char character in element.Value)
+                {
+                    // Word can resave the same native symbol as a font-specific private-use character.
+                    if (character == 0xF000 + code && string.Equals(runFont, font, StringComparison.OrdinalIgnoreCase))
+                        symbols.Add(Tuple.Create(text.Length, runFont, ((int)character).ToString("X4", CultureInfo.InvariantCulture)));
+                    else text.Append(character);
+                }
+            }
+            string sentence = text.ToString();
+            int start = sentence.IndexOf(reference, StringComparison.Ordinal);
+            if (sentence != RequiredString(task, "expectedSentence") || start < 0 || sentence.IndexOf(reference, start + reference.Length, StringComparison.Ordinal) >= 0)
+            { detail = "The symbol reference text or surrounding sentence changed."; return false; }
+            int expectedOffset = placement == "after" ? start + reference.Length : start;
+            bool match = symbols.Count == 1 && symbols[0].Item1 == expectedOffset &&
+                string.Equals(symbols[0].Item2, font, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(symbols[0].Item3, expectedChar, StringComparison.OrdinalIgnoreCase);
+            detail = match ? "The required Word symbol is immediately " + placement + " the unchanged reference text."
+                : "The required symbol is missing, incorrect, or in the wrong position.";
             return match;
         }
 
@@ -589,7 +623,7 @@ namespace MosWord2019.Core.Services
                     !NullableTwipsEquals(spacing, "before", before, i) || !NullableTwipsEquals(spacing, "after", after, i))
                 { detail = "One or more target paragraphs do not use the exact verified spacing without changing before/after spacing."; return false; }
             }
-            detail = "Both target paragraphs use Exactly 14 pt with their original before/after spacing.";
+            detail = "All target paragraphs use the declared exact line spacing with their original before/after spacing.";
             return true;
         }
 
@@ -824,12 +858,12 @@ namespace MosWord2019.Core.Services
             List<XElement> directParagraphs = body?.Elements(W + "p").ToList() ?? new List<XElement>();
             List<XElement> targets = expectedText.Select(text => directParagraphs.SingleOrDefault(paragraph => ParagraphText(paragraph) == text)).ToList();
             if (targets.Any(value => value == null) || targets.Distinct().Count() != expectedText.Length)
-            { detail = "The four target paragraphs were not found uniquely."; return false; }
+            { detail = "The target paragraphs were not found uniquely."; return false; }
 
             List<DocumentSection> sections = DocumentSections(document);
             List<int> containing = targets.Select(target => sections.FindIndex(section => section.Content.Contains(target))).ToList();
             if (containing.Any(index => index < 0) || containing.Distinct().Count() != 1)
-            { detail = "The four target paragraphs do not form one section block."; return false; }
+            { detail = "The target paragraphs do not form one section block."; return false; }
             int sectionIndex = containing[0];
             DocumentSection targetSection = sections[sectionIndex];
             string[] sectionText = targetSection.Content.Where(element => element.Name == W + "p" && ParagraphText(element).Length > 0)
@@ -839,7 +873,7 @@ namespace MosWord2019.Core.Services
                                    (sectionIndex == sections.Count - 1 || ColumnCount(sections[sectionIndex + 1].Properties) == 1);
             bool match = sectionText.SequenceEqual(expectedText) && ColumnCount(targetSection.Properties) == expectedColumns &&
                 Twips(columns, "space", -1) == expectedSpacing && neighborsSingle;
-            detail = match ? "Exactly the four target paragraphs form the verified two-column block with 0.4-inch spacing."
+            detail = match ? "Exactly the declared target paragraphs form the verified column block with its requested spacing."
                 : "The paragraph block, column count, column spacing, or surrounding one-column layout is incorrect.";
             return match;
         }
@@ -904,14 +938,16 @@ namespace MosWord2019.Core.Services
             string horizontal = RequiredString(task, "horizontalAlignment");
             string vertical = RequiredString(task, "verticalAlignment");
             string relativeFrom = RequiredString(task, "relativeFrom");
-            string afterParagraph = RequiredString(task, "afterParagraph");
+            string afterParagraph = OptionalBool(task, "requireLastBodyParagraph", false) ? string.Empty : RequiredString(task, "afterParagraph");
             XDocument document = package.Xml("word/document.xml");
             List<XElement> matches = document.Descendants(Wp + "anchor").Where(anchor =>
                 string.Equals((string)anchor.Descendants(Wps + "spPr").Elements(A + "prstGeom").FirstOrDefault()?.Attribute("prst"), geometry, StringComparison.Ordinal) &&
                 string.Equals(VisibleText(anchor.Descendants(Wps + "txbx").FirstOrDefault()).TrimEnd(), expectedText, StringComparison.Ordinal)).ToList();
             if (matches.Count != 1) { detail = "The exact requested Word shape and text were not found uniquely."; return false; }
             XElement match = matches[0];
-            bool placement = match.Element(Wp + "wrapSquare") != null &&
+            string wrap = task.Extra.ContainsKey("expectedWrap") ? RequiredString(task, "expectedWrap") : "square";
+            if (wrap != "square" && wrap != "tight") throw new InvalidDataException("Invalid shape wrapping metadata.");
+            bool placement = match.Element(Wp + (wrap == "tight" ? "wrapTight" : "wrapSquare")) != null &&
                 string.Equals((string)match.Element(Wp + "positionH")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
                 string.Equals((string)match.Element(Wp + "positionH")?.Element(Wp + "align"), horizontal, StringComparison.Ordinal) &&
                 string.Equals((string)match.Element(Wp + "positionV")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
@@ -919,7 +955,13 @@ namespace MosWord2019.Core.Services
             XElement outerParagraph = match.Ancestors(W + "p").FirstOrDefault();
             string anchorText = outerParagraph == null ? null : ParagraphTextOutsideTextBoxes(outerParagraph);
             bool matchAll = placement && string.Equals(anchorText, afterParagraph, StringComparison.Ordinal);
-            detail = matchAll ? "The Horizontal Scroll shape has exact text, Square wrapping, and page-bottom centered positioning."
+            if (OptionalBool(task, "requireLastBodyParagraph", false))
+            {
+                var body = document.Root.Element(W + "body");
+                matchAll &= outerParagraph == body.Elements(W + "p").LastOrDefault() &&
+                    PreviousNonemptyParagraph(outerParagraph) == RequiredString(task, "anchorPrecedingParagraph");
+            }
+            detail = matchAll ? "The requested Word shape has exact text, declared wrapping and page-relative positioning."
                 : "The target shape has the wrong wrap, page-relative position, or anchor region.";
             return matchAll;
         }
