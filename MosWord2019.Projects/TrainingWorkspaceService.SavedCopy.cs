@@ -9,6 +9,27 @@ namespace MosWord2019.Projects
 {
     public sealed partial class TrainingWorkspaceService
     {
+        public static bool RequiresExportCheckpoint(ProjectPackage package)
+        {
+            return package?.Tasks?.Any(t => t.AssertionType == "PlainTextDocumentExport") == true;
+        }
+
+        public string GetExportCheckpointPath(ProjectPackage package)
+        {
+            return Path.Combine(GetPackagePaths(package).WorkingDirectory, "export-checkpoint.docx");
+        }
+
+        private void RestoreExportCheckpoint(ProjectPackage package, PackagePaths paths)
+        {
+            if (!RequiresExportCheckpoint(package)) return;
+            string checkpoint = GetExportCheckpointPath(package);
+            if (!File.Exists(checkpoint)) return;
+            if ((File.GetAttributes(checkpoint) & FileAttributes.ReparsePoint) != 0) throw new IOException("Checkpoint cannot be a reparse point.");
+            // The caller has closed Word before PrepareWorkingCopy. This copies only a trainer-owned
+            // formatted checkpoint; the personal TXT output is never opened, overwritten or deleted.
+            PreserveSavedWorkingCopy(package, checkpoint);
+        }
+
         /// <summary>
         /// Checkpoint a saved Save As document into this project's own work.docx. A template's main
         /// content type is changed only in the checkpoint, never in the learner's exported template.

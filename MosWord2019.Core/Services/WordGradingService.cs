@@ -47,7 +47,8 @@ namespace MosWord2019.Core.Services
             "TextRangeFormattingEquals", "SavedWordTemplate", "FileExistsInCustomOfficeTemplates",
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
-            "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition"
+            "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -66,6 +67,12 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task.AssertionType == "PlainTextDocumentExport")
+                {
+                    string detail;
+                    bool passed = CheckPlainTextExport(task, out detail);
+                    return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail, detail, task.AssertionType, task.TaskId);
+                }
                 if (task.AssertionType == TemplateOutputLocation.AssertionType)
                 {
                     string output = TemplateOutputLocation.Resolve(RequiredString(task, "expectedFileName"));
@@ -137,6 +144,8 @@ namespace MosWord2019.Core.Services
                         case "TableCellSpacingEquals": passed = CheckTableCellSpacing(package, task, out detail); break;
                         case "PictureBorderColorEquals": passed = CheckPictureBorderColor(package, task, out detail); break;
                         case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
+                        case "InsertedTableAutoFitContents": passed = CheckInsertedAutoFitTable(package, task, out detail); break;
+                        case "NumberedListSequence": passed = CheckNumberedSequence(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
@@ -1041,11 +1050,22 @@ namespace MosWord2019.Core.Services
             { detail = "The target table is missing or its content was changed."; return false; }
             List<int> widths = tables[0].Element(W + "tblGrid")?.Elements(W + "gridCol")
                 .Select(column => Twips(column, "w", -1)).ToList() ?? new List<int>();
-            bool widthsMatch = widths.Count == header.Length && widths.All(width => Math.Abs(width - expectedWidth) <= tolerance);
+            JToken alternatives;
+            int[] allowed = task.Extra.TryGetValue("acceptedWidthTwips", out alternatives) ? alternatives.Values<int>().ToArray() : new[] { expectedWidth };
+            bool widthsMatch = widths.Count == header.Length && allowed.Any(value => widths.All(width => Math.Abs(width - value) <= tolerance));
+            if (OptionalBool(task, "requireCellWidths", false))
+                widthsMatch &= TableCellsMatchWidths(tables[0], widths, tolerance);
+            JToken paragraphs;
+            if (task.Extra.TryGetValue("expectedCellParagraphs", out paragraphs))
+                widthsMatch &= JToken.DeepEquals(JArray.FromObject(tables[0].Elements(W + "tr").Select(row =>
+                    row.Elements(W + "tc").Select(cell => cell.Elements(W + "p").Select(ParagraphText).ToArray()).ToArray()).ToArray()), paragraphs);
+            JToken heading;
+            if (task.Extra.TryGetValue("precedingHeading", out heading))
+                widthsMatch &= PreviousNonemptyParagraph(tables[0]) == (string)heading;
             bool rowsMatch = !noRowHeight || tables[0].Elements(W + "tr")
                 .All(row => row.Element(W + "trPr")?.Element(W + "trHeight") == null);
             bool match = widthsMatch && rowsMatch;
-            detail = match ? "Every column in the target table has the verified 1.57-inch width and row heights remain unchanged."
+            detail = match ? "Every column in the unchanged target table matches the declared width and tolerance."
                 : "One or more target table columns have the wrong width, or row height was changed.";
             return match;
         }
@@ -1089,10 +1109,12 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckSmartArtDirection(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string anchor = RequiredString(task, "anchorText");
             bool expectedReverse = RequiredBool(task, "expectedReverse");
-            string[] expectedText = RequiredStrings(task, "expectedTextItems");
-            List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
+            JToken graph, heading;
+            bool logical = task.Extra.TryGetValue("expectedLogicalNodes", out graph);
+            List<SmartArtReference> smartArts = task.Extra.TryGetValue("precedingHeading", out heading)
+                ? AllSmartArts(package).Where(s => PreviousNonemptyParagraph(s.Container.Ancestors(W + "p").FirstOrDefault()) == (string)heading).ToList()
+                : FindSmartArts(package, RequiredString(task, "anchorText"));
             if (smartArts.Count != 1)
             { detail = "The target SmartArt was not found uniquely."; return false; }
             XDocument data = package.Xml(smartArts[0].DataPart);
@@ -1100,8 +1122,15 @@ namespace MosWord2019.Core.Services
             string[] actualText = data.Descendants(A + "t").Select(value => value.Value).ToArray();
             bool validDirection = string.IsNullOrEmpty(actualDirection) || string.Equals(actualDirection, "rev", StringComparison.Ordinal);
             bool actualReverse = string.Equals(actualDirection, "rev", StringComparison.Ordinal);
-            bool match = validDirection && actualReverse == expectedReverse && actualText.SequenceEqual(expectedText);
-            detail = match ? "The target SmartArt is in the verified Right-to-Left state without changing its data items."
+            bool contentMatch = logical ? SmartArtLogicalNodesMatch(data, graph as JArray) : actualText.SequenceEqual(RequiredStrings(task, "expectedTextItems"));
+            if (logical)
+            {
+                var ids = smartArts[0].Container.Descendants(Dgm + "relIds").FirstOrDefault();
+                string layout = package.RelatedPart("word/document.xml", (string)ids?.Attribute(R + "lo"));
+                contentMatch &= layout != null && (string)package.Xml(layout).Root.Attribute("uniqueId") == RequiredString(task, "expectedLayoutId");
+            }
+            bool match = validDirection && actualReverse == expectedReverse && contentMatch;
+            detail = match ? "The target SmartArt has the declared direction and unchanged item order/hierarchy."
                 : "The target SmartArt direction or its data-item order/text is incorrect.";
             return match;
         }

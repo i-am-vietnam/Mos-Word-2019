@@ -81,6 +81,13 @@ namespace MosWord2019.Core.Services
                 match = id != null && ends.Count == 1 &&
                     !before.Any(e => e.Ancestors(W + "r").Any() &&
                         ((e.Name == W + "t" && e.Value.Length > 0) || e.Name == W + "tab" || e.Name == W + "br"));
+                if (match && OptionalBool(task, "requireCollapsedRange", false))
+                {
+                    var range = document.Descendants().SkipWhile(e => e != bookmarks[0]).Skip(1).TakeWhile(e => e != ends[0]).ToList();
+                    match = ends[0].Ancestors(W + "p").FirstOrDefault() == paragraphs[0] &&
+                        document.Descendants().SkipWhile(e => e != bookmarks[0]).Contains(ends[0]) &&
+                        !range.Any(e => (e.Name == W + "t" && e.Value.Length > 0) || e.Name == W + "tab" || e.Name == W + "br" || e.Name == W + "drawing");
+                }
             }
             detail = match ? "The exact bookmark starts at logical offset zero of the unchanged target paragraph."
                 : "The required bookmark is missing, misnamed, misplaced or the paragraph changed.";

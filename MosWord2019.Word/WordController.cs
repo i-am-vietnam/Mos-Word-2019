@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed class WordController : IWordController, IWordWindowLayout, IWordDocumentState
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordExportCheckpoint
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -86,6 +86,7 @@ namespace MosWord2019.Word
                 session.Application.Caption = caption;
                 session.Application.DisplayAlerts = Wd.WdAlertLevel.wdAlertsNone;
                 session.Application.AutomationSecurity = Office.MsoAutomationSecurity.msoAutomationSecurityForceDisable;
+                session.Application.DocumentBeforeSave += BeforeDocumentSave;
             }
             catch (WinApiProcessHelper.OwnershipRejectedException)
             {
@@ -181,6 +182,7 @@ namespace MosWord2019.Word
             ReleaseCom(session.Document);
             session.Document = null;
             session.DocumentPath = null;
+            exportCheckpointPath = null;
         }
 
         public void Close()
@@ -218,6 +220,8 @@ namespace MosWord2019.Word
             }
             if (session.Application != null)
             {
+                try { session.Application.DocumentBeforeSave -= BeforeDocumentSave; }
+                catch (COMException ex) when (IsDisconnected(ex)) { }
                 if (!preserveApplication)
                 {
                     try { session.Application.Quit(Wd.WdSaveOptions.wdDoNotSaveChanges); }

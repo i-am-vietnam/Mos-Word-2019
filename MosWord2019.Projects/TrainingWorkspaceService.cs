@@ -104,6 +104,7 @@ namespace MosWord2019.Projects
         {
             PackagePaths paths = GetPackagePaths(package);
             Directory.CreateDirectory(paths.WorkingDirectory);
+            RestoreExportCheckpoint(package, paths);
             // Only a learner-created modern checkpoint takes precedence over legacy work.
             // This never converts a starter or completes the learner's Convert task.
             if (paths.Extension == ".doc")
@@ -142,6 +143,11 @@ namespace MosWord2019.Projects
                 {
                     string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
                     if (File.Exists(converted)) File.Delete(converted); // Exact owned checkpoint; caller closed Word.
+                }
+                if (RequiresExportCheckpoint(package))
+                {
+                    string checkpoint = GetExportCheckpointPath(package);
+                    if (File.Exists(checkpoint)) File.Delete(checkpoint); // Exact workspace checkpoint; never the TXT output.
                 }
                 return paths.WorkingPath;
             }

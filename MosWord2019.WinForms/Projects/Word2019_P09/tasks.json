@@ -1,15 +1,301 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P09_T01_TITLE",
+    "instructionKey": "P09_T01_INST",
+    "assertionType": "BookmarkAtParagraphStart",
+    "targetParagraph": "If, during an assignment or a supervised check, you are found to cheat, falsify data or plagiarism the work of another student, you will be assigned a zero for this assignment or proctored check.",
+    "bookmarkName": "Cheating",
+    "requireCollapsedRange": true
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P09_T02_TITLE",
+    "instructionKey": "P09_T02_INST",
+    "assertionType": "InsertedTableAutoFitContents",
+    "precedingHeading": "Rating",
+    "precedingParagraph": "The following table illustrates how your final grade is calculated.",
+    "followingHeading": "Regulation",
+    "expectedTableRows": [
+      [
+        "Rating",
+        "Rating range"
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P09_T03_TITLE",
+    "instructionKey": "P09_T03_INST",
+    "assertionType": "NumberedListSequence",
+    "precedingParagraph": "Prerequisites",
+    "expectedParagraphs": [
+      "Information Technology",
+      "Internet",
+      "Edit text"
+    ],
+    "expectedStart": 111,
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1."
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P09_T04_TITLE",
+    "instructionKey": "P09_T04_INST",
+    "assertionType": "SmartArtDirectionEquals",
+    "precedingHeading": "Course path",
+    "expectedReverse": false,
+    "expectedLogicalNodes": [
+      {
+        "text": "1. Manage Documents",
+        "children": []
+      },
+      {
+        "text": "2. Insert and Format Text, Paragraphs, and Sections",
+        "children": []
+      },
+      {
+        "text": "3. Manage Tables and Lists",
+        "children": []
+      },
+      {
+        "text": "4. Create and Manage References",
+        "children": []
+      },
+      {
+        "text": "5. Insert and Format Graphic elements",
+        "children": []
+      },
+      {
+        "text": "6. Manage Document Collaboration",
+        "children": []
+      },
+      {
+        "text": "7. Singe Projects",
+        "children": []
+      },
+      {
+        "text": "8. Simulation Exam",
+        "children": []
+      }
+    ],
+    "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/bProcess4"
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P09_T05_TITLE",
+    "instructionKey": "P09_T05_INST",
+    "assertionType": "DocumentStyleSet",
+    "semanticStyleRequirements": [
+      {
+        "styleId": "Title",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "pPr/spacing",
+        "attributes": {
+          "after": "400",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "72"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "28"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "320",
+          "after": "80",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "40"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "160",
+          "after": "40",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "32"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/ind",
+        "attributes": {
+          "left": "720",
+          "right": "720"
+        }
+      },
+      {
+        "styleId": "IntenseQuote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P09_T06_TITLE",
+    "instructionKey": "P09_T06_INST",
+    "assertionType": "TableColumnWidthsEqual",
+    "targetHeaderRow": [
+      "77-725: Word 201677-727: Excel 201677-729: PowerPoint 2016",
+      "77-730: Access 201677-726: Word 2016 Expert77-727: Excel 2016 Expert"
+    ],
+    "expectedTableRows": [
+      [
+        "77-725: Word 201677-727: Excel 201677-729: PowerPoint 2016",
+        "77-730: Access 201677-726: Word 2016 Expert77-727: Excel 2016 Expert"
+      ]
+    ],
+    "expectedWidthTwips": 4608,
+    "widthToleranceTwips": 1,
+    "acceptedWidthTwips": [
+      4608,
+      4592
+    ],
+    "requireCellWidths": true,
+    "precedingHeading": "Office 2016",
+    "requireNoExplicitRowHeight": false,
+    "expectedCellParagraphs": [
+      [
+        [
+          "77-725: Word 2016",
+          "77-727: Excel 2016",
+          "77-729: PowerPoint 2016"
+        ],
+        [
+          "77-730: Access 2016",
+          "77-726: Word 2016 Expert",
+          "77-727: Excel 2016 Expert"
+        ]
+      ]
+    ]
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P09_T07_TITLE",
+    "instructionKey": "P09_T07_INST",
+    "assertionType": "CustomBulletList",
+    "precedingParagraph": "Necessary equipment",
+    "targetParagraphs": [
+      "Pen",
+      "Notebook or binder",
+      "Computer or Laptop"
+    ],
+    "expectedGlyph": "▸",
+    "expectedBulletFont": "Segoe UI Emoji"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P09_T08_TITLE",
+    "instructionKey": "P09_T08_INST",
+    "assertionType": "PlainTextDocumentExport",
+    "expectedFileName": "Memo.txt",
+    "requiredTextSegments": [
+      "Course MO-100, How to pass MOS Word Assosicate 2019 Exam?",
+      "Academic Integrity",
+      "The following table illustrates how your final grade is calculated.",
+      "77-725: Word 2016",
+      "77-730: Access 2016",
+      "ltthoc@hocict.edu.vn",
+      "Necessary equipment",
+      "Computer or Laptop"
+    ],
+    "textSegmentAlternatives": [
+      [
+        "MOS Word 2019 Associate",
+        "MOS WORD 2019 ASSOCIATE"
+      ],
+      [
+        "If, during an assignment or a supervised check, you are found to cheat, falsify data or plagiarism the work of another student, you will be assigned a zero for this assignment or proctored check.",
+        "IF, DURING AN ASSIGNMENT OR A SUPERVISED CHECK, YOU ARE FOUND TO CHEAT, FALSIFY DATA OR PLAGIARISM THE WORK OF ANOTHER STUDENT, YOU WILL BE ASSIGNED A ZERO FOR THIS ASSIGNMENT OR PROCTORED CHECK."
+      ]
+    ],
+    "minimumCharacters": 4000
+  }
 ]

@@ -1,10 +1,24 @@
 # Project Status
 
-Verified: 2026-10-04. Earlier phase evidence below retains its historical dates.
+Verified: 2026-10-05. Earlier phase evidence below retains its historical dates.
 
-## Current Project 8 state
+## Current Project 9 state
 
-Verified 2026-10-04 on main HEAD `f1615f23fe24610f781f0aebb7988a508ed10eb9`; starting status clean. P01-P07 are committed; P08 changes remain local/uncommitted. No commit or push.
+Verified on main HEAD `f2eec356d573e5339c08b359f164f6ecd1826935` (Bo sung project 9), dedicated Word origin, starting worktree clean. P01-P08 are committed in that baseline; the P09 implementation described here is local/uncommitted. No commit or push.
+
+P09 has eight tasks and uses 56 supported generic assertion identifiers overall. Three new assertions cover the inserted AutoFit Contents table, effective decimal numbering sequence and validated Documents plain-text export. Optional collapsed bookmarks, logical SmartArt connection order/hierarchy and declared table-width alternatives preserve prior metadata contracts. P01-P08 task metadata, starters and language files are unchanged.
+
+Real Word 2019 Version 16.0 / Build 16.0.14026 saved/reopened individual positives pass T01-T07. The 28 baseline/positive/negative/near-miss checks, 12 text-export cases and 21 supplemental semantic cases match their expected results. The combined Word-created P09 answer grades 8/8 before/after formatted reopen with the actual native Memo.txt export; the EN/VI real-form harness has zero failures. Established combined P01-P05 were rerun and remain 8/8; new EN/VI real-form regression reruns P06-P08 combined 8/8, legacy Convert/Restart and exact Cert/Notes cleanup. These are new checks, separate from the historical phase evidence below.
+
+Native Plain Text Save As changes FullName to Documents/Memo.txt and SaveFormat to 2 while the live Word model still retains formatting and objects. For packages declaring PlainTextDocumentExport, an owned DocumentBeforeSave callback writes a valid formatted OOXML checkpoint before a lossy save. Grading, switching and normal close preserve the live model; reopening uses the checkpoint. Confirmed Restart closes/discards and restores the starter; Memo.txt is never deleted by Trainer. Checkpoint failures cancel save and retain live edits with a bilingual technical message. No second Word application is used for grading.
+
+Production Visual Studio F5 verified EN/VI login, Project 1-9 discovery, eight P09 tabs, native collapsed bookmark, six-by-two table/AutoFit Contents, numbering 111-113, SmartArt direction and default-encoding Plain Text Save As. Correct/Đúng and Incorrect/Sai results were observed. Native conversion cancellation keeps work.docx and creates no Memo.txt; after export, T01-T04 still pass from saved formatted state and T08 is Correct. Normal close/reopen preserves them. Restart No preserves work; Yes restores the exact starter hash and Task 1 with the same owned PID. Word stays above the bottom-quarter trainer without Save controls. The separate real-form harness verifies combined 8/8, P07-P09 switching, ungraded/subsequent-edit persistence, save failure and cleanup in both languages.
+
+An independent unsaved Word sentinel survives grading/cleanup. Saving another disposable document in the owned application does not replace the held document's checkpoint; macro security remains ForceDisable. Final owned Word processes are absent. Clean/Rebuild Debug and Release each report 0 errors/0 warnings. Source and actual output P01-P09 EN/VI validate 0/0 with eight tasks and deterministic order; all nine starter hashes are unchanged. Evidence: ignored artifacts/phase13-p09. P08's Accessibility Checker UI reproduction gap remains unresolved. Testing Mode is not started.
+
+## Historical Project 8 verification
+
+Verified 2026-10-04 on then-current main HEAD `f1615f23fe24610f781f0aebb7988a508ed10eb9`; starting status clean. P08 was local during those checks and is now committed in the current baseline. No commit or push was performed by that verification.
 
 P08 has exactly eight tasks. P01-P08 EN/VI source and actual Debug/Release output validate with 0 errors/0 warnings; discovery is Project 1-8. Four new metadata-driven OOXML assertions bring the supported set to 53. Footnote adds optional logical reference location/preceding heading; text-range formatting adds optional inherited paragraph alignment. Existing P01-P07 metadata, UI and Word lifecycle source are unchanged.
 
@@ -57,7 +71,7 @@ Projects build repair: TemplateOutputCleanupService already existed with the cor
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P08 validate in EN/VI and appear deterministically as Project 1-8 with eight tasks each. Starter files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P09 validate in EN/VI and appear deterministically as Project 1-9 with eight tasks each. Starter files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx or legacy .doc working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves and grades only the selected task, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 

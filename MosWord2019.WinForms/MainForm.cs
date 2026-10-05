@@ -52,6 +52,17 @@ namespace MosWord2019
             this.confirmRestart = confirmRestart ?? (message => MessageBox.Show(this, message, Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes);
             this.notify = notify ?? (message => MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
+            if (word is IWordExportCheckpoint checkpoint)
+                checkpoint.ExportCheckpointFailed += message =>
+                {
+                    if (IsDisposed || Disposing || !IsHandleCreated) return;
+                    BeginInvoke((Action)(() =>
+                    {
+                        if (IsDisposed || Disposing) return;
+                        status.Text = T("Save cancelled: unable to preserve formatted work.", "Đã hủy lưu: không thể giữ bản làm việc có định dạng.");
+                        notify(status.Text);
+                    }));
+                };
             Text = "MOS Word 2019";
             StartPosition = FormStartPosition.Manual;
             Font = new Font("Segoe UI", 9F);
@@ -128,6 +139,7 @@ namespace MosWord2019
             AppLogger.Write("Training Word open " + path);
             currentProject = selected;
             currentWorkPath = path;
+            ConfigureExportCheckpoint();
             BuildTaskTabs();
             ShowTask(0);
             status.Text = T("Project opened", "Đã mở dự án");
@@ -287,6 +299,7 @@ namespace MosWord2019
             word.OpenDocument(path);
             currentProject = project;
             currentWorkPath = path;
+            ConfigureExportCheckpoint();
             BuildTaskTabs();
             ShowTask(0);
             AppLogger.Write("Training restart " + path);
@@ -310,6 +323,8 @@ namespace MosWord2019
                 }
                 var documentState = word as IWordDocumentState;
                 savedPath = documentState?.CurrentDocumentPath ?? currentWorkPath;
+                if (TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
+                    savedPath = ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
                 context = documentState == null ? null : new TrainingGradeContext
                 {
                     DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState.DefaultTemplateFolder : null,
@@ -361,9 +376,22 @@ namespace MosWord2019
 
         private void PreserveSaveAsWork()
         {
+            if (TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
+            {
+                ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
+                return;
+            }
             var state = word as IWordDocumentState;
             if (state != null && currentProject != null)
                 workspace.PreserveSavedWorkingCopy(currentProject, state.CurrentDocumentPath);
+        }
+
+        private void ConfigureExportCheckpoint()
+        {
+            if (!TrainingWorkspaceService.RequiresExportCheckpoint(currentProject)) return;
+            var checkpoint = word as IWordExportCheckpoint;
+            if (checkpoint == null) throw new NotSupportedException("The Word controller cannot safely preserve a lossy export.");
+            checkpoint.ConfigureExportCheckpoint(workspace.GetExportCheckpointPath(currentProject));
         }
 
         private void Run(Action action)

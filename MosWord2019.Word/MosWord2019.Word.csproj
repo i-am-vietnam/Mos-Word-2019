@@ -16,7 +16,7 @@
     <DebugType>pdbonly</DebugType><Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath><DefineConstants>TRACE</DefineConstants><WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup><Reference Include="System" /><Reference Include="System.Core" /></ItemGroup>
+  <ItemGroup><Reference Include="System" /><Reference Include="System.Core" /><Reference Include="System.Xml" /><Reference Include="System.Xml.Linq" /><Reference Include="System.IO.Compression" /></ItemGroup>
   <ItemGroup><Compile Include="**\*.cs" Exclude="bin\**;obj\**" /></ItemGroup>
   <ItemGroup><ProjectReference Include="..\MosWord2019.Core\MosWord2019.Core.csproj"><Project>{81177DAA-9487-42DB-8881-3985E00981E4}</Project><Name>MosWord2019.Core</Name></ProjectReference></ItemGroup>
   <ItemGroup>
