@@ -184,8 +184,16 @@
     "taskId": "T06",
     "titleKey": "P11_T06_TITLE",
     "instructionKey": "P11_T06_INST",
-    "assertionType": "TaskSpecificationUnavailable",
-    "reason": "The supplied starter has no Basic Informatic heading or target list. The required target paragraphs need confirmation. / Starter không có tiêu đề Basic Informatic và danh sách cần đánh số; cần xác nhận nội dung task."
+    "assertionType": "NumberedListSequence",
+    "precedingParagraph": "About MOS",
+    "expectedParagraphs": [
+      "At present, individuals with an international MOS (Microsoft Office Specialist) certifications are getting attention from many domestic and foreign companies in employment recruiting, such as major financial institutes, and telecom corporations. Besides, MOS program is being used as a standard curriculum for K1-12 pupils and college students in our country. Since MOS is still new, therefore studying and obtaining the MOS certification is difficult due to some obstacles for the students.",
+      "Base on my own professional experiences and personal encounters, I will summarize several important topics to keep in mind when studying as well as taking exam for MOS certification."
+    ],
+    "expectedLevel": 0,
+    "expectedStart": 1,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1)"
   },
   {
     "taskId": "T07",
