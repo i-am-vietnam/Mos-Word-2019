@@ -74,13 +74,6 @@ namespace MosWord2019.Projects
                 AddError(result, "STARTER_EXTENSION_UNSUPPORTED", projectId, "", "starter must use .docx, .docm or .doc.");
             if (!File.Exists(Path.Combine(projectFolderPath, starter)))
                 AddError(result, "STARTER_MISSING", projectId, "", "Declared starter does not exist: " + starter);
-            string prepared = result.Meta.PreparedStarter ?? "";
-            if (prepared.Length > 0 && string.IsNullOrWhiteSpace(result.Meta.PreparationContextKey))
-                AddError(result, "PREPARATION_CONTEXT_REQUIRED", projectId, "", "Prepared prerequisites require explicit learner-facing language context.");
-            if (prepared.Length > 0 && (prepared != Path.GetFileName(prepared) || Path.IsPathRooted(prepared) ||
-                !string.Equals(Path.GetExtension(prepared), Path.GetExtension(starter), StringComparison.OrdinalIgnoreCase) ||
-                !File.Exists(Path.Combine(projectFolderPath, prepared))))
-                AddError(result, "PREPARED_STARTER_INVALID", projectId, "", "Prepared prerequisite baseline must exist in the package root and use the starter's format.");
         }
 
         private static void ValidateTasks(ValidationResult result, string projectId)
@@ -149,8 +142,6 @@ namespace MosWord2019.Projects
             if (result.Tasks == null) return;
             foreach (KeyValuePair<string, Dictionary<string, string>> language in result.Languages)
             {
-                if (!string.IsNullOrEmpty(result.Meta?.PreparedStarter))
-                    ValidateKey(result, projectId, "", language.Key, language.Value, result.Meta.PreparationContextKey, "PREPARATION_CONTEXT_NOT_FOUND");
                 foreach (TaskDefinition task in result.Tasks)
                 {
                     if (task == null) continue;

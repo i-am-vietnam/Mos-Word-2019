@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordExportCheckpoint, IWordLegacyCheckpoint
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordExportCheckpoint
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -183,8 +183,6 @@ namespace MosWord2019.Word
             session.Document = null;
             session.DocumentPath = null;
             exportCheckpointPath = null;
-            legacyCheckpoint = false;
-            legacyCheckpointError = null;
         }
 
         public void Close()

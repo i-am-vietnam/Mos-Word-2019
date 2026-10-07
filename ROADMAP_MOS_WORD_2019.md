@@ -1,8 +1,8 @@
 # MOS Word 2019 Roadmap
 
-## Current supplied-project checkpoint — 2026-10-04
+## Current supplied-project checkpoint — 2026-10-07
 
-P01–P06 grading is committed in main HEAD 9fbf1ba762e3f4a43e4476d3a67b01e8cf909a2a. The authorized P06 Red/Accent 1 and template-contract corrections plus P07 legacy-input integration/grading are complete locally/uncommitted. P01–P07 each validate with eight EN/VI tasks; corrected P06 and P07 combined answers pass 8/8, and P01–P05 regression remains 8/8. These supplied-project milestones do not start Testing Mode. PROJECT_STATUS.md records current evidence; the original plan and earlier checkpoints below remain historical.
+The product contains P01-P10: P01-P09 have eight tasks each and P10 has seventeen. Project 11 is removed at the user's request; the completed P10 implementation and approved T08/T11 fixes remain. These removals are local/uncommitted on main HEAD 74b4f9794858445b105d106b993f8e9a8f061267; no commit or push. PROJECT_STATUS.md distinguishes fresh removal verification from historical Word/UI evidence and remaining classroom acceptance gaps. Testing Mode remains not started. The original plan and earlier checkpoints below remain historical.
 
 ## Scope and initial checkpoint
 

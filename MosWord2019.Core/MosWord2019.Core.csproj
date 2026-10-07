@@ -33,7 +33,6 @@
     <Compile Include="Interfaces\IWordController.cs" />
     <Compile Include="Interfaces\IWordDocumentState.cs" />
     <Compile Include="Interfaces\IWordExportCheckpoint.cs" />
-    <Compile Include="Interfaces\IWordLegacyCheckpoint.cs" />
     <Compile Include="Interfaces\IWordWindowLayout.cs" />
     <Compile Include="Models\ProjectMeta.cs" />
     <Compile Include="Models\ProjectPackage.cs" />
@@ -52,8 +51,6 @@
     <Compile Include="Services\WordGradingService.DocumentAssertions.cs" />
     <Compile Include="Services\WordGradingService.CourseAssertions.cs" />
     <Compile Include="Services\WordGradingService.TableTrainingAssertions.cs" />
-    <Compile Include="Services\WordGradingService.SkillReviewAssertions.cs" />
-    <Compile Include="Services\LegacyWordSnapshot.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

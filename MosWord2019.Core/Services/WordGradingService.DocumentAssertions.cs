@@ -63,20 +63,20 @@ namespace MosWord2019.Core.Services
             XElement line = drawing?.Descendants(pic + "spPr").Elements(A + "ln").SingleOrDefault();
             XElement scheme = line?.Element(A + "solidFill")?.Element(A + "schemeClr");
             string themeName = RequiredString(task, "expectedSchemeColor");
-            XElement theme = package.Xml("word/theme/theme1.xml").Descendants(A + "clrScheme").Single().Element(A + (themeName == "tx2" ? "dk2" : themeName == "tx1" ? "dk1" : themeName == "bg1" ? "lt1" : themeName == "bg2" ? "lt2" : themeName))?.Elements().FirstOrDefault();
+            XElement theme = package.Xml("word/theme/theme1.xml").Descendants(A + "clrScheme").Single().Element(A + themeName)?.Elements().FirstOrDefault();
             string themeRgb = (string)theme?.Attribute("lastClr") ?? (string)theme?.Attribute("val");
             bool match = drawing != null && line != null && PictureGeometryMatches(drawing, task) &&
                 ParagraphText(drawing.Ancestors(W + "p").FirstOrDefault()) == RequiredString(task, "anchorParagraph") &&
-                (!OptionalBool(task, "requireOriginalLineStyle", true) || DrawingInteger(line, "w", 9525) == RequiredInt(task, "expectedWidthEmu")) && // Word default 0.75 pt when omitted.
-                (!OptionalBool(task, "requireOriginalLineStyle", true) || ((string)line.Element(A + "prstDash")?.Attribute("val") ?? "solid") == RequiredString(task, "expectedDash")) &&
-                (!OptionalBool(task, "requireOriginalLineStyle", true) || (line.Element(A + "custDash") == null && ((string)line.Attribute("cmpd") ?? "sng") == "sng")) &&
+                DrawingInteger(line, "w", 9525) == RequiredInt(task, "expectedWidthEmu") && // Word default 0.75 pt when omitted.
+                ((string)line.Element(A + "prstDash")?.Attribute("val") ?? "solid") == RequiredString(task, "expectedDash") &&
+                line.Element(A + "custDash") == null && ((string)line.Attribute("cmpd") ?? "sng") == "sng" &&
                 (string)scheme?.Attribute("val") == themeName &&
                 string.Equals(themeRgb, RequiredString(task, "expectedThemeRgb"), StringComparison.OrdinalIgnoreCase) &&
                 scheme.Elements().Count() == 1 && DrawingInteger(scheme.Element(A + "lumMod"), "val", -1) == RequiredInt(task, "expectedLumMod");
             // DrawingML attributes are unqualified, unlike WordprocessingML Twips attributes.
-            match = match && (!OptionalBool(task, "requireOriginalLineStyle", true) || line.Elements().All(e => e.Name == A + "solidFill" || e.Name == A + "prstDash" || e.Name == A + "round" || e.Name == A + "bevel" || e.Name == A + "miter"));
-            detail = match ? "The source picture has the verified border-color semantics and task-declared line properties."
-                : "The target picture or its task-declared border properties are incorrect.";
+            match = match && line.Elements().All(e => e.Name == A + "solidFill" || e.Name == A + "prstDash" || e.Name == A + "round" || e.Name == A + "bevel" || e.Name == A + "miter");
+            detail = match ? "The source picture has the verified theme border color, original width and dash style."
+                : "The target picture or its border color, width or dash style is incorrect.";
             return match;
         }
 

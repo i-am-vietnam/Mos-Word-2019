@@ -1,8 +1,0 @@
-{
-  "projectId": "Word2019_P11",
-  "officeVersion": "Word2019",
-  "version": "1.0.0",
-  "starter": "starter.docx",
-  "preparedStarter": "prepared-starter.docx",
-  "preparationContextKey": "P11_PREPARATION_CONTEXT"
-}

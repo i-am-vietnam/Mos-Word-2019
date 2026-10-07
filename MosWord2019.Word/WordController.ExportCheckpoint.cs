@@ -13,28 +13,7 @@ namespace MosWord2019.Word
     {
         private string exportCheckpointPath;
         private volatile bool writingCheckpoint;
-        private bool legacyCheckpoint;
-        private string legacyCheckpointError;
         public event Action<string> ExportCheckpointFailed;
-
-        public void ConfigureLegacyCheckpoint(string checkpointPath)
-        {
-            legacyCheckpoint = true;
-            legacyCheckpointError = null;
-            ConfigureExportCheckpoint(checkpointPath);
-        }
-
-        public string GetPreservedFormattedPath()
-        {
-            EnsureUsable();
-            if (!legacyCheckpoint || !IsOpened || exportCheckpointPath == null)
-                throw new InvalidOperationException("No legacy-output preservation is configured.");
-            if (session.Document.SaveFormat != (int)Wd.WdSaveFormat.wdFormatDocument)
-                SaveFormattedCheckpoint();
-            if (legacyCheckpointError != null || !File.Exists(exportCheckpointPath))
-                throw new IOException("The formatted state preceding legacy Save As could not be preserved. " + legacyCheckpointError);
-            return exportCheckpointPath;
-        }
 
         public void ConfigureExportCheckpoint(string checkpointPath)
         {
@@ -57,23 +36,16 @@ namespace MosWord2019.Word
                 incoming = Marshal.GetIUnknownForObject(document);
                 owned = Marshal.GetIUnknownForObject(session.Document);
                 if (incoming != owned) return; // Never inspect an unrelated document, even in the owned application.
-                if (legacyCheckpoint && document.SaveFormat == (int)Wd.WdSaveFormat.wdFormatDocument) return;
                 // Office supplies this document to its connection-point callback on an RPC thread.
                 // Read only that event argument (confirmed owned by COM identity), then write its
                 // immutable serialization. Never call the held-session lifecycle from this callback
                 // or synchronously invoke the UI which may itself be waiting in Word.Save().
                 WriteFormattedCheckpoint(document.WordOpenXML);
-                if (legacyCheckpoint)
-                {
-                    legacyCheckpointError = null;
-                    AppLogger.Write("Legacy export: preserved current modern formatted state before native save");
-                }
             }
             catch (Exception ex)
             {
-                if (legacyCheckpoint) legacyCheckpointError = ex.Message;
-                else cancel = true; // Existing opt-in plain-text contract; never used by legacy output.
-                AppLogger.Write(legacyCheckpoint ? "Legacy export preservation failed; native Save As was not cancelled" : "Training export checkpoint failed; native save cancelled", ex);
+                cancel = true; // Do not let a failed checkpoint precede a lossy save.
+                AppLogger.Write("Training export checkpoint failed; native save cancelled", ex);
                 try { ExportCheckpointFailed?.Invoke(ex.Message); }
                 catch (Exception notificationError) { AppLogger.Write("Unable to report cancelled export save", notificationError); }
             }

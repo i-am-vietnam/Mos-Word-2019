@@ -14,11 +14,6 @@ namespace MosWord2019.Projects
             return package?.Tasks?.Any(t => t.AssertionType == "PlainTextDocumentExport") == true;
         }
 
-        public static bool RequiresLegacyCheckpoint(ProjectPackage package)
-        {
-            return package?.Tasks?.Any(t => t.AssertionType == "LegacyWordDocumentExport") == true;
-        }
-
         public string GetExportCheckpointPath(ProjectPackage package)
         {
             return Path.Combine(GetPackagePaths(package).WorkingDirectory, "export-checkpoint.docx");
@@ -26,13 +21,10 @@ namespace MosWord2019.Projects
 
         private void RestoreExportCheckpoint(ProjectPackage package, PackagePaths paths)
         {
-            if (!RequiresExportCheckpoint(package) && !RequiresLegacyCheckpoint(package)) return;
+            if (!RequiresExportCheckpoint(package)) return;
             string checkpoint = GetExportCheckpointPath(package);
             if (!File.Exists(checkpoint)) return;
             if ((File.GetAttributes(checkpoint) & FileAttributes.ReparsePoint) != 0) throw new IOException("Checkpoint cannot be a reparse point.");
-            // A newer working file may contain valid edits made after a prior trainer session.
-            // Never replace those edits with an older retained export snapshot.
-            if (File.Exists(paths.WorkingPath) && File.GetLastWriteTimeUtc(paths.WorkingPath) >= File.GetLastWriteTimeUtc(checkpoint)) return;
             // The caller has closed Word before PrepareWorkingCopy. This copies only a trainer-owned
             // formatted checkpoint; the personal TXT output is never opened, overwritten or deleted.
             PreserveSavedWorkingCopy(package, checkpoint);

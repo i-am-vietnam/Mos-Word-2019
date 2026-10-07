@@ -48,7 +48,7 @@ namespace MosWord2019.Core.Services
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
-            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "ColumnBreakBeforeParagraph", "LegacyWordDocumentExport", "TaskSpecificationUnavailable"
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -67,21 +67,6 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
-                if (task.AssertionType == "LegacyWordDocumentExport")
-                {
-                    if (string.IsNullOrWhiteSpace(context?.DefaultSaveAsFolder)) return Error(task, "The original working folder is required to grade the default-location legacy export.");
-                    string name = RequiredString(task, "expectedFileName");
-                    if (name != Path.GetFileName(name) || Path.IsPathRooted(name) || !string.Equals(Path.GetExtension(name), ".doc", StringComparison.OrdinalIgnoreCase))
-                        return Error(task, "The legacy output metadata must declare an exact .doc filename.");
-                    string output = Path.Combine(context.DefaultSaveAsFolder, name);
-                    if (!File.Exists(output)) return new TaskGradeResult(TaskGradeOutcome.Fail, "The required binary Word output is missing from the original default working folder.", task.AssertionType, task.TaskId);
-                    string content;
-                    try { content = new LegacyWordSnapshot(output).MainText(); }
-                    catch (Exception ex) when (ex is InvalidDataException || ex is OverflowException || ex is ArgumentException) { return new TaskGradeResult(TaskGradeOutcome.Fail, "The output is not a readable genuine binary Word document: " + ex.Message, task.AssertionType, task.TaskId); }
-                    bool match = RequiredStrings(task, "requiredTextFragments").All(text => content.Contains(text));
-                    return new TaskGradeResult(match ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail, match ? "The exact default-location output is a genuine binary Word document with the declared document content." : "The legacy output does not contain the required source-document content.", task.AssertionType, task.TaskId);
-                }
-                if (task.AssertionType == "TaskSpecificationUnavailable") return Error(task, RequiredString(task, "reason"));
                 if (task.AssertionType == ExternalOutputLocation.DocumentsAssertionType)
                 {
                     bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName")));
@@ -168,7 +153,6 @@ namespace MosWord2019.Core.Services
                         case "PictureBorderColorEquals": passed = CheckPictureBorderColor(package, task, out detail); break;
                         case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
                         case "InsertedTableAutoFitContents": passed = CheckInsertedAutoFitTable(package, task, out detail); break;
-                        case "ColumnBreakBeforeParagraph": passed = CheckColumnBreak(package, task, out detail); break;
                         case "NumberedListSequence": passed = CheckNumberedSequence(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
@@ -471,7 +455,7 @@ namespace MosWord2019.Core.Services
         private static bool CheckTextConvertedToTable(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             string heading = RequiredString(task, "sectionHeading");
-            string intro = task.Extra.ContainsKey("introParagraph") ? RequiredString(task, "introParagraph") : null;
+            string intro = RequiredString(task, "introParagraph");
             string following = RequiredString(task, "followingHeading");
             int expectedColumns = RequiredInt(task, "expectedColumns");
             int expectedRows = RequiredInt(task, "expectedRows");
@@ -480,29 +464,20 @@ namespace MosWord2019.Core.Services
             XElement body = document.Root?.Element(W + "body");
             List<XElement> children = body?.Elements().ToList() ?? new List<XElement>();
             int headingIndex = children.FindIndex(e => e.Name == W + "p" && ParagraphText(e) == heading);
-            int introIndex = intro == null ? headingIndex : children.FindIndex(headingIndex + 1, e => e.Name == W + "p" && ParagraphText(e) == intro);
+            int introIndex = children.FindIndex(headingIndex + 1, e => e.Name == W + "p" && ParagraphText(e) == intro);
             int followingIndex = children.FindIndex(Math.Max(0, introIndex + 1), e => e.Name == W + "p" && ParagraphTextOutsideTextBoxes(e) == following);
-            if (headingIndex < 0 || (intro != null && introIndex != headingIndex + 1) || followingIndex <= introIndex)
-            { detail = "The declared section anchors are missing or out of order."; return false; }
+            if (headingIndex < 0 || introIndex != headingIndex + 1 || followingIndex < 0)
+            { detail = "The Lecturers section anchors are missing or out of order."; return false; }
             List<XElement> between = children.Skip(introIndex + 1).Take(followingIndex - introIndex - 1).ToList();
             List<XElement> tables = between.Where(e => e.Name == W + "tbl").ToList();
             if (tables.Count != 1 || between.Any(e => e.Name == W + "p" && (ParagraphText(e).Contains("\t") || e.Descendants(W + "tab").Any())))
             { detail = "The tab-delimited source block was not replaced by one table in the required section."; return false; }
             XElement table = tables[0];
-            if (OptionalBool(task, "requireDefaultAutoFit", false))
-            {
-                XElement properties = table.Element(W + "tblPr");
-                XElement width = properties?.Element(W + "tblW");
-                string layout = (string)properties?.Element(W + "tblLayout")?.Attribute(W + "type");
-                if (layout == "fixed" || (string)width?.Attribute(W + "type") != "auto" ||
-                    (string)width?.Attribute(W + "w") != "0")
-                { detail = "The converted table does not retain the verified default AutoFit semantics."; return false; }
-            }
             int columns = table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() ?? 0;
             int rows = table.Elements(W + "tr").Count();
-            if (columns != expectedColumns || rows != expectedRows || table.Descendants().Any(e => e.Name == W + "gridSpan" || e.Name == W + "vMerge" || e.Name == W + "hMerge") || !(OptionalBool(task, "ignoreDataRowOrder", false) ? TableRowsEqualIgnoringDataOrder(table, expectedCells) : TableRowsEqual(table, expectedCells)))
+            if (columns != expectedColumns || rows != expectedRows || !TableRowsEqual(table, expectedCells))
             { detail = "The converted table does not match the verified Word table structure and content."; return false; }
-            detail = "The complete tab-delimited block is the verified Word table in the declared section.";
+            detail = "The complete tab-delimited block is the verified Word table in the Lecturers section.";
             return true;
         }
 
@@ -537,7 +512,7 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextBoxText(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string anchor = task.Extra.ContainsKey("sectionHeading") ? (string)task.Extra["anchorText"] : RequiredString(task, "anchorText");
+            string anchor = RequiredString(task, "anchorText");
             string fill = RequiredString(task, "fillColor");
             string geometry = RequiredString(task, "shapeGeometry");
             string expected = RequiredString(task, "expectedText");
@@ -546,16 +521,8 @@ namespace MosWord2019.Core.Services
             List<TextBoxCandidate> matches = TextBoxCandidates(document)
                 .Where(candidate => candidate.OuterParagraph != null &&
                     ParagraphTextOutsideTextBoxes(candidate.OuterParagraph) == anchor &&
-                    TextBoxFillMatches(package, candidate, fill, task) &&
+                    string.Equals(NormalizeColor(candidate.FillColor), NormalizeColor(fill), StringComparison.OrdinalIgnoreCase) &&
                     string.Equals(candidate.Geometry, geometry, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (task.Extra.ContainsKey("sectionHeading"))
-            {
-                var body = document.Root.Element(W + "body");
-                var children = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "txbxContent").Any()).ToList();
-                int start = children.FindIndex(e => e.Name == W + "p" && ParagraphTextOutsideTextBoxes(e) == RequiredString(task, "sectionHeading"));
-                int end = children.FindIndex(Math.Max(0, start + 1), e => e.Name == W + "p" && ParagraphTextOutsideTextBoxes(e) == RequiredString(task, "followingHeading"));
-                matches = matches.Where(c => start >= 0 && end > start && children.IndexOf(c.OuterParagraph) > start && children.IndexOf(c.OuterParagraph) < end).ToList();
-            }
             if (matches.Count != 1) { detail = "The target dark-blue text box was not found uniquely."; return false; }
             XElement textBox = matches[0].TextBox;
             string actual = textBox == null ? null : VisibleText(textBox).TrimEnd();
@@ -564,20 +531,6 @@ namespace MosWord2019.Core.Services
             detail = match ? "The target dark-blue text box contains the exact requested text."
                 : "The required exact text is missing from the target dark-blue text box.";
             return match;
-        }
-
-        private static bool TextBoxFillMatches(PackageSnapshot package, TextBoxCandidate candidate, string expected, TaskDefinition task)
-        {
-            string color = candidate.FillColor ?? "";
-            if (color.StartsWith("theme:", StringComparison.Ordinal))
-            {
-                string scheme = color.Substring(6);
-                if (task.Extra.ContainsKey("expectedFillScheme") && scheme != (string)task.Extra["expectedFillScheme"]) return false;
-                string key = scheme == "tx2" ? "dk2" : scheme == "tx1" ? "dk1" : scheme == "bg1" ? "lt1" : scheme == "bg2" ? "lt2" : scheme;
-                var theme = package.Xml("word/theme/theme1.xml").Descendants(A + "clrScheme").Single().Element(A + key)?.Elements().FirstOrDefault();
-                color = (string)theme?.Attribute("lastClr") ?? (string)theme?.Attribute("val");
-            }
-            return string.Equals(NormalizeColor(color), NormalizeColor(expected), StringComparison.OrdinalIgnoreCase);
         }
 
         private static IEnumerable<TextBoxCandidate> TextBoxCandidates(XDocument document)
@@ -612,7 +565,7 @@ namespace MosWord2019.Core.Services
             if (properties == null || textBox == null) return null;
             return new TextBoxCandidate(outer, textBox,
                 (string)properties.Element(A + "prstGeom")?.Attribute("prst"),
-                (string)properties.Element(A + "solidFill")?.Element(A + "srgbClr")?.Attribute("val") ?? "theme:" + (string)properties.Element(A + "solidFill")?.Element(A + "schemeClr")?.Attribute("val"));
+                (string)properties.Element(A + "solidFill")?.Element(A + "srgbClr")?.Attribute("val"));
         }
 
         private static TextBoxCandidate VmlTextBoxCandidate(XElement shape, XElement outer)
@@ -647,10 +600,6 @@ namespace MosWord2019.Core.Services
                 .Where(p => ParagraphText(p) == expectedParagraph).ToList();
             if (paragraphs.Count != 1) { detail = "The target paragraph or target word was changed."; return false; }
             bool active = HasActiveCommentOnText(paragraphs[0], targetText);
-            if (!active && task.Extra.ContainsKey("protectedComments"))
-                foreach (JObject item in RequiredArray(task, "protectedComments"))
-                    if (!ProtectedCommentExists(package, document, item))
-                    { detail = "An unrelated declared comment or its anchor was removed."; return false; }
             detail = active ? "The comment attached to the target text is still active."
                 : "The target text is preserved and its attached comment is deleted.";
             return !active;
@@ -698,10 +647,10 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableAccessibilityFirstRow(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string[] header = RequiredHeader(task);
+            string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             XDocument document = package.Xml("word/document.xml");
-            List<XElement> tables = FindTaskTables(document, header, task);
+            List<XElement> tables = FindTablesByHeader(document, header);
             if (tables.Count != 1 || !TableRowsEqual(tables[0], expectedRows))
             { detail = "The target table is missing or its content was changed."; return false; }
             XElement look = tables[0].Element(W + "tblPr")?.Element(W + "tblLook");
@@ -720,9 +669,9 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableRows(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string[] header = RequiredHeader(task);
+            string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
-            List<XElement> tables = FindTaskTables(package.Xml("word/document.xml"), header, task);
+            List<XElement> tables = FindTablesByHeader(package.Xml("word/document.xml"), header);
             bool match = tables.Count == 1 && TableRowsEqual(tables[0], expectedRows);
             detail = match ? "The target table has the exact required row order and unchanged content."
                 : "The target table row order or content is incorrect.";
@@ -776,15 +725,15 @@ namespace MosWord2019.Core.Services
             int precedingIndex = children.FindIndex(element => element.Name == W + "p" && ParagraphText(element) == precedingText);
             int followingIndex = children.FindIndex(element => element.Name == W + "p" && ParagraphText(element) == followingText);
             if (precedingIndex < 0 || followingIndex != precedingIndex + 2 || children[precedingIndex + 1].Name != W + "p")
-            { detail = "The required blank paragraph location in the declared section was not preserved."; return false; }
+            { detail = "The required blank paragraph location in the IC3 section was not preserved."; return false; }
             XElement targetParagraph = children[precedingIndex + 1];
             List<XElement> allModels = document.Descendants(Am3d + "model3d").ToList();
             List<XElement> targetModels = targetParagraph.Descendants(Mc + "Choice")
                 .Where(choice => ((string)choice.Attribute("Requires") ?? "").Split(' ').Contains("am3d"))
                 .SelectMany(choice => choice.Descendants(Am3d + "model3d")).ToList();
             XElement model = targetModels.Count == 1 ? targetModels[0] : null;
-            if (model == null || (OptionalBool(task, "requireGlobalUniqueness", true) && allModels.Count != 1) || (OptionalBool(task, "requireInline", true) && !model.Ancestors(Wp + "inline").Any()))
-            { detail = "The required 3D model is missing, ambiguous, or has the wrong task-declared placement."; return false; }
+            if (model == null || allModels.Count != 1 || !model.Ancestors(Wp + "inline").Any())
+            { detail = "The supplied 3D model is missing, is not unique, or is not In Line with Text at the required location."; return false; }
             XElement graphicData = model.Ancestors(A + "graphicData").FirstOrDefault();
             string relationshipId = (string)model.Attribute(R + "embed");
             string part = package.RelatedPart("word/document.xml", relationshipId);
@@ -792,7 +741,7 @@ namespace MosWord2019.Core.Services
                 !string.IsNullOrWhiteSpace(part) && part.EndsWith(".glb", StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(package.Hash(part), expectedHash, StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrEmpty(ParagraphText(targetParagraph));
-            detail = match ? "The verified 3D model is in the declared paragraph with the requested placement."
+            detail = match ? "The verified Glasses 3D model is inline in the required IC3 paragraph."
                 : "The model content, format, or insertion position is incorrect.";
             return match;
         }
@@ -1083,10 +1032,10 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableFirstRowHeader(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string[] header = RequiredHeader(task);
+            string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             XDocument document = package.Xml("word/document.xml");
-            List<XElement> tables = FindTaskTables(document, header, task);
+            List<XElement> tables = FindTablesByHeader(document, header);
             bool ignoreOrder = OptionalBool(task, "ignoreDataRowOrder", false);
             if (tables.Count != 1 || !(ignoreOrder ? TableRowsEqualIgnoringDataOrder(tables[0], expectedRows) : TableRowsEqual(tables[0], expectedRows)))
             { detail = "The target table is missing or its content was changed."; return false; }
@@ -1122,13 +1071,13 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableColumnWidths(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string[] header = RequiredHeader(task);
+            string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             int expectedWidth = RequiredInt(task, "expectedWidthTwips");
             int tolerance = RequiredInt(task, "widthToleranceTwips");
             bool noRowHeight = OptionalBool(task, "requireNoExplicitRowHeight", false);
             XDocument document = package.Xml("word/document.xml");
-            List<XElement> tables = FindTaskTables(document, header, task);
+            List<XElement> tables = FindTablesByHeader(document, header);
             if (tables.Count != 1 || !TableRowsEqual(tables[0], expectedRows))
             { detail = "The target table is missing or its content was changed."; return false; }
             List<int> widths = tables[0].Element(W + "tblGrid")?.Elements(W + "gridCol")
@@ -1136,8 +1085,6 @@ namespace MosWord2019.Core.Services
             JToken alternatives;
             int[] allowed = task.Extra.TryGetValue("acceptedWidthTwips", out alternatives) ? alternatives.Values<int>().ToArray() : new[] { expectedWidth };
             bool widthsMatch = widths.Count == header.Length && allowed.Any(value => widths.All(width => Math.Abs(width - value) <= tolerance));
-            if (task.Extra.ContainsKey("acceptedColumnWidthSets"))
-                widthsMatch = RequiredArray(task, "acceptedColumnWidthSets").Any(set => set.Values<int>().SequenceEqual(widths));
             if (OptionalBool(task, "requireCellWidths", false))
                 widthsMatch &= TableCellsMatchWidths(tables[0], widths, tolerance);
             JToken paragraphs;
@@ -1169,13 +1116,9 @@ namespace MosWord2019.Core.Services
             XElement paragraph = paragraphs[0];
             List<XElement> citations = paragraph.Elements(W + "sdt")
                 .Where(value => value.Element(W + "sdtPr")?.Element(W + "citation") != null).ToList();
-            if (citations.Count != 1 || (!OptionalBool(task, "allowTrailingWhitespace", false) && paragraph.Elements().LastOrDefault() != citations[0]))
+            if (citations.Count != 1 || paragraph.Elements().LastOrDefault() != citations[0])
             { detail = "The required citation placeholder is missing from the end of the target paragraph."; return false; }
             XElement citation = citations[0];
-            if (OptionalBool(task, "allowTrailingWhitespace", false) &&
-                (string.Concat(citation.ElementsBeforeSelf().Where(e => e.Name != W + "pPr").Select(VisibleText)).TrimEnd() != targetText ||
-                 citation.ElementsAfterSelf().Any(e => !string.IsNullOrWhiteSpace(VisibleText(e)) || e.Descendants().Any(x => x.Name == W + "drawing" || x.Name == W + "fldChar" || x.Name == W + "sym"))))
-            { detail = "The citation is not after the complete unchanged target text."; return false; }
             string actualField = NormalizeFieldCode(string.Concat(citation.Descendants(W + "instrText").Select(value => value.Value)));
             bool complexField = citation.Descendants(W + "fldChar").Any(value => (string)value.Attribute(W + "fldCharType") == "begin") &&
                 citation.Descendants(W + "fldChar").Any(value => (string)value.Attribute(W + "fldCharType") == "end");
@@ -1226,13 +1169,14 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckSmartArtAltText(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            string anchor = RequiredString(task, "anchorText");
             string expected = RequiredString(task, "expectedDescription");
-            List<SmartArtReference> smartArts = FindTaskSmartArts(package, task);
+            List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
             if (smartArts.Count != 1)
             { detail = "The target SmartArt was not found uniquely."; return false; }
             XElement properties = smartArts[0].Container.Element(Wp + "docPr");
             bool match = string.Equals((string)properties?.Attribute("descr"), expected, StringComparison.Ordinal) &&
-                (!OptionalBool(task, "requireEmptyTitle", true) || string.IsNullOrEmpty((string)properties?.Attribute("title")));
+                string.IsNullOrEmpty((string)properties?.Attribute("title"));
             detail = match ? "The entire target SmartArt has the exact requested alt-text description."
                 : "The requested description is missing, differs, or was placed in the title field.";
             return match;
@@ -1254,7 +1198,6 @@ namespace MosWord2019.Core.Services
         {
             string sourceText = RequiredString(task, "sourceParagraph");
             string destinationText = RequiredString(task, "destinationParagraph");
-            if (task.Extra.ContainsKey("expectedRunFormatting")) return CheckCopiedFormatting(package, task, out detail);
             string alignment = RequiredString(task, "expectedAlignment");
             string style = RequiredString(task, "expectedCharacterStyle");
             XDocument document = package.Xml("word/document.xml");
