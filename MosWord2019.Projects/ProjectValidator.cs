@@ -32,6 +32,12 @@ namespace MosWord2019.Projects
 
             string projectId = result.Meta == null ? folderName : (result.Meta.ProjectId ?? "").Trim();
             ValidateMeta(result, projectFolderPath, metaPath, folderName, projectId);
+            if (result.Meta != null)
+            {
+                try { TrainingWorkspaceService.ValidateAssetOptions(new ProjectPackage { Meta = result.Meta, ProjectFolderPath = projectFolderPath }); }
+                catch (Exception ex) when (ex is IOException || ex is ArgumentException || ex is InvalidOperationException)
+                { AddError(result, "ASSET_STAGING_INVALID", projectId, "", ex.Message); }
+            }
             ValidateTasks(result, projectId);
             LoadLanguages(result, projectFolderPath, projectId, requestedLanguageCode);
             ValidateLanguageKeys(result, projectId);

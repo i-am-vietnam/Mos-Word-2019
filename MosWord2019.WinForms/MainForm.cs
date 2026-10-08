@@ -131,14 +131,22 @@ namespace MosWord2019
             AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
             SaveAndCloseDocument();
             status.Text = T("Opening project...", "Đang mở dự án...");
-            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected))
-                AppLogger.Write("Training project asset available " + stagedAsset);
-            string path = workspace.PrepareWorkingCopy(selected);
-            AppLogger.Write("Training working copy prepared " + path);
-            word.OpenDocument(path);
-            AppLogger.Write("Training Word open " + path);
-            currentProject = selected;
-            currentWorkPath = path;
+            try
+            {
+                foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected))
+                    AppLogger.Write("Training project asset available " + stagedAsset);
+                string path = workspace.PrepareWorkingCopy(selected);
+                AppLogger.Write("Training working copy prepared " + path);
+                word.OpenDocument(path);
+                AppLogger.Write("Training Word open " + path);
+                currentProject = selected;
+                currentWorkPath = path;
+            }
+            catch
+            {
+                if (!word.IsOpened) workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                throw;
+            }
             ConfigureExportCheckpoint();
             BuildTaskTabs();
             ShowTask(0);
@@ -265,6 +273,7 @@ namespace MosWord2019
             if (word.IsOpened) return true;
             AppLogger.Write("Training manual Word closure " + currentWorkPath);
             word.Close();
+            workspace.CleanupProjectAssets(currentProject, assetLog => AppLogger.Write(assetLog));
             ClearProject();
             string message = T("Word was closed. Choose a project and click Go to reopen the saved working copy.",
                 "Word đã đóng. Chọn dự án và bấm Bắt đầu để mở lại bản làm việc đã lưu.");
@@ -282,6 +291,7 @@ namespace MosWord2019
             AppLogger.Write("Training save " + currentWorkPath);
             word.CloseDocument();
             AppLogger.Write("Training document close " + currentWorkPath);
+            workspace.CleanupProjectAssets(currentProject, assetLog => AppLogger.Write(assetLog));
             ClearProject();
         }
 
@@ -293,12 +303,21 @@ namespace MosWord2019
             var project = currentProject;
             word.CloseDocument(); // Explicit confirmed discard; do not save.
             ClearProject();
-            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
-                AppLogger.Write("Training project asset available after restart " + stagedAsset);
-            string path = workspace.ResetWorkingCopy(project);
-            word.OpenDocument(path);
-            currentProject = project;
-            currentWorkPath = path;
+            string path;
+            try
+            {
+                foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
+                    AppLogger.Write("Training project asset available after restart " + stagedAsset);
+                path = workspace.ResetWorkingCopy(project);
+                word.OpenDocument(path);
+                currentProject = project;
+                currentWorkPath = path;
+            }
+            catch
+            {
+                if (!word.IsOpened) workspace.CleanupProjectAssets(project, assetLog => AppLogger.Write(assetLog));
+                throw;
+            }
             ConfigureExportCheckpoint();
             BuildTaskTabs();
             ShowTask(0);
@@ -409,9 +428,9 @@ namespace MosWord2019
                 if (assetConflict != null)
                 {
                     status.Text = string.Format(T(
-                        "Documents already contains a different file named {0}. Move or rename it, then try again.",
-                        "Documents đã có tệp khác tên {0}. Hãy di chuyển hoặc đổi tên tệp đó rồi thử lại."),
-                        assetConflict.AssetFileName);
+                        "A different file named {0} already exists in {1}. Move or rename it, then try again.",
+                        "Đã có tệp khác tên {0} tại {1}. Hãy di chuyển hoặc đổi tên tệp đó rồi thử lại."),
+                        assetConflict.AssetFileName, assetConflict.Location);
                 }
                 else if (ex is InvalidDataException)
                 {

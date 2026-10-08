@@ -48,7 +48,7 @@ namespace MosWord2019.Core.Services
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
-            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments"
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -151,6 +151,7 @@ namespace MosWord2019.Core.Services
                         case "TableRowCharacterStyle": passed = CheckTableRowCharacterStyle(package, task, out detail); break;
                         case "TableCellSpacingEquals": passed = CheckTableCellSpacing(package, task, out detail); break;
                         case "PictureBorderColorEquals": passed = CheckPictureBorderColor(package, task, out detail); break;
+                        case "PictureInsertedAtAnchor": passed = CheckInsertedPicture(package, task, out detail); break;
                         case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
                         case "InsertedTableAutoFitContents": passed = CheckInsertedAutoFitTable(package, task, out detail); break;
                         case "NumberedListSequence": passed = CheckNumberedSequence(package, task, out detail); break;
@@ -774,6 +775,11 @@ namespace MosWord2019.Core.Services
                 boundaryIndex--;
             }
             match = match && boundaries > 0;
+            if (match && OptionalBool(task, "requireFollowingSectionContinuous", false))
+            {
+                var following = DocumentSections(document).SingleOrDefault(s => s.Content.Contains(children[headingIndexes[0]]));
+                match = (string)following?.Properties?.Element(W + "type")?.Attribute(W + "val") == "continuous";
+            }
             detail = match ? "A real Continuous section boundary occurs at the local boundary immediately before the target heading."
                 : "The closest section boundary immediately before the target heading is missing or is not Continuous.";
             return match;
@@ -860,7 +866,11 @@ namespace MosWord2019.Core.Services
             XDocument document = package.Xml("word/document.xml");
             XElement body = document.Root?.Element(W + "body");
             List<XElement> directParagraphs = body?.Elements(W + "p").ToList() ?? new List<XElement>();
-            List<XElement> targets = expectedText.Select(text => directParagraphs.SingleOrDefault(paragraph => ParagraphText(paragraph) == text)).ToList();
+            List<XElement> targets = expectedText.Select(text =>
+            {
+                var matches = directParagraphs.Where(paragraph => ParagraphText(paragraph) == text).ToList();
+                return matches.Count == 1 ? matches[0] : null;
+            }).ToList();
             if (targets.Any(value => value == null) || targets.Distinct().Count() != expectedText.Length)
             { detail = "The target paragraphs were not found uniquely."; return false; }
 
@@ -1049,7 +1059,7 @@ namespace MosWord2019.Core.Services
             string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             XDocument document = package.Xml("word/document.xml");
-            List<XElement> tables = FindTablesByHeader(document, header);
+            List<XElement> tables = FindTaskTables(document, task, header);
             bool ignoreOrder = OptionalBool(task, "ignoreDataRowOrder", false);
             if (tables.Count != 1 || !(ignoreOrder ? TableRowsEqualIgnoringDataOrder(tables[0], expectedRows) : TableRowsEqual(tables[0], expectedRows)))
             { detail = "The target table is missing or its content was changed."; return false; }

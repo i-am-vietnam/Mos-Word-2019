@@ -32,6 +32,7 @@
     <Compile Include="ProjectValidator.cs" />
     <Compile Include="TemplateOutputCleanupService.cs" />
     <Compile Include="TrainingWorkspaceService.cs" />
+    <Compile Include="TrainingWorkspaceService.Assets.cs" />
     <Compile Include="TrainingWorkspaceService.SavedCopy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

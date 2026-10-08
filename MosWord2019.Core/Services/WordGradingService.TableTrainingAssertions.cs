@@ -60,7 +60,7 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableRowCharacterStyle(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            var tables = FindTablesByHeader(package.Xml("word/document.xml"), RequiredStrings(task, "targetHeaderRow"));
+            var tables = FindTaskTables(package.Xml("word/document.xml"), task, RequiredStrings(task, "targetHeaderRow"));
             string style = RequiredString(task, "characterStyleId");
             var styles = package.Xml("word/styles.xml").Root;
             bool match = tables.Count == 1 && TableRowsEqual(tables[0], RequiredStringMatrix(task, "expectedTableRows")) &&

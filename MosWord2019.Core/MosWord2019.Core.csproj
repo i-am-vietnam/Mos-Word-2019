@@ -51,6 +51,7 @@
     <Compile Include="Services\WordGradingService.DocumentAssertions.cs" />
     <Compile Include="Services\WordGradingService.CourseAssertions.cs" />
     <Compile Include="Services\WordGradingService.TableTrainingAssertions.cs" />
+    <Compile Include="Services\WordGradingService.PictureInsertion.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

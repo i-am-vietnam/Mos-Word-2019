@@ -40,6 +40,30 @@ namespace MosWord2019.Core.Services
                 .Where(r => !r.Ancestors(W + "sectPrChange").Any() && (string)r.Attribute(W + "type") == headerType)
                 .Select(r => package.RelatedPart("word/document.xml", (string)r.Attribute(R + "id"))).Distinct().ToList();
             bool match = parts.Count > 0;
+            if (OptionalBool(task, "requireEverySectionHeader", false))
+            {
+                var document = package.Xml("word/document.xml");
+                var sections = DocumentSections(document);
+                var inherited = new Dictionary<string, string>(StringComparer.Ordinal);
+                XDocument settings;
+                bool even = package.TryXml("word/settings.xml", out settings) && IsOn(settings.Root.Element(W + "evenAndOddHeaders"));
+                foreach (var section in sections)
+                {
+                    foreach (var reference in section.Properties.Elements(W + "headerReference"))
+                        inherited[(string)reference.Attribute(W + "type")] = (string)reference.Attribute(R + "id");
+                    var active = new List<string> { headerType };
+                    if (IsOn(section.Properties.Element(W + "titlePg"))) active.Add("first");
+                    if (even) active.Add("even");
+                    foreach (string type in active.Distinct())
+                    {
+                        string id;
+                        if (!inherited.TryGetValue(type, out id)) { match = false; continue; }
+                        string part = package.RelatedPart("word/document.xml", id);
+                        if (string.IsNullOrEmpty(part)) match = false;
+                        else if (!parts.Contains(part)) parts.Add(part);
+                    }
+                }
+            }
             foreach (string part in parts)
             {
                 var targets = package.Xml(part).Root.Elements(W + "p").Where(p => ParagraphTextOutsideTextBoxes(p) == expectedText).ToList();
@@ -53,6 +77,12 @@ namespace MosWord2019.Core.Services
                     string actualColor, shadowXml;
                     if (!effective.TryGetValue("color", out actualColor) || actualColor != color ||
                         !effective.TryGetValue((W14 + "shadow").ToString(), out shadowXml)) { match = false; continue; }
+                    if (task.Extra.ContainsKey("expectedThemeColor"))
+                    {
+                        XElement colorElement = EffectiveRunColorElement(package, targets[0], run);
+                        match &= (string)colorElement?.Attribute(W + "themeColor") == RequiredString(task, "expectedThemeColor") &&
+                            colorElement?.Attribute(W + "themeTint") == null && colorElement?.Attribute(W + "themeShade") == null;
+                    }
                     XElement shadow = XElement.Parse(shadowXml);
                     match &= attributes.Properties().All(a => (string)shadow.Attribute(W14 + a.Name) == (string)a.Value);
                     var shadowColor = shadow.Element(W14 + "srgbClr");
@@ -63,6 +93,18 @@ namespace MosWord2019.Core.Services
             detail = match ? "The unchanged target header uses the verified fill and shadow preset on all text."
                 : "The target header text, fill or shadow preset is incorrect.";
             return match;
+        }
+
+        private static XElement EffectiveRunColorElement(PackageSnapshot package, XElement paragraph, XElement run)
+        {
+            var styles = package.Xml("word/styles.xml").Root;
+            string paragraphStyle = (string)paragraph.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val") ?? "Normal";
+            string characterStyle = (string)run.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val");
+            var sources = new List<XElement> { styles.Element(W + "docDefaults")?.Element(W + "rPrDefault")?.Element(W + "rPr") };
+            sources.AddRange(StyleChain(styles, paragraphStyle).Select(s => s.Element(W + "rPr")));
+            sources.AddRange(StyleChain(styles, characterStyle).Select(s => s.Element(W + "rPr")));
+            sources.Add(run.Element(W + "rPr"));
+            return sources.Where(s => s?.Element(W + "color") != null).Select(s => s.Element(W + "color")).LastOrDefault();
         }
 
         private static bool CheckBookmarkStart(PackageSnapshot package, TaskDefinition task, out string detail)

@@ -11,12 +11,19 @@ namespace MosWord2019.Projects
     public sealed class ProjectAssetConflictException : IOException
     {
         public ProjectAssetConflictException(string assetFileName)
-            : base("Documents already contains a different file named " + assetFileName + ". Move or rename that file, then try again.")
+            : this(assetFileName, "Documents")
+        {
+        }
+
+        public ProjectAssetConflictException(string assetFileName, string location)
+            : base(location + " already contains a different file named " + assetFileName + ". Move or rename that file, then try again.")
         {
             AssetFileName = assetFileName ?? "";
+            Location = location ?? "";
         }
 
         public string AssetFileName { get; private set; }
+        public string Location { get; private set; }
     }
 
     public sealed partial class TrainingWorkspaceService
@@ -27,6 +34,7 @@ namespace MosWord2019.Projects
             new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".docx", ".docm", ".doc" };
         private readonly string workingRootPath;
         private readonly string documentsRootPath;
+        private readonly string picturesRootPath;
 
         public TrainingWorkspaceService()
             : this(DefaultWorkingRoot(), Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))
@@ -39,6 +47,11 @@ namespace MosWord2019.Projects
         }
 
         public TrainingWorkspaceService(string workingRootPath, string documentsRootPath)
+            : this(workingRootPath, documentsRootPath, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+        {
+        }
+
+        public TrainingWorkspaceService(string workingRootPath, string documentsRootPath, string picturesRootPath)
         {
             if (string.IsNullOrWhiteSpace(workingRootPath))
                 throw new ArgumentException("A Training working root is required.", nameof(workingRootPath));
@@ -46,52 +59,18 @@ namespace MosWord2019.Projects
                 throw new ArgumentException("A Documents root is required.", nameof(documentsRootPath));
             this.workingRootPath = Path.GetFullPath(workingRootPath);
             this.documentsRootPath = Path.GetFullPath(documentsRootPath);
+            if (string.IsNullOrWhiteSpace(picturesRootPath))
+                throw new ArgumentException("A Pictures root is required.", nameof(picturesRootPath));
+            this.picturesRootPath = Path.GetFullPath(picturesRootPath);
         }
 
         public string WorkingRootPath { get { return workingRootPath; } }
         public string DocumentsRootPath { get { return documentsRootPath; } }
+        public string PicturesRootPath { get { return picturesRootPath; } }
 
         public IList<string> StageProjectAssetsToDocuments(ProjectPackage package)
         {
-            if (package == null) throw new ArgumentNullException(nameof(package));
-            if (string.IsNullOrWhiteSpace(package.ProjectFolderPath))
-                throw new ArgumentException("ProjectFolderPath is required.", nameof(package));
-
-            string packageRoot = Path.GetFullPath(package.ProjectFolderPath);
-            string assetsRoot = Path.GetFullPath(Path.Combine(packageRoot, "assets"));
-            EnsureContained(packageRoot, assetsRoot, "Assets path escapes the package root.");
-            var staged = new List<string>();
-            if (!Directory.Exists(assetsRoot)) return staged;
-            if ((File.GetAttributes(assetsRoot) & FileAttributes.ReparsePoint) != 0)
-                throw new InvalidDataException("Project assets folder must not be a reparse point.");
-
-            Directory.CreateDirectory(documentsRootPath);
-            foreach (string source in Directory.GetFiles(assetsRoot, "*", SearchOption.TopDirectoryOnly))
-            {
-                FileAttributes attributes = File.GetAttributes(source);
-                if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
-                    throw new InvalidDataException("Project assets must be regular files: " + Path.GetFileName(source));
-
-                string sourcePath = Path.GetFullPath(source);
-                EnsureContained(assetsRoot, sourcePath, "An asset path escapes the assets folder.");
-                string fileName = Path.GetFileName(sourcePath);
-                if (string.IsNullOrWhiteSpace(fileName) || fileName == "." || fileName == "..")
-                    throw new InvalidDataException("Project asset has an invalid file name.");
-                string destination = Path.GetFullPath(Path.Combine(documentsRootPath, fileName));
-                EnsureContained(documentsRootPath, destination, "An asset destination escapes Documents.");
-
-                if (File.Exists(destination))
-                {
-                    if (!FilesEqual(sourcePath, destination))
-                        throw new ProjectAssetConflictException(fileName);
-                }
-                else
-                {
-                    File.Copy(sourcePath, destination, false);
-                }
-                staged.Add(destination);
-            }
-            return staged;
+            return StageAssets(package);
         }
 
         public string GetWorkingCopyPath(ProjectPackage package)

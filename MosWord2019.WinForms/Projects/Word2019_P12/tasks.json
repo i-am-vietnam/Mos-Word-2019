@@ -1,15 +1,415 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P12_T01_TITLE",
+    "instructionKey": "P12_T01_INST",
+    "assertionType": "ParagraphBlockColumns",
+    "targetParagraphs": [
+      "As soon as you are ready to start, you can send us a first version of your book. If we like what you've written, you'll be invited to meet with the team and discuss in person how to publish.",
+      "We can handle all editing processes for you so you can focus on creating your content. Our writers will help you shape the message you intend to communicate to your readers. Our DTP specialists will take care of the layout of the book to achieve a professional print. Our illustrators and designers can turn your cover ideas into visuals.",
+      "We can offer you great rates from printers to help you contain your overall costs while creating a professional-quality publication. We can also put you in touch with book sales and marketing specialists who will help you get your book published in bookstores and put it in the hands of your readers!"
+    ],
+    "expectedColumns": 2,
+    "expectedColumnSpacingTwips": 720
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P12_T02_TITLE",
+    "instructionKey": "P12_T02_INST",
+    "assertionType": "DocumentStyleSet",
+    "semanticStyleRequirements": [
+      {
+        "styleId": "Heading1",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "360",
+          "after": "40",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/color",
+        "attributes": {
+          "val": "6C643F",
+          "themeColor": "accent6",
+          "themeShade": "BF"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "40"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/rFonts",
+        "attributes": {
+          "asciiTheme": "majorHAnsi",
+          "eastAsiaTheme": "majorEastAsia",
+          "hAnsiTheme": "majorHAnsi",
+          "cstheme": "majorBidi"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "80",
+          "after": "0",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "28"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "pPr/spacing",
+        "attributes": {
+          "after": "0",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "rPr/spacing",
+        "attributes": {
+          "val": "-15"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "96"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "30"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "pPr/spacing",
+        "attributes": {
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "SubtleEmphasis",
+        "path": "rPr/i",
+        "attributes": {}
+      }
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P12_T03_TITLE",
+    "instructionKey": "P12_T03_INST",
+    "assertionType": "TableRowCharacterStyle",
+    "targetHeaderRow": [
+      "Gender",
+      "HOCICT Publishings",
+      "External partner"
+    ],
+    "expectedTableRows": [
+      [
+        "Gender",
+        "HOCICT Publishings",
+        "External partner"
+      ],
+      [
+        "Biographies",
+        "",
+        ""
+      ],
+      [
+        "Commerce",
+        "",
+        ""
+      ],
+      [
+        "Children's books",
+        "",
+        ""
+      ],
+      [
+        "Computing and Internet",
+        "",
+        ""
+      ],
+      [
+        "Theatre",
+        "",
+        ""
+      ],
+      [
+        "Fantastic",
+        "",
+        ""
+      ],
+      [
+        "Health, family and lifestyle",
+        "",
+        ""
+      ],
+      [
+        "History",
+        "",
+        ""
+      ],
+      [
+        "Home and gardening",
+        "",
+        ""
+      ],
+      [
+        "Humor",
+        "",
+        ""
+      ],
+      [
+        "Detective novel",
+        "",
+        ""
+      ],
+      [
+        "Poetry",
+        "",
+        ""
+      ],
+      [
+        "Romance novel",
+        "",
+        ""
+      ],
+      [
+        "Science fiction",
+        "",
+        ""
+      ],
+      [
+        "Personal development",
+        "",
+        ""
+      ]
+    ],
+    "tableSectionHeading": "Our specializations",
+    "tableSectionEndHeading": "Where to find us",
+    "rowIndex": 0,
+    "characterStyleId": "SubtleEmphasis"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P12_T04_TITLE",
+    "instructionKey": "P12_T04_INST",
+    "assertionType": "DocumentPageBorder",
+    "colorExpectationConfirmed": true,
+    "expectedColor": "90C226",
+    "expectedThemeColor": "accent1",
+    "expectedStyle": "single",
+    "expectedSizeEighthPoints": 24
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P12_T05_TITLE",
+    "instructionKey": "P12_T05_INST",
+    "assertionType": "HeaderTextEffectEquals",
+    "headerText": "HOCICT Publishing",
+    "headerType": "default",
+    "expectedColor": "90C226",
+    "expectedThemeColor": "accent1",
+    "requireEverySectionHeader": true,
+    "shadowAttributes": [
+      {
+        "blurRad": "38100",
+        "dist": "25400",
+        "dir": "5400000",
+        "sx": "100000",
+        "sy": "100000",
+        "kx": "0",
+        "ky": "0",
+        "algn": "ctr"
+      }
+    ],
+    "shadowColor": "6E747A",
+    "shadowAlpha": "57000"
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P12_T06_TITLE",
+    "instructionKey": "P12_T06_INST",
+    "assertionType": "ContinuousSectionBreakBeforeHeading",
+    "targetHeading": "Where to find us",
+    "requireFollowingSectionContinuous": true
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P12_T07_TITLE",
+    "instructionKey": "P12_T07_INST",
+    "assertionType": "TableFirstRowIsHeader",
+    "targetHeaderRow": [
+      "Gender",
+      "HOCICT Publishings",
+      "External partner"
+    ],
+    "expectedTableRows": [
+      [
+        "Gender",
+        "HOCICT Publishings",
+        "External partner"
+      ],
+      [
+        "Biographies",
+        "",
+        ""
+      ],
+      [
+        "Commerce",
+        "",
+        ""
+      ],
+      [
+        "Children's books",
+        "",
+        ""
+      ],
+      [
+        "Computing and Internet",
+        "",
+        ""
+      ],
+      [
+        "Theatre",
+        "",
+        ""
+      ],
+      [
+        "Fantastic",
+        "",
+        ""
+      ],
+      [
+        "Health, family and lifestyle",
+        "",
+        ""
+      ],
+      [
+        "History",
+        "",
+        ""
+      ],
+      [
+        "Home and gardening",
+        "",
+        ""
+      ],
+      [
+        "Humor",
+        "",
+        ""
+      ],
+      [
+        "Detective novel",
+        "",
+        ""
+      ],
+      [
+        "Poetry",
+        "",
+        ""
+      ],
+      [
+        "Romance novel",
+        "",
+        ""
+      ],
+      [
+        "Science fiction",
+        "",
+        ""
+      ],
+      [
+        "Personal development",
+        "",
+        ""
+      ]
+    ],
+    "tableSectionHeading": "Our specializations",
+    "tableSectionEndHeading": "Where to find us"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P12_T08_TITLE",
+    "instructionKey": "P12_T08_INST",
+    "assertionType": "PictureInsertedAtAnchor",
+    "targetHeading": "Where to find us",
+    "paragraphOffsetAfterHeading": 1,
+    "targetImageSha256s": [
+      "4087445497DB73CA716930C73D163F2C43292CA7AB1609139D35C710B628F15C"
+    ],
+    "expectedBodyParagraphs": [
+      "Our mission",
+      "Some say that everyone is capable of writing a book. Anyway, at HOCICT Publishing, we love books and authors.",
+      "Writing a book can be a daunting and scary experience, and the fear of a refusal can distract many people from a life's goal. At HOCICT Publishing we can support you throughout the process. Our team consists of excellent writers, designers and other DTP specialists to help you every step of the way.",
+      "Editing process",
+      "As soon as you are ready to start, you can send us a first version of your book. If we like what you've written, you'll be invited to meet with the team and discuss in person how to publish.",
+      "We can handle all editing processes for you so you can focus on creating your content. Our writers will help you shape the message you intend to communicate to your readers. Our DTP specialists will take care of the layout of the book to achieve a professional print. Our illustrators and designers can turn your cover ideas into visuals.",
+      "We can offer you great rates from printers to help you contain your overall costs while creating a professional-quality publication. We can also put you in touch with book sales and marketing specialists who will help you get your book published in bookstores and put it in the hands of your readers!",
+      "Publishing",
+      "If you don't need all our services, you can self-publish your book for a small fee. For more information, visit our website or call us for free advice on how best to move forward. We can offer you design advice or other services to help make your publication a success.",
+      "Our specializations",
+      "If HOCICT Publishing specializes in Comptuing and Internet's books, our experience extends to many other genres. In the table below, you will find the list of all the genres we do. Fortunately, we collaborate with external publishing partners who can help you if we can't ourselves.",
+      "Gender",
+      "HOCICT Publishings",
+      "External partner",
+      "Biographies",
+      "Commerce",
+      "Children's books",
+      "Computing and Internet",
+      "Theatre",
+      "Fantastic",
+      "Health, family and lifestyle",
+      "History",
+      "Home and gardening",
+      "Humor",
+      "Detective novel",
+      "Poetry",
+      "Romance novel",
+      "Science fiction",
+      "Personal development",
+      "Where to find us"
+    ],
+    "expectedBodySymbols": [
+      "Wingdings|F0FC|Biographies|1",
+      "Wingdings|F0FC|Commerce|1",
+      "Wingdings|F0FC|Children's books|2",
+      "Wingdings|F0FC|Computing and Internet|1",
+      "Wingdings|F0FC|Theatre|2",
+      "Wingdings|F0FC|Fantastic|2",
+      "Wingdings|F0FC|Health, family and lifestyle|1",
+      "Wingdings|F0FC|History|2",
+      "Wingdings|F0FC|Home and gardening|2",
+      "Wingdings|F0FC|Humor|2",
+      "Wingdings|F0FC|Detective novel|1",
+      "Wingdings|F0FC|Poetry|2",
+      "Wingdings|F0FC|Romance novel|1",
+      "Wingdings|F0FC|Science fiction|1",
+      "Wingdings|F0FC|Personal development|2"
+    ]
+  }
 ]
