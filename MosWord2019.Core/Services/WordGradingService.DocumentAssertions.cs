@@ -86,6 +86,27 @@ namespace MosWord2019.Core.Services
             return int.TryParse((string)element?.Attribute(attribute), out value) ? value : fallback;
         }
 
+        private static HashSet<XElement> GeneratedTocParagraphs(XElement body)
+        {
+            var generated = new HashSet<XElement>(BodyFields(body).Where(f =>
+                f.Code.ToString().TrimStart().StartsWith("TOC ", StringComparison.OrdinalIgnoreCase)).SelectMany(f => f.ResultParagraphs));
+            foreach (XElement sdt in body.Descendants(W + "sdt"))
+            {
+                XElement heading = sdt.Element(W + "sdtContent")?.Elements(W + "p").FirstOrDefault();
+                if ((string)sdt.Element(W + "sdtPr")?.Element(W + "docPartObj")?.Element(W + "docPartGallery")?.Attribute(W + "val") == "Table of Contents" &&
+                    (string)heading?.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val") == "TOCHeading" &&
+                    sdt.Descendants(W + "p").Any(generated.Contains))
+                {
+                    generated.Add(heading);
+                    XElement closing = sdt.Element(W + "sdtContent")?.Elements(W + "p").LastOrDefault();
+                    // Word places the complex TOC field's end in a separate empty paragraph.
+                    if (closing != null && ParagraphText(closing).Length == 0 && closing.Descendants(W + "fldChar")
+                        .Any(e => (string)e.Attribute(W + "fldCharType") == "end")) generated.Add(closing);
+                }
+            }
+            return generated;
+        }
+
         private static bool CheckTrackedChangesDisposition(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             XElement body = package.Xml("word/document.xml").Root.Element(W + "body");
@@ -93,6 +114,7 @@ namespace MosWord2019.Core.Services
             bool match = !body.Descendants().Any(e => e.Name.Namespace == W &&
                 (revisionElements.Contains(e.Name.LocalName) || e.Name.LocalName.EndsWith("PrChange", StringComparison.Ordinal)));
             var generated = new HashSet<XElement>(BodyFields(body).Where(f => f.Code.ToString().TrimStart().StartsWith("TOC ", StringComparison.OrdinalIgnoreCase)).SelectMany(f => f.ResultParagraphs));
+            if (OptionalBool(task, "ignoreGeneratedTocHeading", false)) generated.UnionWith(GeneratedTocParagraphs(body));
             var paragraphs = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() &&
                 !p.Ancestors(W + "txbxContent").Any() && !generated.Contains(p)).Select(ParagraphTextOutsideTextBoxes).Where(s => s.Length > 0).ToArray();
             match &= paragraphs.SequenceEqual(RequiredStrings(task, "expectedBodyParagraphs"));

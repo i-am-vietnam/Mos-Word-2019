@@ -1,16 +1,24 @@
 # Project Status
 
-Verified: 2026-10-07. Earlier phase evidence below retains its historical dates.
+Verified: 2026-10-08. Earlier phase evidence below retains its historical dates.
 
-## Current checkpoint: completed Project 10 retained
+## Current checkpoint: NEW eight-task Project 11
 
-At the user's request, Project 11 is removed from source packages, Debug/Release output, MSBuild items, its preparation/checkpoint integration and its three dedicated assertion identifiers. P11-only source files and disposable evidence are removed. Git history is preserved; the starting main HEAD remains `74b4f9794858445b105d106b993f8e9a8f061267`, with a clean starting worktree and the dedicated Word origin. The removals/documentation changes are local and uncommitted; no commit or push was performed.
+Starting branch `main`, HEAD `91053a0c8ddd0edcb2dd768c857954cc88350166` (`Lam lai project 11`), clean worktree, dedicated Word origin. The new supplied P11 sponge-cake package is authoritative. Its four-item skeleton has been replaced locally with T01-T08 using the existing EN/VI instructions. The obsolete nineteen-task Skill Review P11 is not restored. P01-P10 packages, P10 T08/T11 fixes, production starters, MainForm and Word lifecycle source remain unchanged. No commit or push.
 
-The completed P10 checkpoint is retained together with its later approved fixes. P10 T08 accepts Word-created AutoFit Window preferences 99.9-100% (`tblW pct=4995..5000`), inherited table properties and consistent cell widths; fixed/contents/contradictory widths fail. P10 T11 targets the two certification paragraphs in About Author and remains compatible with valid T01 deletion and T04 Webdings insertion. The exact current P10 task metadata and EN/VI files are unchanged. Shared effective numbering-level/override fixes remain.
+P01-P09 and P11 have eight tasks each; P10 has seventeen. All eleven source and actual Debug/Release packages validate EN/VI with 0 errors/0 warnings and deterministic Project 1-11 discovery. Existing P11 MSBuild items are reused without duplicates. Core still routes 59 generic assertion identifiers; no new identifier or project/task-ID grading branch was added.
 
-New removal verification: P01-P10 source and both actual build output trees validate EN/VI 0 errors/0 warnings, discover only Project 1-10, and match source bytes. P10 corrected Word-created combined answer grades 17/17; all 11 T08/T11 positive/negative/split-run cases match. Existing combined P01-P05 and P08 regrade 8/8. P06/P07/P09 saved-document tasks regrade 7/7; their file-existence T08 returns Fail because Cert.dotx, Notes.dotx and Memo.txt are absent. Those outputs were not created or deleted for this check. New verification does not claim another production F5/manual Word run. Previous classroom/UI gaps below remain explicit.
+Real Word 2019 Version 16.0 / Build 16.0.14026 created eight individual positives and a combined answer through the owned Word API, each saved/closed/reopened/resaved. All 32 baseline/positive/negative/near-miss cases match; three additional native disposition/spacing negatives and nineteen supplemental synthetic targeting/interaction negatives pass. P11 combined is 8/8. T01 has four real revisions: deletion `very `, insertion `(2) Beat butter and sugar in a separate bowl for about 4-5 minutes. `, Bold on `Bake the cake for`, and Italic on `45-60 minutes`. Text revisions are accepted; both formatting revisions are rejected. T03 is native Webdings `w:sym/F0E1` before the unchanged sentence, which has no final period. T04 is 336/auto, T08 is 280/exact, and T07 is the real Contents/TOCHeading/Automatic Table 1 content control.
 
-Debug and Release Clean/Rebuild each report 0 errors/0 warnings. All ten production starter hashes and every P10 package file remain unchanged; Excel reference Git status is identical to preflight. Evidence is ignored under `artifacts/remove-p11-20261007`, including preserved P10-native evidence formerly stored with P11. Testing Mode remains not started.
+Only explicit P11 metadata permits T04's two 280/exact overrides and generated TOC result/heading/empty field-end paragraphs. Every other applicable paragraph still needs 336/auto. P05 defaults and messages remain unchanged. P11 SmartArt is selected between Manufacturing Process and Various type; exact paragraph-text metadata protects T08 against prefix-only false positives. T01 preserves the body and table-hosted list content while permitting the real generated TOC heading.
+
+Approved combined P01-P09 answers pass 8/8 and approved corrected P10 passes 17/17. P06/P07/P09 existence-only tasks were verified with initially absent, test-owned declared files and cleaned afterward; no fresh native export success is claimed. All 47 focused older assertion checks match, including all eleven approved P10 T08/T11 cases.
+
+Programmatic actual WinForms/Word EN/VI integration has zero failures: eleven projects, eight P11 tabs, T01 initial selection, selected-task Correct/Incorrect and Đúng/Sai, Prev/Next, P10-P11 switching, persisted 8/8 after reopen, Restart No preservation and Yes exact starter/T01, no Save controls, trainer bottom-quarter bounds, same owned PID during Grade/switch/Restart, and normal owned cleanup. EN PID 6220 and VI PID 5100 exited; an independent unsaved Word sentinel survived. Final WINWORD count is zero.
+
+**Acceptance still partial:** native production Visual Studio F5 and manual ribbon/dialog execution for P11 were not verified. Computer Use failed after reset with `helper_unknown_error: setup refresh had errors`. API samples are not claimed as manual UI evidence; especially verify the learner Continue Numbering action against the captured native 1-6 list semantics. The older P10 Symbol dialog and P08 Accessibility Checker gaps remain open.
+
+Final Debug and Release Clean/Rebuild each report 0 errors/0 warnings; both output trees match package source bytes. An earlier build attempted while a verification harness held DLLs reported 4 copy errors/22 file-lock retry/cleanup warnings, then succeeded after cleanup. A fresh optional older-template SaveAs2 smoke did not complete; its exact test-owned Word process was cleaned, with no unrelated process killed. All eleven production starter SHA-256 hashes are unchanged; P11 is `DAD2A21F6AD9FBA13D786DE03354380FBEF7D75904018163DA1926F88D0B79EE`. Scoped diff/check and final evidence are under ignored `artifacts/p11-new`. Excel was not modified or built. Testing Mode remains not started.
 
 ## Historical completed Project 10 verification — 2026-10-05
 
@@ -84,16 +92,17 @@ Projects build repair: TemplateOutputCleanupService already existed with the cor
 - Project 7 integration/grading: complete and committed; real legacy input, eight tasks and combined EN/VI 8/8 verified.
 
 - Project 8 grading/package: committed; combined 8/8 regression passes, with the documented Accessibility Checker UI reproduction item still open.
-- Project 9 grading: committed in the starting baseline; current T08 simplified-existence correction is local/uncommitted and verified.
-- Project 10 grading/package: local/uncommitted, seventeen tasks and combined 17/17 verified; full manual ribbon/dialog acceptance remains partial as stated above.
+- Project 9 grading: committed in the current baseline, including the simplified T08 existence contract; regression 8/8 with its declared output present.
+- Project 10 grading/package: committed in the current baseline, seventeen tasks and approved combined 17/17 verified; manual ribbon/dialog acceptance remains partial.
+- NEW Project 11 grading/package: local eight-task implementation, native API combined 8/8 and programmatic EN/VI Training checks pass; native F5/manual UI acceptance remains pending.
 
 ## Current architecture
 
-Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P10 validate in EN/VI and appear deterministically as Project 1-10; P01-P09 have eight tasks each and P10 has seventeen. Starter files are unchanged.
+Core owns Word-specific package/validation models and lifecycle/layout contracts. Projects owns deterministic Word2019_Pnn discovery, structural validation, language loading, Training working copies, safe asset staging and Save As checkpointing. The sole production source root is MosWord2019.WinForms/Projects; classic MSBuild copies its content to the runtime Projects directory without duplicate items. P01-P11 validate in EN/VI and appear deterministically as Project 1-11; P01-P09 and P11 have eight tasks each and P10 has seventeen. Starter files are unchanged.
 
 IWordController defines IsOpened, StartWord, OpenDocument, Save, CloseDocument, Close and IDisposable. WordController owns one visible Word application and at most one .docx or legacy .doc working copy. WordSession stores only owned state; WinApiProcessHelper captures and retains the verified process handle. Core WordGradingService snapshots the saved package with FileShare.ReadWrite and evaluates normalized OOXML without Office COM. MainForm saves before selected saved-document tasks, bypasses saving for declared external-existence tasks, keeps Word open, and presents bilingual Pass/Fail/Error results. Login permits Training only and stores en/vi in AppSession.
 
-## Verification
+## Historical Phase 2 verification
 
 Visual Studio MSBuild 18.10.1, Any CPU:
 
@@ -134,9 +143,9 @@ Final Debug and Release builds each report 0 errors and 0 warnings. Both outputs
 
 ## Git and reference safety
 
-Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current main HEAD is `bc2f90b1b591281700c1d0c035e51b57c4691a04`, containing committed P01-P09 work and supplied P10 resources. Current P09 T08 correction/P10 implementation is local/uncommitted; no commit or push was performed.
+Phase 4B is committed at `cbabacab4644df07f6b13247e8546bed8bf0f49c`. P01 grading is committed at `64c34c5f6468383e46c6262f824ab14b91188aaa`; Phase 6 P02 is committed through focused correction `a969f5c592ab92b3e551c68a8242f114dd283f75`. Current main HEAD is `91053a0c8ddd0edcb2dd768c857954cc88350166`, containing committed P01-P10 and the NEW P11 source starter/instructions. The eight-task P11 implementation is local/uncommitted; no commit or push was performed.
 
-Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Historical reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Historical parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Earlier verification retained all 185 tracked Excel file hashes and the installer archive hash; that evidence is not reclassified as a new P10 test. This task did not modify or build Excel or change parent Git configuration. Do not edit parent Git settings or ignore rules.
+Excel's actual Git root is the parent; WinForms lives under ../MosTrainer. Historical reference HEAD: a75a89fc8a5502364e9b3b8b4eb9bc003d23a29d. Historical parent status: pre-existing untracked Installer/Output/MOS_Excel_2019_Setup_v1.0.0.rar and the separate MosWord2019/ folder. Earlier verification retained all 185 tracked Excel file hashes and the installer archive hash; that evidence is not reclassified as a new P11 test. This task did not modify or build Excel or change parent Git configuration. Do not edit parent Git settings or ignore rules.
 
 ## Phase 5 verification
 

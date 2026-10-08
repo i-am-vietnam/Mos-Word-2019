@@ -2,11 +2,25 @@
 
 ## Starting point
 
-Independent MOS Word 2019 product on main HEAD 74b4f9794858445b105d106b993f8e9a8f061267, inspected 2026-10-07 with a clean starting worktree. The user's requested Project 11 removal is local/uncommitted; no history rewrite, commit or push. Runtime/source packages stop at P10 (P01-P09 eight tasks; P10 seventeen). P11 package, preparation, legacy-export additions and dedicated assertions are absent. Preserve the approved P10 T08/T11 fixes and current package bytes. Testing Mode is not implemented.
+Independent MOS Word 2019 product on main HEAD `91053a0c8ddd0edcb2dd768c857954cc88350166`, inspected 2026-10-08 with a clean starting worktree and the dedicated Word origin. P01-P10, including approved P10 T08/T11 fixes, are committed in this baseline. The NEW P11 sponge-cake starter and eight-task EN/VI instructions are supplied in the baseline; its complete task definitions and narrowly optional assertion metadata support are now local/uncommitted. The obsolete nineteen-task Skill Review P11 must not be restored. Source/runtime discovery is Project 1-11: P01-P09 and P11 eight tasks, P10 seventeen. Core exposes 59 generic assertion identifiers. Testing Mode is not implemented; no commit/push or Excel change.
+
+## NEW Project 11 saved-state grading
+
+P11 reuses TrackedChangesDisposition, SmartArtAltTextDescriptionEquals, SymbolInserted, DocumentParagraphLineSpacingMultiple, ContinuedNumberingSequence, PictureWrapType, AutomaticTableOfContents and ParagraphLineSpacingExact. WordController, working-copy orchestration, MainForm and package inclusion source are unchanged; existing P11 items copy once to both output trees.
+
+Fresh saved/reopened Word API samples establish the four revision dispositions, whole SmartArt `wp:docPr descr="Process flow"`, Webdings 225 `w:sym char="F0E1"` immediately before the exact unpunctuated Cooling sentence, 336/auto document spacing, one decimal level-zero list starting 1 without override (Word renders 1-6), fingerprinted Serving picture `wp:anchor/wp:wrapSquare`, and real Contents/TOCHeading/TOC field `TOC \o "1-3" \h \z \u` immediately after Making sponge cake. Final WIKIHOW/email paragraphs are 280/exact with after=160 and before absent. Serving media SHA-256 is `46DE21D6998A4400A63C33DF29D8FF343A77BB2786ED921F8BB4731533DC3B84`.
+
+Optional SmartArt `sectionHeading`/`sectionEndHeading` selects the whole graphic inside unique main-body boundaries rather than a drawing ordinal or empty anchor. Without that metadata, P03 uses its unchanged anchor lookup. Optional `targetParagraphTexts` adds exact text selection to ParagraphLineSpacingExact; P02/P10 prefix behavior remains unchanged.
+
+DocumentParagraphLineSpacingMultiple excludes only real TOC field-result paragraphs and their verified building-block heading/empty field-end paragraph when `ignoreGeneratedTocResultParagraphs` is explicitly true. `allowedOverrideParagraphs` accepts an exact declared paragraph only with its declared spacing, rather than exempting arbitrary spacing. P11 declares WIKIHOW and wiki@wikihow.com at 280/exact. All other applicable paragraphs need 336/auto. P05 without these options has unchanged results and messages.
+
+TrackedChangesDisposition's optional `ignoreGeneratedTocHeading` allows the real generated TOC heading in P11; P08's default is unchanged. P11 regenerates expected body paragraphs and the table-hosted list content from its native T01 positive. Only the two actual changed text ranges carry rejectedFormattingRanges: original Gill Sans MT 12pt/complex-script 11pt, without the tracked Bold/Italic. No line-spacing expectation in T01 conflicts with T04/T08.
+
+Evidence: ignored `artifacts/p11-new`. P11 matrix 32/32, three additional native negatives, nineteen synthetic negatives, combined 8/8; 47 focused earlier cases and approved P01-P10 combined regressions pass. EN/VI actual-form integration passes with same-PID Grade/switch/Restart, persistence, exact starter reset, unsaved unrelated sentinel protection and zero final Word processes. P06/P07/P09 full combined checks use temporary exact-existence files, cleaned afterward. Native F5/manual feature-family acceptance remains pending because Computer Use could not initialize; API evidence must not be described as manual ribbon/dialog verification. Final Debug/Release Clean/Rebuild and all eleven source/output package validations are 0 errors/0 warnings; starters unchanged.
 
 ## Project 9 package and simplified external output
 
-P01-P10 source and actual Debug/Release packages validate EN/VI with eight tasks for P01-P09 and seventeen for P10, with deterministic Project 1-10 discovery. There are 59 supported generic identifiers. P09 uses InsertedTableAutoFitContents, NumberedListSequence and FileExistsInDocuments; it reuses BookmarkAtParagraphStart, SmartArtDirectionEquals, DocumentStyleSet, TableColumnWidthsEqual and CustomBulletList. All earlier package metadata is unchanged.
+P01-P11 source and actual Debug/Release packages validate EN/VI with eight tasks for P01-P09/P11 and seventeen for P10, with deterministic Project 1-11 discovery. There are 59 supported generic identifiers. P09 uses InsertedTableAutoFitContents, NumberedListSequence and FileExistsInDocuments; it reuses BookmarkAtParagraphStart, SmartArtDirectionEquals, DocumentStyleSet, TableColumnWidthsEqual and CustomBulletList. All earlier package metadata is unchanged.
 
 T01 optionally requires the exact bookmark to be collapsed at logical paragraph offset zero. P07 retains its original start-only default. T02 checks the declared Rating/description/Regulation boundary, unchanged 6x2 cells, no merges, native auto table width and auto cell widths; table width alone is insufficient. T03 resolves style numPr, linked definitions and level/start overrides plus preceding numbering context for one unchanged decimal sequence 111-113.
 
@@ -22,7 +36,7 @@ New P09 verification includes native production F5 Save As/default conversion wi
 
 ## Project 10 saved-state assertions and integration
 
-P10 has seventeen tasks; there is no global eight-task validation rule. Existing WinForms content rules copy its five required package files once. Source/runtime roots, task-tab UI and WordController/session ownership source are unchanged. P10 supplied starter remains immutable; the currently approved T08/T11 wording and metadata are preserved byte-for-byte during P11 removal.
+P10 has seventeen tasks; there is no global eight-task validation rule. Existing WinForms content rules copy its five required package files once. Source/runtime roots, task-tab UI and WordController/session ownership source are unchanged. P10 supplied starter remains immutable; the currently approved T08/T11 wording and metadata are preserved byte-for-byte during NEW P11 implementation.
 
 Two new OOXML assertions in WordGradingService.TableTrainingAssertions.cs are explicitly compiled by classic Core.csproj. InsertedTableAutoFitWindow locates the table immediately below a unique precedingHeading, requires exact rows/cells with no merges and checks native tblW pct=4995..5000 (99.9-100%), positive five-column grid and automatic layout. Table style inheritance is resolved; cell widths must agree with window-fitted grid/shares. Page-sized grid alone is insufficient; fixed/contents/contradictory preferred widths fail. TableRowCharacterStyle locates unchanged Office 2019 content and requires SubtleEmphasis on every visible run of row zero; empty paragraph marks need not carry it.
 
@@ -34,7 +48,7 @@ Evidence under ignored artifacts/phase14-p10: 68-case matrix, seventeen per-task
 
 P10 starter SHA-256 is 264F72C018D122A97DAD38DFD7D328FE25BEBADD5DA46274F3CC5124BB97E7D3; all ten production starter hashes are unchanged. Debug/Release Clean/Rebuild each report 0 errors/0 warnings; actual output packages match source and validate EN/VI 0/0. No commit/push and no Excel modification/build.
 
-## Project 11 removal verification — 2026-10-07
+## Historical obsolete Project 11 removal verification — 2026-10-07
 
 The completed P10 checkpoint was restored without resetting Git or changing P01-P10 package bytes. P11-only IWordLegacyCheckpoint, LegacyWordSnapshot, SkillReviewAssertions, preparation metadata/copy behavior and MainForm legacy-export branch were removed. P07's original legacy input/learner Convert workflow and P06/P07 exact template grading/cleanup remain. Core exposes the completed P10 set of 59 assertion identifiers.
 
@@ -135,7 +149,7 @@ Never copy IExcelController, ExcelController, ExcelSession, Excel GradingService
 
 ## Repository safety
 
-Word owns its .git, main branch, and dedicated origin. P01-P09 implementation and supplied P10 resources are committed at starting HEAD bc2f90b1b591281700c1d0c035e51b57c4691a04. The current P09 T08 correction/P10 implementation is local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Historical reference/hash manifests are retained in ignored artifacts/.
+Word owns its .git, main branch, and dedicated origin. P01-P10 and supplied NEW P11 resources are committed at starting HEAD 91053a0c8ddd0edcb2dd768c857954cc88350166. The NEW eight-task P11 implementation is local and uncommitted. The actual Excel Git root is the parent, not ../MosTrainer; never run a Git mutation in the parent. Parent status naturally lists MosWord2019/ as untracked. Do not hide that by modifying parent ignore rules. Historical reference/hash manifests are retained in ignored artifacts/.
 
 ## Phase 2 lifecycle contract and ownership
 
@@ -211,7 +225,7 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` recognizes 53 implemented identifiers; production P06 DocumentPageBorder has confirmed color metadata.
+`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` currently recognizes 59 implemented identifiers; production P06 DocumentPageBorder has confirmed color metadata.
 
 ## Phase 6 P02 grading architecture
 

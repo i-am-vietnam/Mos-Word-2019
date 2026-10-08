@@ -1,15 +1,175 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P11_T01_TITLE",
+    "instructionKey": "P11_T01_INST",
+    "assertionType": "TrackedChangesDisposition",
+    "expectedBodyParagraphs": [
+      "Making sponge cake",
+      "Manufacturing Process",
+      "If you've never made a sponge cake or want to make a no-frills treat, try making a basic sponge cake. You need nothing more than flour, sugar, eggs and butter for a simple cake that you can top with your favorite frosting or leave it as is.",
+      "Various type",
+      "Once you get used to baking cakes, you can change it up a bit or add flavor to the cake:",
+      "Process",
+      "Weighing",
+      "The HOCICT Coffee sells over 100 sponge cakes a day to students and teachers of the Institute. Many of our guests have a sponge cake and coffee every day before class. Every day, our customers expect to enjoy delicious products of equal quality.",
+      "For this, it is important to always weigh the ingredients of our spong cakes recipes using a scale.",
+      "Mixture",
+      "(1) Mix flour, baking powder and salt in a bowl. (2) Beat butter and sugar in a separate bowl for about 4-5 minutes. (3) Beat 2 eggs into the butter-sugar mixture at low speed, beating one egg at a time. (4) Stir in the dry ingredients and buttermilk to get a smooth batter",
+      "Stop stirring as soon as the last amount of dry ingredients has been mixed into the mixture.",
+      "Portioning",
+      "Use a 23x23cm square cake mold, 23x13cm rectangular mold or 23cm diameter round mold and spray the mold with non-stick oil, then cut a piece of parchment paper to fit the bottom of the mold.",
+      "Pour all the cake batter into the prepared cake pan and use a knife or spoon to spread the dough evenly. This way, the surface of the cake will not curl while baking.",
+      "Cooking",
+      "Preheat oven to 177ºC (350.6ºF).",
+      "Bake the cake for 45-60 minutes. Place the cake pan in the middle of the preheated oven and bake for 45 minutes. When the cake turns dark yellow and begins to slide off the sides of the mold, it is done. Since each oven is different, yours may need more baking time.",
+      "Cooling",
+      "Let the muffins cool in the baking sheet for 1 hours",
+      "Turn off the oven and wear heat-resistant gloves to remove the cake.",
+      "Place the cake pan on a cooling rack and let it cool completely before removing the cake from the pan.",
+      "Release",
+      "When the cake is completely cool, use a knife to run it around the edge of the mold, then place the cake mold on the table and place the cake cooling rack upside down on top of the cake. Holding the cooling rack and the bottom of the cake pan, quickly flip the cake onto the cooling rack.",
+      "If necessary, lightly tap on the back of the sponge cake tins.",
+      "Serving",
+      " Offer customers to warm their sponge cakes. Microwave for 7 seconds and serve them on a plate.",
+      "Otherwise, put the spong cakes in a brown bakery bag.",
+      "WIKIHOW",
+      "wiki@wikihow.com"
+    ],
+    "ignoreGeneratedTocHeading": true,
+    "protectedTables": [
+      {
+        "header": [
+          "Chocolate sponge cakeStrawberry sponge cakeSponge cake rolled with bamboo charcoal",
+          "Salted egg sponge cakeGreen teas sponge cakeraisins sponge cake"
+        ],
+        "rows": [
+          [
+            "Chocolate sponge cakeStrawberry sponge cakeSponge cake rolled with bamboo charcoal",
+            "Salted egg sponge cakeGreen teas sponge cakeraisins sponge cake"
+          ]
+        ]
+      }
+    ],
+    "rejectedFormattingRanges": [
+      {
+        "targetParagraph": "Bake the cake for 45-60 minutes. Place the cake pan in the middle of the preheated oven and bake for 45 minutes. When the cake turns dark yellow and begins to slide off the sides of the mold, it is done. Since each oven is different, yours may need more baking time.",
+        "targetText": "Bake the cake for",
+        "expectedFormatting": {
+          "font.ascii": "Gill Sans MT",
+          "font.hAnsi": "Gill Sans MT",
+          "szCs": "val=22",
+          "sz": "val=24"
+        }
+      },
+      {
+        "targetParagraph": "Bake the cake for 45-60 minutes. Place the cake pan in the middle of the preheated oven and bake for 45 minutes. When the cake turns dark yellow and begins to slide off the sides of the mold, it is done. Since each oven is different, yours may need more baking time.",
+        "targetText": "45-60 minutes",
+        "expectedFormatting": {
+          "font.ascii": "Gill Sans MT",
+          "font.hAnsi": "Gill Sans MT",
+          "szCs": "val=22",
+          "sz": "val=24"
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P11_T02_TITLE",
+    "instructionKey": "P11_T02_INST",
+    "assertionType": "SmartArtAltTextDescriptionEquals",
+    "sectionHeading": "Manufacturing Process",
+    "sectionEndHeading": "Various type",
+    "expectedDescription": "Process flow"
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P11_T03_TITLE",
+    "instructionKey": "P11_T03_INST",
+    "assertionType": "SymbolInserted",
+    "anchorText": "Let the muffins cool in the baking sheet for 1 hours",
+    "expectedSentence": "Let the muffins cool in the baking sheet for 1 hours",
+    "symbolFont": "Webdings",
+    "symbolCode": 225
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P11_T04_TITLE",
+    "instructionKey": "P11_T04_INST",
+    "assertionType": "DocumentParagraphLineSpacingMultiple",
+    "expectedLineTwips": 336,
+    "expectedLineRule": "auto",
+    "ignoreGeneratedTocResultParagraphs": true,
+    "allowedOverrideParagraphs": [
+      {
+        "paragraphText": "WIKIHOW",
+        "expectedLineTwips": 280,
+        "expectedLineRule": "exact"
+      },
+      {
+        "paragraphText": "wiki@wikihow.com",
+        "expectedLineTwips": 280,
+        "expectedLineRule": "exact"
+      }
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P11_T05_TITLE",
+    "instructionKey": "P11_T05_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": [
+      "Chocolate sponge cake",
+      "Strawberry sponge cake",
+      "Sponge cake rolled with bamboo charcoal",
+      "Salted egg sponge cake",
+      "Green teas sponge cake",
+      "raisins sponge cake"
+    ],
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1."
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P11_T06_TITLE",
+    "instructionKey": "P11_T06_INST",
+    "assertionType": "PictureWrapType",
+    "targetImageSha256": "46DE21D6998A4400A63C33DF29D8FF343A77BB2786ED921F8BB4731533DC3B84"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P11_T07_TITLE",
+    "instructionKey": "P11_T07_INST",
+    "assertionType": "AutomaticTableOfContents",
+    "documentTitle": "Making sponge cake",
+    "expectedGallery": "Table of Contents",
+    "expectedHeadingText": "Contents",
+    "expectedFieldCode": "TOC \\o \"1-3\" \\h \\z \\u"
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P11_T08_TITLE",
+    "instructionKey": "P11_T08_INST",
+    "assertionType": "ParagraphLineSpacingExact",
+    "targetParagraphStartsWith": [
+      "WIKIHOW",
+      "wiki@wikihow.com"
+    ],
+    "targetParagraphTexts": [
+      "WIKIHOW",
+      "wiki@wikihow.com"
+    ],
+    "expectedLineTwips": 280,
+    "expectedLineRule": "exact",
+    "expectedBeforeTwips": [
+      null,
+      null
+    ],
+    "expectedAfterTwips": [
+      160,
+      160
+    ]
+  }
 ]

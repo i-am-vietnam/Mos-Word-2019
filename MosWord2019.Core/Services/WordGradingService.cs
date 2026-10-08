@@ -613,10 +613,12 @@ namespace MosWord2019.Core.Services
             JArray before = RequiredArray(task, "expectedBeforeTwips");
             JArray after = RequiredArray(task, "expectedAfterTwips");
             XDocument document = package.Xml("word/document.xml");
+            string[] exactTexts = task.Extra.ContainsKey("targetParagraphTexts") ? RequiredStrings(task, "targetParagraphTexts") : null;
+            if (exactTexts != null && exactTexts.Length != prefixes.Length) throw new InvalidDataException("Exact paragraph metadata must match the prefix count.");
             for (int i = 0; i < prefixes.Length; i++)
             {
                 List<XElement> matches = document.Descendants(W + "body").Descendants(W + "p")
-                    .Where(p => ParagraphText(p).StartsWith(prefixes[i], StringComparison.Ordinal)).ToList();
+                    .Where(p => exactTexts == null ? ParagraphText(p).StartsWith(prefixes[i], StringComparison.Ordinal) : ParagraphText(p) == exactTexts[i]).ToList();
                 if (matches.Count != 1) { detail = "A target paragraph was not found uniquely."; return false; }
                 XElement spacing = matches[0].Element(W + "pPr")?.Element(W + "spacing");
                 if (Twips(spacing, "line", -1) != line || (string)spacing?.Attribute(W + "lineRule") != rule ||
@@ -782,16 +784,28 @@ namespace MosWord2019.Core.Services
             int expectedLine = RequiredInt(task, "expectedLineTwips");
             string expectedRule = RequiredString(task, "expectedLineRule");
             XDocument document = package.Xml("word/document.xml");
+            var generated = OptionalBool(task, "ignoreGeneratedTocResultParagraphs", false)
+                ? GeneratedTocParagraphs(document.Root?.Element(W + "body")) : new HashSet<XElement>();
             List<XElement> paragraphs = document.Root?.Element(W + "body")?.Descendants(W + "p")
-                .Where(paragraph => !paragraph.Ancestors(W + "txbxContent").Any()).ToList() ?? new List<XElement>();
+                .Where(paragraph => !paragraph.Ancestors(W + "txbxContent").Any() && !generated.Contains(paragraph)).ToList() ?? new List<XElement>();
             if (paragraphs.Count == 0) { detail = "The main document story contains no paragraphs."; return false; }
+            JToken overrides;
+            var allowed = task.Extra.TryGetValue("allowedOverrideParagraphs", out overrides) ? (JArray)overrides : new JArray();
             bool match = paragraphs.All(paragraph =>
             {
                 XElement spacing = paragraph.Element(W + "pPr")?.Element(W + "spacing");
-                return Twips(spacing, "line", -1) == expectedLine &&
-                    string.Equals((string)spacing?.Attribute(W + "lineRule"), expectedRule, StringComparison.Ordinal);
+                if (Twips(spacing, "line", -1) == expectedLine &&
+                    string.Equals((string)spacing?.Attribute(W + "lineRule"), expectedRule, StringComparison.Ordinal)) return true;
+                // Later tasks may declare an exact spacing override; this never exempts arbitrary spacing.
+                string text = ParagraphText(paragraph);
+                return allowed.OfType<JObject>().Any(value => text == (string)value["paragraphText"] &&
+                    paragraphs.Count(p => ParagraphText(p) == text) == 1 &&
+                    Twips(spacing, "line", -1) == (int)value["expectedLineTwips"] &&
+                    (string)spacing?.Attribute(W + "lineRule") == (string)value["expectedLineRule"]);
             });
-            detail = match ? "Every paragraph in the main document story uses the verified Multiple 1.4 line spacing."
+            detail = match ? (allowed.Count == 0 && !OptionalBool(task, "ignoreGeneratedTocResultParagraphs", false)
+                ? "Every paragraph in the main document story uses the verified Multiple 1.4 line spacing."
+                : "Every applicable main-story paragraph uses the declared Multiple spacing or an explicit later-task override.")
                 : "One or more main-story paragraphs do not use Multiple 1.4 line spacing.";
             return match;
         }
@@ -1169,9 +1183,22 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckSmartArtAltText(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            string anchor = RequiredString(task, "anchorText");
             string expected = RequiredString(task, "expectedDescription");
-            List<SmartArtReference> smartArts = FindSmartArts(package, anchor);
+            List<SmartArtReference> smartArts;
+            if (task.Extra.ContainsKey("sectionHeading"))
+            {
+                string startText = RequiredString(task, "sectionHeading"), endText = RequiredString(task, "sectionEndHeading");
+                smartArts = AllSmartArts(package).Where(s =>
+                {
+                    XElement body = s.Container.Document.Root.Element(W + "body");
+                    var starts = body.Elements(W + "p").Where(p => ParagraphText(p) == startText).ToList();
+                    var ends = body.Elements(W + "p").Where(p => ParagraphText(p) == endText).ToList();
+                    XElement paragraph = s.Container.Ancestors(W + "p").FirstOrDefault();
+                    return starts.Count == 1 && ends.Count == 1 && paragraph != null && XNode.CompareDocumentOrder(starts[0], paragraph) < 0 &&
+                        XNode.CompareDocumentOrder(paragraph, ends[0]) < 0;
+                }).ToList();
+            }
+            else smartArts = FindSmartArts(package, RequiredString(task, "anchorText"));
             if (smartArts.Count != 1)
             { detail = "The target SmartArt was not found uniquely."; return false; }
             XElement properties = smartArts[0].Container.Element(Wp + "docPr");

@@ -1,10 +1,10 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-07.
+Reviewed: 2026-10-08.
 
 ## Current product checkpoint
 
-Project 11 is intentionally removed at the user's request. Available packages stop at Project 10; the approved P10 T08/T11 fixes are retained. New saved-state regression/build/package checks pass. No new manual F5 run was performed during this removal, so the existing P10 Symbol dialog and P08 Accessibility Checker acceptance gaps remain open. P06/P07/P09 external-output tasks were observed as Fail with their declared output files absent; no personal output files were changed for regression.
+NEW P11 is the supplied sponge-cake project with eight implemented tasks, not the obsolete nineteen-task Skill Review project. P11 native Word API combined grading is 8/8; source/runtime EN/VI validation and programmatic actual-form/lifecycle tests pass. Approved P01-P10 packages and P10 T08/T11 remain unchanged. Native production F5/manual P11 feature-family acceptance is still pending: Computer Use initialization failed after reset with `helper_unknown_error: setup refresh had errors`. Existing P10 Symbol dialog and P08 Accessibility Checker acceptance gaps remain open.
 
 ## Confirmed task contracts and limitations
 
@@ -35,7 +35,7 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - If another document is opened in the owned Word application, Close preserves that application and reports the reason. The same conservative preservation applies when remaining document ownership cannot be inspected. It relinquishes the process handle; the user must close the remaining Word documents. This intentional protection is not an orphan-cleanup success claim.
 - OpenDocument supports existing writable, unencrypted .docx and legacy .doc working copies. TrainingWorkspaceService can derive `.docx` or `.docm` working names from approved package starters, but Phase 2 does not yet open `.docm`; enabling macro documents requires an explicit lifecycle/security decision.
 - PID capture requires a visible Word OpusApp window on an interactive Windows desktop. The registered Word 16.0 library 8.7 and Office Core 2.8 PIAs are build prerequisites; no hard-coded PIA filesystem path is committed.
-- P01 through P10 starters and EN/VI instructions are supplied and structurally valid. There are 59 routed assertion identifiers and all current expected states are confirmed. Structural package validation remains separate from runtime supported-assertion dispatch.
+- P01 through P11 starters and EN/VI instructions are supplied and structurally valid. There are 59 routed assertion identifiers and all current expected states are confirmed. Structural package validation remains separate from runtime supported-assertion dispatch.
 - The current supplied P01 starter serializes the Contact Us target picture with Tight wrapping, so fresh T08 grades Fail as intended. An older Phase 5 blob used Square; the later starter revision is authoritative and must not be reverted. The target-specific assertion still rejects Tight/Inline and does not accept a different Square picture.
 - Package validation checks declared files, JSON, IDs, languages and task keys without opening Word. It does not yet inspect the starter as an OOXML ZIP package; the disposable starter was independently created and opened with Word.
 - ProjectLoader omits invalid packages from its returned list. Call ProjectValidator directly when the UI needs detailed package diagnostics.
@@ -43,7 +43,7 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - Training runtime exposes .docx and legacy .doc packages; .docm packages are filtered out pending lifecycle verification.
 - P01 tasks.json now links all eight supplied task titles/instructions. The starter and EN/VI instruction meaning are unchanged.
 - Normal save failures cancel project switching or form closure to preserve live learner content. The learner may need to recover content through Word before retrying. Unexpected cleanup failures are logged and reported; conservative Phase 2 extra-document protection still applies.
-- Training grading exists for eight tasks in each of P01 through P09 and seventeen tasks in P10; grading/combined regressions pass, with the explicit UI acceptance gaps above. Authentication, Testing Mode, scoring, database, and installer do not exist. Login is mode/language selection, not authentication.
+- Training grading exists for eight tasks in each of P01 through P09/P11 and seventeen tasks in P10; grading/combined regressions pass, with the explicit UI acceptance gaps above. Authentication, Testing Mode, scoring, database, and installer do not exist. Login is mode/language selection, not authentication.
 - P03 Right-to-Left ground truth shows that the requested state omits `dgm:dir val="rev"`; the supplied starter's `rev` state is the opposite and correctly fails fresh T05. P03 Accessibility header semantics are `w:tblLook` first-row flags, distinct from Repeat Header Rows (`w:tblHeader`).
 - The supplied P04 starter already contains the requested Continuous section break immediately before `MOS 2019`, so fresh P04 T05 grades Pass. This confirmed immutable-content limitation was not changed to manufacture a failing baseline. The local assertion accepts adjacent blank Continuous boundary paragraphs created by Word, while Next Page and a Continuous break elsewhere with a non-Continuous closest boundary fail.
 - P04 asset staging deliberately refuses to overwrite a different same-name file in Documents. The learner must move or rename that personal file before opening/restarting the project; an identical `Glasses.obj` is preserved.
@@ -51,6 +51,9 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - Word has an independent nested Git repository beneath the actual Excel Git root. Always use the Word working directory for Git writes; the parent lists MosWord2019/ as untracked.
 
 ## Remaining verification
+
+- P11 actual native F5/ribbon/dialog execution for all eight tasks, especially Continue Numbering on the second list. Saved/reopened Word API positives and displayed 1-6 values are verified, but they do not establish the exact manual command path. No native UI acceptance is claimed while Computer Use is unavailable.
+- A fresh optional P06 template SaveAs2 automation attempt did not complete and was aborted; only its proven test-owned Word process was cleaned. This is a verification gap, not an established production defect. Earlier full export/UI evidence remains historical. Current P06/P07/P09 combined regression uses the approved existence-only contract with test-owned declared files, all removed after the checks.
 
 - Broader Windows 10/11 classroom deployment and Office bitness/build combinations. Runtime evidence currently covers Office 2019 ProPlus retail x64 16.0.14026.20302 on this machine.
 - Phase 4B actual desktop UI was verified at 125%. EN/VI font-layout simulations at 100/125/150% passed; actual OS 100/150% configurations and multi-monitor transitions still require classroom acceptance. A minimum trainer height can exceed 25% on small/high-scale working areas to keep task text usable.
