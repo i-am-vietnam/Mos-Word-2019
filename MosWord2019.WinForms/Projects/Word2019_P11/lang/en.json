@@ -1,0 +1,18 @@
+{
+  "P11_T01_TITLE": "Task 1",
+  "P11_T01_INST": "Accept all tracked insertions and deletions. Reject all formatting changes.",
+  "P11_T02_TITLE": "Task 2",
+  "P11_T02_INST": "In the \"Manufacturing Process\" section, assign the alt text description \"Process flow\" to the SmartArt graphic. Be sure to select the entire SmartArt graphic.",
+  "P11_T03_TITLE": "Task 3",
+  "P11_T03_INST": "In the \"Cooling\" section, insert a thermometer symbol before the phrase \"Let the muffins cool in the baking sheet for 1 hours\". Use the Webdings font and character code \"225\" (the thermometer symbol).",
+  "P11_T04_TITLE": "Task 4",
+  "P11_T04_INST": "Set the line spacing to 1.4 lines for the entire document.",
+  "P11_T05_TITLE": "Task 5",
+  "P11_T05_INST": "In the \"Various type\" section, continue the numbering of the list at the top of the second column so that the list items are numbered from 1 through 6.",
+  "P11_T06_TITLE": "Task 6",
+  "P11_T06_INST": "In the \"Serving\" section, change the text wrapping for the picture to Square.",
+  "P11_T07_TITLE": "Task 7",
+  "P11_T07_INST": "In the blank paragraph after the document title, insert a table of contents. Use the Automatic Table 1 style.",
+  "P11_T08_TITLE": "Task 8",
+  "P11_T08_INST": "At the end of the document, change the line spacing of the last two paragraphs to exactly 14 pt."
+}
