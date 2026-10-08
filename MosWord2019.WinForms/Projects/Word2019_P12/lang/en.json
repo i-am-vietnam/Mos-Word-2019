@@ -1,0 +1,18 @@
+{
+  "P12_T01_TITLE": "Task 1",
+  "P12_T01_INST": "In the \"Editing Process\" section, split the three paragraphs below the title into two columns.",
+  "P12_T02_TITLE": "Task 2",
+  "P12_T02_INST": "Apply the Basic (Stylish) style set to the document.",
+  "P12_T03_TITLE": "Task 3",
+  "P12_T03_INST": "In the first row of the table, apply the Subtle Emphasis style to the text.",
+  "P12_T04_TITLE": "Task 4",
+  "P12_T04_INST": "Add a 3 pt Green, Accent 1 Box page border to the whole document.",
+  "P12_T05_TITLE": "Task 5",
+  "P12_T05_INST": "In the document header, apply the text effect Fill: Green, Accent color 1; Shadow.",
+  "P12_T06_TITLE": "Task 6",
+  "P12_T06_INST": "Insert a Continuous section break at the beginning of the \"Where to find us\" heading.",
+  "P12_T07_TITLE": "Task 7",
+  "P12_T07_INST": "Configure the table so that the first row is automatically repeated at the top of each page as the header row.",
+  "P12_T08_TITLE": "Task 8",
+  "P12_T08_INST": "In the \"Where to find us\" section, in the empty paragraph, insert the Map image from the Pictures folder."
+}

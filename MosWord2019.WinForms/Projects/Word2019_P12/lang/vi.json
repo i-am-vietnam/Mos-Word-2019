@@ -1,0 +1,18 @@
+﻿{
+  "P12_T01_TITLE": "Tác vụ 1",
+  "P12_T01_INST": "Trong phần \"Editing Process\", chia ba đoạn văn bên dưới tiêu đề thành hai cột.",
+  "P12_T02_TITLE": "Tác vụ 2",
+  "P12_T02_INST": "Áp dụng bộ kiểu Basic (Stylish) cho tài liệu.",
+  "P12_T03_TITLE": "Tác vụ 3",
+  "P12_T03_INST": "Trong hàng đầu tiên của bảng, áp dụng kiểu Subtle Emphasis cho văn bản.",
+  "P12_T04_TITLE": "Tác vụ 4",
+  "P12_T04_INST": "Thêm đường viền trang kiểu Box, màu Green, Accent 1, độ dày 3 pt cho toàn bộ tài liệu.",
+  "P12_T05_TITLE": "Tác vụ 5",
+  "P12_T05_INST": "Trong phần đầu trang của tài liệu, áp dụng hiệu ứng văn bản Fill: Green, Accent color 1; Shadow.",
+  "P12_T06_TITLE": "Tác vụ 6",
+  "P12_T06_INST": "Chèn ngắt section kiểu Continuous tại đầu tiêu đề \"Where to find us\".",
+  "P12_T07_TITLE": "Tác vụ 7",
+  "P12_T07_INST": "Thiết lập bảng để hàng đầu tiên tự động lặp lại ở đầu mỗi trang dưới dạng hàng tiêu đề.",
+  "P12_T08_TITLE": "Tác vụ 8",
+  "P12_T08_INST": "Trong phần \"Where to find us\", tại đoạn trống, chèn hình Map từ thư mục Pictures."
+}
