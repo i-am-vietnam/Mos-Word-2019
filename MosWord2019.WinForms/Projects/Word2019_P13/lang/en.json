@@ -1,0 +1,14 @@
+{
+  "P13_T01_TITLE": "Task 1",
+  "P13_T01_INST": "Find the word \"el3ameed22\" and delete it from the document.",
+  "P13_T02_TITLE": "Task 2",
+  "P13_T02_INST": "Use a Word feature to replace all instances of \"Kadry Elmenshawy\" with \"Woodgrove Plus\".",
+  "P13_T03_TITLE": "Task 3",
+  "P13_T03_INST": "In the \"El3ameed\" section, convert the tab-delimited text to a two-column table. Accept the default AutoFit behavior.",
+  "P13_T04_TITLE": "Task 4",
+  "P13_T04_INST": "In the blank paragraph after the document title, insert a table of contents. Use the Automatic Table 1 style.",
+  "P13_T05_TITLE": "Task 5",
+  "P13_T05_INST": "In the \"Kadry\" section, in the dark blue text box, insert the text \"Kadry Elmenshawy\".",
+  "P13_T06_TITLE": "Task 6",
+  "P13_T06_INST": "In the \"Elmenshawy\" section, delete the comment that is attached to the text \"$3,000\"."
+}
