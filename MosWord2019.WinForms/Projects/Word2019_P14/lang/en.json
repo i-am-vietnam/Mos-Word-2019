@@ -1,0 +1,14 @@
+{
+  "P14_T01_TITLE": "Task 1",
+  "P14_T01_INST": "Apply the Centered style set to the document.",
+  "P14_T02_TITLE": "Task 2",
+  "P14_T02_INST": "In the \"El3ameed\" section, merge the cells in the first row of the table.",
+  "P14_T03_TITLE": "Task 3",
+  "P14_T03_INST": "In the \"last forever!\" section, convert the five paragraphs starting with \"Kadry\" to a bulleted list.",
+  "P14_T04_TITLE": "Task 4",
+  "P14_T04_INST": "Align the bullets with the left page margin. Do not change the hanging indent distance.",
+  "P14_T05_TITLE": "Task 5",
+  "P14_T05_INST": "In the \"Kadry Elmenshawy\" section, insert a footnote immediately after the heading. Enter the footnote text \"Kadry Elmenshawy\".",
+  "P14_T06_TITLE": "Task 6",
+  "P14_T06_INST": "Accept all tracked insertions and deletions. Reject all formatting changes."
+}

@@ -47,6 +47,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckBodyReplacement(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("replacementLocations"))
+                return CheckLocatedReplacement(package, task, out detail);
             string oldText = RequiredString(task, "oldText"), replacement = RequiredString(task, "newText");
             string expected = RequiredString(task, "expectedParagraph");
             var paragraphs = MainParagraphs(package);

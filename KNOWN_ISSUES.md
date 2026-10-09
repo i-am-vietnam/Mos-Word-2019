@@ -1,12 +1,18 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-08.
+Reviewed: 2026-10-09.
 
 ## Current product checkpoint
 
-P12 has eight implemented tasks and native Word API combined grading 8/8. Metadata-driven Documents/Pictures staging and safe session-owned cleanup are verified, including actual special folders and EN/VI real-form transitions. P01-P11 packages, approved P10 T08/T11 and NEW eight-task sponge-cake P11 remain unchanged; approved combined regressions pass. Native production F5/manual P12 GUI acceptance is pending because Computer Use initialization fails with `helper_unknown_error: setup refresh had errors`. Existing P11/P10/P08 GUI acceptance gaps remain open.
+P13 has six implemented tasks and native Word API combined6/6; source/output ENVI validation and actual-form integration pass. P01-P12 packages, approved P10 corrections, NEW P11 and P12 lifecycle are unchanged, with approved combined regressions passing. Native production F5/manual P13 GUI acceptance remains unverified because Computer Use initialization/reset/retry fails with helper_unknown_error: setup refresh had errors. Existing older GUI gaps remain open.
 
 ## Confirmed task contracts and limitations
+
+- P13 supplied starter differs from the prompt's tab-delimited-source description: it already contains a fixed-layout 8x2 fee table under El3ameed. Baseline T03 legitimately passes; starter is immutable and grading must not require editing it or infer conversion click history. Native table-to-tabs preparation and default API reconversion confirm cell content and fixed layout. The actual Convert Text to Table dialog default remains a manual verification item; no GUI default is claimed.
+- P13 T01/T02 originals reside in VML textboxes, not ordinary body paragraphs. T01 native Delete and raw removal produce one/two internal spaces respectively; only those observed final strings are accepted. T02 has one original occurrence in the five-paragraph High School Checking box. Later T05 Kadry Elmenshawy is expected and must not trigger a global replacement failure.
+- P13 Automatic Table 1 natively serializes as fldSimple inside the real TOC SDT and displays No table of contents entries found; source headings are not TOC heading styles. This is an observed content limitation, not a reason to invent heading styles or require nonempty entries.
+- P13 native Delete removes the sole Arabic comment on $3,000. Native Comment.Done setter reported This command is not available; resolved done=1 coverage is synthetic-negative evidence, not a successful native Resolve action. Exact manual Delete/Resolve remains pending.
+- P13 separate Project 13.docx was not available for starter comparison. The supplied Desktop guide was read and used as reference. Confirm its original source file when available; do not silently replace the production starter.
 
 - P12 assets are staged before open and never inserted automatically. Cleanup owns only copies created during the current Training session, checks hash and Windows file identity on an exclusive deletion handle, and preserves pre-existing, modified, replaced or locked files. Cleanup failures are logged and may leave a copy behind. Session ownership is not persisted across abnormal termination; crash-resume cleanup is not promised. Redirected/reparse asset paths are refused.
 - P12 cleanup is explicitly opt-in via meta.assetStaging/OnProjectClose. Older P04 Documents-only Glasses.obj staging and existing P06/P07 template-output cleanup contracts remain unchanged. Save or close errors cancel transitions before asset cleanup; Restart retains assets during a valid session.
@@ -40,7 +46,7 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - If another document is opened in the owned Word application, Close preserves that application and reports the reason. The same conservative preservation applies when remaining document ownership cannot be inspected. It relinquishes the process handle; the user must close the remaining Word documents. This intentional protection is not an orphan-cleanup success claim.
 - OpenDocument supports existing writable, unencrypted .docx and legacy .doc working copies. TrainingWorkspaceService can derive `.docx` or `.docm` working names from approved package starters, but Phase 2 does not yet open `.docm`; enabling macro documents requires an explicit lifecycle/security decision.
 - PID capture requires a visible Word OpusApp window on an interactive Windows desktop. The registered Word 16.0 library 8.7 and Office Core 2.8 PIAs are build prerequisites; no hard-coded PIA filesystem path is committed.
-- P01 through P12 starters and EN/VI instructions are supplied and structurally valid. There are 60 routed assertion identifiers and all current expected states are confirmed. Structural package validation remains separate from runtime supported-assertion dispatch.
+- P01 through P13 starters and EN/VI instructions are supplied and structurally valid. There are 60 routed assertion identifiers and all current expected states are confirmed. Structural package validation remains separate from runtime supported-assertion dispatch.
 - The current supplied P01 starter serializes the Contact Us target picture with Tight wrapping, so fresh T08 grades Fail as intended. An older Phase 5 blob used Square; the later starter revision is authoritative and must not be reverted. The target-specific assertion still rejects Tight/Inline and does not accept a different Square picture.
 - Package validation checks declared files, JSON, IDs, languages and task keys without opening Word. It does not yet inspect the starter as an OOXML ZIP package; the disposable starter was independently created and opened with Word.
 - ProjectLoader omits invalid packages from its returned list. Call ProjectValidator directly when the UI needs detailed package diagnostics.
@@ -48,7 +54,7 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - Training runtime exposes .docx and legacy .doc packages; .docm packages are filtered out pending lifecycle verification.
 - P01 tasks.json now links all eight supplied task titles/instructions. The starter and EN/VI instruction meaning are unchanged.
 - Normal save failures cancel project switching or form closure to preserve live learner content. The learner may need to recover content through Word before retrying. Unexpected cleanup failures are logged and reported; conservative Phase 2 extra-document protection still applies.
-- Training grading exists for eight tasks in each of P01 through P09/P11/P12 and seventeen tasks in P10; grading/combined regressions pass, with the explicit UI acceptance gaps above. Authentication, Testing Mode, scoring, database, and installer do not exist. Login is mode/language selection, not authentication.
+- Training grading exists for eight tasks in each of P01 through P09/P11/P12, seventeen tasks in P10 and six tasks in P13; grading/combined regressions pass, with the explicit UI acceptance gaps above. Authentication, Testing Mode, scoring, database, and installer do not exist. Login is mode/language selection, not authentication.
 - P03 Right-to-Left ground truth shows that the requested state omits `dgm:dir val="rev"`; the supplied starter's `rev` state is the opposite and correctly fails fresh T05. P03 Accessibility header semantics are `w:tblLook` first-row flags, distinct from Repeat Header Rows (`w:tblHeader`).
 - The supplied P04 starter already contains the requested Continuous section break immediately before `MOS 2019`, so fresh P04 T05 grades Pass. This confirmed immutable-content limitation was not changed to manufacture a failing baseline. The local assertion accepts adjacent blank Continuous boundary paragraphs created by Word, while Next Page and a Continuous break elsewhere with a non-Continuous closest boundary fail.
 - P04 asset staging deliberately refuses to overwrite a different same-name file in Documents. The learner must move or rename that personal file before opening/restarting the project; an identical `Glasses.obj` is preserved.
@@ -56,6 +62,8 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - Word has an independent nested Git repository beneath the actual Excel Git root. Always use the Word working directory for Git writes; the parent lists MosWord2019/ as untracked.
 
 ## Remaining verification
+
+- P13 native production F5/manual Ctrl+F, Ctrl+H, conversion dialog default, Automatic Table 1 gallery, textbox entry, Delete-versus-Resolve and screenshot-based upper Word placement. API/form lifecycle and saved-state grading are verified; GUI actions are not. Compare separate Project 13.docx if supplied.
 
 - P12 native production F5 and manual ribbon/dialog execution for all eight tasks, especially the exact Green Accent 1 Shadow gallery preset. API ground truth and actual-form integration are verified; no manual GUI claim is made. Compare the separate supplied Word - Project 12.docx when its path becomes available.
 

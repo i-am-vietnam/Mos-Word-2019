@@ -1,15 +1,142 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P13_T01_TITLE",
+    "instructionKey": "P13_T01_INST",
+    "assertionType": "TextRemovedFromParagraph",
+    "targetParagraphScope": "TextBox",
+    "targetParagraphStartsWith": "Set up a recurring",
+    "removedText": "el3ameed22",
+    "expectedFinalText": "Set up a recurring transfer from your Woodgrove Checking account to your Woodgrove",
+    "expectedRemainingCount": 0,
+    "acceptedFinalTexts": [
+      "Set up a recurring  transfer from your Woodgrove Checking account to your Woodgrove"
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P13_T02_TITLE",
+    "instructionKey": "P13_T02_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "Kadry Elmenshawy",
+    "newText": "Woodgrove Plus",
+    "expectedReplacementCount": 1,
+    "replacementLocations": [
+      {
+        "scope": "TextBox",
+        "paragraphStartsWith": "When students turn 18,",
+        "expectedParagraphs": [
+          "For high school students age",
+          "13–18",
+          "",
+          "When students turn 18, the account becomes a Woodgrove Plus Checking",
+          "account."
+        ]
+      }
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P13_T03_TITLE",
+    "instructionKey": "P13_T03_INST",
+    "assertionType": "TextConvertedToTable",
+    "sectionHeading": "El3ameed",
+    "introParagraph": "Fees apply to all checking and savings accounts.",
+    "allowBlankSectionSpacing": true,
+    "expectedColumns": 2,
+    "expectedRows": 8,
+    "expectedTableRows": [
+      [
+        "Card replacement (lost)",
+        "$12"
+      ],
+      [
+        "Card replacement (rush request)",
+        "$5"
+      ],
+      [
+        "ATM transaction",
+        "$2.50 per transaction"
+      ],
+      [
+        "Insufficient funds",
+        "$37"
+      ],
+      [
+        "Stop payment",
+        "$30"
+      ],
+      [
+        "Cashier’s check",
+        "$8 per check"
+      ],
+      [
+        "Wire transfer: domestic",
+        "$15"
+      ],
+      [
+        "Wire transfer: international",
+        "$35"
+      ]
+    ],
+    "expectedTableLayout": "fixed"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P13_T04_TITLE",
+    "instructionKey": "P13_T04_INST",
+    "assertionType": "AutomaticTableOfContents",
+    "documentTitle": "U.S. BANK ACCOUNTS FOR INTERNATIONAL STUDENTS",
+    "expectedGallery": "Table of Contents",
+    "expectedHeadingText": "Contents",
+    "expectedFieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+    "allowSimpleField": true
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P13_T05_TITLE",
+    "instructionKey": "P13_T05_INST",
+    "assertionType": "TextBoxTextEquals",
+    "precedingSectionText": "Kadry",
+    "followingSectionText": "WOODGROVE   COLLEGE   CHECKING",
+    "shapeGeometry": "rect",
+    "expectedFillScheme": "tx2",
+    "expectedFillLumMod": 75000,
+    "expectedFillThemeSlot": "dk2",
+    "expectedFillThemeRgb": "1F497D",
+    "expectedText": "Kadry Elmenshawy",
+    "expectedWidthEmu": 2705100,
+    "expectedHeightEmu": 876300,
+    "expectedPositionH": {
+      "relativeFrom": "column",
+      "posOffset": "939800",
+      "align": null
+    },
+    "expectedPositionV": {
+      "relativeFrom": "paragraph",
+      "posOffset": "109220",
+      "align": null
+    },
+    "expectedAlignment": "center",
+    "expectedRunFormatting": {
+      "font.ascii": "Calibri",
+      "font.hAnsi": "Calibri",
+      "font.eastAsia": "Calibri",
+      "font.cs": "Calibri",
+      "color": "FFFFFF",
+      "sz": "val=24",
+      "szCs": "val=24"
+    },
+    "expectedRotation": 0,
+    "requireExactRunFormatting": true
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P13_T06_TITLE",
+    "instructionKey": "P13_T06_INST",
+    "assertionType": "CommentDeletedAtText",
+    "expectedParagraph": "$3,000",
+    "targetText": "$3,000",
+    "deletedCommentText": "تعديل"
+  }
 ]

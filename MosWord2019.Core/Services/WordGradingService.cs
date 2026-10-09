@@ -414,6 +414,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextRemoved(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("targetParagraphScope"))
+                return CheckScopedTextRemoved(package, task, out detail);
             string prefix = RequiredString(task, "targetParagraphStartsWith");
             string removed = RequiredString(task, "removedText");
             string expected = RequiredString(task, "expectedFinalText");
@@ -455,6 +457,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextConvertedToTable(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "allowBlankSectionSpacing", false))
+                return CheckSpacedTextConvertedToTable(package, task, out detail);
             string heading = RequiredString(task, "sectionHeading");
             string intro = RequiredString(task, "introParagraph");
             string following = RequiredString(task, "followingHeading");
@@ -503,9 +507,17 @@ namespace MosWord2019.Core.Services
                 .FirstOrDefault(x => x.StartsWith("TOC ", StringComparison.Ordinal)) ?? "";
             bool hasComplexField = sdt.Descendants(W + "fldChar").Any(e => (string)e.Attribute(W + "fldCharType") == "begin") &&
                                    sdt.Descendants(W + "fldChar").Any(e => (string)e.Attribute(W + "fldCharType") == "end");
+            bool hasField = hasComplexField;
+            if (OptionalBool(task, "allowSimpleField", false))
+            {
+                var fields = sdt.Descendants(W + "fldSimple")
+                    .Select(e => NormalizeFieldCode((string)e.Attribute(W + "instr")))
+                    .Where(code => code.StartsWith("TOC ", StringComparison.Ordinal)).ToList();
+                if (!hasComplexField && fields.Count == 1) { actualField = fields[0]; hasField = true; }
+            }
             bool match = string.Equals((string)galleryElement?.Attribute(W + "val"), gallery, StringComparison.Ordinal) && unique &&
                          heading != null && ParagraphText(heading) == headingText && headingStyle == "TOCHeading" &&
-                         string.Equals(actualField, fieldCode, StringComparison.Ordinal) && hasComplexField;
+                         string.Equals(actualField, fieldCode, StringComparison.Ordinal) && hasField;
             detail = match ? "The verified Automatic Table 1 structure is immediately after the title."
                 : "The content is not the required Automatic Table 1 Word structure.";
             return match;
@@ -513,6 +525,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextBoxText(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("expectedFillScheme"))
+                return CheckThemeTextBoxText(package, task, out detail);
             string anchor = RequiredString(task, "anchorText");
             string fill = RequiredString(task, "fillColor");
             string geometry = RequiredString(task, "shapeGeometry");
@@ -601,6 +615,15 @@ namespace MosWord2019.Core.Services
                 .Where(p => ParagraphText(p) == expectedParagraph).ToList();
             if (paragraphs.Count != 1) { detail = "The target paragraph or target word was changed."; return false; }
             bool active = HasActiveCommentOnText(paragraphs[0], targetText);
+            if (task.Extra.ContainsKey("deletedCommentText"))
+            {
+                active |= paragraphs[0].Descendants().Any(e => e.Name == W + "commentRangeStart" ||
+                    e.Name == W + "commentRangeEnd" || e.Name == W + "commentReference");
+                XDocument comments = package.EntryNames.Contains("word/comments.xml") ? package.Xml("word/comments.xml") : null;
+                var remaining = comments == null ? new List<string>() : comments.Descendants(W + "comment")
+                    .Select(e => VisibleText(e).TrimEnd()).ToList();
+                active |= remaining.Contains(RequiredString(task, "deletedCommentText"));
+            }
             detail = active ? "The comment attached to the target text is still active."
                 : "The target text is preserved and its attached comment is deleted.";
             return !active;

@@ -1,0 +1,14 @@
+﻿{
+  "P14_T01_TITLE": "Tác vụ 1",
+  "P14_T01_INST": "Áp dụng bộ kiểu Centered cho toàn bộ tài liệu.",
+  "P14_T02_TITLE": "Tác vụ 2",
+  "P14_T02_INST": "Trong phần \"El3ameed\", gộp các ô trong hàng đầu tiên của bảng thành một ô.",
+  "P14_T03_TITLE": "Tác vụ 3",
+  "P14_T03_INST": "Trong phần \"last forever!\", chuyển đổi năm đoạn văn bắt đầu từ \"Kadry\" thành danh sách dấu đầu dòng.",
+  "P14_T04_TITLE": "Tác vụ 4",
+  "P14_T04_INST": "Căn các dấu đầu dòng thẳng với lề trái của trang. Không thay đổi khoảng cách thụt lề treo.",
+  "P14_T05_TITLE": "Tác vụ 5",
+  "P14_T05_INST": "Trong phần \"Kadry Elmenshawy\", chèn chú thích cuối trang ngay sau tiêu đề. Nhập nội dung chú thích \"Kadry Elmenshawy\".",
+  "P14_T06_TITLE": "Tác vụ 6",
+  "P14_T06_INST": "Chấp nhận tất cả các thay đổi chèn và xóa đang được theo dõi. Từ chối tất cả các thay đổi định dạng."
+}
