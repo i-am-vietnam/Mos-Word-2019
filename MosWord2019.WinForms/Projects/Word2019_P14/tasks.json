@@ -1,15 +1,296 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P14_T01_TITLE",
+    "instructionKey": "P14_T01_INST",
+    "assertionType": "DocumentStyleSet",
+    "expectedStyleSet": "Centered",
+    "semanticStyleRequirements": [
+      {
+        "styleId": "Title",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "pPr/spacing",
+        "attributes": {
+          "after": "400",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "72"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "28"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "320",
+          "after": "80",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "40"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "160",
+          "after": "40",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "32"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/ind",
+        "attributes": {
+          "left": "720",
+          "right": "720"
+        }
+      },
+      {
+        "styleId": "IntenseQuote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P14_T02_TITLE",
+    "instructionKey": "P14_T02_INST",
+    "assertionType": "TableCellsMerged",
+    "tableAnchor": "Southridge Video",
+    "expectedColumnSpan": 2,
+    "expectedTableRows": [
+      [
+        "Southridge Video"
+      ],
+      [
+        "Address",
+        "123 Main StreetSeattle, WA 98101"
+      ],
+      [
+        "Phone",
+        "206-555‐0100"
+      ],
+      [
+        "Email",
+        "info@southridgevideo.com"
+      ],
+      [
+        "Website",
+        "www.southridgevideo.com"
+      ],
+      [
+        "Hours",
+        "9:00 am–5:00 pm Monday–Friday"
+      ]
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P14_T03_TITLE",
+    "instructionKey": "P14_T03_INST",
+    "assertionType": "BulletedList",
+    "targetParagraphs": [
+      "Kadry",
+      "Elmenshawy",
+      "Corporate",
+      "events",
+      "El3ameed"
+    ],
+    "exactTargetParagraphs": true,
+    "checkIndentation": false
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P14_T04_TITLE",
+    "instructionKey": "P14_T04_INST",
+    "assertionType": "BulletedList",
+    "targetParagraphs": [
+      "Kadry",
+      "Elmenshawy",
+      "Corporate",
+      "events",
+      "El3ameed"
+    ],
+    "exactTargetParagraphs": true,
+    "expectedBulletPositionTwips": 0,
+    "expectedHangingDistanceTwips": 360
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P14_T05_TITLE",
+    "instructionKey": "P14_T05_INST",
+    "assertionType": "Footnote",
+    "anchorText": "Kadry Elmenshawy",
+    "referenceAfterText": "Kadry Elmenshawy",
+    "expectedText": "Kadry Elmenshawy"
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P14_T06_TITLE",
+    "instructionKey": "P14_T06_INST",
+    "assertionType": "TrackedChangesDisposition",
+    "expectedBodyParagraphs": [
+      "last forever!",
+      "Southridge Video provides professional videography and photography services for occasions such as:",
+      "Kadry",
+      "Elmenshawy",
+      "Corporate",
+      "events",
+      "El3ameed",
+      " El3ameed",
+      "Kadry Elmenshawy",
+      "Just the Highlights",
+      "1–2 videographers",
+      "3 Ultra HD 4K cameras",
+      "5–10 minutes of the best highlights from the event",
+      "Alison B. says, “We shall cherish the video of our daughter’s award ceremony forever! Thank you for such an amazing production.”",
+      "The Whole Story",
+      "1–2 videographers",
+      "3 Ultra HD 4K cameras",
+      "30-minute feature film of edited footage from the event",
+      "Wey Yuan G. says, “Words can’t express how happy we are to have chosen gg Southridge Video for our 50th wedding anniversary",
+      "celebration…simply wonderful! See you again at our 60th!”",
+      "Leave Nothing Out",
+      "2–3 videographers",
+      "4 Ultra HD 4K cameras",
+      "60-minute feature film of edited footage from the event",
+      "All Event Packages include a digital file",
+      "Videography",
+      "Our videographers are highly trained. They have many years of experience. They know how to film your event without getting in your way.",
+      "Jesper A. says, “What a night! Thanks to the wonderful video you made for us, we’ll never forget our remarkable evening.”",
+      "We use multiple ultra–high definition cameras to fully capture every smile."
+    ],
+    "requireNoStoryRevisions": true,
+    "protectedTables": [
+      {
+        "anchor": "Southridge Video",
+        "acceptedRows": [
+          [
+            [
+              "Southridge Video",
+              ""
+            ],
+            [
+              "Address",
+              "123 Main StreetSeattle, WA 98101"
+            ],
+            [
+              "Phone",
+              "206-555‐0100"
+            ],
+            [
+              "Email",
+              "info@southridgevideo.com"
+            ],
+            [
+              "Website",
+              "www.southridgevideo.com"
+            ],
+            [
+              "Hours",
+              "9:00 am–5:00 pm Monday–Friday"
+            ]
+          ],
+          [
+            [
+              "Southridge Video"
+            ],
+            [
+              "Address",
+              "123 Main StreetSeattle, WA 98101"
+            ],
+            [
+              "Phone",
+              "206-555‐0100"
+            ],
+            [
+              "Email",
+              "info@southridgevideo.com"
+            ],
+            [
+              "Website",
+              "www.southridgevideo.com"
+            ],
+            [
+              "Hours",
+              "9:00 am–5:00 pm Monday–Friday"
+            ]
+          ]
+        ]
+      }
+    ],
+    "rejectedDirectFormattingRanges": [
+      {
+        "targetParagraph": "Our videographers are highly trained. They have many years of experience. They know how to film your event without getting in your way.",
+        "targetText": "your way",
+        "absentProperties": [
+          "color"
+        ]
+      }
+    ]
+  }
 ]

@@ -79,6 +79,57 @@ namespace MosWord2019.Core.Services
             return result;
         }
 
+        private static bool CheckExactBulletedList(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var paragraphs = MainParagraphs(package);
+            string[] texts = RequiredStrings(task, "targetParagraphs");
+            var indexes = texts.Select(t => paragraphs.FindIndex(p => ParagraphText(p) == t)).ToList();
+            if (indexes.Count == 0 || indexes.Any(i => i < 0) ||
+                texts.Any(t => paragraphs.Count(p => ParagraphText(p) == t) != 1) ||
+                indexes.Where((n, i) => i > 0 && n != indexes[i - 1] + 1).Any())
+            { detail = "The exact list items are not one unique consecutive paragraph block."; return false; }
+            bool geometry = OptionalBool(task, "checkIndentation", true);
+            string listId = null, listLevel = null;
+            XElement styles = package.Xml("word/styles.xml").Root;
+            foreach (int index in indexes)
+            {
+                XElement paragraph = paragraphs[index];
+                XElement number = EffectiveNumberProperties(package, paragraph);
+                string id = (string)number.Element(W + "numId")?.Attribute(W + "val");
+                string levelId = (string)number.Element(W + "ilvl")?.Attribute(W + "val") ?? "0";
+                XElement level = EffectiveNumberingLevel(package, paragraph, new HashSet<string>());
+                if (level == null || (string)level.Element(W + "numFmt")?.Attribute(W + "val") != "bullet" ||
+                    (listId != null && (listId != id || listLevel != levelId)))
+                { detail = "Every item must belong to the same genuine bullet list and level."; return false; }
+                listId = id; listLevel = levelId;
+                if (!geometry) continue;
+                // Resolve style/default indentation, then the numbering level and direct overrides.
+                XElement indent = new XElement(W + "ind");
+                foreach (var ind in new[] { styles.Element(W + "docDefaults")?.Element(W + "pPrDefault")?.Element(W + "pPr")?.Element(W + "ind") }
+                    .Concat(StyleChain(styles, (string)paragraph.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val") ?? "Normal")
+                        .Select(s => s.Element(W + "pPr")?.Element(W + "ind")))
+                    .Concat(new[] { level.Element(W + "pPr")?.Element(W + "ind"), paragraph.Element(W + "pPr")?.Element(W + "ind") }).Where(e => e != null))
+                {
+                    foreach (var a in ind.Attributes()) indent.SetAttributeValue(a.Name, a.Value);
+                    if (ind.Attribute(W + "firstLine") != null) indent.Attribute(W + "hanging")?.Remove();
+                    if (ind.Attribute(W + "hanging") != null) indent.Attribute(W + "firstLine")?.Remove();
+                    if (ind.Attribute(W + "left") != null) indent.Attribute(W + "start")?.Remove();
+                }
+                int left = Twips(indent, "start", Twips(indent, "left", 0));
+                int hanging = Twips(indent, "hanging", -Twips(indent, "firstLine", 0));
+                bool correct = left - hanging == RequiredInt(task, "expectedBulletPositionTwips");
+                if (task.Extra.ContainsKey("expectedHangingDistanceTwips"))
+                    correct &= hanging == RequiredInt(task, "expectedHangingDistanceTwips");
+                else correct &= left == RequiredInt(task, "expectedTextIndentTwips");
+                if (!correct) { detail = "Bullet position or preserved hanging distance differs."; return false; }
+            }
+            if ((indexes[0] > 0 && HasNumbering(paragraphs[indexes[0] - 1])) ||
+                (indexes.Last() + 1 < paragraphs.Count && HasNumbering(paragraphs[indexes.Last() + 1])))
+            { detail = "The list includes a neighboring paragraph outside the target block."; return false; }
+            detail = geometry ? "The exact bullet list has the required position and hanging distance." : "All exact items form one genuine bullet list.";
+            return true;
+        }
+
         private static bool CheckNumberedSequence(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             var paragraphs = MainParagraphs(package);

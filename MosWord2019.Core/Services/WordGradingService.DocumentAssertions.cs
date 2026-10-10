@@ -113,6 +113,13 @@ namespace MosWord2019.Core.Services
             string[] revisionElements = { "ins", "del", "moveFrom", "moveTo", "moveFromRangeStart", "moveFromRangeEnd", "moveToRangeStart", "moveToRangeEnd", "cellIns", "cellDel", "cellMerge", "numberingChange" };
             bool match = !body.Descendants().Any(e => e.Name.Namespace == W &&
                 (revisionElements.Contains(e.Name.LocalName) || e.Name.LocalName.EndsWith("PrChange", StringComparison.Ordinal)));
+            if (OptionalBool(task, "requireNoStoryRevisions", false))
+                foreach (string part in package.EntryNames.Where(p => p.StartsWith("word/", StringComparison.Ordinal) && p.EndsWith(".xml", StringComparison.Ordinal)))
+                {
+                    XDocument story = package.Xml(part);
+                    match &= !story.Descendants().Any(e => e.Name.Namespace == W &&
+                        (revisionElements.Contains(e.Name.LocalName) || e.Name.LocalName.EndsWith("PrChange", StringComparison.Ordinal)));
+                }
             var generated = new HashSet<XElement>(BodyFields(body).Where(f => f.Code.ToString().TrimStart().StartsWith("TOC ", StringComparison.OrdinalIgnoreCase)).SelectMany(f => f.ResultParagraphs));
             if (OptionalBool(task, "ignoreGeneratedTocHeading", false)) generated.UnionWith(GeneratedTocParagraphs(body));
             var paragraphs = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() &&
@@ -124,8 +131,13 @@ namespace MosWord2019.Core.Services
                 match &= body.Descendants(W + "tbl").Count() == ((JArray)token).Count;
                 foreach (JObject table in (JArray)token)
                 {
-                    var candidates = FindTablesByHeader(package.Xml("word/document.xml"), table["header"].Values<string>().ToArray());
-                    match &= candidates.Count == 1 && TableRowsEqual(candidates[0], ((JArray)table["rows"]).Select(row => row.Values<string>().ToArray()).ToArray());
+                    var candidates = table["anchor"] != null
+                        ? body.Descendants(W + "tbl").Where(t => VisibleText(t).Contains((string)table["anchor"])).ToList()
+                        : FindTablesByHeader(package.Xml("word/document.xml"), table["header"].Values<string>().ToArray());
+                    var alternatives = table["acceptedRows"] as JArray;
+                    match &= candidates.Count == 1 && (alternatives != null
+                        ? alternatives.Cast<JArray>().Any(rows => TableRowsEqual(candidates[0], rows.Select(row => row.Values<string>().ToArray()).ToArray()))
+                        : TableRowsEqual(candidates[0], ((JArray)table["rows"]).Select(row => row.Values<string>().ToArray()).ToArray()));
                 }
             }
             if (task.Extra.TryGetValue("protectedComments", out token))
@@ -150,6 +162,29 @@ namespace MosWord2019.Core.Services
                 string marginsDetail;
                 match &= CheckDocumentMargins(package, marginsTask, out marginsDetail);
             }
+            if (task.Extra.TryGetValue("rejectedDirectFormattingRanges", out token))
+                foreach (JObject range in (JArray)token)
+                {
+                    var targets = body.Descendants(W + "p").Where(p => ParagraphTextOutsideTextBoxes(p) == (string)range["targetParagraph"]).ToList();
+                    string text = (string)range["targetText"];
+                    string paragraphText = targets.Count == 1 ? ParagraphTextOutsideTextBoxes(targets[0]) : "";
+                    int start = paragraphText.IndexOf(text, StringComparison.Ordinal);
+                    if (start < 0 || paragraphText.IndexOf(text, start + text.Length, StringComparison.Ordinal) >= 0)
+                    { match = false; continue; }
+                    int offset = 0, covered = 0;
+                    foreach (var run in targets[0].Descendants(W + "r").Where(r => !r.Ancestors(W + "txbxContent").Any()))
+                    {
+                        int length = VisibleText(run).Length;
+                        int overlap = Math.Max(0, Math.Min(offset + length, start + text.Length) - Math.Max(offset, start));
+                        if (overlap > 0)
+                        {
+                            match &= range["absentProperties"].Values<string>().All(name => run.Element(W + "rPr")?.Element(W + name) == null);
+                            covered += overlap;
+                        }
+                        offset += length;
+                    }
+                    match &= covered == text.Length;
+                }
             detail = match ? "Revision dispositions preserve accepted insertions, remove accepted deletions and retain required original formatting/content."
                 : "Pending revisions, incorrect insertion/deletion disposition, changed content or accepted formatting/layout changes remain.";
             return match;

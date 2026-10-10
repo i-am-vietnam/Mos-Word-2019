@@ -1,0 +1,14 @@
+{
+  "P15_T01_TITLE": "Task 1",
+  "P15_T01_INST": "Display the Integral header on all pages of the document except page 1.",
+  "P15_T02_TITLE": "Task 2",
+  "P15_T02_INST": "In the \"Depanning\" section, insert a thermometer symbol before the phrase \"The muffin tray will still be hot!\". Use the Webdings font and character code \"225\" (the thermometer symbol).",
+  "P15_T03_TITLE": "Task 3",
+  "P15_T03_INST": "Set the line spacing to 1.4 lines for the entire document.",
+  "P15_T04_TITLE": "Task 4",
+  "P15_T04_INST": "In the \"Top Sellers\" section, continue the numbering of the list at the top of the second column so that the list items are numbered from 1 through 6.",
+  "P15_T05_TITLE": "Task 5",
+  "P15_T05_INST": "In the \"Overview\" section, apply the Soft Round bevel shape effect to the SmartArt graphic. Be sure to select the entire SmartArt graphic.",
+  "P15_T06_TITLE": "Task 6",
+  "P15_T06_INST": "In the \"Serving\" section, change the text wrapping for the picture to Square."
+}

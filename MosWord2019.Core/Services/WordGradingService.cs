@@ -208,6 +208,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckBulletedList(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "exactTargetParagraphs", false))
+                return CheckExactBulletedList(package, task, out detail);
             string[] targets = RequiredStrings(task, "targetParagraphs");
             int expectedBullet = RequiredInt(task, "expectedBulletPositionTwips");
             int expectedText = RequiredInt(task, "expectedTextIndentTwips");
@@ -397,6 +399,8 @@ namespace MosWord2019.Core.Services
             { detail = "The complete first row is not merged across the required columns."; return false; }
             if (rows.Skip(1).Any(row => row.Elements(W + "tc").Count() != columns || row.Descendants(W + "gridSpan").Any() || row.Descendants(W + "vMerge").Any()))
             { detail = "An unrelated table row was merged or changed structurally."; return false; }
+            if (task.Extra.ContainsKey("expectedTableRows") && !TableRowsEqual(table, RequiredStringMatrix(task, "expectedTableRows")))
+            { detail = "The merged header or the unchanged lower-row content differs."; return false; }
             detail = "Only the full first row of the target table is merged.";
             return true;
         }
