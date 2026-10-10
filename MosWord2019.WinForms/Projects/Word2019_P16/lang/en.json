@@ -1,0 +1,18 @@
+{
+  "P16_T01_TITLE": "Task 1",
+  "P16_T01_INST": "Remove the document from Compatibility Mode.",
+  "P16_T02_TITLE": "Task 2",
+  "P16_T02_INST": "Save a copy of the document as a plain-text file named \"Outline for Proposal\".",
+  "P16_T03_TITLE": "Task 3",
+  "P16_T03_INST": "Convert all footnotes to endnotes.",
+  "P16_T04_TITLE": "Task 4",
+  "P16_T04_INST": "Change the document margins to 0.5\" for the top and bottom and 0.25\" for the left and right.",
+  "P16_T05_TITLE": "Task 5",
+  "P16_T05_INST": "Clear all formatting from the paragraph that begins with \"These are just suggestions...\".",
+  "P16_T06_TITLE": "Task 6",
+  "P16_T06_INST": "In the table, set the spacing between cells to 0.03\".",
+  "P16_T07_TITLE": "Task 7",
+  "P16_T07_INST": "Modify the table of contents to display only Heading Level 1.",
+  "P16_T08_TITLE": "Task 8",
+  "P16_T08_INST": "Set the line spacing to 1.4 lines for the entire document."
+}

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using MosWord2019.Core.Diagnostics;
 
 namespace MosWord2019.Projects
 {
@@ -81,36 +82,45 @@ namespace MosWord2019.Projects
 
         public string PrepareWorkingCopy(ProjectPackage package)
         {
-            PackagePaths paths = GetPackagePaths(package);
-            Directory.CreateDirectory(paths.WorkingDirectory);
-            RestoreExportCheckpoint(package, paths);
-            // Only a learner-created modern checkpoint takes precedence over legacy work.
-            // This never converts a starter or completes the learner's Convert task.
-            if (paths.Extension == ".doc")
-            {
-                string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
-                if (File.Exists(converted)) return converted;
-            }
-            if (!File.Exists(paths.WorkingPath))
-            {
-                File.Copy(paths.StarterPath, paths.WorkingPath, false);
-                MakeWritable(paths.WorkingPath);
-            }
-            return paths.WorkingPath;
+            return PrepareFreshWorkingCopy(package);
         }
 
+        /// <summary>Begins a new Training session. The caller must close its owned Word document first.</summary>
+        public string PrepareFreshWorkingCopy(ProjectPackage package) { return ResetWorkingCopy(package); }
+
         /// <summary>
-        /// Replaces only the closed working file. The caller must close Word first.
+        /// Restores the closed working file and removes exact reserved alternate/checkpoint files.
+        /// The caller must close its owned Word document first.
         /// </summary>
         public string ResetWorkingCopy(ProjectPackage package)
         {
             PackagePaths paths = GetPackagePaths(package);
+            RejectReparsePath(paths.StarterPath);
+            RejectReparsePath(paths.WorkingDirectory);
             Directory.CreateDirectory(paths.WorkingDirectory);
+            RejectReparsePath(paths.WorkingDirectory);
+            // Invalidate these exact reserved workspace states at every session boundary.
+            // External exports and arbitrary files in the directory are never cleanup targets.
+            string[] ownedPaths = { Path.Combine(paths.WorkingDirectory, "work.doc"),
+                Path.Combine(paths.WorkingDirectory, "work.docx"), Path.Combine(paths.WorkingDirectory, "work.docm"),
+                Path.Combine(paths.WorkingDirectory, "export-checkpoint.docx") };
+            var guards = new List<FileStream>();
             string temporaryPath = Path.Combine(
                 paths.WorkingDirectory,
                 ".reset-" + Guid.NewGuid().ToString("N") + paths.Extension);
             try
             {
+                foreach (string owned in ownedPaths)
+                {
+                    EnsureContained(workingRootPath, owned, "Working state escapes the Training root.");
+                    if (string.Equals(paths.StarterPath, owned, StringComparison.OrdinalIgnoreCase))
+                        throw new IOException("A Training working path cannot be the package starter: " + owned);
+                    RejectReparsePath(owned);
+                    if (Directory.Exists(owned)) throw new IOException("A working file path is a directory: " + owned);
+                    // Keep guards until replacement/deletion. ShareDelete permits our atomic
+                    // rename but refuses any existing or newly opening reader/writer (including Word).
+                    if (File.Exists(owned)) guards.Add(new FileStream(owned, FileMode.Open, FileAccess.Read, FileShare.Delete));
+                }
                 File.Copy(paths.StarterPath, temporaryPath, false);
                 MakeWritable(temporaryPath);
                 if (File.Exists(paths.WorkingPath))
@@ -118,20 +128,18 @@ namespace MosWord2019.Projects
                 else
                     File.Move(temporaryPath, paths.WorkingPath);
                 MakeWritable(paths.WorkingPath);
-                if (paths.Extension == ".doc")
-                {
-                    string converted = Path.ChangeExtension(paths.WorkingPath, ".docx");
-                    if (File.Exists(converted)) File.Delete(converted); // Exact owned checkpoint; caller closed Word.
-                }
-                if (RequiresExportCheckpoint(package))
-                {
-                    string checkpoint = GetExportCheckpointPath(package);
-                    if (File.Exists(checkpoint)) File.Delete(checkpoint); // Exact workspace checkpoint; never the TXT output.
-                }
+                foreach (string owned in ownedPaths.Where(p => !string.Equals(p, paths.WorkingPath, StringComparison.OrdinalIgnoreCase)))
+                    if (File.Exists(owned)) File.Delete(owned);
                 return paths.WorkingPath;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Write("Training fresh working copy failed " + paths.WorkingPath, ex);
+                throw new IOException("Unable to restore a fresh Training starter at " + paths.WorkingPath + ". Close documents using its workspace and retry.", ex);
             }
             finally
             {
+                foreach (var guard in guards) guard.Dispose();
                 if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
             }
         }

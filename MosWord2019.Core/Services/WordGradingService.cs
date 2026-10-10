@@ -295,6 +295,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckHeader(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "checkAllSections", false))
+                return CheckAllSectionHeaders(package, task, out detail);
             XDocument document = package.Xml("word/document.xml");
             XElement section = document.Root?.Element(W + "body")?.Element(W + "sectPr");
             if (section?.Element(W + "titlePg") == null) { detail = "Different First Page is not enabled."; return false; }
@@ -355,8 +357,10 @@ namespace MosWord2019.Core.Services
                 foreach (char character in element.Value)
                 {
                     // Word can resave the same native symbol as a font-specific private-use character.
-                    if (character == 0xF000 + code && string.Equals(runFont, font, StringComparison.OrdinalIgnoreCase))
-                        symbols.Add(Tuple.Create(text.Length, runFont, ((int)character).ToString("X4", CultureInfo.InvariantCulture)));
+                    if ((character == 0xF000 + code ||
+                         (OptionalBool(task, "acceptNativeAnsiSymbolText", false) && character == code)) &&
+                        string.Equals(runFont, font, StringComparison.OrdinalIgnoreCase))
+                        symbols.Add(Tuple.Create(text.Length, runFont, expectedChar));
                     else text.Append(character);
                 }
             }
@@ -412,8 +416,53 @@ namespace MosWord2019.Core.Services
             XElement wrapper = drawing.DescendantsAndSelf().SelectMany(e => e.AncestorsAndSelf())
                 .FirstOrDefault(e => e.Name == Wp + "anchor" || e.Name == Wp + "inline");
             bool match = wrapper != null && wrapper.Name == Wp + "anchor" && wrapper.Element(Wp + "wrapSquare") != null;
+            if (task.Extra.ContainsKey("anchorParagraph"))
+                match &= ParagraphText(drawing.Ancestors(W + "p").FirstOrDefault()) == RequiredString(task, "anchorParagraph");
             detail = match ? "The target picture uses Square wrapping." : "The target picture does not use Square wrapping.";
             return match;
+        }
+
+        private static bool CheckAllSectionHeaders(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var sections = DocumentSections(package.Xml("word/document.xml"));
+            var effective = new Dictionary<string, string>(StringComparer.Ordinal);
+            bool evenHeaders = IsOn(package.Xml("word/settings.xml").Root?.Element(W + "evenAndOddHeaders"));
+            for (int index = 0; index < sections.Count; index++)
+            {
+                XElement properties = sections[index].Properties;
+                foreach (XElement reference in properties.Elements(W + "headerReference"))
+                    effective[(string)reference.Attribute(W + "type") ?? "default"] =
+                        package.RelatedPart("word/document.xml", (string)reference.Attribute(R + "id"));
+                bool differentFirst = IsOn(properties.Element(W + "titlePg"));
+                string firstPart;
+                effective.TryGetValue("first", out firstPart);
+                if (index == 0 && (!differentFirst || (!string.IsNullOrEmpty(firstPart) &&
+                    HeaderHasVisibleContent(package.Xml(firstPart).Root))))
+                { detail = "Page 1 must have an empty different-first-page header."; return false; }
+                var required = new List<string> { "default" };
+                if (evenHeaders) required.Add("even");
+                // Native Word defers a continuous section's first-page header; it does not
+                // suppress the existing page header. New-page sections do use that header.
+                if (index > 0 && differentFirst && (string)properties.Element(W + "type")?.Attribute(W + "val") != "continuous")
+                    required.Add("first");
+                foreach (string type in required)
+                {
+                    string part;
+                    effective.TryGetValue(type, out part);
+                    XElement table = string.IsNullOrEmpty(part) ? null : package.Xml(part).Root?.Elements(W + "tbl").SingleOrDefault();
+                    XElement shading = table?.Element(W + "tblPr")?.Element(W + "shd");
+                    XElement title = table?.Descendants(W + "sdt").SingleOrDefault(s =>
+                        (string)s.Element(W + "sdtPr")?.Element(W + "alias")?.Attribute(W + "val") == RequiredString(task, "expectedTitleControlAlias"));
+                    string binding = (string)title?.Element(W + "sdtPr")?.Element(W + "dataBinding")?.Attribute(W + "xpath");
+                    if (table?.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() != RequiredInt(task, "expectedHeaderTableColumns") ||
+                        !string.Equals((string)shading?.Attribute(W + "fill"), RequiredString(task, "expectedHeaderFillColor"), StringComparison.OrdinalIgnoreCase) ||
+                        (string)shading?.Attribute(W + "themeFill") != RequiredString(task, "expectedHeaderThemeFill") ||
+                        binding == null || binding.IndexOf("coreProperties", StringComparison.Ordinal) < 0)
+                    { detail = "Section " + (index + 1) + " has a missing or incorrect effective " + type + " header."; return false; }
+                }
+            }
+            detail = "Page 1 is empty and effective section headers retain the required Integral structure.";
+            return sections.Count > 0;
         }
 
         private static bool CheckTextRemoved(PackageSnapshot package, TaskDefinition task, out string detail)

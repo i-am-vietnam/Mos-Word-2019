@@ -8,7 +8,7 @@ Read AGENTS.md, PROJECT_STATUS.md, KNOWN_ISSUES.md, CODEX_CONTEXT.md, then only 
 4. Preserve C# Windows Forms and .NET Framework 4.7.2.
 5. Use Microsoft.Office.Interop.Word for Word desktop control.
 6. Never edit starter.docx directly.
-7. Training must use a working copy.
+7. Every new Training session must start from an untouched starter working copy. Preserve edits only within the active session; never resume saved answers on Go, switch or app relaunch.
 8. Testing must use SessionId-isolated working copies.
 9. Never kill unrelated WINWORD.EXE processes; manage only proven session-owned processes.
 10. New grading assertions require positive and negative verification, plus relevant regression checks. Never substitute fake PASS results.

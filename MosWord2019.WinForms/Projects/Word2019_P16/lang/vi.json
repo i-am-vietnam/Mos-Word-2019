@@ -1,0 +1,18 @@
+﻿{
+  "P16_T01_TITLE": "Tác vụ 1",
+  "P16_T01_INST": "Chuyển tài liệu ra khỏi chế độ tương thích (Compatibility Mode).",
+  "P16_T02_TITLE": "Tác vụ 2",
+  "P16_T02_INST": "Lưu một bản sao của tài liệu dưới dạng tệp văn bản thuần (Plain Text) có tên \"Outline for Proposal\".",
+  "P16_T03_TITLE": "Tác vụ 3",
+  "P16_T03_INST": "Chuyển đổi tất cả chú thích cuối trang (Footnotes) thành chú thích cuối tài liệu (Endnotes).",
+  "P16_T04_TITLE": "Tác vụ 4",
+  "P16_T04_INST": "Thay đổi lề trang của tài liệu: lề trên và lề dưới 0,5 inch, lề trái và lề phải 0,25 inch.",
+  "P16_T05_TITLE": "Tác vụ 5",
+  "P16_T05_INST": "Xóa toàn bộ định dạng của đoạn văn bắt đầu bằng \"These are just suggestions...\".",
+  "P16_T06_TITLE": "Tác vụ 6",
+  "P16_T06_INST": "Trong bảng, đặt khoảng cách giữa các ô (Cell Spacing) là 0,03 inch.",
+  "P16_T07_TITLE": "Tác vụ 7",
+  "P16_T07_INST": "Thay đổi mục lục (Table of Contents) để chỉ hiển thị các tiêu đề cấp 1 (Heading Level 1).",
+  "P16_T08_TITLE": "Tác vụ 8",
+  "P16_T08_INST": "Thiết lập giãn dòng thành 1,4 dòng cho toàn bộ tài liệu."
+}

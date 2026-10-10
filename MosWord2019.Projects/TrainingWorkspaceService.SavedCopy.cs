@@ -19,17 +19,6 @@ namespace MosWord2019.Projects
             return Path.Combine(GetPackagePaths(package).WorkingDirectory, "export-checkpoint.docx");
         }
 
-        private void RestoreExportCheckpoint(ProjectPackage package, PackagePaths paths)
-        {
-            if (!RequiresExportCheckpoint(package)) return;
-            string checkpoint = GetExportCheckpointPath(package);
-            if (!File.Exists(checkpoint)) return;
-            if ((File.GetAttributes(checkpoint) & FileAttributes.ReparsePoint) != 0) throw new IOException("Checkpoint cannot be a reparse point.");
-            // The caller has closed Word before PrepareWorkingCopy. This copies only a trainer-owned
-            // formatted checkpoint; the personal TXT output is never opened, overwritten or deleted.
-            PreserveSavedWorkingCopy(package, checkpoint);
-        }
-
         /// <summary>
         /// Checkpoint a saved Save As document into this project's own work.docx. A template's main
         /// content type is changed only in the checkpoint, never in the learner's exported template.
@@ -38,11 +27,13 @@ namespace MosWord2019.Projects
         public void PreserveSavedWorkingCopy(ProjectPackage package, string savedDocumentPath)
         {
             PackagePaths paths = GetPackagePaths(package);
+            RejectReparsePath(paths.WorkingDirectory);
             string saved = Path.GetFullPath(savedDocumentPath);
             // Legacy work stays binary until the learner converts it. Never put OOXML into work.doc.
             if (paths.Extension == ".doc" && !string.Equals(saved, paths.WorkingPath, StringComparison.OrdinalIgnoreCase))
                 paths.WorkingPath = Path.ChangeExtension(paths.WorkingPath, ".docx");
             if (string.Equals(saved, paths.WorkingPath, StringComparison.OrdinalIgnoreCase)) return;
+            RejectReparsePath(paths.WorkingPath);
             string extension = Path.GetExtension(saved);
             if (!string.Equals(extension, ".docx", StringComparison.OrdinalIgnoreCase) &&
                 !string.Equals(extension, ".dotx", StringComparison.OrdinalIgnoreCase))

@@ -104,7 +104,7 @@ namespace MosWord2019
             previous.Click += (s, e) => Run(() => ShowTask(taskIndex - 1));
             next.Click += (s, e) => Run(() => ShowTask(taskIndex + 1));
             restart.Click += (s, e) => Run(RestartProject);
-            grade.Click += (s, e) => GradeCurrentTask();
+            grade.Click += (s, e) => Run(GradeCurrentTask);
             tabTasks.SelectedIndexChanged += (s, e) => UpdateTaskNavigation();
             projects.SelectedIndexChanged += (s, e) => { go.Enabled = projects.SelectedItem != null; };
             ClearProject();
@@ -129,13 +129,13 @@ namespace MosWord2019
             ValidateTranslations(selected);
             templateOutputs.Register(selected); // Retain exact targets even after switching projects.
             AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
-            SaveAndCloseDocument();
+            EndTrainingSession();
             status.Text = T("Opening project...", "Đang mở dự án...");
             try
             {
                 foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected))
                     AppLogger.Write("Training project asset available " + stagedAsset);
-                string path = workspace.PrepareWorkingCopy(selected);
+                string path = workspace.PrepareFreshWorkingCopy(selected);
                 AppLogger.Write("Training working copy prepared " + path);
                 word.OpenDocument(path);
                 AppLogger.Write("Training Word open " + path);
@@ -272,25 +272,22 @@ namespace MosWord2019
             if (currentProject == null) return false;
             if (word.IsOpened) return true;
             AppLogger.Write("Training manual Word closure " + currentWorkPath);
+            EndTrainingSession();
             word.Close();
-            workspace.CleanupProjectAssets(currentProject, assetLog => AppLogger.Write(assetLog));
-            ClearProject();
-            string message = T("Word was closed. Choose a project and click Go to reopen the saved working copy.",
-                "Word đã đóng. Chọn dự án và bấm Bắt đầu để mở lại bản làm việc đã lưu.");
+            string message = T("Word was closed. This Training session ended. Choose a project and click Go to start again from its original starter.",
+                "Word đã đóng. Phiên luyện tập đã kết thúc. Chọn dự án và bấm Bắt đầu để làm lại từ tài liệu gốc.");
             status.Text = message;
             notify(message);
             return false;
         }
 
-        private void SaveAndCloseDocument()
+        private void EndTrainingSession()
         {
             if (currentProject == null) return;
-            if (!CheckDocument()) return;
-            word.Save(); // Failure cancels switching/exit and preserves live learner work.
-            PreserveSaveAsWork();
-            AppLogger.Write("Training save " + currentWorkPath);
-            word.CloseDocument();
-            AppLogger.Write("Training document close " + currentWorkPath);
+            word.CloseDocument(); // Ownership-safe discard; never save merely for leaving Training.
+            AppLogger.Write("Training document discarded " + currentWorkPath);
+            // Retain project/path/assets until reset succeeds, so a failed reset is retryable.
+            workspace.ResetWorkingCopy(currentProject);
             workspace.CleanupProjectAssets(currentProject, assetLog => AppLogger.Write(assetLog));
             ClearProject();
         }
@@ -302,22 +299,12 @@ namespace MosWord2019
                 "Làm lại dự án này?\nCác thay đổi hiện tại sẽ bị xóa."))) return;
             var project = currentProject;
             word.CloseDocument(); // Explicit confirmed discard; do not save.
-            ClearProject();
-            string path;
-            try
-            {
-                foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
-                    AppLogger.Write("Training project asset available after restart " + stagedAsset);
-                path = workspace.ResetWorkingCopy(project);
-                word.OpenDocument(path);
-                currentProject = project;
-                currentWorkPath = path;
-            }
-            catch
-            {
-                if (!word.IsOpened) workspace.CleanupProjectAssets(project, assetLog => AppLogger.Write(assetLog));
-                throw;
-            }
+            // Keep validated project state/assets if reset or reopen fails; the next action can retry safely.
+            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
+                AppLogger.Write("Training project asset available after restart " + stagedAsset);
+            string path = workspace.ResetWorkingCopy(project);
+            word.OpenDocument(path);
+            currentWorkPath = path;
             ConfigureExportCheckpoint();
             BuildTaskTabs();
             ShowTask(0);
@@ -331,7 +318,7 @@ namespace MosWord2019
             if (currentProject == null || taskIndex < 0 || taskIndex >= currentProject.Tasks.Count) return;
             TaskDefinition task = currentProject.Tasks[taskIndex];
             bool externalOutput = ExternalOutputLocation.IsExistenceAssertion(task.AssertionType);
-            if (!externalOutput && !CheckDocument()) return;
+            if (!CheckDocument()) return;
             string savedPath;
             TrainingGradeContext context;
             try
@@ -451,7 +438,7 @@ namespace MosWord2019
             bool completed = false;
             Run(() =>
             {
-                SaveAndCloseDocument();
+                EndTrainingSession();
                 word.Dispose();
                 controllerDisposed = true;
                 templateOutputs.Cleanup();
@@ -472,7 +459,7 @@ namespace MosWord2019
             }
             if (disposing && !controllerDisposed)
             {
-                SaveAndCloseDocument();
+                EndTrainingSession();
                 word.Dispose();
                 controllerDisposed = true;
                 templateOutputs.Cleanup();

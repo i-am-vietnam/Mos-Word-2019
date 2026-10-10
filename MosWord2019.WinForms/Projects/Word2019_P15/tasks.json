@@ -1,15 +1,34 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01", "titleKey": "P15_T01_TITLE", "instructionKey": "P15_T01_INST",
+    "assertionType": "HeaderDifferentFirstPage", "headerBuiltIn": "Integral", "differentFirstPage": true,
+    "checkAllSections": true, "expectedHeaderTableColumns": 2,
+    "expectedHeaderFillColor": "C0504D", "expectedHeaderThemeFill": "accent2", "expectedTitleControlAlias": "Title"
+  },
+  {
+    "taskId": "T02", "titleKey": "P15_T02_TITLE", "instructionKey": "P15_T02_INST",
+    "assertionType": "SymbolInserted", "anchorText": "The muffin tray will still be hot!",
+    "expectedSentence": "The muffin tray will still be hot! Protect your hands with hot pads or a dry towel when you remove the muffins from the muffin tray.",
+    "symbolFont": "Webdings", "symbolCode": 225, "acceptNativeAnsiSymbolText": true
+  },
+  {
+    "taskId": "T03", "titleKey": "P15_T03_TITLE", "instructionKey": "P15_T03_INST",
+    "assertionType": "DocumentParagraphLineSpacingMultiple", "expectedLineTwips": 336, "expectedLineRule": "auto"
+  },
+  {
+    "taskId": "T04", "titleKey": "P15_T04_TITLE", "instructionKey": "P15_T04_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": ["Blueberry streusel muffins", "Apple muffins", "Savory bacon cheddar corn muffins", "Apple bran muffins", "Zucchini chocolate chip muffins", "Whole grain banana muffins"],
+    "expectedLevel": 0, "expectedNumberFormat": "decimal", "expectedLevelText": "%1."
+  },
+  {
+    "taskId": "T05", "titleKey": "P15_T05_TITLE", "instructionKey": "P15_T05_INST",
+    "assertionType": "SmartArtAllNodesBevelEquals", "expectedTextItems": ["Weighing", "Mixing", "Portioning", "Baking", "Cooling"], "expectedBevelPreset": "softRound"
+  },
+  {
+    "taskId": "T06", "titleKey": "P15_T06_TITLE", "instructionKey": "P15_T06_INST",
+    "assertionType": "PictureWrapType", "expectedWrapType": "Square",
+    "targetImageSha256": "73CC1C320B42714C4A7BF0171A441DD3B0BFDCD78D7922DEA2CB9864CF67D20E",
+    "anchorParagraph": "Offer to reheat muffins for customers. Heat for 7 seconds in the microwave and serve on a plate."
+  }
 ]

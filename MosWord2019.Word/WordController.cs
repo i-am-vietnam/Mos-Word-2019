@@ -174,6 +174,26 @@ namespace MosWord2019.Word
         public void CloseDocument()
         {
             EnsureThread();
+            // Switching/reset must never proceed while this application contains a
+            // document not owned by this controller. Full Close has its own preservation path.
+            Wd.Documents documents = null;
+            try
+            {
+                if (session?.Application != null)
+                {
+                    documents = session.Application.Documents;
+                    int owned = session.Document != null && DocumentStillOpen() ? 1 : 0;
+                    if (documents.Count > owned)
+                        throw new InvalidOperationException("Close the additional documents in this Word application before ending the Training session.");
+                }
+            }
+            catch (COMException ex) when (IsDisconnected(ex)) { }
+            finally { ReleaseCom(documents); }
+            CloseOwnedDocument();
+        }
+
+        private void CloseOwnedDocument()
+        {
             if (session?.Document == null) return;
             try { session.Document.Close(Wd.WdSaveOptions.wdDoNotSaveChanges); }
             catch (COMException ex) when (IsDisconnected(ex)) { }
@@ -210,7 +230,7 @@ namespace MosWord2019.Word
             }
             finally { TryRelease(documents, errors); }
 
-            try { CloseDocument(); }
+            try { CloseOwnedDocument(); }
             catch (Exception ex) { errors.Add(ex); }
             finally
             {
