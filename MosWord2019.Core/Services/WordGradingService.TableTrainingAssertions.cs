@@ -60,7 +60,13 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableRowCharacterStyle(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            var tables = FindTaskTables(package.Xml("word/document.xml"), task, RequiredStrings(task, "targetHeaderRow"));
+            bool allowEmpty = OptionalBool(task, "allowEmptyRowCells", false);
+            // Empty headers carry a column position. Do not filter them out for opted-in tables.
+            string[] header = OptionalBool(task, "preserveEmptyHeaderCells", false)
+                ? RequiredArray(task, "targetHeaderRow").Select(t => t.Type == Newtonsoft.Json.Linq.JTokenType.String ? (string)t :
+                    throw new InvalidDataException("Invalid table header metadata.")).ToArray()
+                : RequiredStrings(task, "targetHeaderRow");
+            var tables = FindTaskTables(package.Xml("word/document.xml"), task, header);
             string style = RequiredString(task, "characterStyleId");
             var styles = package.Xml("word/styles.xml").Root;
             bool match = tables.Count == 1 && TableRowsEqual(tables[0], RequiredStringMatrix(task, "expectedTableRows")) &&
@@ -69,10 +75,10 @@ namespace MosWord2019.Core.Services
             {
                 int rowIndex = RequiredInt(task, "rowIndex");
                 var row = tables[0].Elements(W + "tr").ElementAtOrDefault(rowIndex);
-                match = row != null && row.Elements(W + "tc").All(cell =>
+                match = row != null && (!allowEmpty || row.Descendants(W + "r").Any(r => VisibleText(r).Length > 0)) && row.Elements(W + "tc").All(cell =>
                 {
                     var runs = cell.Descendants(W + "r").Where(r => VisibleText(r).Length > 0).ToList();
-                    return runs.Count > 0 && runs.All(r => (string)r.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val") == style);
+                    return (runs.Count > 0 || allowEmpty) && runs.All(r => (string)r.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val") == style);
                 });
             }
             detail = match ? "All visible text in the declared table row uses the requested character style."

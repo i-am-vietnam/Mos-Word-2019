@@ -1,15 +1,275 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P18_T01_TITLE",
+    "instructionKey": "P18_T01_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "Environmental School Project",
+    "newText": "ESP",
+    "expectedReplacementCount": 13,
+    "expectedParagraph": "Two case studies that I will be examining have different pedagogical approaches, yet both connect students to their learning beyond the classroom.  The “ESP” in Maple Ridge, B.C. involves students learning about the environment outside of the classroom and among nature.  The second case study on the other hand involves the VIPKids company (http://blog.vipkid.com.cn/) that allows students from China to learn English through one-on-one mentoring using Web-conferencing software such as Skype.",
+    "expectedReplacementParagraphs": [
+      "Two case studies that I will be examining have different pedagogical approaches, yet both connect students to their learning beyond the classroom.  The “ESP” in Maple Ridge, B.C. involves students learning about the environment outside of the classroom and among nature.  The second case study on the other hand involves the VIPKids company (http://blog.vipkid.com.cn/) that allows students from China to learn English through one-on-one mentoring using Web-conferencing software such as Skype.",
+      "The ESP uses a variety of learning theories to engage students.  This project had students explore and learn from their environment and community outside of the classroom   This method of teaching dates back to before schooling was mandatory.  Students learned from the local community, parents, and the environment around them.  The ESP intends to bring this back by having students spend “extensive time immersed in the outdoors, dialoguing with a diversity of people connected to these places” (https://hollyhocklife.org/place-based-imaginative-and-ecological-education-in-maple-ridge-bc/, 2013).  This is an example of placed-based learning as students interact, explore, and have discussions about the environment around them (http://www.uvm.edu/place/community/index.php). The ESP also engages students in their learning by using project-based learning.  Students learn about how to use natural materials from the environment to build and design drums (ESP, 2017).  Another example would be when older students learn how salmon operate by performing dissections on salmon at various times of the year, giving the students an opportunity to knowledge build throughout the project (V. Lock, 2015). Students learn by participating in the context of the lesson and are asked to reflect on their learning as well, which is an example of experiential learning (Schwartz, p.8)  Lastly, students also take what they learn from the environment and apply it to different parts of the curriculum subjects such as language arts, and sciences (http://es.sd42.ca/principles-and-values/).",
+      "The Top Challenges for the ESP",
+      "The ESP states on its website that it adheres to principles of inclusion, yet they fail to demonstrate how a child with a physical disability would be able to partake in their demonstrated activities.",
+      "How could school boards and teachers receive funding for projects like the ESP?",
+      "Suggestions for the ESP and VIPKids company:",
+      "These two case studies use different pedagogical approaches to engage students. The ESP allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the ESP through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the ESP does.",
+      "ESP in Maple Ridge. (2017). Retrieved from http://es.sd42.ca/"
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P18_T02_TITLE",
+    "instructionKey": "P18_T02_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": [
+      "How can the teachers foster an inclusive classroom in this setting for students with disabilities?",
+      "How will this program tailor itself to meet the rigid requirements listed in the provincial curriculum?",
+      "How could school boards and teachers receive funding for projects like the Environmental School Project?",
+      "How can VIPKids add more pedagogical approaches into their teaching practices?",
+      "How can the company allow for teacher creativity and innovation?"
+    ],
+    "paragraphTextAlternatives": {
+      "How could school boards and teachers receive funding for projects like the Environmental School Project?": [
+        "How could school boards and teachers receive funding for projects like the ESP?"
+      ]
+    },
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1.",
+    "verifyEffectiveSequence": true,
+    "requireOnlyTargetNumbering": true,
+    "numberingScopeEndParagraph": "The program online only teaches a certain way.  What about learners with challenges or disabilities?  The learning would be hard to alter for the teacher if lessons are being provided."
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P18_T03_TITLE",
+    "instructionKey": "P18_T03_INST",
+    "assertionType": "CommentResolved",
+    "targetParagraph": "The VIPKids company on the other hand uses technology to engage students through one-on-one tutoring sessions with a teacher in a different part of the world.  Students in China learn English through a video and presentation software program that is facilitated by a teacher in North America.  This is an example of networked learning which can be defined as “learning through participation in communities of learners where meaning is both negotiated and created through collaborative dialog” (Dircknick et al, 2009).  The company takes advantage of technology to create one-on-one tutoring sessions that move at the learner’s pace while they can interact with the instructor and the screen by drawing, typing, or by speaking to the instructor.  Students can also work with a variety of instructors, which allows them to network with more people outside of their own culture.  The hidden learning skill is not just learning the English language, but interacting and learning with others online. By interacting with a teacher one-on-one, the students practice conversational English, as well as written English, ameliorating the student’s learning experience.",
+    "expectedCommentText": "Maybe I should actually explian more about the technology."
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P18_T04_TITLE",
+    "instructionKey": "P18_T04_INST",
+    "assertionType": "BookmarkAtParagraphStart",
+    "targetParagraph": "These two case studies use different pedagogical approaches to engage students. The Environmental School Project allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the Environmental School Project through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the Environmental School Project does.",
+    "targetParagraphAlternatives": [
+      "These two case studies use different pedagogical approaches to engage students. The ESP allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the ESP through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the ESP does."
+    ],
+    "precedingHeading": "Suggestions for the Environmental School Project and VIPKids company:",
+    "precedingHeadingAlternatives": [
+      "Suggestions for the ESP and VIPKids company:"
+    ],
+    "bookmarkName": "Conclusion",
+    "requireCollapsedRange": true
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P18_T05_TITLE",
+    "instructionKey": "P18_T05_INST",
+    "assertionType": "InsertedTableAutoFitContents",
+    "precedingParagraph": "These two case studies use different pedagogical approaches to engage students. The Environmental School Project allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the Environmental School Project through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the Environmental School Project does.",
+    "precedingParagraphAlternatives": [
+      "These two case studies use different pedagogical approaches to engage students. The ESP allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the ESP through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the ESP does."
+    ],
+    "precedingHeading": "Suggestions for the Environmental School Project and VIPKids company:",
+    "precedingHeadingAlternatives": [
+      "Suggestions for the ESP and VIPKids company:"
+    ],
+    "followingHeading": "References:",
+    "allowBlankBoundaries": true,
+    "expectedColumns": 3,
+    "expectedTableRows": [
+      [
+        "",
+        "Advantages",
+        "Disadvantages"
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P18_T06_TITLE",
+    "instructionKey": "P18_T06_INST",
+    "assertionType": "DocumentStyleSet",
+    "expectedStyleSet": "Lines (Stylish)",
+    "semanticStyleRequirements": [
+      {
+        "styleId": "Heading1",
+        "path": "pPr/pBdr/bottom",
+        "attributes": {
+          "val": "single",
+          "sz": "4",
+          "space": "2",
+          "themeColor": "accent2"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "360",
+          "after": "120",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/color",
+        "attributes": {
+          "val": "262626",
+          "themeColor": "text1",
+          "themeTint": "D9"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "40"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "120",
+          "after": "0",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/color",
+        "attributes": {
+          "val": "ED7D31",
+          "themeColor": "accent2"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "36"
+        }
+      },
+      {
+        "styleId": "IntenseQuote",
+        "path": "pPr/pBdr/top",
+        "attributes": {
+          "val": "single",
+          "sz": "24",
+          "space": "4",
+          "themeColor": "accent2"
+        }
+      },
+      {
+        "styleId": "IntenseQuote",
+        "path": "pPr/ind",
+        "attributes": {
+          "left": "936",
+          "right": "936"
+        }
+      },
+      {
+        "styleId": "IntenseEmphasis",
+        "path": "rPr/b"
+      },
+      {
+        "styleId": "IntenseEmphasis",
+        "path": "rPr/i"
+      },
+      {
+        "styleId": "IntenseEmphasis",
+        "path": "rPr/color",
+        "attributes": {
+          "val": "ED7D31",
+          "themeColor": "accent2"
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P18_T07_TITLE",
+    "instructionKey": "P18_T07_INST",
+    "assertionType": "TableRowCharacterStyle",
+    "targetHeaderRow": [
+      "",
+      "Advantages",
+      "Disadvantages"
+    ],
+    "preserveEmptyHeaderCells": true,
+    "allowEmptyRowCells": true,
+    "tableSectionHeading": "These two case studies use different pedagogical approaches to engage students. The Environmental School Project allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the Environmental School Project through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the Environmental School Project does.",
+    "tableSectionHeadingAlternatives": [
+      "These two case studies use different pedagogical approaches to engage students. The ESP allows students to connect with their community and environment but does not incorporate technology like VIPKids does.  Students could share their experiences in the ESP through blogs or social media to enrich community connections.  Whereas the VIPKids company could foster more of a student community through collaborative assignments and on-going projects like the ESP does."
+    ],
+    "tableSectionEndHeading": "References:",
+    "expectedTableRows": [
+      [
+        "",
+        "Advantages",
+        "Disadvantages"
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ],
+      [
+        "",
+        "",
+        ""
+      ]
+    ],
+    "rowIndex": 0,
+    "characterStyleId": "SubtleEmphasis"
+  }
 ]

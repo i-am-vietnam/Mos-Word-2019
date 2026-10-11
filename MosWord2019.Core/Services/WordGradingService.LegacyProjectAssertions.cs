@@ -110,11 +110,13 @@ namespace MosWord2019.Core.Services
         private static bool CheckBookmarkStart(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             var document = package.Xml("word/document.xml");
-            string target = RequiredString(task, "targetParagraph"), name = RequiredString(task, "bookmarkName");
+            string name = RequiredString(task, "bookmarkName");
             var paragraphs = document.Root.Element(W + "body").Descendants(W + "p")
-                .Where(p => !p.Ancestors(W + "txbxContent").Any() && ParagraphText(p) == target).ToList();
+                .Where(p => !p.Ancestors(W + "txbxContent").Any() && MatchesDeclaredText(task, "targetParagraph", ParagraphText(p))).ToList();
             var bookmarks = document.Descendants(W + "bookmarkStart").Where(b => (string)b.Attribute(W + "name") == name).ToList();
             bool match = paragraphs.Count == 1 && bookmarks.Count == 1 && bookmarks[0].Ancestors(W + "p").FirstOrDefault() == paragraphs[0];
+            if (match && task.Extra.ContainsKey("precedingHeading"))
+                match = MatchesDeclaredText(task, "precedingHeading", PreviousNonemptyParagraph(paragraphs[0]));
             if (match)
             {
                 string id = (string)bookmarks[0].Attribute(W + "id");

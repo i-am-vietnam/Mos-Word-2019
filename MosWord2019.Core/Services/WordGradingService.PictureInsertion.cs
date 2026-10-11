@@ -12,10 +12,9 @@ namespace MosWord2019.Core.Services
         {
             var tables = FindTablesByHeader(document, header);
             if (!task.Extra.ContainsKey("tableSectionHeading")) return tables;
-            string heading = RequiredString(task, "tableSectionHeading");
             var body = document.Root.Element(W + "body");
             var children = body.Elements().ToList();
-            var headings = children.Where(p => p.Name == W + "p" && ParagraphText(p) == heading).ToList();
+            var headings = children.Where(p => p.Name == W + "p" && MatchesDeclaredText(task, "tableSectionHeading", ParagraphText(p))).ToList();
             if (headings.Count != 1) return new List<XElement>();
             int start = children.IndexOf(headings[0]);
             string endHeading = task.Extra.ContainsKey("tableSectionEndHeading") ? RequiredString(task, "tableSectionEndHeading") : null;

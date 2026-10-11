@@ -964,6 +964,8 @@ namespace MosWord2019.Core.Services
             string expectedLevelText = RequiredString(task, "expectedLevelText");
             XDocument document = package.Xml("word/document.xml");
             List<XElement> bodyParagraphs = document.Root?.Element(W + "body")?.Descendants(W + "p").ToList() ?? new List<XElement>();
+            if (OptionalBool(task, "verifyEffectiveSequence", false))
+                return CheckEffectiveContinuedSequence(package, task, bodyParagraphs, expectedText, out detail);
             var targetSet = new HashSet<string>(expectedText, StringComparer.Ordinal);
             List<XElement> targets = bodyParagraphs.Where(paragraph => targetSet.Contains(ParagraphText(paragraph))).ToList();
             if (targets.Count != expectedText.Length || !targets.Select(ParagraphText).SequenceEqual(expectedText) ||
@@ -978,7 +980,7 @@ namespace MosWord2019.Core.Services
                 int level = Twips(properties?.Element(W + "ilvl"), "val", -1);
                 if (string.IsNullOrEmpty(currentId) || level != expectedLevel ||
                     (numberId != null && !string.Equals(numberId, currentId, StringComparison.Ordinal)))
-                { detail = "The six items are not one continued Word numbering sequence."; return false; }
+                { detail = "The target items are not one continued Word numbering sequence."; return false; }
                 numberId = currentId;
             }
 
@@ -993,7 +995,7 @@ namespace MosWord2019.Core.Services
             bool match = !hasOverride && Twips(levelDefinition?.Element(W + "start"), "val", -1) == 1 &&
                 string.Equals((string)levelDefinition?.Element(W + "numFmt")?.Attribute(W + "val"), expectedFormat, StringComparison.Ordinal) &&
                 string.Equals((string)levelDefinition?.Element(W + "lvlText")?.Attribute(W + "val"), expectedLevelText, StringComparison.Ordinal);
-            detail = match ? "The six target items are one real Word numbering sequence from 1 through 6."
+            detail = match ? "The target items are one real Word numbering sequence from 1 through " + expectedText.Length + "."
                 : "The shared numbering definition does not match the verified continued sequence.";
             return match;
         }

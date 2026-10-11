@@ -1,0 +1,14 @@
+{
+  "P19_T01_TITLE": "Task 1",
+  "P19_T01_INST": "At the end of the sentence containing \"and I was very proud...\", insert a Continuous section break.",
+  "P19_T02_TITLE": "Task 2",
+  "P19_T02_INST": "In the \"The Biggest Event\" section, format the two paragraphs into three columns.",
+  "P19_T03_TITLE": "Task 3",
+  "P19_T03_INST": "In the document header, apply the Fill: Aqua, Accent 1; Shadow text effect to the text.",
+  "P19_T04_TITLE": "Task 4",
+  "P19_T04_INST": "In the \"5 Fun Facts\" section, change the bullet points to custom bullets. Use the coffee symbol from the Segoe UI Emoji font and character code \"2615\".",
+  "P19_T05_TITLE": "Task 5",
+  "P19_T05_INST": "In the first paragraph after the \"Introduction\" heading, insert a footnote with the text \"The metal was a special kind made from the wing of an airplane\" at the beginning of the word \"metal\".",
+  "P19_T06_TITLE": "Task 6",
+  "P19_T06_INST": "Reject all tracked insertions and deletions. Accept all formatting changes."
+}

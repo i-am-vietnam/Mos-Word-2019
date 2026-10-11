@@ -45,20 +45,22 @@ namespace MosWord2019.Core.Services
         private static bool CheckInsertedAutoFitTable(PackageSnapshot package, TaskDefinition task, out string detail)
         {
             var body = package.Xml("word/document.xml").Root.Element(W + "body");
-            var anchors = body.Elements(W + "p").Where(p => ParagraphText(p) == RequiredString(task, "precedingParagraph")).ToList();
-            bool match = anchors.Count == 1 && PreviousNonemptyParagraph(anchors[0]) == RequiredString(task, "precedingHeading");
-            XElement table = match ? anchors[0].ElementsAfterSelf().FirstOrDefault() : null;
+            var anchors = body.Elements(W + "p").Where(p => MatchesDeclaredText(task, "precedingParagraph", ParagraphText(p))).ToList();
+            bool match = anchors.Count == 1 && MatchesDeclaredText(task, "precedingHeading", PreviousNonemptyParagraph(anchors[0]));
+            bool blankBoundaries = OptionalBool(task, "allowBlankBoundaries", false);
+            XElement table = match ? anchors[0].ElementsAfterSelf().FirstOrDefault(e => !blankBoundaries || !IsBlankTableBoundary(e)) : null;
             if (table?.Name != W + "tbl") match = false;
             if (match)
             {
-                var following = table.ElementsAfterSelf().FirstOrDefault(e => e.Name != W + "p" || !string.IsNullOrWhiteSpace(ParagraphText(e)));
+                var following = table.ElementsAfterSelf().FirstOrDefault(e => blankBoundaries ? !IsBlankTableBoundary(e) :
+                    e.Name != W + "p" || !string.IsNullOrWhiteSpace(ParagraphText(e)));
                 var properties = table.Element(W + "tblPr");
                 var width = properties?.Element(W + "tblW");
                 string layout = (string)properties?.Element(W + "tblLayout")?.Attribute(W + "type");
                 match = following?.Name == W + "p" && ParagraphText(following) == RequiredString(task, "followingHeading") &&
                     TableRowsEqual(table, RequiredStringMatrix(task, "expectedTableRows")) &&
                     !table.Descendants().Any(e => e.Name == W + "gridSpan" || e.Name == W + "vMerge" || e.Name == W + "hMerge") &&
-                    table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() == 2 &&
+                    table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() == (task.Extra.ContainsKey("expectedColumns") ? RequiredInt(task, "expectedColumns") : 2) &&
                     (layout == null || layout == "autofit") && (string)width?.Attribute(W + "type") == "auto" && Twips(width, "w", -1) == 0 &&
                     table.Elements(W + "tr").SelectMany(r => r.Elements(W + "tc")).All(c =>
                         (string)c.Element(W + "tcPr")?.Element(W + "tcW")?.Attribute(W + "type") == "auto" &&
@@ -66,6 +68,83 @@ namespace MosWord2019.Core.Services
             }
             detail = match ? "The unchanged table has the declared dimensions and native AutoFit Contents at the required boundary."
                 : "The table location, cells, dimensions or AutoFit Contents state is incorrect.";
+            return match;
+        }
+
+        private static bool MatchesDeclaredText(TaskDefinition task, string key, string actual)
+        {
+            return actual == RequiredString(task, key) || (task.Extra.ContainsKey(key + "Alternatives") &&
+                RequiredStrings(task, key + "Alternatives").Contains(actual));
+        }
+
+        private static bool IsBlankTableBoundary(XElement element)
+        {
+            return element.Name == W + "bookmarkStart" || element.Name == W + "bookmarkEnd" ||
+                (element.Name == W + "p" && string.IsNullOrWhiteSpace(ParagraphText(element)) &&
+                 !element.Descendants().Any(e => e.Name == W + "drawing" || e.Name == W + "pict" ||
+                    e.Name == W + "object" || e.Name == W + "tab" || e.Name == W + "br" || e.Name == W + "fldChar"));
+        }
+
+        private static bool CheckEffectiveContinuedSequence(PackageSnapshot package, TaskDefinition task,
+            List<XElement> paragraphs, string[] expected, out string detail)
+        {
+            var alternatives = task.Extra.ContainsKey("paragraphTextAlternatives") ? task.Extra["paragraphTextAlternatives"] as JObject : null;
+            if (task.Extra.ContainsKey("paragraphTextAlternatives") && (alternatives == null || alternatives.Properties()
+                .Any(p => !(p.Value is JArray) || ((JArray)p.Value).Any(v => v.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)v)))))
+                throw new InvalidDataException("Invalid numbered paragraph alternatives metadata.");
+            var targets = new List<XElement>();
+            foreach (string text in expected)
+            {
+                var found = paragraphs.Where(p => ParagraphText(p) == text ||
+                    (alternatives?[text] is JArray && ((JArray)alternatives[text]).Values<string>().Contains(ParagraphText(p)))).ToList();
+                if (found.Count != 1 || targets.Contains(found[0]) ||
+                    (targets.Count > 0 && paragraphs.IndexOf(found[0]) <= paragraphs.IndexOf(targets.Last())))
+                { detail = "The exact numbered items are missing, duplicated or out of order."; return false; }
+                targets.Add(found[0]);
+            }
+            int levelIndex = RequiredInt(task, "expectedLevel");
+            string id = null;
+            foreach (var p in targets)
+            {
+                var properties = EffectiveNumberProperties(package, p);
+                string current = (string)properties.Element(W + "numId")?.Attribute(W + "val");
+                var level = EffectiveNumberingLevel(package, p, new HashSet<string>());
+                if (current == null || current == "0" || (id != null && current != id) ||
+                    Twips(properties.Element(W + "ilvl"), "val", 0) != levelIndex ||
+                    (string)level?.Element(W + "numFmt")?.Attribute(W + "val") != RequiredString(task, "expectedNumberFormat") ||
+                    (string)level?.Element(W + "lvlText")?.Attribute(W + "val") != RequiredString(task, "expectedLevelText"))
+                { detail = "The items do not share the required effective Word numbering."; return false; }
+                id = current;
+            }
+            int initial = NumberingSequenceStart(package, id, levelIndex, new HashSet<string>()), value = initial;
+            int targetIndex = 0;
+            int scopeEnd = paragraphs.Count - 1;
+            if (task.Extra.ContainsKey("numberingScopeEndParagraph"))
+            {
+                var ends = paragraphs.Where(p => MatchesDeclaredText(task, "numberingScopeEndParagraph", ParagraphText(p))).ToList();
+                if (ends.Count != 1 || paragraphs.IndexOf(ends[0]) < paragraphs.IndexOf(targets.Last()))
+                { detail = "The numbering scope boundary is missing or changed."; return false; }
+                scopeEnd = paragraphs.IndexOf(ends[0]);
+            }
+            foreach (var p in paragraphs)
+            {
+                var pr = EffectiveNumberProperties(package, p);
+                string current = (string)pr.Element(W + "numId")?.Attribute(W + "val");
+                if (OptionalBool(task, "requireOnlyTargetNumbering", false) && paragraphs.IndexOf(p) >= paragraphs.IndexOf(targets[0]) &&
+                    paragraphs.IndexOf(p) <= scopeEnd && current != null && current != "0" && !targets.Contains(p))
+                { detail = "A paragraph outside the declared items was numbered."; return false; }
+                if (current != id) continue;
+                int currentLevel = Twips(pr.Element(W + "ilvl"), "val", 0);
+                if (currentLevel < levelIndex) value = initial;
+                else if (currentLevel == levelIndex)
+                {
+                    if (targets.Contains(p) && value != ++targetIndex)
+                    { detail = "The effective list numbers do not continue from 1 through " + expected.Length + "."; return false; }
+                    value++;
+                }
+            }
+            bool match = targetIndex == expected.Length;
+            detail = match ? "The exact items form one effective Word sequence from 1 through " + expected.Length + "." : "The numbering sequence is incomplete.";
             return match;
         }
 
