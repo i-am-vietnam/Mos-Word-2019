@@ -323,23 +323,26 @@ namespace MosWord2019
             TrainingGradeContext context;
             try
             {
+                var documentState = word as IWordDocumentState;
+                context = new TrainingGradeContext
+                {
+                    OwnedDocumentPath = documentState?.CurrentDocumentPath,
+                    OwnedDocumentSaveFormat = (word as IWordSaveFormat)?.CurrentSaveFormat
+                };
+                bool plainText = ExternalOutputLocation.IsOwnedPlainTextOutput(context);
                 // File-existence tasks inspect only their declared output; grading does not save/alter that template.
-                if (!externalOutput)
+                if (!externalOutput && !plainText)
                 {
                     word.Save();
                     PreserveSaveAsWork();
                 }
-                var documentState = externalOutput ? null : word as IWordDocumentState;
                 savedPath = documentState?.CurrentDocumentPath ?? currentWorkPath;
-                if (ExternalOutputLocation.IsDeclaredDocumentsOutput(currentProject, savedPath))
+                if (plainText || ExternalOutputLocation.IsDeclaredDocumentsOutput(currentProject, savedPath))
                     savedPath = currentWorkPath; // Grade the retained Word working copy, never a lossy external output.
                 if (!externalOutput && TrainingWorkspaceService.RequiresExportCheckpoint(currentProject))
                     savedPath = ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
-                context = documentState == null ? null : new TrainingGradeContext
-                {
-                    DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState.DefaultTemplateFolder : null,
-                    SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase)
-                };
+                context.DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState?.DefaultTemplateFolder : null;
+                context.SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase);
                 AppLogger.Write("Training grade source " + savedPath + " task " + task.TaskId);
             }
             catch (Exception ex)

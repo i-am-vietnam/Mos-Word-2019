@@ -191,6 +191,8 @@ namespace MosWord2019.Core.Services
                 match = ranges.Count == 1 && ranges[0].Groups[1].Value == RequiredString(task, "headingRange") &&
                     !Regex.IsMatch(code, @"\\[tf]\b", RegexOptions.IgnoreCase) &&
                     RequiredStrings(task, "expectedEntryTitles").All(t => CountOccurrences(fields[0].Result.ToString(), t) == 1);
+                if (task.Extra.ContainsKey("excludedEntryTitles"))
+                    match &= RequiredStrings(task, "excludedEntryTitles").All(t => CountOccurrences(fields[0].Result.ToString(), t) == 0);
             }
             detail = match ? "A real automatic TOC is configured for the requested heading range and retains its generated entries."
                 : "The TOC is static, missing, empty, or configured for an incorrect heading range.";

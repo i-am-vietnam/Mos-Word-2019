@@ -1,15 +1,146 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P16_T01_TITLE",
+    "instructionKey": "P16_T01_INST",
+    "assertionType": "ModernWordDocumentFormat",
+    "minimumCompatibilityMode": 15,
+    "allowedMainContentTypes": [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P16_T02_TITLE",
+    "instructionKey": "P16_T02_INST",
+    "assertionType": "PlainTextAtOwnedSavedLocation",
+    "expectedFileName": "Outline for Proposal.txt"
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P16_T03_TITLE",
+    "instructionKey": "P16_T03_INST",
+    "assertionType": "FootnotesConvertedToEndnotes",
+    "expectedNotes": [
+      {
+        "text": "https://www.youtube.com/watch?v=H3DIzb-AmIA",
+        "referenceAfter": "August 1, 2014 "
+      },
+      {
+        "text": "https://www.youtube.com/watch?v=zS5wbhWCOjc",
+        "referenceAfter": "May 17, 2012 "
+      },
+      {
+        "text": "https://www.youtube.com/watch?v=fE82JHNhaEY",
+        "referenceAfter": "November 15, 2011 "
+      },
+      {
+        "text": "https://www.learning-styles-online.com/overview/",
+        "referenceAfter": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners."
+      }
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P16_T04_TITLE",
+    "instructionKey": "P16_T04_INST",
+    "assertionType": "DocumentMarginsEquals",
+    "topTwips": 720,
+    "bottomTwips": 720,
+    "leftTwips": 360,
+    "rightTwips": 360
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P16_T05_TITLE",
+    "instructionKey": "P16_T05_INST",
+    "assertionType": "TextRangeFormattingEquals",
+    "targetParagraph": "These are just suggestions based on current observations",
+    "targetText": "These are just suggestions based on current observations",
+    "expectedFormatting": {
+      "font.ascii": "Georgia",
+      "font.hAnsi": "Georgia",
+      "sz": "val=22",
+      "szCs": "val=22"
+    },
+    "expectedAlignment": "left"
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P16_T06_TITLE",
+    "instructionKey": "P16_T06_INST",
+    "assertionType": "TableCellSpacingEquals",
+    "targetHeaderRow": [
+      "",
+      "Mike’s Office",
+      "Surfwtw",
+      "Sali Kaceli"
+    ],
+    "expectedRows": [
+      [
+        "",
+        "Mike’s Office",
+        "Surfwtw",
+        "Sali Kaceli"
+      ],
+      [
+        "Subscribers",
+        "200~",
+        "5,000~",
+        "55,000~"
+      ],
+      [
+        "# of views on most popular video",
+        "1,300~",
+        "477,000~",
+        "2,500,000~"
+      ],
+      [
+        "Total Channel Views",
+        "16,800~",
+        "2,300,000~",
+        "10,800,000~"
+      ],
+      [
+        "Key Focus",
+        " Teaching people how to become a Microsoft Office professional",
+        "Excel Music covers",
+        "MoodleExcelWordPowerPointOutlook Access"
+      ],
+      [
+        "First day a Microsoft related video was posted",
+        "August 1, 2014",
+        "May 17, 2012",
+        "November 15, 2011"
+      ]
+    ],
+    "expectedSpacingTwips": 21
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P16_T07_TITLE",
+    "instructionKey": "P16_T07_INST",
+    "assertionType": "TableOfContentsLevels",
+    "headingRange": "1-1",
+    "expectedEntryTitles": [
+      "Claudia’s Proposal for Mike’s Office",
+      "My Recommendations:",
+      "Conclusion"
+    ],
+    "excludedEntryTitles": [
+      "Outline:",
+      "First Suggestion:",
+      "Second Suggestion:",
+      "Third Suggestion:",
+      "Fourth Suggestion:"
+    ]
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P16_T08_TITLE",
+    "instructionKey": "P16_T08_INST",
+    "assertionType": "DocumentParagraphLineSpacingMultiple",
+    "expectedLineTwips": 336,
+    "expectedLineRule": "auto"
+  }
 ]

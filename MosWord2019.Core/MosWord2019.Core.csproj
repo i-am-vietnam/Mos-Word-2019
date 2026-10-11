@@ -32,6 +32,7 @@
     <Compile Include="Diagnostics\AppLogger.cs" />
     <Compile Include="Interfaces\IWordController.cs" />
     <Compile Include="Interfaces\IWordDocumentState.cs" />
+    <Compile Include="Interfaces\IWordSaveFormat.cs" />
     <Compile Include="Interfaces\IWordExportCheckpoint.cs" />
     <Compile Include="Interfaces\IWordWindowLayout.cs" />
     <Compile Include="Models\ProjectMeta.cs" />

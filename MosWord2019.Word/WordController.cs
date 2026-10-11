@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordExportCheckpoint
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -18,6 +18,16 @@ namespace MosWord2019.Word
 
         // Diagnostics only; callers never receive a COM object or a process handle.
         public int? OwnedProcessId { get { return session?.Process?.Id; } }
+
+        public int CurrentSaveFormat
+        {
+            get
+            {
+                EnsureUsable();
+                if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
+                return session.Document.SaveFormat;
+            }
+        }
 
         public string CurrentDocumentPath
         {

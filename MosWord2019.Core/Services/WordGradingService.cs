@@ -48,7 +48,7 @@ namespace MosWord2019.Core.Services
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
-            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor"
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -67,6 +67,12 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task.AssertionType == ExternalOutputLocation.OwnedPlainTextAssertionType)
+                {
+                    bool passed = ExternalOutputLocation.CheckOwnedPlainText(task, context);
+                    return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
+                        "The owned document must be saved as Plain Text with the exact declared name at its observed Save As location.", task.AssertionType, task.TaskId);
+                }
                 if (task.AssertionType == ExternalOutputLocation.DocumentsAssertionType)
                 {
                     bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName")));
@@ -91,6 +97,17 @@ namespace MosWord2019.Core.Services
                     return task.AssertionType == "ModernWordDocumentFormat"
                         ? new TaskGradeResult(TaskGradeOutcome.Fail, "The document is still in legacy .doc format.", task.AssertionType, task.TaskId)
                         : Error(task, "Convert the legacy document with File > Info > Convert, then save before grading this OOXML task.");
+                }
+                if (task.AssertionType == "ModernWordDocumentFormat")
+                {
+                    // A renamed legacy compound file is a nonmodern answer, not an OOXML package.
+                    using (var stream = new FileStream(documentPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        var signature = new byte[4];
+                        if (stream.Read(signature, 0, signature.Length) == 4 &&
+                            signature[0] == 0xD0 && signature[1] == 0xCF && signature[2] == 0x11 && signature[3] == 0xE0)
+                            return new TaskGradeResult(TaskGradeOutcome.Fail, "The document is still in legacy binary format.", task.AssertionType, task.TaskId);
+                    }
                 }
                 using (var package = PackageSnapshot.Open(documentPath))
                 {

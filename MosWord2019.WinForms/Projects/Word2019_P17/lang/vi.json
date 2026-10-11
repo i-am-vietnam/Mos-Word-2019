@@ -1,0 +1,14 @@
+﻿{
+  "P17_T01_TITLE": "Tác vụ 1",
+  "P17_T01_INST": "Hiển thị đầu trang (Header) kiểu Retrospect trên tất cả các trang của tài liệu, ngoại trừ trang đầu tiên.",
+  "P17_T02_TITLE": "Tác vụ 2",
+  "P17_T02_INST": "Ngay trước tiêu đề \"Part 1, schedules\", chèn ký hiệu agenda. Sử dụng phông Webdings và mã ký tự \"166\".",
+  "P17_T03_TITLE": "Tác vụ 3",
+  "P17_T03_INST": "Áp dụng hiệu ứng hình dạng Soft Round Bevel cho đồ họa SmartArt.",
+  "P17_T04_TITLE": "Tác vụ 4",
+  "P17_T04_INST": "Đổi kiểu ngắt dòng văn bản (Text Wrapping) của hình ảnh ở trang thứ hai thành Square.",
+  "P17_T05_TITLE": "Tác vụ 5",
+  "P17_T05_INST": "Trong thuộc tính của tệp, thêm \"Coffee shops\" làm Category.",
+  "P17_T06_TITLE": "Tác vụ 6",
+  "P17_T06_INST": "Trong khoảng trống ở cuối trang 2, chèn hình dạng Horizontal Scroll chứa văn bản \"Thank you!\". Đặt hình ở chính giữa phía dưới trang với kiểu ngắt dòng Tight."
+}

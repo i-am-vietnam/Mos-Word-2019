@@ -37,7 +37,10 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableCellSpacing(PackageSnapshot package, TaskDefinition task, out string detail)
         {
-            var tables = FindTablesByHeader(package.Xml("word/document.xml"), RequiredStrings(task, "targetHeaderRow"));
+            // A leading label cell may be empty; preserve its column in the exact header identity.
+            string[] header = RequiredArray(task, "targetHeaderRow").Values<string>().ToArray();
+            if (header.Any(value => value == null)) throw new InvalidDataException("Invalid table header metadata.");
+            var tables = FindTablesByHeader(package.Xml("word/document.xml"), header);
             int expected = RequiredInt(task, "expectedSpacingTwips");
             bool match = tables.Count == 1 && expected > 0;
             if (match)

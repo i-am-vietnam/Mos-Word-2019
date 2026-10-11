@@ -1,0 +1,14 @@
+{
+  "P17_T01_TITLE": "Task 1",
+  "P17_T01_INST": "Display the Retrospect header on all pages of the document except the first page.",
+  "P17_T02_TITLE": "Task 2",
+  "P17_T02_INST": "Immediately before the heading \"Part 1, schedules\", insert an agenda symbol. Use the Webdings font and character code \"166\".",
+  "P17_T03_TITLE": "Task 3",
+  "P17_T03_INST": "Apply the Soft Round Bevel shape effect to the SmartArt graphic.",
+  "P17_T04_TITLE": "Task 4",
+  "P17_T04_INST": "Change the text wrapping of the image on the second page to Square.",
+  "P17_T05_TITLE": "Task 5",
+  "P17_T05_INST": "In the file properties, add \"Coffee shops\" as a category.",
+  "P17_T06_TITLE": "Task 6",
+  "P17_T06_INST": "In the empty space at the bottom of page 2, insert a Horizontal Scroll shape that contains the text \"Thank you!\". Position the shape at the bottom center of the page with Tight text wrapping."
+}
