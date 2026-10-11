@@ -1,15 +1,46 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01", "titleKey": "P17_T01_TITLE", "instructionKey": "P17_T01_INST",
+    "assertionType": "HeaderDifferentFirstPage", "headerBuiltIn": "Retrospect", "differentFirstPage": true,
+    "checkAllSections": true, "expectedHeaderTableColumns": 2,
+    "expectedHeaderCellThemeFills": [["accent2", "accent2"], ["accent1", "accent1"]],
+    "expectedHeaderCellFills": [["BD582C", "BD582C"], ["E48312", "E48312"]],
+    "requireHeaderControlsCaps": true,
+    "expectedHeaderControls": [
+      {"row": 0, "column": 0, "alias": "Title", "bindingPath": ["coreProperties", "title"]},
+      {"row": 0, "column": 1, "alias": "Date", "bindingPath": ["CoverPageProperties", "PublishDate"]}
+    ]
+  },
+  {
+    "taskId": "T02", "titleKey": "P17_T02_TITLE", "instructionKey": "P17_T02_INST",
+    "assertionType": "SymbolInserted", "anchorText": "Part 1: Schedules", "expectedSentence": "Part 1: Schedules",
+    "symbolFont": "Webdings", "symbolCode": 166, "acceptNativeAnsiSymbolText": true
+  },
+  {
+    "taskId": "T03", "titleKey": "P17_T03_TITLE", "instructionKey": "P17_T03_INST",
+    "assertionType": "SmartArtAllNodesBevelEquals", "expectedTextItems": ["Speed", "Accuracy", "Artists", "Accessibility"],
+    "expectedLogicalNodes": [
+      {"text": "Speed", "children": []}, {"text": "Accuracy", "children": []},
+      {"text": "Artists", "children": []}, {"text": "Accessibility", "children": []}
+    ],
+    "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+    "expectedBevelPreset": "softRound", "expectedPresentationBevelNames": ["imgShp"]
+  },
+  {
+    "taskId": "T04", "titleKey": "P17_T04_TITLE", "instructionKey": "P17_T04_INST",
+    "assertionType": "PictureWrapType", "expectedWrapType": "Square",
+    "targetImageSha256": "2E563EC6D474F31BE394D5A367323F1769A924B5F5EE4D09250C28BA3CAA7DB2",
+    "anchorParagraph": "Himalayan Coffee House"
+  },
+  {
+    "taskId": "T05", "titleKey": "P17_T05_TITLE", "instructionKey": "P17_T05_INST",
+    "assertionType": "CorePropertyEquals", "propertyName": "category", "expectedValue": "Coffee shops"
+  },
+  {
+    "taskId": "T06", "titleKey": "P17_T06_TITLE", "instructionKey": "P17_T06_INST",
+    "assertionType": "ShapeWithTextWrapAndPosition", "shapeGeometry": "horizontalScroll", "expectedText": "Thank you!",
+    "expectedWrap": "tight", "horizontalAlignment": "center", "verticalAlignment": "bottom", "relativeFrom": "page",
+    "requireLastBodyParagraph": true,
+    "anchorPrecedingParagraph": "The following is a list of service standards that we promise to our customers:"
+  }
 ]
