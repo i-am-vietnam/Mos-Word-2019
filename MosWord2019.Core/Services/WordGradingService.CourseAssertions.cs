@@ -77,6 +77,118 @@ namespace MosWord2019.Core.Services
                 RequiredStrings(task, key + "Alternatives").Contains(actual));
         }
 
+        private static bool CheckParagraphEndSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var document = package.Xml("word/document.xml");
+            var children = document.Root.Element(W + "body").Elements().ToList();
+            var anchors = children.Where(p => p.Name == W + "p" &&
+                MatchesDeclaredText(task, "precedingParagraph", ParagraphTextOutsideTextBoxes(p))).ToList();
+            var headings = children.Where(p => p.Name == W + "p" &&
+                ParagraphTextOutsideTextBoxes(p) == RequiredString(task, "targetHeading")).ToList();
+            bool match = anchors.Count == 1 && headings.Count == 1 && children.IndexOf(anchors[0]) < children.IndexOf(headings[0]);
+            if (match)
+            {
+                int start = children.IndexOf(anchors[0]), end = children.IndexOf(headings[0]);
+                var between = children.Skip(start + 1).Take(end - start - 1).ToList();
+                match = between.All(IsBlankTableBoundary);
+                var boundaries = new[] { anchors[0] }.Concat(between).Where(p => p.Name == W + "p" && p.Element(W + "pPr")?.Element(W + "sectPr") != null).ToList();
+                var sections = DocumentSections(document);
+                match &= boundaries.Count > 0 && boundaries.All(p =>
+                {
+                    int index = sections.FindIndex(s => s.Content.Contains(p));
+                    return index >= 0 && index + 1 < sections.Count &&
+                        (string)sections[index + 1].Properties.Element(W + "type")?.Attribute(W + "val") == "continuous";
+                });
+            }
+            detail = match ? "A real Continuous boundary follows the complete unchanged narrative before the declared heading."
+                : "The paragraph-end boundary is absent, misplaced, non-Continuous or its narrative changed.";
+            return match;
+        }
+
+        private static bool CheckMainStoryColumnBlock(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var expected = RequiredStrings(task, "targetParagraphs");
+            var document = package.Xml("word/document.xml");
+            var paragraphs = document.Root.Element(W + "body").Elements(W + "p").ToList();
+            var alternatives = task.Extra.ContainsKey("paragraphTextAlternatives") ? task.Extra["paragraphTextAlternatives"] as JObject : new JObject();
+            if (alternatives == null || alternatives.Properties().Any(p => !(p.Value is JArray) || ((JArray)p.Value).Any(v => v.Type != JTokenType.String)))
+                throw new InvalidDataException("Invalid column paragraph alternatives.");
+            Func<string, string, bool> accepts = (canonical, actual) => canonical == actual ||
+                (alternatives[canonical] is JArray && ((JArray)alternatives[canonical]).Values<string>().Contains(actual));
+            var targets = expected.Select(text => paragraphs.Where(p => accepts(text, ParagraphTextOutsideTextBoxes(p))).ToList()).ToList();
+            bool match = targets.All(t => t.Count == 1);
+            if (match)
+            {
+                var selected = targets.Select(t => t[0]).ToList();
+                var sections = DocumentSections(document);
+                var containing = sections.Where(s => selected.All(s.Content.Contains)).ToList();
+                match = selected.Distinct().Count() == expected.Length && containing.Count == 1;
+                if (match)
+                {
+                    var section = containing[0];
+                    match = section.Content.Where(p => p.Name == W + "p" && ParagraphTextOutsideTextBoxes(p).Length > 0).SequenceEqual(selected) &&
+                        ColumnCount(section.Properties) == RequiredInt(task, "expectedColumns") &&
+                        sections.Where(s => s != section).All(s => ColumnCount(s.Properties) == 1);
+                    if (OptionalBool(task, "checkColumnSpacing", true))
+                        match &= Twips(section.Properties.Element(W + "cols"), "space", -1) == RequiredInt(task, "expectedColumnSpacingTwips");
+                    if (task.Extra.ContainsKey("preservedDropCap"))
+                    {
+                        var drop = task.Extra["preservedDropCap"] as JObject;
+                        if (drop == null) throw new InvalidDataException("Invalid Drop Cap metadata.");
+                        var p = selected.SingleOrDefault(x => ParagraphTextOutsideTextBoxes(x) == (string)drop["text"]);
+                        var frame = p?.Element(W + "pPr")?.Element(W + "framePr");
+                        match &= frame != null && (string)frame.Attribute(W + "dropCap") == (string)drop["dropCap"] &&
+                            (string)frame.Attribute(W + "lines") == (string)drop["lines"];
+                    }
+                }
+            }
+            match &= CheckPreservedStoryObjects(package, task);
+            detail = match ? "Exactly the declared main-story paragraphs, including their Drop Cap, occupy the requested columns; surrounding sections remain single-column."
+                : "The narrative, Drop Cap, column scope/count/spacing or protected story content is incorrect.";
+            return match;
+        }
+
+        private static bool CheckPreservedStoryObjects(PackageSnapshot package, TaskDefinition task)
+        {
+            bool match = true;
+            var body = package.Xml("word/document.xml").Root.Element(W + "body");
+            if (task.Extra.ContainsKey("preservedBodyParagraphs"))
+            {
+                var declared = RequiredArray(task, "preservedBodyParagraphs");
+                if (declared.Any(t => t.Type != JTokenType.String && !(t is JArray)) ||
+                    declared.OfType<JArray>().Any(a => a.Count == 0 || a.Any(t => t.Type != JTokenType.String)))
+                    throw new InvalidDataException("Invalid preserved body paragraph metadata.");
+                var generated = GeneratedTocParagraphs(body);
+                var actual = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() &&
+                    !p.Ancestors(W + "txbxContent").Any() && !generated.Contains(p))
+                    .Select(ParagraphTextOutsideTextBoxes).Where(t => t.Length > 0).ToList();
+                match &= actual.Count == declared.Count && actual.Select((text, i) => i < declared.Count &&
+                    (declared[i].Type == JTokenType.String ? text == (string)declared[i] : ((JArray)declared[i]).Values<string>().Contains(text))).All(v => v);
+            }
+            if (task.Extra.ContainsKey("protectedTableRows"))
+            {
+                var tables = body.Descendants(W + "tbl").ToList();
+                var declared = RequiredArray(task, "protectedTableRows");
+                match &= tables.Count == declared.Count;
+                foreach (var rows in declared)
+                {
+                    if (!(rows is JArray) || ((JArray)rows).Any(row => !(row is JArray) || ((JArray)row).Any(t => t.Type != JTokenType.String)))
+                        throw new InvalidDataException("Invalid protected table rows.");
+                    var cells = ((JArray)rows).Select(row => row.Values<string>().ToArray()).ToArray();
+                    match &= tables.Count(table => TableRowsEqual(table, cells)) == 1;
+                }
+            }
+            if (task.Extra.ContainsKey("protectedPictureSha256s"))
+                match &= RequiredStrings(task, "protectedPictureSha256s").All(hash => FindPictureDrawing(package, new[] { hash }) != null);
+            if (task.Extra.ContainsKey("protectedTextBoxParagraphs"))
+            {
+                var text = ScopedStoryParagraphs(package.Xml("word/document.xml"), "TextBox")
+                    .Select(StoryParagraphText).Where(t => t.Length > 0).Distinct().ToList();
+                match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
+            }
+            return match;
+        }
+
         private static bool IsBlankTableBoundary(XElement element)
         {
             return element.Name == W + "bookmarkStart" || element.Name == W + "bookmarkEnd" ||

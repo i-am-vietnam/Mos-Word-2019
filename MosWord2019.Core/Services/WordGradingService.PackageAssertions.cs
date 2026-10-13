@@ -101,6 +101,13 @@ namespace MosWord2019.Core.Services
                 match = found.Count == 1 && (targets.Count == 0 || candidates.IndexOf(found[0]) > candidates.IndexOf(targets.Last()));
                 if (match) targets.Add(found[0]);
             }
+            if (OptionalBool(task, "requireExactBulletScope", false))
+            {
+                if (!scoped) throw new InvalidDataException("Exact bullet scope requires section headings.");
+                match &= paragraphs.Count(p => ParagraphTextOutsideTextBoxes(p) == (string)scope) == 1 &&
+                    paragraphs.Count(p => ParagraphTextOutsideTextBoxes(p) == RequiredString(task, "followingHeading")) == 1 &&
+                    candidates.Where(p => text(p).Length > 0).SequenceEqual(targets);
+            }
             for (int i = 0; match && i < expected.Length; i++)
             {
                 XElement level = EffectiveNumberingLevel(package, targets[i], new HashSet<string>());
@@ -111,6 +118,15 @@ namespace MosWord2019.Core.Services
                     level?.Element(W + "lvlPicBulletId") == null &&
                     (ascii == font || highAnsi == font) && (ascii == null || ascii == font) && (highAnsi == null || highAnsi == font);
             }
+            if (match && OptionalBool(task, "requireExactBulletScope", false))
+                match = !paragraphs.Except(targets).Any(p =>
+                {
+                    var level = EffectiveNumberingLevel(package, p, new HashSet<string>());
+                    var fonts = level?.Element(W + "rPr")?.Element(W + "rFonts");
+                    return (string)level?.Element(W + "numFmt")?.Attribute(W + "val") == "bullet" &&
+                        (string)level?.Element(W + "lvlText")?.Attribute(W + "val") == glyph &&
+                        ((string)fonts?.Attribute(W + "ascii") == font || (string)fonts?.Attribute(W + "hAnsi") == font);
+                });
             detail = match ? "The unchanged target paragraphs use real custom bullets with the required glyph and font."
                 : "One or more target paragraphs lack the required real bullet glyph/font or their content/order changed.";
             return match;
@@ -357,7 +373,8 @@ namespace MosWord2019.Core.Services
                     if (overlap > 0)
                     {
                         var actual = EffectiveRunFormatting(package, paragraphs[0], run);
-                        match &= actual.Count == expected.Count && expected.Properties().All(p => actual.ContainsKey(p.Name) && actual[p.Name] == (string)p.Value);
+                        match &= (OptionalBool(task, "allowAdditionalFormatting", false) || actual.Count == expected.Count) &&
+                            expected.Properties().All(p => actual.ContainsKey(p.Name) && actual[p.Name] == (string)p.Value);
                         covered += overlap;
                     }
                     offset += length;

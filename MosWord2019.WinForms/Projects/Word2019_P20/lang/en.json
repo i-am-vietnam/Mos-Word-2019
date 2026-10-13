@@ -1,0 +1,25 @@
+
+{
+  "P20_T01_TITLE": "Task 1",
+  "P20_T01_INST": "Save a copy of the document as a Word 2019 template named \"Notes\" that is compatible with the latest Word features and does not support macros. Save the template file in the default location.",
+  "P20_T02_TITLE": "Task 2",
+  "P20_T02_INST": "Find the word \"automatic\" and delete it from the document.",
+  "P20_T03_TITLE": "Task 3",
+  "P20_T03_INST": "Use a Word feature to replace all instances of \"Woodgrove Basic\" with \"Woodgrove plus\".",
+  "P20_T04_TITLE": "Task 4",
+  "P20_T04_INST": "In the \"Banking fees\" section, convert the tab-delimited text to a two-column table. Accept the default AutoFit behavior.",
+  "P20_T05_TITLE": "Task 5",
+  "P20_T05_INST": "In the blank paragraph after the document title, insert a table of contents. Use the Automatic Table 1 style.",
+  "P20_T06_TITLE": "Task 6",
+  "P20_T06_INST": "In the \"Checking Accounts\" section, insert the text \"Anytime Account Access\" in the dark blue text box.",
+  "P20_T07_TITLE": "Task 7",
+  "P20_T07_INST": "In the \"Saving Account\" section, delete the comment attached to the text \"$3000\".",
+  "P20_T08_TITLE": "Task 8",
+  "P20_T08_INST": "Apply the Centered style set to the document.",
+  "P20_T09_TITLE": "Task 9",
+  "P20_T09_INST": "In the \"Contact Us\" section, merge the cells in the first row of the table.",
+  "P20_T10_TITLE": "Task 10",
+  "P20_T10_INST": "In the \"Making moments last forever\" section, convert the five paragraphs starting with \"Corporate events\" to a bulleted list.",
+  "P20_T11_TITLE": "Task 11",
+  "P20_T11_INST": "In the \"Event packages\" section, insert a footnote immediately after the heading. Enter the footnote text \"Includes digital files\"."
+}

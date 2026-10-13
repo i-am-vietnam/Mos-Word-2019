@@ -1,0 +1,25 @@
+﻿
+{
+  "P20_T01_TITLE": "Tác vụ 1",
+  "P20_T01_INST": "Lưu một bản sao của tài liệu dưới dạng mẫu Word 2019 có tên \"Notes\", tương thích với các tính năng Word mới nhất và không hỗ trợ macro. Lưu tệp mẫu tại vị trí mặc định.",
+  "P20_T02_TITLE": "Tác vụ 2",
+  "P20_T02_INST": "Tìm từ \"automatic\" và xóa từ đó khỏi tài liệu.",
+  "P20_T03_TITLE": "Tác vụ 3",
+  "P20_T03_INST": "Sử dụng tính năng Word để thay thế tất cả các lần xuất hiện của \"Woodgrove Basic\" bằng \"Woodgrove plus\".",
+  "P20_T04_TITLE": "Tác vụ 4",
+  "P20_T04_INST": "Trong phần \"Banking fees\", chuyển văn bản được phân tách bằng dấu tab thành bảng gồm 2 cột. Giữ nguyên thiết lập AutoFit mặc định.",
+  "P20_T05_TITLE": "Tác vụ 5",
+  "P20_T05_INST": "Trong đoạn văn trống sau tiêu đề tài liệu, chèn mục lục sử dụng kiểu Automatic Table 1.",
+  "P20_T06_TITLE": "Tác vụ 6",
+  "P20_T06_INST": "Trong phần \"Checking Accounts\", chèn nội dung \"Anytime Account Access\" vào hộp văn bản màu xanh đậm.",
+  "P20_T07_TITLE": "Tác vụ 7",
+  "P20_T07_INST": "Trong phần \"Saving Account\", xóa bình luận được đính kèm với văn bản \"$3000\".",
+  "P20_T08_TITLE": "Tác vụ 8",
+  "P20_T08_INST": "Áp dụng bộ kiểu Centered cho tài liệu.",
+  "P20_T09_TITLE": "Tác vụ 9",
+  "P20_T09_INST": "Trong phần \"Contact Us\", gộp các ô ở hàng đầu tiên của bảng.",
+  "P20_T10_TITLE": "Tác vụ 10",
+  "P20_T10_INST": "Trong phần \"Making moments last forever\", chuyển năm đoạn văn bắt đầu bằng \"Corporate events\" thành danh sách dấu đầu dòng.",
+  "P20_T11_TITLE": "Tác vụ 11",
+  "P20_T11_INST": "Trong phần \"Event packages\", chèn chú thích cuối trang ngay sau tiêu đề. Nhập nội dung chú thích \"Includes digital files\"."
+}

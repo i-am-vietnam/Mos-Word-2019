@@ -891,6 +891,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckContinuousSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "paragraphEndBoundary", false))
+                return CheckParagraphEndSectionBreak(package, task, out detail);
             string heading = RequiredString(task, "targetHeading");
             XDocument document = package.Xml("word/document.xml");
             XElement body = document.Root?.Element(W + "body");
@@ -1002,6 +1004,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckParagraphBlockColumns(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "useMainStoryText", false))
+                return CheckMainStoryColumnBlock(package, task, out detail);
             string[] expectedText = RequiredStrings(task, "targetParagraphs");
             int expectedColumns = RequiredInt(task, "expectedColumns");
             int expectedSpacing = RequiredInt(task, "expectedColumnSpacingTwips");

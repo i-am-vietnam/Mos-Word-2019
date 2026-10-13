@@ -159,6 +159,17 @@ namespace MosWord2019.Core.Services
                     string formattingDetail;
                     match &= CheckTextRangeFormatting(package, formattingTask, out formattingDetail);
                 }
+            if (task.Extra.TryGetValue("acceptedFormattingRanges", out token))
+            {
+                if (!(token is JArray)) throw new InvalidDataException("Invalid accepted formatting metadata.");
+                foreach (JObject range in (JArray)token)
+                {
+                    var formattingTask = new TaskDefinition { Extra = range.Properties().ToDictionary(p => p.Name, p => p.Value) };
+                    string formattingDetail;
+                    match &= CheckTextRangeFormatting(package, formattingTask, out formattingDetail);
+                }
+            }
+            match &= CheckPreservedStoryObjects(package, task);
             if (task.Extra.TryGetValue("rejectedMargins", out token))
             {
                 var marginsTask = new TaskDefinition { Extra = ((JObject)token).Properties().ToDictionary(p => p.Name, p => p.Value) };
@@ -188,8 +199,11 @@ namespace MosWord2019.Core.Services
                     }
                     match &= covered == text.Length;
                 }
-            detail = match ? "Revision dispositions preserve accepted insertions, remove accepted deletions and retain required original formatting/content."
-                : "Pending revisions, incorrect insertion/deletion disposition, changed content or accepted formatting/layout changes remain.";
+            detail = task.Extra.ContainsKey("acceptedFormattingRanges")
+                ? (match ? "No pending revisions remain; restored text and accepted formatting preserve the declared content."
+                    : "Pending revisions, incorrect restored text, missing accepted formatting or changed protected content remain.")
+                : (match ? "Revision dispositions preserve accepted insertions, remove accepted deletions and retain required original formatting/content."
+                    : "Pending revisions, incorrect insertion/deletion disposition, changed content or accepted formatting/layout changes remain.");
             return match;
         }
     }

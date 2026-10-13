@@ -57,9 +57,15 @@ namespace MosWord2019.Core.Services
                     foreach (string type in active.Distinct())
                     {
                         string id;
-                        if (!inherited.TryGetValue(type, out id)) { match = false; continue; }
+                        if (!inherited.TryGetValue(type, out id))
+                        {
+                            if (type == headerType || !OptionalBool(task, "allowEmptyAuxiliaryHeaders", false)) match = false;
+                            continue;
+                        }
                         string part = package.RelatedPart("word/document.xml", id);
                         if (string.IsNullOrEmpty(part)) match = false;
+                        else if (type != headerType && OptionalBool(task, "allowEmptyAuxiliaryHeaders", false) &&
+                            !HeaderHasVisibleContent(package.Xml(part).Root)) continue;
                         else if (!parts.Contains(part)) parts.Add(part);
                     }
                 }
