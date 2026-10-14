@@ -1,4 +1,3 @@
-
 {
   "P20_T01_TITLE": "Task 1",
   "P20_T01_INST": "Save a copy of the document as a Word 2019 template named \"Notes\" that is compatible with the latest Word features and does not support macros. Save the template file in the default location.",
@@ -13,7 +12,7 @@
   "P20_T06_TITLE": "Task 6",
   "P20_T06_INST": "In the \"Checking Accounts\" section, insert the text \"Anytime Account Access\" in the dark blue text box.",
   "P20_T07_TITLE": "Task 7",
-  "P20_T07_INST": "In the \"Saving Account\" section, delete the comment attached to the text \"$3000\".",
+  "P20_T07_INST": "In SAVING ACCOUNTS, delete the original comment \"Do you know this price\" attached to \"$300\". Preserve the paragraph; resolving the comment is insufficient.",
   "P20_T08_TITLE": "Task 8",
   "P20_T08_INST": "Apply the Centered style set to the document.",
   "P20_T09_TITLE": "Task 9",

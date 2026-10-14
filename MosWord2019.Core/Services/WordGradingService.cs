@@ -98,7 +98,8 @@ namespace MosWord2019.Core.Services
                         ? new TaskGradeResult(TaskGradeOutcome.Fail, "The document is still in legacy .doc format.", task.AssertionType, task.TaskId)
                         : Error(task, "Convert the legacy document with File > Info > Convert, then save before grading this OOXML task.");
                 }
-                if (task.AssertionType == "ModernWordDocumentFormat")
+                if (task.AssertionType == "ModernWordDocumentFormat" ||
+                    (task.AssertionType == "SavedWordTemplate" && OptionalBool(task, "allowPictureFreeIdentity", false)))
                 {
                     // A renamed legacy compound file is a nonmodern answer, not an OOXML package.
                     using (var stream = new FileStream(documentPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -422,6 +423,11 @@ namespace MosWord2019.Core.Services
             { detail = "An unrelated table row was merged or changed structurally."; return false; }
             if (task.Extra.ContainsKey("expectedTableRows") && !TableRowsEqual(table, RequiredStringMatrix(task, "expectedTableRows")))
             { detail = "The merged header or the unchanged lower-row content differs."; return false; }
+            if (task.Extra.ContainsKey("expectedMergedCellParagraphs") &&
+                (firstCells[0].Descendants(W + "vMerge").Any() ||
+                 !firstCells[0].Elements(W + "p").Select(StoryParagraphText).Where(t => t.Length > 0)
+                    .SequenceEqual(RequiredStrings(task, "expectedMergedCellParagraphs"))))
+            { detail = "The merged cell's original paragraph content or horizontal merge differs."; return false; }
             detail = "Only the full first row of the target table is merged.";
             return true;
         }
@@ -574,6 +580,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextConvertedToTable(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "sourceBlockConversion", false))
+                return CheckSourceBlockConvertedToTable(package, task, out detail);
             if (OptionalBool(task, "allowBlankSectionSpacing", false))
                 return CheckSpacedTextConvertedToTable(package, task, out detail);
             string heading = RequiredString(task, "sectionHeading");
@@ -642,6 +650,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextBoxText(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("sectionStartText"))
+                return CheckSectionRgbTextBox(package, task, out detail);
             if (task.Extra.ContainsKey("expectedFillScheme"))
                 return CheckThemeTextBoxText(package, task, out detail);
             string anchor = RequiredString(task, "anchorText");
@@ -725,6 +735,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckCommentDeleted(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("sectionStartText"))
+                return CheckSectionCommentDeleted(package, task, out detail);
             string expectedParagraph = RequiredString(task, "expectedParagraph");
             string targetText = RequiredString(task, "targetText");
             XDocument document = package.Xml("word/document.xml");

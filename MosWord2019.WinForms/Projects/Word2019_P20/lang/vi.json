@@ -1,4 +1,3 @@
-﻿
 {
   "P20_T01_TITLE": "Tác vụ 1",
   "P20_T01_INST": "Lưu một bản sao của tài liệu dưới dạng mẫu Word 2019 có tên \"Notes\", tương thích với các tính năng Word mới nhất và không hỗ trợ macro. Lưu tệp mẫu tại vị trí mặc định.",
@@ -13,7 +12,7 @@
   "P20_T06_TITLE": "Tác vụ 6",
   "P20_T06_INST": "Trong phần \"Checking Accounts\", chèn nội dung \"Anytime Account Access\" vào hộp văn bản màu xanh đậm.",
   "P20_T07_TITLE": "Tác vụ 7",
-  "P20_T07_INST": "Trong phần \"Saving Account\", xóa bình luận được đính kèm với văn bản \"$3000\".",
+  "P20_T07_INST": "Trong SAVING ACCOUNTS, xóa comment gốc \"Do you know this price\" gắn với \"$300\". Giữ nguyên đoạn văn; chỉ Resolve comment chưa đáp ứng yêu cầu.",
   "P20_T08_TITLE": "Tác vụ 8",
   "P20_T08_INST": "Áp dụng bộ kiểu Centered cho tài liệu.",
   "P20_T09_TITLE": "Tác vụ 9",

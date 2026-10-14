@@ -1,15 +1,386 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P20_T01_TITLE",
+    "instructionKey": "P20_T01_INST",
+    "assertionType": "SavedWordTemplate",
+    "expectedFileName": "Notes.dotx",
+    "allowPictureFreeIdentity": true,
+    "identityParagraphs": [
+      "Project 5 Preparation File",
+      "Fees apply to all checking and saving accounts.",
+      "CHECKING ACCOUNTS",
+      "SAVING ACCOUNTS",
+      "Event Packages"
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P20_T02_TITLE",
+    "instructionKey": "P20_T02_INST",
+    "assertionType": "TextRemovedFromParagraph",
+    "targetParagraphScope": "MainBody",
+    "targetParagraphStartsWith": "Themes and styles also help keep your",
+    "removedText": "automatic",
+    "expectedRemainingCount": 0,
+    "expectedFinalText": "Themes and styles also help keep your coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme."
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P20_T03_TITLE",
+    "instructionKey": "P20_T03_INST",
+    "assertionType": "BodyTextReplaceAll",
+    "oldText": "Woodgrove Basic",
+    "newText": "Woodgrove plus",
+    "expectedReplacementCount": 5,
+    "replacementLocations": [
+      {
+        "scope": "MainBody",
+        "paragraphStartsWith": "Video provides a powerful way to help yo",
+        "expectedParagraphs": [
+          "Video provides a powerful way to help you prove your point. When you click Online Woodgrove plus, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document."
+        ]
+      },
+      {
+        "scope": "MainBody",
+        "paragraphStartsWith": "Save time in Word with new buttons that ",
+        "expectedParagraphs": [
+          "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and Woodgrove plus for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign."
+        ]
+      },
+      {
+        "scope": "MainBody",
+        "paragraphStartsWith": "Reading is easier, too, in the new Readi",
+        "expectedParagraphs": [
+          "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove plus. If you need to stop reading before you reach the end, Word remembers where you left off - even on another device."
+        ],
+        "sectionStartText": "CHECKING ACCOUNTS",
+        "sectionEndText": "SAVING ACCOUNTS",
+        "sectionStartKind": "singleCellTable",
+        "sectionEndKind": "singleCellTable"
+      },
+      {
+        "scope": "MainBody",
+        "paragraphStartsWith": "Reading is easier, too, in the new Readi",
+        "expectedParagraphs": [
+          "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove plus. If $300 you need to stop reading before you reach the end, Word remembers where you left off - even on another device."
+        ],
+        "sectionStartText": "SAVING ACCOUNTS",
+        "sectionEndText": "Event Packages",
+        "sectionStartKind": "singleCellTable",
+        "sectionEndKind": "paragraph"
+      },
+      {
+        "scope": "MainBody",
+        "paragraphStartsWith": "Reading is easier, too, in the new Readi",
+        "expectedParagraphs": [
+          "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove plus. If $300 you need to stop reading before you reach the end, Word remembers where you left off - even on another device."
+        ],
+        "sectionStartText": "Event Packages",
+        "sectionToDocumentEnd": true,
+        "sectionStartKind": "paragraph"
+      }
+    ],
+    "requireNoOriginalText": true
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P20_T04_TITLE",
+    "instructionKey": "P20_T04_INST",
+    "assertionType": "TextConvertedToTable",
+    "sourceBlockConversion": true,
+    "sectionStartText": "BANKING FEES",
+    "sectionEndText": "CHECKING ACCOUNTS",
+    "sectionStartKind": "singleCellTable",
+    "sectionEndKind": "singleCellTable",
+    "introParagraph": "Fees apply to all checking and saving accounts.",
+    "followingParagraph": "Themes and styles also help keep your automatic coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme.",
+    "followingParagraphAlternatives": [
+      "Themes and styles also help keep your coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme."
+    ],
+    "expectedColumns": 2,
+    "expectedRows": 4,
+    "expectedTableRows": [
+      [
+        "Card",
+        "$12"
+      ],
+      [
+        "Stop payment",
+        "$300"
+      ],
+      [
+        "Domestic",
+        "$200"
+      ],
+      [
+        "Transfer",
+        "$600"
+      ]
+    ],
+    "expectedTableLayout": "fixed",
+    "allowOmittedTableLayout": true,
+    "sourceParagraphs": [
+      "Card\t$12",
+      "Stop payment\t$300",
+      "Domestic\t$200",
+      "Transfer\t$600"
+    ],
+    "preservedSectionParagraphs": [
+      "Fees apply to all checking and saving accounts.",
+      [
+        "Themes and styles also help keep your automatic coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme.",
+        "Themes and styles also help keep your coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme."
+      ],
+      [
+        "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and Woodgrove Basic for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign.",
+        "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and Woodgrove plus for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign."
+      ]
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P20_T05_TITLE",
+    "instructionKey": "P20_T05_INST",
+    "assertionType": "AutomaticTableOfContents",
+    "documentTitle": "Project 5 Preparation File",
+    "expectedGallery": "Table of Contents",
+    "expectedHeadingText": "Contents",
+    "expectedFieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+    "allowSimpleField": true
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P20_T06_TITLE",
+    "instructionKey": "P20_T06_INST",
+    "assertionType": "TextBoxTextEquals",
+    "sectionStartText": "CHECKING ACCOUNTS",
+    "sectionEndText": "SAVING ACCOUNTS",
+    "sectionStartKind": "singleCellTable",
+    "sectionEndKind": "singleCellTable",
+    "shapeGeometry": "rect",
+    "fillColor": "002060",
+    "expectedText": "Anytime Account Access",
+    "expectedTextBoxCount": 1,
+    "expectedWidthsEmu": [
+      2360930
+    ],
+    "expectedHeightEmu": 790575,
+    "expectedPositionH": {
+      "relativeFrom": "column",
+      "posOffset": "1290955"
+    },
+    "expectedPositionV": {
+      "relativeFrom": "paragraph",
+      "posOffset": "210185"
+    },
+    "expectedRelativeWidth": "40000",
+    "preservedSectionParagraphs": [
+      [
+        "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove Basic. If you need to stop reading before you reach the end, Word remembers where you left off - even on another device.",
+        "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove plus. If you need to stop reading before you reach the end, Word remembers where you left off - even on another device."
+      ]
+    ],
+    "expectedRotation": 0,
+    "expectedFlipH": false,
+    "expectedFlipV": false
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P20_T07_TITLE",
+    "instructionKey": "P20_T07_INST",
+    "assertionType": "CommentDeletedAtText",
+    "sectionStartText": "SAVING ACCOUNTS",
+    "sectionEndText": "Event Packages",
+    "sectionStartKind": "singleCellTable",
+    "sectionEndKind": "paragraph",
+    "targetText": "$300",
+    "expectedParagraph": "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove Basic. If $300 you need to stop reading before you reach the end, Word remembers where you left off - even on another device.",
+    "expectedParagraphAlternatives": [
+      "Reading is easier, too, in the new Reading view. You can collapse parts of the document and focus on the text you Woodgrove plus. If $300 you need to stop reading before you reach the end, Word remembers where you left off - even on another device."
+    ],
+    "deletedCommentText": "Do you know this price",
+    "deletedCommentAuthor": "Windows User",
+    "requireConsistentCommentMetadata": true
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P20_T08_TITLE",
+    "instructionKey": "P20_T08_INST",
+    "assertionType": "DocumentStyleSet",
+    "expectedStyleSet": "Centered",
+    "semanticStyleRequirements": [
+      {
+        "styleId": "Title",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "pPr/spacing",
+        "attributes": {
+          "after": "400",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Title",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "72"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Subtitle",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "28"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "320",
+          "after": "80",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading1",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "40"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "pPr/spacing",
+        "attributes": {
+          "before": "160",
+          "after": "40",
+          "line": "240",
+          "lineRule": "auto"
+        }
+      },
+      {
+        "styleId": "Heading2",
+        "path": "rPr/sz",
+        "attributes": {
+          "val": "32"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      },
+      {
+        "styleId": "Quote",
+        "path": "pPr/ind",
+        "attributes": {
+          "left": "720",
+          "right": "720"
+        }
+      },
+      {
+        "styleId": "IntenseQuote",
+        "path": "pPr/jc",
+        "attributes": {
+          "val": "center"
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T09",
+    "titleKey": "P20_T09_TITLE",
+    "instructionKey": "P20_T09_INST",
+    "assertionType": "TableCellsMerged",
+    "tableAnchor": "Schoolvideo",
+    "expectedColumnSpan": 2,
+    "expectedMergedCellParagraphs": [
+      "School",
+      "video"
+    ],
+    "expectedTableRows": [
+      [
+        "Schoolvideo"
+      ],
+      [
+        "Address",
+        "123 main street"
+      ],
+      [
+        "Phone",
+        "1234567"
+      ],
+      [
+        "Email",
+        "info@video.com"
+      ],
+      [
+        "Web",
+        "Info.com"
+      ]
+    ]
+  },
+  {
+    "taskId": "T10",
+    "titleKey": "P20_T10_TITLE",
+    "instructionKey": "P20_T10_INST",
+    "assertionType": "BulletedList",
+    "exactTargetParagraphs": true,
+    "checkIndentation": false,
+    "targetParagraphs": [
+      "Corporate events",
+      "School events",
+      "Sports events",
+      "Subjective events",
+      "Non-subjective events"
+    ],
+    "sectionStartText": "Making moments last forever!\t\t\tContact us",
+    "sectionEndText": "Video provides a powerful way to help you prove your point. When you click Online Woodgrove Basic, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+    "sectionEndTextAlternatives": [
+      "Video provides a powerful way to help you prove your point. When you click Online Woodgrove plus, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document."
+    ],
+    "sectionStartKind": "paragraph",
+    "sectionEndKind": "paragraph"
+  },
+  {
+    "taskId": "T11",
+    "titleKey": "P20_T11_TITLE",
+    "instructionKey": "P20_T11_INST",
+    "assertionType": "Footnote",
+    "anchorText": "Event Packages",
+    "referenceAfterText": "Event Packages",
+    "expectedText": "Includes digital files"
+  }
 ]

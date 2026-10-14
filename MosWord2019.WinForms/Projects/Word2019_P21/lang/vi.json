@@ -1,0 +1,27 @@
+﻿
+{
+  "P21_T01_TITLE": "Tác vụ 1",
+  "P21_T01_INST": "Thêm đường viền trang kiểu Box, màu Dark Blue, Accent 1, độ dày 3 pt cho toàn bộ tài liệu.",
+  "P21_T02_TITLE": "Tác vụ 2",
+  "P21_T02_INST": "Ở cuối tài liệu, thay đổi giãn dòng của hai đoạn văn cuối cùng thành Exactly 14 pt.",
+  "P21_T03_TITLE": "Tác vụ 3",
+  "P21_T03_INST": "Áp dụng kiểu Intense Emphasis cho đoạn văn nằm sau hình ảnh.",
+  "P21_T04_TITLE": "Tác vụ 4",
+  "P21_T04_INST": "Chia bốn đoạn văn trước hình ảnh thành hai cột, với khoảng cách giữa các cột là 0,3 inch.",
+  "P21_T05_TITLE": "Tác vụ 5",
+  "P21_T05_INST": "Trong phần \"Depinning\", chèn ký hiệu nhiệt kế ngay trước cụm \"The muffin tray will still be hot\". Sử dụng phông Webdings và mã ký tự \"225\".",
+  "P21_T06_TITLE": "Tác vụ 6",
+  "P21_T06_INST": "Trong phần \"Top Sellers\", tiếp tục đánh số danh sách ở đầu cột thứ hai để các mục trong danh sách được đánh số liên tục từ 1 đến 6.",
+  "P21_T07_TITLE": "Tác vụ 7",
+  "P21_T07_INST": "Kiểm tra các vấn đề về khả năng truy cập (Accessibility) của tài liệu. Sửa lỗi liên quan đến bảng được báo cáo trong kết quả kiểm tra bằng cách thực hiện hành động được đề xuất đầu tiên. Không sửa các lỗi khác được báo cáo.",
+  "P21_T08_TITLE": "Tác vụ 8",
+  "P21_T08_INST": "Trong phần \"Description\", chèn một nguồn trích dẫn giữ chỗ (Placeholder Citation) mới có tên \"Manufacturing1\" tại cuối đoạn văn thứ hai sau tiêu đề.",
+  "P21_T09_TITLE": "Tác vụ 9",
+  "P21_T09_INST": "Trong phần \"Manufacturing Process\", đặt mô tả văn bản thay thế (Alt Text Description) là \"Process flow\" cho đồ họa SmartArt.",
+  "P21_T10_TITLE": "Tác vụ 10",
+  "P21_T10_INST": "Trong phần \"Kids love dinosaurs\", sao chép định dạng của đoạn văn đầu tiên và áp dụng cho đoạn văn thứ hai.",
+  "P21_T11_TITLE": "Tác vụ 11",
+  "P21_T11_INST": "Trong phần \"Geologic\", sắp xếp dữ liệu trong bảng theo \"Geologic period\" tăng dần, sau đó theo \"Dinosaur\" tăng dần.",
+  "P21_T12_TITLE": "Tác vụ 12",
+  "P21_T12_INST": "Trong phần \"More dinosaur facts\", thay đổi cấp danh sách của mục \"Velociraptor\" thành Level 3."
+}

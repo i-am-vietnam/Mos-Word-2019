@@ -1,0 +1,27 @@
+
+{
+  "P21_T01_TITLE": "Task 1",
+  "P21_T01_INST": "Add a 3 pt Dark Blue, Accent 1 Box page border to the whole document.",
+  "P21_T02_TITLE": "Task 2",
+  "P21_T02_INST": "At the end of the document, change the line spacing of the last two paragraphs to Exactly 14 pt.",
+  "P21_T03_TITLE": "Task 3",
+  "P21_T03_INST": "Apply the Intense Emphasis style to the paragraph after the picture.",
+  "P21_T04_TITLE": "Task 4",
+  "P21_T04_INST": "Split the four paragraphs before the picture into two columns with a column spacing of 0.3\".",
+  "P21_T05_TITLE": "Task 5",
+  "P21_T05_INST": "In the \"Depinning\" section, insert a thermometer symbol before the phrase \"The muffin tray will still be hot\". Use the Webdings font and character code \"225\".",
+  "P21_T06_TITLE": "Task 6",
+  "P21_T06_INST": "In the \"Top Sellers\" section, continue the numbering of the list at the top of the second column so that the list items are numbered from 1 through 6.",
+  "P21_T07_TITLE": "Task 7",
+  "P21_T07_INST": "Check the document for accessibility issues. Correct the table-related issue reported in the inspection results by performing the first recommended action. Do not fix other reported issues.",
+  "P21_T08_TITLE": "Task 8",
+  "P21_T08_INST": "In the \"Description\" section, insert a new placeholder citation named \"Manufacturing1\" at the end of the second paragraph after the heading.",
+  "P21_T09_TITLE": "Task 9",
+  "P21_T09_INST": "In the \"Manufacturing Process\" section, assign the alt text description \"Process flow\" to the SmartArt graphic.",
+  "P21_T10_TITLE": "Task 10",
+  "P21_T10_INST": "In the \"Kids love dinosaurs\" section, copy the formatting of the first paragraph and apply it to the second paragraph.",
+  "P21_T11_TITLE": "Task 11",
+  "P21_T11_INST": "In the \"Geologic\" section, sort the table data by \"Geologic period\" (Ascending) and then by \"Dinosaur\" (Ascending).",
+  "P21_T12_TITLE": "Task 12",
+  "P21_T12_INST": "In the \"More dinosaur facts\" section, change the list level for \"Velociraptor\" to Level 3."
+}

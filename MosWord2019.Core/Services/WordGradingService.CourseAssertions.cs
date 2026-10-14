@@ -280,6 +280,12 @@ namespace MosWord2019.Core.Services
                 indexes.Where((n, i) => i > 0 && n != indexes[i - 1] + 1).Any())
             { detail = "The exact list items are not one unique consecutive paragraph block."; return false; }
             bool geometry = OptionalBool(task, "checkIndentation", true);
+            if (task.Extra.ContainsKey("sectionStartText"))
+            {
+                var section = DeclaredBodySection(paragraphs[0].Document, task);
+                if (section == null || indexes.Any(i => !section.Contains(BodyChild(paragraphs[i]))))
+                { detail = "The bullet items are outside their declared original section."; return false; }
+            }
             string listId = null, listLevel = null;
             XElement styles = package.Xml("word/styles.xml").Root;
             foreach (int index in indexes)

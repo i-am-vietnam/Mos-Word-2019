@@ -64,6 +64,12 @@ namespace MosWord2019.Core.Services
                     throw new InvalidDataException("Invalid replacement location metadata.");
                 var found = ScopedStoryParagraphs(document, scope)
                     .Where(p => StoryParagraphText(p).StartsWith(prefix, StringComparison.Ordinal)).ToList();
+                if (location["sectionStartText"] != null)
+                {
+                    var sectionTask = new TaskDefinition { Extra = location.Properties().ToDictionary(p => p.Name, p => p.Value) };
+                    var section = DeclaredBodySection(document, sectionTask);
+                    found = section == null ? new List<XElement>() : found.Where(p => section.Contains(BodyChild(p))).ToList();
+                }
                 if (found.Count != 1 || !selected.Add(found[0]))
                 { detail = "An original replacement location is missing or duplicated."; return false; }
                 XElement box = found[0].Ancestors(W + "txbxContent").FirstOrDefault();
@@ -74,6 +80,8 @@ namespace MosWord2019.Core.Services
                 replaced += actual.Sum(t => CountOccurrences(t, newText));
             }
             bool match = replaced == RequiredInt(task, "expectedReplacementCount");
+            if (OptionalBool(task, "requireNoOriginalText", false))
+                match &= !ScopedStoryParagraphs(document, "AllBodyStories").Any(p => StoryParagraphText(p).Contains(oldText));
             detail = match ? "Every declared original occurrence is replaced; later text in other locations is independent."
                 : "The replacement count at the original source locations is incorrect.";
             return match;
@@ -116,6 +124,142 @@ namespace MosWord2019.Core.Services
             detail = match ? "The complete source block is one table in the declared section with native default layout."
                 : "Table location, source content, columns, rows, or default layout is incorrect.";
             return match;
+        }
+
+        private static List<XElement> DeclaredBodySection(XDocument document, TaskDefinition task)
+        {
+            var children = document.Root.Element(W + "body").Elements().ToList();
+            Func<string, List<XElement>> boundary = key => ScopedStoryParagraphs(document, "MainBody")
+                .Where(p => MatchesDeclaredText(task, key, StoryParagraphText(p))).Select(BodyChild).Distinct().ToList();
+            var starts = boundary("sectionStartText");
+            var ends = OptionalBool(task, "sectionToDocumentEnd", false) ? new List<XElement>() : boundary("sectionEndText");
+            if (starts.Count != 1 || (!OptionalBool(task, "sectionToDocumentEnd", false) && ends.Count != 1)) return null;
+            Func<XElement, string, bool> kind = (element, key) =>
+            {
+                if (!task.Extra.ContainsKey(key)) return true;
+                string value = RequiredString(task, key);
+                if (value != "paragraph" && value != "singleCellTable") throw new InvalidDataException("Unsupported semantic section boundary kind.");
+                return value == "paragraph" ? element.Name == W + "p" : element.Name == W + "tbl" &&
+                    element.Elements(W + "tr").Count() == 1 && element.Descendants(W + "tc").Count() == 1;
+            };
+            if (!kind(starts[0], "sectionStartKind") || (ends.Count > 0 && !kind(ends[0], "sectionEndKind"))) return null;
+            int first = children.IndexOf(starts[0]), last = ends.Count == 0 ? children.Count : children.IndexOf(ends[0]);
+            return first < last ? children.Skip(first + 1).Take(last - first - 1).ToList() : null;
+        }
+
+        private static bool SectionParagraphsPreserved(List<XElement> section, TaskDefinition task)
+        {
+            if (!task.Extra.ContainsKey("preservedSectionParagraphs")) return true;
+            var declared = RequiredArray(task, "preservedSectionParagraphs");
+            if (declared.Any(t => t.Type != JTokenType.String && (!(t is JArray) || ((JArray)t).Count == 0 || ((JArray)t).Any(v => v.Type != JTokenType.String))))
+                throw new InvalidDataException("Invalid preserved section paragraph metadata.");
+            var actual = section.Where(p => p.Name == W + "p").Select(StoryParagraphText).Where(t => t.Length > 0).ToList();
+            return actual.Count == declared.Count && actual.Select((text, i) => declared[i].Type == JTokenType.String
+                ? text == (string)declared[i] : ((JArray)declared[i]).Values<string>().Contains(text)).All(v => v);
+        }
+
+        private static bool CheckSourceBlockConvertedToTable(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var section = DeclaredBodySection(package.Xml("word/document.xml"), task);
+            detail = "The declared source block, heading, surrounding prose or converted table differs.";
+            if (section == null) return false;
+            var intros = section.Where(e => e.Name == W + "p" && StoryParagraphText(e) == RequiredString(task, "introParagraph")).ToList();
+            var ends = section.Where(e => e.Name == W + "p" && MatchesDeclaredText(task, "followingParagraph", StoryParagraphText(e))).ToList();
+            if (intros.Count != 1 || ends.Count != 1 || section.IndexOf(intros[0]) >= section.IndexOf(ends[0])) return false;
+            var block = section.Skip(section.IndexOf(intros[0]) + 1).Take(section.IndexOf(ends[0]) - section.IndexOf(intros[0]) - 1).ToList();
+            var tables = block.Where(e => e.Name == W + "tbl").ToList();
+            bool match = tables.Count == 1 && block.Where(e => e.Name != W + "tbl").All(e =>
+                e.Name == W + "bookmarkStart" || e.Name == W + "bookmarkEnd" ||
+                (e.Name == W + "p" && StoryParagraphText(e).Length == 0 && !e.Descendants().Any(n =>
+                    n.Name == W + "drawing" || n.Name == W + "pict" || n.Name == W + "object" || n.Name == W + "fldChar" || n.Name == W + "instrText")));
+            if (match)
+            {
+                var table = tables[0];
+                match = TableRowsEqual(table, RequiredStringMatrix(task, "expectedTableRows")) &&
+                    table.Elements(W + "tr").Count() == RequiredInt(task, "expectedRows") &&
+                    table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() == RequiredInt(task, "expectedColumns") &&
+                    !table.Descendants().Any(e => e.Name == W + "gridSpan" || e.Name == W + "vMerge");
+                if (task.Extra.ContainsKey("expectedTableLayout"))
+                {
+                    XElement layout = table.Element(W + "tblPr")?.Element(W + "tblLayout");
+                    // Word's Convert Text to Table dialog can omit tblLayout even with
+                    // its default "Fixed column width: Auto" selected. API conversion
+                    // writes fixed explicitly; only declared packages accept omission.
+                    match &= (layout == null && OptionalBool(task, "allowOmittedTableLayout", false)) ||
+                        ((string)layout?.Attribute(W + "type") ?? "autofit") == RequiredString(task, "expectedTableLayout");
+                }
+            }
+            var source = RequiredStrings(task, "sourceParagraphs");
+            match &= !MainParagraphs(package).Any(p => source.Contains(StoryParagraphText(p)));
+            match &= SectionParagraphsPreserved(section, task);
+            if (match) detail = "Only the declared tab-delimited source block is converted, preserving its heading and neighboring prose.";
+            return match;
+        }
+
+        private static bool CheckSectionRgbTextBox(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var document = package.Xml("word/document.xml");
+            var section = DeclaredBodySection(document, task);
+            var all = TextBoxCandidates(document).ToList();
+            var boxes = section == null ? new List<TextBoxCandidate>() : all.Where(c => section.Contains(BodyChild(c.OuterParagraph))).ToList();
+            detail = "The original section-scoped textbox, exact text, fill, size or relative placement differs.";
+            if (all.Count != RequiredInt(task, "expectedTextBoxCount") || boxes.Count != 1) return false;
+            var box = boxes[0];
+            if (box.TextBox.Parent.Name != Wps + "txbx") return false;
+            var shape = box.TextBox.Parent.Parent;
+            var properties = shape.Element(Wps + "spPr");
+            var anchor = shape.Ancestors(Wp + "anchor").FirstOrDefault();
+            var extent = properties?.Element(A + "xfrm")?.Element(A + "ext");
+            var widths = RequiredArray(task, "expectedWidthsEmu").Select(t => (long)t).ToArray();
+            bool match = box.Geometry == RequiredString(task, "shapeGeometry") &&
+                NormalizeColor(box.FillColor) == NormalizeColor(RequiredString(task, "fillColor")) &&
+                string.Join("\n", box.TextBox.Elements(W + "p").Select(StoryParagraphText)) == RequiredString(task, "expectedText") &&
+                widths.Contains(DrawingInteger(extent, "cx", -1)) &&
+                widths.Contains(DrawingInteger(anchor?.Element(Wp + "extent"), "cx", -1)) &&
+                DrawingInteger(extent, "cy", -1) == RequiredInt(task, "expectedHeightEmu") &&
+                DrawingInteger(anchor?.Element(Wp + "extent"), "cy", -1) == RequiredInt(task, "expectedHeightEmu") &&
+                PositionMatches(anchor?.Element(Wp + "positionH"), task.Extra["expectedPositionH"] as JObject) &&
+                PositionMatches(anchor?.Element(Wp + "positionV"), task.Extra["expectedPositionV"] as JObject);
+            match &= SectionParagraphsPreserved(section, task);
+            XNamespace wp14 = "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing";
+            if (task.Extra.ContainsKey("expectedRotation"))
+                match &= DrawingInteger(properties?.Element(A + "xfrm"), "rot", 0) == RequiredInt(task, "expectedRotation") &&
+                    new[] { "1", "true" }.Contains((string)properties?.Element(A + "xfrm")?.Attribute("flipH")) == OptionalBool(task, "expectedFlipH", false) &&
+                    new[] { "1", "true" }.Contains((string)properties?.Element(A + "xfrm")?.Attribute("flipV")) == OptionalBool(task, "expectedFlipV", false);
+            if (task.Extra.ContainsKey("expectedRelativeWidth"))
+                match &= (string)anchor?.Element(wp14 + "sizeRelH")?.Attribute("relativeFrom") == "margin" &&
+                    (string)anchor?.Element(wp14 + "sizeRelH")?.Element(wp14 + "pctWidth") == RequiredString(task, "expectedRelativeWidth");
+            if (match) detail = "The original logical rectangle contains the exact text with its native size/fill and relative placement preserved.";
+            return match;
+        }
+
+        private static bool CheckSectionCommentDeleted(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            var section = DeclaredBodySection(package.Xml("word/document.xml"), task);
+            var paragraphs = section == null ? new List<XElement>() : section.Where(e => e.Name == W + "p" &&
+                MatchesDeclaredText(task, "expectedParagraph", StoryParagraphText(e))).ToList();
+            detail = "The original comment or its anchor remains, or its source narrative/section changed.";
+            if (paragraphs.Count != 1 || HasActiveCommentOnText(paragraphs[0], RequiredString(task, "targetText"))) return false;
+            XDocument comments;
+            if (package.TryXml("word/comments.xml", out comments) && comments.Root.Elements(W + "comment").Any(c =>
+                VisibleText(c).TrimEnd() == RequiredString(task, "deletedCommentText") &&
+                (!task.Extra.ContainsKey("deletedCommentAuthor") || (string)c.Attribute(W + "author") == RequiredString(task, "deletedCommentAuthor")))) return false;
+            if (OptionalBool(task, "requireConsistentCommentMetadata", false))
+            {
+                var liveIds = new HashSet<string>(comments == null ? Enumerable.Empty<string>() :
+                    comments.Root.Elements(W + "comment").Select(c => (string)c.Attribute(W + "id")), StringComparer.Ordinal);
+                if (paragraphs[0].Descendants().Where(e => e.Name == W + "commentRangeStart" || e.Name == W + "commentRangeEnd" || e.Name == W + "commentReference")
+                    .Any(e => !liveIds.Contains((string)e.Attribute(W + "id")))) return false;
+                XNamespace w14 = "http://schemas.microsoft.com/office/word/2010/wordml";
+                XNamespace w15 = "http://schemas.microsoft.com/office/word/2012/wordml";
+                var liveParagraphIds = new HashSet<string>(comments == null ? Enumerable.Empty<string>() :
+                    comments.Descendants(W + "p").Select(p => (string)p.Attribute(w14 + "paraId")), StringComparer.Ordinal);
+                XDocument extended;
+                if (package.TryXml("word/commentsExtended.xml", out extended) && extended.Descendants(w15 + "commentEx")
+                    .Any(e => !liveParagraphIds.Contains((string)e.Attribute(w15 + "paraId")))) return false;
+            }
+            detail = "The comment in the declared section is deleted while its original text and other stories remain intact.";
+            return true;
         }
 
         private static XElement BodyChild(XElement element)

@@ -1,8 +1,6 @@
 {
   "P19_T01_TITLE": "Task 1",
   "P19_T01_INST": "In \"The Biggest Event\", insert a Continuous section break at the end of the second narrative paragraph, after \"and I was very proud to beconsidered one of them\" (after the pending tracked period, if still displayed). Keep the original wording; do not add punctuation.",
-  "P19_T02_TITLE": "Task 2",
-  "P19_T02_INST": "In \"The Biggest Event\", format only the two narrative paragraphs beginning \"In the spring of 2016...\" and \"The night of the George Wicken...\" into three columns. Include the existing Drop Cap I; exclude the section heading and \"My Recent Favourite\". Preserve other content and one-column sections. To retain the Drop Cap, complete T01 first, place the cursor in a narrative paragraph and choose Layout > Columns > Three for that bounded section.",
   "P19_T03_TITLE": "Task 3",
   "P19_T03_INST": "In the document header, apply the Fill: Aqua, Accent 1; Shadow text effect to the text.",
   "P19_T04_TITLE": "Task 4",

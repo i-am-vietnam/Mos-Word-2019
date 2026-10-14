@@ -406,7 +406,14 @@ namespace MosWord2019.Core.Services
                 package.Xml("word/document.xml").Root.Name == W + "document";
             var text = MainParagraphs(package).Select(ParagraphText).ToList();
             match &= RequiredStrings(task, "identityParagraphs").All(p => text.Count(t => t == p) == 1);
-            match &= FindPictureDrawing(package, RequiredStrings(task, "targetImageSha256s")) != null;
+            if (OptionalBool(task, "allowPictureFreeIdentity", false))
+            {
+                // A declared picture-free identity still requires the strict Save As provenance,
+                // template content type and unchanged semantic anchors checked above.
+                match &= !package.Xml("word/document.xml").Descendants(A + "blip").Any() &&
+                    !package.EntryNames.Any(n => n.StartsWith("word/media/", StringComparison.OrdinalIgnoreCase));
+            }
+            else match &= FindPictureDrawing(package, RequiredStrings(task, "targetImageSha256s")) != null;
             detail = match ? "The current working document was saved as the correct modern, nonmacro template at Word's default template location."
                 : "The template name/location/type/content or current-attempt provenance is incorrect.";
             return match;
