@@ -28,7 +28,10 @@ namespace MosWord2019.Core.Services
                 {
                     var b = borders.Element(W + edge);
                     return b != null && (string)b.Attribute(W + "val") == style && Twips(b, "sz", -1) == size &&
-                        (!task.Extra.ContainsKey("expectedThemeColor") || (string)b.Attribute(W + "themeColor") == (string)task.Extra["expectedThemeColor"]) &&
+                        (!task.Extra.ContainsKey("expectedThemeColor") || (string)b.Attribute(W + "themeColor") == (string)task.Extra["expectedThemeColor"] ||
+                            (OptionalBool(task, "allowOmittedThemeColor", false) && b.Attribute(W + "themeColor") == null &&
+                             ResolveColor(package, new XElement(W + "color", new XAttribute(W + "themeColor", RequiredString(task, "expectedThemeColor"))),
+                                "val", "themeColor", "themeTint", "themeShade") == color.ToUpperInvariant())) &&
                         !new[] { "1", "true", "on" }.Contains((string)b.Attribute(W + "shadow")) &&
                         !new[] { "1", "true", "on" }.Contains((string)b.Attribute(W + "frame")) &&
                         ResolveColor(package, b, "color", "themeColor", "themeTint", "themeShade") == color.ToUpperInvariant();

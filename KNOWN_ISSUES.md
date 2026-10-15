@@ -1,10 +1,17 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-13.
+Reviewed: 2026-10-14.
 
-## Current product checkpoint
+## Project 21 verified limitations
 
-P20 has eleven implemented tasks and native API saved/reopened combined11/11 answers, including template first/last. P19 now has exactly T01/T03/T04/T05/T06 and a fresh one-column5/5 answer; historical six-task evidence is superseded. No live P19 workflow requires three columns. Current verification is in artifacts/p20/REPORT.md and PROJECT_STATUS.md.
+- **T07 checker reproducibility:** the untouched starter's native checker on this host reports missing Alt Text(3), non-inline objects(2) and hard-to-read contrast(4), but no table recommendation. The user explicitly authorized Header Row for Name/Name and requested this limitation be recorded. The grader tests that saved result, not whether a panel was opened or which action was clicked. Do not relabel the user decision as an observed first recommendation. Geologic already had first-row header semantics.
+- **Color caption discrepancy:** the reference says Dark Blue, Accent1; the actual supplied theme/palette names accent1 Blue (4F81BD). Dark Blue/Text2 is1F497D. P21 EN/VI and metadata use the observed Accent1; no P06 override was borrowed.
+- **GUI coverage:** native Ribbon/dialog samples and representative production F5 checks are recorded separately in `artifacts/p21/REPORT.md`. Full twelve-task manual GUI completion remains unverified. Existing earlier-project GUI gaps and P17 current-starter FAIL/historical Square PASS remain unchanged.
+- **Native API fixture persistence:** ListLevelNumber can change in-memory XML while Word still reports Saved=true. The P21 fixture explicitly dirties then saves/reopens/resaves; a separate Ribbon Level3 sample verifies the real saved state. Do not change production Save logic based on this API-only fixture behavior.
+
+## Previous checkpoint — Project 20
+
+P20 has eleven implemented tasks and native API saved/reopened combined11/11 answers, including template first/last. P19 has exactly T01/T03/T04/T05/T06 and a fresh one-column5/5 answer; historical six-task evidence is superseded. No live P19 workflow requires three columns. Project20 verification is in artifacts/p20/REPORT.md; the current checkpoint is at the top of PROJECT_STATUS.md.
 
 - **Confirmed wording discrepancy:** the supplied P20 guide says $3000, but the original Saving Accounts comment Do you know this price actually covers $300 followed by a space. T07 EN/VI now name $300; the duplicate Event Packages narrative and fee-table $300 are not the target. The original starter was not changed.
 - **Existing template-name overlap:** P20-only exit preserves Notes.dotx. Visiting P07 in the same session registers its pre-existing exact Notes.dotx cleanup, which deletes that path on normal exit even if subsequently created in P20. EN/VI integration confirms both behaviors. No output deletion or settings change was added for P20. Tests protect pre-existing files and archive only their own templates.

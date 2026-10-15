@@ -1,8 +1,24 @@
 # Project Status
 
-Verified: 2026-10-13. Earlier phase evidence below retains its historical dates.
+## Current checkpoint — Project 21, 2026-10-14
 
-## Current follow-up: P20 T04 native-dialog false negative — 2026-10-13
+Started from clean `main` HEAD `7a44ed220391fd9d922e46d60e64aceb1545abfd` ("Bo sung project 21"), parent `df88582ac9dd82fe41b0f82fc834108c87ff7754`, with the expected Word origin. P20, its native T04 fix and P19's five-task inventory are committed in this starting state; older statements about uncommitted implementations below are historical.
+
+P21 now implements exactly **T01–T12**, with complete EN/VI keys and real OOXML assertions. Existing meta/starter/five build-copy entries are reused. Confirmed locator corrections name the final two contact paragraphs, the unique event paragraph and the four Manufacturing narratives. The native Office palette calls Accent 1 **Blue** (`4F81BD`), distinct from Dark Blue/Text 2 (`1F497D`); both languages now use the observed Accent 1 caption.
+
+**T07 decision:** native Accessibility Checker on this host reports missing Alt Text, non-inline objects and contrast, but no table issue or first table recommendation. The user explicitly chose: "Bật Header Row cho bảng Name/Name; ghi rõ giới hạn checker hiện tại". T07 therefore grades the Name/Name table's native first-row header semantics, preserving its cells and unrelated picture/table/diagram accessibility state. It allows T09's Process flow description and T11's legitimate Geologic row order. This is an explicit task clarification, not a claim that the missing recommendation was observed.
+
+Four Core partial files add metadata opt-ins for semantic section targets, preserved outside column blocks, effective full-paragraph Format Painter, protected accessibility/content, native RGB border equivalence, header paragraph boundaries and list order. All 61 assertion identifiers/defaults, pure-package grading, MainForm/Interop/lifecycle/framework and P01–P20 packages remain unchanged. P19 retains T01/T03/T04/T05/T06; P20 T04 retains `allowOmittedTableLayout`.
+
+The native saved/reopened combined answer passes **12/12**. Final P21 matrix passes91/91, synthetic checks40/40 and separately labeled generic tied-key sort checks2/2. Actual production-package MainForm/owned Word EN/VI integration passes175/175, including all twelve selected-task results, same grading PID, fresh Go/switch/relaunch, Restart No/Yes, manual closure, P19 five/P20 eleven tabs, P20 native T04 and P16 eight owned-TXT tasks per language. An unrelated unsaved Word sentinel is preserved and all test-owned processes close. Approved older-answer/context regressions pass158/158; focused47/47, family41/41, affected73/73 and supplemental28/28 also pass (347 total).
+
+Computer Use production F5 verifies EN T01 Incorrect and native Header Row T07 Correct; a fresh VI session verifies T07 Sai→Đúng and native Paragraph > Exactly14pt T02 Đúng. Separate native Ribbon/dialog samples pass T01/T04/T06/T10/T12. API, synthetic XML and manual GUI results are labeled separately in `artifacts/p21/REPORT.md`; full twelve-task manual GUI completion remains a verification gap.
+
+Final Debug/Release Any CPU Rebuild each has0 errors/0 warnings. Source and both outputs validate EN/VI with0 errors/0 warnings, deterministic Project1–21 discovery and P19=5/P20=11/P21=12. All111 package files match both outputs; all21 starter hashes are unchanged. Independent original P21 and tracked starter remain byte-identical SHA-256 `1AE19CF59A753E58BA673D54AC314971B28935418CA18E784B5B4865A54D066C`, Git blob `f6d25eaecd0b3f20ba68f2a9aac1cd5c218e14de`. Normal F5 shutdown restores the same starter bytes; final Word/Trainer process and test-lock inventories are empty. Diff checks pass. AGENTS.md is unchanged because no project-wide rule changed. No commit/push/pull/reset or Excel work was performed.
+
+Verified: 2026-10-14. Earlier phase evidence below retains its historical dates.
+
+## Historical follow-up: P20 T04 native-dialog false negative — 2026-10-13
 
 Reproduced the user's reported Incorrect in production F5 after selecting only Card/Stop payment/Domestic/Transfer,2 columns,Tabs and the unchanged Fixed column width: Auto default. The native GUI answer has the correct4x2 cells, location and protected prose but omits tblLayout. Earlier API conversion serialized fixed explicitly; requiring that marker caused the false negative.
 

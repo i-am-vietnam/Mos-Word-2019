@@ -110,6 +110,8 @@ namespace MosWord2019.Core.Services
             var expected = RequiredStrings(task, "targetParagraphs");
             var document = package.Xml("word/document.xml");
             var paragraphs = document.Root.Element(W + "body").Elements(W + "p").ToList();
+            if (task.Extra.ContainsKey("sectionStartText"))
+                paragraphs = (DeclaredBodySection(document, task) ?? new List<XElement>()).Where(p => p.Name == W + "p").ToList();
             var alternatives = task.Extra.ContainsKey("paragraphTextAlternatives") ? task.Extra["paragraphTextAlternatives"] as JObject : new JObject();
             if (alternatives == null || alternatives.Properties().Any(p => !(p.Value is JArray) || ((JArray)p.Value).Any(v => v.Type != JTokenType.String)))
                 throw new InvalidDataException("Invalid column paragraph alternatives.");
@@ -128,7 +130,7 @@ namespace MosWord2019.Core.Services
                     var section = containing[0];
                     match = section.Content.Where(p => p.Name == W + "p" && ParagraphTextOutsideTextBoxes(p).Length > 0).SequenceEqual(selected) &&
                         ColumnCount(section.Properties) == RequiredInt(task, "expectedColumns") &&
-                        sections.Where(s => s != section).All(s => ColumnCount(s.Properties) == 1);
+                        OutsideColumnSectionsMatch(sections.Where(s => s != section).ToList(), task);
                     if (OptionalBool(task, "checkColumnSpacing", true))
                         match &= Twips(section.Properties.Element(W + "cols"), "space", -1) == RequiredInt(task, "expectedColumnSpacingTwips");
                     if (task.Extra.ContainsKey("preservedDropCap"))
@@ -143,7 +145,7 @@ namespace MosWord2019.Core.Services
                 }
             }
             match &= CheckPreservedStoryObjects(package, task);
-            detail = match ? "Exactly the declared main-story paragraphs, including their Drop Cap, occupy the requested columns; surrounding sections remain single-column."
+            detail = match ? "Exactly the declared main-story paragraphs occupy the requested columns; surrounding sections retain their declared layout."
                 : "The narrative, Drop Cap, column scope/count/spacing or protected story content is incorrect.";
             return match;
         }
@@ -161,7 +163,8 @@ namespace MosWord2019.Core.Services
                 var generated = GeneratedTocParagraphs(body);
                 var actual = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() &&
                     !p.Ancestors(W + "txbxContent").Any() && !generated.Contains(p))
-                    .Select(ParagraphTextOutsideTextBoxes).Where(t => t.Length > 0).ToList();
+                    .Select(p => OptionalBool(task, "ignoreCitationsInPreservedText", false)
+                        ? ParagraphTextOutsideCitations(p) : ParagraphTextOutsideTextBoxes(p)).Where(t => t.Length > 0).ToList();
                 match &= actual.Count == declared.Count && actual.Select((text, i) => i < declared.Count &&
                     (declared[i].Type == JTokenType.String ? text == (string)declared[i] : ((JArray)declared[i]).Values<string>().Contains(text))).All(v => v);
             }
@@ -186,7 +189,7 @@ namespace MosWord2019.Core.Services
                     .Select(StoryParagraphText).Where(t => t.Length > 0).Distinct().ToList();
                 match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
             }
-            return match;
+            return match && CheckDeclaredObjectPreservation(package, task);
         }
 
         private static bool IsBlankTableBoundary(XElement element)

@@ -1,8 +1,22 @@
 # Technical Context
 
+## Project 21 semantic and preservation opt-ins
+
+Current discovery is Project1–21, P21=12 tasks, P19=5 stable IDs and P20=11. MainForm.GradeCurrentTask → save the owned Word document → WordGradingService.CheckTask remains unchanged. The grader remains pure OOXML with 61 assertion identifiers and no ProjectId/TaskId dispatch.
+
+`ParagraphBlockColumns/useMainStoryText` and effective `ContinuedNumberingSequence` can use `DeclaredBodySection` with semantic text boundaries. Declared boundary kinds are filtered before uniqueness checks, so Geologic's table-cell paragraph does not duplicate its body heading. `preservedColumnBlocks` permits only declared outside paragraph blocks/count/spacing; without it, all outside sections still must be single-column. P21 keeps Top Sellers's native two columns at708 twips while only the four Manufacturing narratives use two columns at432 twips. Its landscape anchor remains inside Save time; no picture relocation or section-count constant is imposed.
+
+`ParagraphFormattingMatches/compareEffectiveFormatting` scopes exact source/destination texts and checks the verified source as well as the destination. It resolves document defaults, paragraph/character styles, theme fonts, effective visual runs, paragraph formatting and paragraph-mark formatting. Explicit black/zero indent/default spacing are normalized; proofing properties are not visual formatting. P03's alignment/character-style default remains unchanged. P21's native full-paragraph result is Calibri12pt, inherited black, left, inherited after200/line276/auto; neither green nor italic may remain.
+
+Optional preservation metadata includes ordered body text ignoring only citation results; table row variants/look masks/repeat-header state/style ID/direct cell colors; picture hashes/Alt Text/wrap; relationship-resolved diagram layout, text and logical tree; contact run appearance/hyperlink; symbol trailing breaks; table-header paragraph boundaries; and list item order. Table color guards follow semantic cell text through permitted row sorting and tolerate run splitting. P21's SmartArt is hierarchy2 with empty logical labels; do not invent node text. Allowed diagram descriptions include the original empty value and independently authorized Process flow. Geologic/Period remain separate header paragraphs. Symbol225 natively resaves as Webdings U+00E1; only its exact font/code/offset and complete original Depinning sentence pass.
+
+`DocumentPageBorder/allowOmittedThemeColor` accepts native explicit RGB only when it matches both the required color and the required theme slot; an explicitly wrong theme slot still fails. The option defaults false. P21 uses accent1=4F81BD, single24 eighth-points on all four edges/all sections/all pages. P06's approved color contract is unchanged.
+
+Native T12 API evidence requires `Document.Saved=false` before saving: this host's ListLevelNumber setter changed in-memory XML without marking the document dirty. This is a fixture limitation; no production save behavior was changed. A separate native Ribbon Level3 sample saved correctly and passed. T07's Header Row contract follows the user's explicit clarification because this host's checker did not expose a table recommendation. Evidence/rerun details: `artifacts/p21/REPORT.md`.
+
 ## Project 20 semantic opt-ins and current P19 inventory
 
-Current source discovery is Project1-20; P19 has five stable IDs T01/T03/T04/T05/T06 and P20 has eleven. The removed P19 column task is not required by any live flow. The earlier P19 six-task subsection below documents historical implementations; its generic helpers remain available to other projects. MainForm.GradeCurrentTask → owned Word Save → PreserveSaveAsWork → WordGradingService.CheckTask is unchanged; grading remains pure OOXML with61 assertion identifiers and no project/task-ID routing.
+At the Project20 checkpoint, discovery was Project1-20; P19 has five stable IDs T01/T03/T04/T05/T06 and P20 has eleven. The removed P19 column task is not required by any live flow. The earlier P19 six-task subsection below documents historical implementations; its generic helpers remain available to other projects. MainForm.GradeCurrentTask → owned Word Save → PreserveSaveAsWork → WordGradingService.CheckTask is unchanged; grading remains pure OOXML with61 assertion identifiers and no project/task-ID routing.
 
 SavedWordTemplate opts into allowPictureFreeIdentity. It retains exact Notes.dotx/default folder/current Save As provenance, modern nonmacro template content type/officeDocument relationship and unique identityParagraphs. The opt-in requires absence of document blips/media; old targetImageSha256s/FindPictureDrawing behavior remains the default. A renamed legacy compound file returns Fail under this opt-in. DefaultTemplateFolder comes from the already-owned Word instance; native Save As selected Custom Office Templates on this host. PreserveSavedWorkingCopy changes only its internal DOCX content type, never the learner's DOTX. P20 adds no cleanup registration; existing P07 Notes cleanup can still apply if P07 was visited in the session.
 
@@ -357,7 +371,7 @@ P01 assertion identifiers are DocumentStyleSet, BulletedList, Footnote, HeaderDi
 
 ## Phase 5 grading architecture
 
-`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` currently recognizes 60 implemented identifiers; production P06 DocumentPageBorder has confirmed color metadata.
+`WordGradingService` is a pure Core service. It copies a saved Word package into memory through a read-only FileStream with FileShare.ReadWrite/Delete, releases the source handle, and grades OOXML parts from the snapshot. It never creates or attaches to Word. `TaskGradeOutcome` separates Pass, Fail and Error so corrupt packages, missing metadata and unsupported assertions cannot appear as learner failures. `IsAssertionTypeSupported` recognizes 61 implemented identifiers at the current P21 checkpoint; production P06 DocumentPageBorder has confirmed color metadata.
 
 ## Phase 6 P02 grading architecture
 

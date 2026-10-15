@@ -390,6 +390,9 @@ namespace MosWord2019.Core.Services
             bool match = symbols.Count == 1 && symbols[0].Item1 == expectedOffset &&
                 string.Equals(symbols[0].Item2, font, StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(symbols[0].Item3, expectedChar, StringComparison.OrdinalIgnoreCase);
+            match &= CheckPreservedStoryObjects(package, task);
+            if (task.Extra.ContainsKey("expectedTrailingBreakCount"))
+                match &= paragraphs[0].Descendants(W + "br").Count() == RequiredInt(task, "expectedTrailingBreakCount");
             detail = match ? "The required Word symbol is immediately " + placement + " the unchanged reference text."
                 : "The required symbol is missing, incorrect, or in the wrong position.";
             return match;
@@ -777,6 +780,8 @@ namespace MosWord2019.Core.Services
                 if (Twips(spacing, "line", -1) != line || (string)spacing?.Attribute(W + "lineRule") != rule ||
                     !NullableTwipsEquals(spacing, "before", before, i) || !NullableTwipsEquals(spacing, "after", after, i))
                 { detail = "One or more target paragraphs do not use the exact verified spacing without changing before/after spacing."; return false; }
+                if (!CheckLineSpacingAppearance(package, matches[0], task))
+                { detail = "The target paragraph's original appearance or hyperlink was changed."; return false; }
             }
             detail = "All target paragraphs use the declared exact line spacing with their original before/after spacing.";
             return true;
@@ -816,9 +821,9 @@ namespace MosWord2019.Core.Services
             bool explicitValueOn = explicitValue == null ? flagValue : explicitValue == "1" ||
                 string.Equals(explicitValue, "true", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(explicitValue, "on", StringComparison.OrdinalIgnoreCase);
-            bool match = explicitValueOn && flagValue;
+            bool match = explicitValueOn && flagValue && CheckPreservedStoryObjects(package, task);
             detail = match ? "The target table designates its first row as the accessibility header row."
-                : "The target table does not designate its first row as the accessibility header row.";
+                : "The target header row or protected accessibility/content properties differ.";
             return match;
         }
 
@@ -828,6 +833,13 @@ namespace MosWord2019.Core.Services
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             List<XElement> tables = FindTablesByHeader(package.Xml("word/document.xml"), header);
             bool match = tables.Count == 1 && TableRowsEqual(tables[0], expectedRows);
+            if (match && task.Extra.ContainsKey("expectedHeaderCellParagraphs"))
+            {
+                var expected = RequiredArray(task, "expectedHeaderCellParagraphs");
+                var cells = tables[0].Elements(W + "tr").First().Elements(W + "tc").ToList();
+                match = cells.Count == expected.Count && cells.Select((cell, i) =>
+                    cell.Elements(W + "p").Select(StoryParagraphText).SequenceEqual(((JArray)expected[i]).Values<string>())).All(v => v);
+            }
             detail = match ? "The target table has the exact required row order and unchanged content."
                 : "The target table row order or content is incorrect.";
             return match;
@@ -840,6 +852,7 @@ namespace MosWord2019.Core.Services
             XDocument document = package.Xml("word/document.xml");
             var numberIds = new HashSet<string>(StringComparer.Ordinal);
             bool targetSeen = false;
+            XElement previous = null;
             foreach (JToken token in expectations)
             {
                 JObject expectation = token as JObject;
@@ -851,6 +864,9 @@ namespace MosWord2019.Core.Services
                 List<XElement> matches = document.Descendants(W + "body").Descendants(W + "p")
                     .Where(paragraph => ParagraphText(paragraph) == text).ToList();
                 if (matches.Count != 1) { detail = "A required list paragraph is missing or changed."; return false; }
+                if (OptionalBool(task, "requireParagraphOrder", false) && previous != null && XNode.CompareDocumentOrder(previous, matches[0]) >= 0)
+                { detail = "The list item order was changed."; return false; }
+                previous = matches[0];
                 XElement numbering = EffectiveNumberProperties(package, matches[0]);
                 int actualLevel = Twips(numbering?.Element(W + "ilvl"), "val", -1) + 1;
                 string numberId = (string)numbering?.Element(W + "numId")?.Attribute(W + "val");
@@ -978,8 +994,10 @@ namespace MosWord2019.Core.Services
             string expectedLevelText = RequiredString(task, "expectedLevelText");
             XDocument document = package.Xml("word/document.xml");
             List<XElement> bodyParagraphs = document.Root?.Element(W + "body")?.Descendants(W + "p").ToList() ?? new List<XElement>();
+            if (task.Extra.ContainsKey("sectionStartText"))
+                bodyParagraphs = (DeclaredBodySection(document, task) ?? new List<XElement>()).Where(p => p.Name == W + "p").ToList();
             if (OptionalBool(task, "verifyEffectiveSequence", false))
-                return CheckEffectiveContinuedSequence(package, task, bodyParagraphs, expectedText, out detail);
+                return CheckEffectiveContinuedSequence(package, task, bodyParagraphs, expectedText, out detail) && CheckPreservedStoryObjects(package, task);
             var targetSet = new HashSet<string>(expectedText, StringComparer.Ordinal);
             List<XElement> targets = bodyParagraphs.Where(paragraph => targetSet.Contains(ParagraphText(paragraph))).ToList();
             if (targets.Count != expectedText.Length || !targets.Select(ParagraphText).SequenceEqual(expectedText) ||
@@ -1391,6 +1409,7 @@ namespace MosWord2019.Core.Services
             XElement properties = smartArts[0].Container.Element(Wp + "docPr");
             bool match = string.Equals((string)properties?.Attribute("descr"), expected, StringComparison.Ordinal) &&
                 string.IsNullOrEmpty((string)properties?.Attribute("title"));
+            match &= CheckDeclaredDiagramPreservation(package, smartArts[0], task);
             detail = match ? "The entire target SmartArt has the exact requested alt-text description."
                 : "The requested description is missing, differs, or was placed in the title field.";
             return match;
@@ -1410,6 +1429,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckParagraphFormatting(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "compareEffectiveFormatting", false))
+                return CheckScopedEffectiveParagraphFormatting(package, task, out detail);
             string sourceText = RequiredString(task, "sourceParagraph");
             string destinationText = RequiredString(task, "destinationParagraph");
             string alignment = RequiredString(task, "expectedAlignment");

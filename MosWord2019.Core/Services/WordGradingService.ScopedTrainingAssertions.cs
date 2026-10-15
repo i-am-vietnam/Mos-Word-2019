@@ -10,6 +10,181 @@ namespace MosWord2019.Core.Services
 {
     public sealed partial class WordGradingService
     {
+        private static bool OutsideColumnSectionsMatch(List<DocumentSection> sections, TaskDefinition task)
+        {
+            if (!task.Extra.ContainsKey("preservedColumnBlocks")) return sections.All(s => ColumnCount(s.Properties) == 1);
+            var declared = RequiredArray(task, "preservedColumnBlocks").Cast<JObject>().ToList();
+            var seen = new HashSet<JObject>();
+            foreach (var section in sections)
+            {
+                var text = section.Content.Where(p => p.Name == W + "p").Select(ParagraphTextOutsideTextBoxes).Where(t => t.Length > 0);
+                var matches = declared.Where(block => text.SequenceEqual(((JArray)block["paragraphs"]).Values<string>())).ToList();
+                if (matches.Count == 0) { if (ColumnCount(section.Properties) != 1) return false; }
+                else if (matches.Count != 1 || !seen.Add(matches[0]) || ColumnCount(section.Properties) != (int)matches[0]["columns"] ||
+                    Twips(section.Properties.Element(W + "cols"), "space", -1) != (int)matches[0]["spacingTwips"]) return false;
+            }
+            return seen.Count == declared.Count;
+        }
+
+        private static bool CheckDeclaredDiagramPreservation(PackageSnapshot package, SmartArtReference diagram, TaskDefinition task)
+        {
+            if (!task.Extra.ContainsKey("preservedDiagram")) return true;
+            var expected = task.Extra["preservedDiagram"] as JObject;
+            if (expected == null) throw new InvalidDataException("Invalid preserved diagram metadata.");
+            var ids = diagram.Container.Descendants(Dgm + "relIds").FirstOrDefault();
+            string layout = package.RelatedPart("word/document.xml", (string)ids?.Attribute(R + "lo"));
+            var data = package.Xml(diagram.DataPart);
+            return layout != null && (string)package.Xml(layout).Root.Attribute("uniqueId") == (string)expected["layoutId"] &&
+                data.Descendants(A + "t").Select(t => t.Value).SequenceEqual(((JArray)expected["textItems"]).Values<string>()) &&
+                SmartArtLogicalNodesMatch(data, expected["logicalNodes"] as JArray);
+        }
+
+        private static bool CheckDeclaredObjectPreservation(PackageSnapshot package, TaskDefinition task)
+        {
+            if (task.Extra.ContainsKey("protectedTableStates"))
+            {
+                var tables = package.Xml("word/document.xml").Descendants(W + "tbl").ToList();
+                foreach (JObject state in RequiredArray(task, "protectedTableStates"))
+                {
+                    var matches = FindTablesByHeader(package.Xml("word/document.xml"), ((JArray)state["header"]).Values<string>().ToArray());
+                    if (matches.Count != 1 || !((JArray)state["rowVariants"]).Cast<JArray>().Any(rows =>
+                        TableRowsEqual(matches[0], rows.Select(r => ((JArray)r).Values<string>().ToArray()).ToArray()))) return false;
+                    var look = matches[0].Element(W + "tblPr")?.Element(W + "tblLook");
+                    if (state["tableStyleId"] != null && (string)matches[0].Element(W + "tblPr")?.Element(W + "tblStyle")?.Attribute(W + "val") != (string)state["tableStyleId"]) return false;
+                    if (state["cellColors"] is JObject)
+                        foreach (var cell in matches[0].Descendants(W + "tc"))
+                        {
+                            var allowed = ((JObject)state["cellColors"])[VisibleText(cell).TrimEnd()] as JArray;
+                            if (allowed == null || cell.Descendants(W + "r").Where(r => r.Descendants(W + "t").Any(t => t.Value.Length > 0)).Any(r =>
+                                !allowed.Values<string>().Contains(string.Join(";", (r.Element(W + "rPr")?.Element(W + "color")?.Attributes() ?? Enumerable.Empty<XAttribute>())
+                                    .OrderBy(a => a.Name.LocalName).Select(a => a.Name.LocalName + "=" + a.Value))))) return false;
+                        }
+                    if (state["lookAttributes"] is JObject && ((JObject)state["lookAttributes"]).Properties().Any(p =>
+                        (string)look?.Attribute(W + p.Name) != (string)p.Value)) return false;
+                    if (state["lookMask"] != null)
+                    {
+                        int flags;
+                        if (look == null || !int.TryParse((string)look.Attribute(W + "val"), System.Globalization.NumberStyles.HexNumber,
+                            System.Globalization.CultureInfo.InvariantCulture, out flags) || (flags & (int)state["lookMask"]) != (int)state["lookFlags"]) return false;
+                    }
+                    if (state["headerRowRepeat"] != null && matches[0].Elements(W + "tr").Any(row =>
+                        IsOn(row.Element(W + "trPr")?.Element(W + "tblHeader")) != (bool)state["headerRowRepeat"])) return false;
+                }
+                if (task.Extra.ContainsKey("expectedTableCount") && tables.Count != RequiredInt(task, "expectedTableCount")) return false;
+            }
+            if (task.Extra.ContainsKey("protectedPictureAccessibility"))
+                foreach (JObject expected in RequiredArray(task, "protectedPictureAccessibility"))
+                {
+                    var picture = FindPictureDrawing(package, new[] { (string)expected["sha256"] });
+                    var container = picture?.Descendants().FirstOrDefault(e => e.Name == Wp + "anchor" || e.Name == Wp + "inline");
+                    var properties = container?.Element(Wp + "docPr");
+                    if (properties == null || ((string)properties.Attribute("descr") ?? "") != (string)expected["description"] ||
+                        ((string)properties.Attribute("title") ?? "") != (string)expected["title"] ||
+                        (expected["wrap"] != null && !container.Elements().Any(e => e.Name.LocalName == (string)expected["wrap"]))) return false;
+                }
+            if (task.Extra.ContainsKey("preservedDiagram"))
+            {
+                var diagrams = AllSmartArts(package);
+                if (diagrams.Count != 1 || !CheckDeclaredDiagramPreservation(package, diagrams[0], task)) return false;
+                if (task.Extra.ContainsKey("allowedDiagramDescriptions"))
+                {
+                    var properties = diagrams[0].Container.Element(Wp + "docPr");
+                    var allowed = RequiredArray(task, "allowedDiagramDescriptions");
+                    if (allowed.Any(v => v.Type != JTokenType.String)) throw new InvalidDataException("Invalid allowed diagram descriptions.");
+                    if (!allowed.Values<string>().Contains((string)properties?.Attribute("descr") ?? "") ||
+                        !string.IsNullOrEmpty((string)properties?.Attribute("title"))) return false;
+                }
+            }
+            return true;
+        }
+
+        private static Dictionary<string, string> EffectiveParagraphFormatting(PackageSnapshot package, XElement paragraph)
+        {
+            var styles = package.Xml("word/styles.xml").Root;
+            var effective = new XElement(W + "pPr");
+            var sources = new[] { styles.Element(W + "docDefaults")?.Element(W + "pPrDefault")?.Element(W + "pPr") }
+                .Concat(StyleChain(styles, (string)paragraph.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val") ?? "Normal").Select(s => s.Element(W + "pPr")))
+                .Concat(new[] { paragraph.Element(W + "pPr") });
+            foreach (var source in sources.Where(s => s != null))
+                foreach (var element in source.Elements().Where(e => !new[] { "pStyle", "rPr", "sectPr", "pPrChange" }.Contains(e.Name.LocalName)))
+                {
+                    var current = effective.Element(element.Name);
+                    if (current == null) effective.Add(new XElement(element));
+                    else if (new[] { "spacing", "ind" }.Contains(element.Name.LocalName))
+                        foreach (var attribute in element.Attributes()) current.SetAttributeValue(attribute.Name, attribute.Value);
+                    else { current.ReplaceWith(new XElement(element)); }
+                }
+            if (effective.Element(W + "jc") == null) effective.Add(new XElement(W + "jc", new XAttribute(W + "val", "left")));
+            // Explicit native zero/default values and inherited defaults have the same visual effect.
+            foreach (var spacing in effective.Elements(W + "spacing"))
+                foreach (var attribute in spacing.Attributes().Where(a =>
+                    new[] { "before", "beforeAutospacing", "afterAutospacing" }.Contains(a.Name.LocalName) &&
+                    new[] { "0", "false", "off" }.Contains(a.Value)).ToList()) attribute.Remove();
+            foreach (var indent in effective.Elements(W + "ind").Where(e => e.Attributes().All(a => a.Value == "0")).ToList()) indent.Remove();
+            return effective.Elements().ToDictionary(e => e.Name.LocalName, e => string.Join(";", e.Attributes().Where(a => a.Name.Namespace == W)
+                .OrderBy(a => a.Name.LocalName).Select(a => a.Name.LocalName + "=" + a.Value)), StringComparer.Ordinal);
+        }
+
+        private static bool CheckScopedEffectiveParagraphFormatting(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            detail = "The scoped source/destination text or complete effective formatting differs.";
+            var section = DeclaredBodySection(package.Xml("word/document.xml"), task);
+            if (section == null) return false;
+            var source = section.Where(p => p.Name == W + "p" && StoryParagraphText(p) == RequiredString(task, "sourceParagraph")).ToList();
+            var destination = section.Where(p => p.Name == W + "p" && StoryParagraphText(p) == RequiredString(task, "destinationParagraph")).ToList();
+            if (source.Count != 1 || destination.Count != 1 || section.IndexOf(source[0]) >= section.IndexOf(destination[0])) return false;
+            var expectedRun = task.Extra["expectedRunFormatting"] as JObject;
+            var expectedParagraph = task.Extra["expectedParagraphFormatting"] as JObject;
+            if (expectedRun == null || expectedParagraph == null) throw new InvalidDataException("Missing effective Format Painter metadata.");
+            Func<Dictionary<string, string>, JObject, bool> equals = (actual, expected) => actual.Count == expected.Count &&
+                expected.Properties().All(p => actual.ContainsKey(p.Name) && actual[p.Name] == (string)p.Value);
+            Func<XElement, XElement, Dictionary<string, string>> runFormatting = (paragraph, run) =>
+            {
+                var actual = EffectiveRunFormatting(package, paragraph, run);
+                if (!actual.ContainsKey("color")) actual["color"] = "000000";
+                return actual;
+            };
+            foreach (var paragraph in new[] { source[0], destination[0] })
+            {
+                if (!equals(EffectiveParagraphFormatting(package, paragraph), expectedParagraph)) return false;
+                var runs = paragraph.Descendants(W + "r").Where(r => r.Descendants(W + "t").Any(t => t.Value.Length > 0)).ToList();
+                if (runs.Count == 0 || runs.Any(r => !equals(runFormatting(paragraph, r), expectedRun))) return false;
+                var mark = new XElement(W + "r", paragraph.Element(W + "pPr")?.Element(W + "rPr") == null ? null :
+                    new XElement(paragraph.Element(W + "pPr").Element(W + "rPr")));
+                if (!equals(runFormatting(paragraph, mark), expectedRun)) return false;
+            }
+            detail = "Both unchanged scoped paragraphs retain the verified effective run, paragraph and paragraph-mark formatting.";
+            return true;
+        }
+
+        private static bool CheckLineSpacingAppearance(PackageSnapshot package, XElement paragraph, TaskDefinition task)
+        {
+            if (!task.Extra.ContainsKey("expectedParagraphAppearance")) return true;
+            var declared = task.Extra["expectedParagraphAppearance"] as JObject;
+            var expected = declared?[StoryParagraphText(paragraph)] as JObject;
+            if (expected == null) throw new InvalidDataException("Missing protected paragraph appearance.");
+            var formatting = EffectiveParagraphFormatting(package, paragraph);
+            if (!formatting.ContainsKey("jc") || formatting["jc"] != "val=" + (string)expected["alignment"]) return false;
+            var requiredRun = expected["runFormatting"] as JObject;
+            if (requiredRun == null) throw new InvalidDataException("Missing protected run appearance.");
+            foreach (var run in paragraph.Descendants(W + "r").Where(r => r.Descendants(W + "t").Any(t => t.Value.Length > 0)))
+            {
+                var actual = EffectiveRunFormatting(package, paragraph, run);
+                if (!actual.ContainsKey("color")) actual["color"] = "000000";
+                if (actual.Count != requiredRun.Count || requiredRun.Properties().Any(p => !actual.ContainsKey(p.Name) || actual[p.Name] != (string)p.Value)) return false;
+            }
+            if (expected["hyperlinkTarget"] != null)
+            {
+                var links = paragraph.Elements(W + "hyperlink").ToList();
+                XNamespace relationships = "http://schemas.openxmlformats.org/package/2006/relationships";
+                var rels = package.Xml("word/_rels/document.xml.rels");
+                if (links.Count != 1 || !rels.Root.Elements(relationships + "Relationship").Any(r =>
+                    (string)r.Attribute("Id") == (string)links[0].Attribute(R + "id") &&
+                    (string)r.Attribute("TargetMode") == "External" && (string)r.Attribute("Target") == (string)expected["hyperlinkTarget"])) return false;
+            }
+            return true;
+        }
+
         // Read each logical story paragraph once: an outer drawing paragraph must
         // not acquire its nested textbox text, and Choice/Fallback are alternatives.
         private static List<XElement> ScopedStoryParagraphs(XDocument document, string scope)
@@ -133,7 +308,6 @@ namespace MosWord2019.Core.Services
                 .Where(p => MatchesDeclaredText(task, key, StoryParagraphText(p))).Select(BodyChild).Distinct().ToList();
             var starts = boundary("sectionStartText");
             var ends = OptionalBool(task, "sectionToDocumentEnd", false) ? new List<XElement>() : boundary("sectionEndText");
-            if (starts.Count != 1 || (!OptionalBool(task, "sectionToDocumentEnd", false) && ends.Count != 1)) return null;
             Func<XElement, string, bool> kind = (element, key) =>
             {
                 if (!task.Extra.ContainsKey(key)) return true;
@@ -142,7 +316,9 @@ namespace MosWord2019.Core.Services
                 return value == "paragraph" ? element.Name == W + "p" : element.Name == W + "tbl" &&
                     element.Elements(W + "tr").Count() == 1 && element.Descendants(W + "tc").Count() == 1;
             };
-            if (!kind(starts[0], "sectionStartKind") || (ends.Count > 0 && !kind(ends[0], "sectionEndKind"))) return null;
+            starts = starts.Where(e => kind(e, "sectionStartKind")).ToList();
+            ends = ends.Where(e => kind(e, "sectionEndKind")).ToList();
+            if (starts.Count != 1 || (!OptionalBool(task, "sectionToDocumentEnd", false) && ends.Count != 1)) return null;
             int first = children.IndexOf(starts[0]), last = ends.Count == 0 ? children.Count : children.IndexOf(ends[0]);
             return first < last ? children.Skip(first + 1).Take(last - first - 1).ToList() : null;
         }

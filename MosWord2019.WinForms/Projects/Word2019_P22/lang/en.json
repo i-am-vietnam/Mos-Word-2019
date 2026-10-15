@@ -1,0 +1,17 @@
+
+{
+  "P22_T01_TITLE": "Task 1",
+  "P22_T01_INST": "At the bottom of page 1, sort the table by the \"Time\" column in Ascending order.",
+  "P22_T02_TITLE": "Task 2",
+  "P22_T02_INST": "Configure the \"Division Types\" table so that the column headings are repeated at the top of the next page.",
+  "P22_T03_TITLE": "Task 3",
+  "P22_T03_INST": "On page 2, convert the tab-delimited text beginning with \"Bruce\" and ending with \"Gotham\" into a table with three columns. Fit the table to the window.",
+  "P22_T04_TITLE": "Task 4",
+  "P22_T04_INST": "On page 2, immediately after the \"Places to Play\" heading, insert a footnote. Cut and paste the text beginning with \"We will be\" and ending with \"locations soon!\" into the footnote.",
+  "P22_T05_TITLE": "Task 5",
+  "P22_T05_INST": "Between the paragraph describing \"Programs\" and the \"Our Motto\" heading, insert a Closed Chevron Process SmartArt graphic. From left to right, enter \"Make friends\", \"Play safe\", and \"Have fun!\".",
+  "P22_T06_TITLE": "Task 6",
+  "P22_T06_INST": "In the document properties, enter \"Clark and Lois\" as the Subject.",
+  "P22_T07_TITLE": "Task 7",
+  "P22_T07_INST": "Display Tab formatting marks in the document. Do not display any other formatting marks."
+}

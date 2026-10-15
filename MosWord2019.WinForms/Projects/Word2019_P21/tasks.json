@@ -1,15 +1,825 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P21_T01_TITLE",
+    "instructionKey": "P21_T01_INST",
+    "assertionType": "DocumentPageBorder",
+    "colorExpectationConfirmed": true,
+    "expectedColor": "4F81BD",
+    "expectedThemeColor": "accent1",
+    "allowOmittedThemeColor": true,
+    "expectedStyle": "single",
+    "expectedSizeEighthPoints": 24
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P21_T02_TITLE",
+    "instructionKey": "P21_T02_INST",
+    "assertionType": "ParagraphLineSpacingExact",
+    "targetParagraphStartsWith": [
+      "Magie’s Travel",
+      "magictravel@sports.com"
+    ],
+    "targetParagraphTexts": [
+      "Magie’s Travel",
+      "magictravel@sports.com"
+    ],
+    "expectedLineTwips": 280,
+    "expectedLineRule": "exact",
+    "expectedBeforeTwips": [
+      null,
+      null
+    ],
+    "expectedAfterTwips": [
+      null,
+      null
+    ],
+    "expectedParagraphAppearance": {
+      "Magie’s Travel": {
+        "alignment": "center",
+        "runFormatting": {
+          "font.ascii": "Calibri",
+          "font.hAnsi": "Calibri",
+          "sz": "val=32",
+          "szCs": "val=32",
+          "color": "000000"
+        }
+      },
+      "magictravel@sports.com": {
+        "alignment": "center",
+        "runFormatting": {
+          "font.ascii": "Calibri",
+          "font.hAnsi": "Calibri",
+          "sz": "val=32",
+          "szCs": "val=32",
+          "color": "0000FF",
+          "u": "single"
+        },
+        "hyperlinkTarget": "mailto:magictravel@sports.com"
+      }
+    }
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P21_T03_TITLE",
+    "instructionKey": "P21_T03_INST",
+    "assertionType": "CharacterStyleAppliedToParagraph",
+    "expectedParagraph": "This event begins at 7pm on January 16",
+    "characterStyleId": "IntenseEmphasis"
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P21_T04_TITLE",
+    "instructionKey": "P21_T04_INST",
+    "assertionType": "ParagraphBlockColumns",
+    "useMainStoryText": true,
+    "targetParagraphs": [
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+      "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+      "Themes and styles also help keep your document coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme.",
+      "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and a button for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign."
+    ],
+    "expectedColumns": 2,
+    "expectedColumnSpacingTwips": 432,
+    "preservedColumnBlocks": [
+      {
+        "paragraphs": [
+          "Liam.",
+          "Noah.",
+          "Oliver.",
+          "Elijah.",
+          "William.",
+          "James."
+        ],
+        "columns": 2,
+        "spacingTwips": 708
+      }
+    ],
+    "sectionStartText": "Manufacturing Process",
+    "sectionEndText": "This event begins at 7pm on January 16",
+    "sectionStartKind": "paragraph",
+    "sectionEndKind": "paragraph",
+    "preservedBodyParagraphs": [
+      "Kids love dinosaurs",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+      "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+      "Top Sellers",
+      "Liam.",
+      "Noah.",
+      "Oliver.",
+      "Elijah.",
+      "William.",
+      "James.",
+      "Geologic",
+      "Depinning",
+      [
+        "The muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the",
+        "áThe muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the",
+        "The muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the"
+      ],
+      "More dinosaur facts",
+      "Velociraptor",
+      "Meaning",
+      "Size",
+      "wieght",
+      "Description",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add.",
+      "You can also type a keyword to search online for the video that best fits your document. To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other.",
+      "Manufacturing Process",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+      "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+      "Themes and styles also help keep your document coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme.",
+      "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and a button for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign.",
+      "This event begins at 7pm on January 16",
+      "Magie’s Travel",
+      "magictravel@sports.com"
+    ],
+    "ignoreCitationsInPreservedText": true,
+    "protectedPictureSha256s": [
+      "A31F09F329B68FF5E9F8F745F55193EB60340687CBDA6D6A938F1EB7F828C3A0",
+      "2D5BE833273005075EF51EB530A5A5816249C01AA1E5E7B5A2EFC1429AA0FE93"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/hierarchy2",
+      "textItems": [],
+      "logicalNodes": [
+        {
+          "text": "",
+          "children": [
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                },
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expectedTableCount": 2,
+    "protectedTableStates": [
+      {
+        "header": [
+          "Dinosaur",
+          "GeologicPeriod"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Dinosaur",
+              "GeologicPeriod"
+            ],
+            [
+              "provides",
+              "help"
+            ],
+            [
+              "video",
+              "search"
+            ],
+            [
+              "keyword",
+              "code"
+            ],
+            [
+              "point",
+              "Online"
+            ]
+          ],
+          [
+            [
+              "Dinosaur",
+              "GeologicPeriod"
+            ],
+            [
+              "keyword",
+              "code"
+            ],
+            [
+              "provides",
+              "help"
+            ],
+            [
+              "point",
+              "Online"
+            ],
+            [
+              "video",
+              "search"
+            ]
+          ]
+        ],
+        "lookAttributes": {
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        },
+        "lookMask": 65535,
+        "lookFlags": 1184,
+        "headerRowRepeat": false,
+        "tableStyleId": "GridTable4-Accent3",
+        "cellColors": {
+          "Dinosaur": [
+            ""
+          ],
+          "GeologicPeriod": [
+            ""
+          ],
+          "provides": [
+            ""
+          ],
+          "help": [
+            ""
+          ],
+          "video": [
+            ""
+          ],
+          "search": [
+            ""
+          ],
+          "keyword": [
+            ""
+          ],
+          "code": [
+            ""
+          ],
+          "point": [
+            ""
+          ],
+          "Online": [
+            ""
+          ]
+        }
+      },
+      {
+        "header": [
+          "Name",
+          "Name"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Name",
+              "Name"
+            ],
+            [
+              "Liam.",
+              "Noah."
+            ],
+            [
+              "Oliver.",
+              "Elijah."
+            ],
+            [
+              "William.",
+              "James."
+            ]
+          ]
+        ],
+        "lookAttributes": {
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        },
+        "lookMask": 65503,
+        "lookFlags": 1152,
+        "headerRowRepeat": false,
+        "tableStyleId": "TableGrid",
+        "cellColors": {
+          "Name": [
+            "val=202124"
+          ],
+          "Liam.": [
+            "val=202124"
+          ],
+          "Noah.": [
+            "val=202124"
+          ],
+          "Oliver.": [
+            "val=202124"
+          ],
+          "Elijah.": [
+            "val=202124"
+          ],
+          "William.": [
+            "val=202124"
+          ],
+          "James.": [
+            "val=202124"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P21_T05_TITLE",
+    "instructionKey": "P21_T05_INST",
+    "assertionType": "SymbolInserted",
+    "anchorText": "The muffin tray will still be hot",
+    "referenceText": "The muffin tray will still be hot",
+    "symbolFont": "Webdings",
+    "symbolCode": 225,
+    "placement": "before",
+    "expectedSentence": "The muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the ",
+    "acceptNativeAnsiSymbolText": true,
+    "expectedTrailingBreakCount": 1,
+    "protectedPictureSha256s": [
+      "A31F09F329B68FF5E9F8F745F55193EB60340687CBDA6D6A938F1EB7F828C3A0",
+      "2D5BE833273005075EF51EB530A5A5816249C01AA1E5E7B5A2EFC1429AA0FE93"
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P21_T06_TITLE",
+    "instructionKey": "P21_T06_INST",
+    "assertionType": "ContinuedNumberingSequence",
+    "expectedParagraphs": [
+      "Liam.",
+      "Noah.",
+      "Oliver.",
+      "Elijah.",
+      "William.",
+      "James."
+    ],
+    "expectedLevel": 0,
+    "expectedNumberFormat": "decimal",
+    "expectedLevelText": "%1.",
+    "verifyEffectiveSequence": true,
+    "requireOnlyTargetNumbering": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "Name",
+          "Name"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Name",
+              "Name"
+            ],
+            [
+              "Liam.",
+              "Noah."
+            ],
+            [
+              "Oliver.",
+              "Elijah."
+            ],
+            [
+              "William.",
+              "James."
+            ]
+          ]
+        ]
+      }
+    ],
+    "sectionStartText": "Top Sellers",
+    "sectionEndText": "Geologic",
+    "sectionStartKind": "paragraph",
+    "sectionEndKind": "paragraph"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P21_T07_TITLE",
+    "instructionKey": "P21_T07_INST",
+    "assertionType": "TableAccessibilityFirstRow",
+    "targetHeaderRow": [
+      "Name",
+      "Name"
+    ],
+    "expectedTableRows": [
+      [
+        "Name",
+        "Name"
+      ],
+      [
+        "Liam.",
+        "Noah."
+      ],
+      [
+        "Oliver.",
+        "Elijah."
+      ],
+      [
+        "William.",
+        "James."
+      ]
+    ],
+    "protectedPictureAccessibility": [
+      {
+        "sha256": "A31F09F329B68FF5E9F8F745F55193EB60340687CBDA6D6A938F1EB7F828C3A0",
+        "description": "",
+        "title": "",
+        "wrap": "wrapSquare"
+      },
+      {
+        "sha256": "2D5BE833273005075EF51EB530A5A5816249C01AA1E5E7B5A2EFC1429AA0FE93",
+        "description": "",
+        "title": "",
+        "wrap": "wrapTopAndBottom"
+      }
+    ],
+    "allowedDiagramDescriptions": [
+      "",
+      "Process flow"
+    ],
+    "preservedBodyParagraphs": [
+      "Kids love dinosaurs",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+      "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+      "Top Sellers",
+      "Liam.",
+      "Noah.",
+      "Oliver.",
+      "Elijah.",
+      "William.",
+      "James.",
+      "Geologic",
+      "Depinning",
+      [
+        "The muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the",
+        "áThe muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the",
+        "The muffin tray will still be hot Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the"
+      ],
+      "More dinosaur facts",
+      "Velociraptor",
+      "Meaning",
+      "Size",
+      "wieght",
+      "Description",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add.",
+      "You can also type a keyword to search online for the video that best fits your document. To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other.",
+      "Manufacturing Process",
+      "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+      "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+      "Themes and styles also help keep your document coordinated. When you click Design and choose a new Theme, the pictures, charts, and SmartArt graphics change to match your new theme. When you apply styles, your headings change to match the new theme.",
+      "Save time in Word with new buttons that show up where you need them. To change the way a picture fits in your document, click it and a button for layout options appears next to it. When you work on a table, click where you want to add a row or a column, and then click the plus sign.",
+      "This event begins at 7pm on January 16",
+      "Magie’s Travel",
+      "magictravel@sports.com"
+    ],
+    "ignoreCitationsInPreservedText": true,
+    "protectedPictureSha256s": [
+      "A31F09F329B68FF5E9F8F745F55193EB60340687CBDA6D6A938F1EB7F828C3A0",
+      "2D5BE833273005075EF51EB530A5A5816249C01AA1E5E7B5A2EFC1429AA0FE93"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/hierarchy2",
+      "textItems": [],
+      "logicalNodes": [
+        {
+          "text": "",
+          "children": [
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                },
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expectedTableCount": 2,
+    "protectedTableStates": [
+      {
+        "header": [
+          "Dinosaur",
+          "GeologicPeriod"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Dinosaur",
+              "GeologicPeriod"
+            ],
+            [
+              "provides",
+              "help"
+            ],
+            [
+              "video",
+              "search"
+            ],
+            [
+              "keyword",
+              "code"
+            ],
+            [
+              "point",
+              "Online"
+            ]
+          ],
+          [
+            [
+              "Dinosaur",
+              "GeologicPeriod"
+            ],
+            [
+              "keyword",
+              "code"
+            ],
+            [
+              "provides",
+              "help"
+            ],
+            [
+              "point",
+              "Online"
+            ],
+            [
+              "video",
+              "search"
+            ]
+          ]
+        ],
+        "lookAttributes": {
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        },
+        "lookMask": 65535,
+        "lookFlags": 1184,
+        "headerRowRepeat": false,
+        "tableStyleId": "GridTable4-Accent3",
+        "cellColors": {
+          "Dinosaur": [
+            ""
+          ],
+          "GeologicPeriod": [
+            ""
+          ],
+          "provides": [
+            ""
+          ],
+          "help": [
+            ""
+          ],
+          "video": [
+            ""
+          ],
+          "search": [
+            ""
+          ],
+          "keyword": [
+            ""
+          ],
+          "code": [
+            ""
+          ],
+          "point": [
+            ""
+          ],
+          "Online": [
+            ""
+          ]
+        }
+      },
+      {
+        "header": [
+          "Name",
+          "Name"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Name",
+              "Name"
+            ],
+            [
+              "Liam.",
+              "Noah."
+            ],
+            [
+              "Oliver.",
+              "Elijah."
+            ],
+            [
+              "William.",
+              "James."
+            ]
+          ]
+        ],
+        "lookAttributes": {
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        },
+        "lookMask": 65503,
+        "lookFlags": 1152,
+        "headerRowRepeat": false,
+        "tableStyleId": "TableGrid",
+        "cellColors": {
+          "Name": [
+            "val=202124"
+          ],
+          "Liam.": [
+            "val=202124"
+          ],
+          "Noah.": [
+            "val=202124"
+          ],
+          "Oliver.": [
+            "val=202124"
+          ],
+          "Elijah.": [
+            "val=202124"
+          ],
+          "William.": [
+            "val=202124"
+          ],
+          "James.": [
+            "val=202124"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "taskId": "T08",
+    "titleKey": "P21_T08_TITLE",
+    "instructionKey": "P21_T08_INST",
+    "assertionType": "CitationPlaceholderAtParagraphEnd",
+    "targetParagraph": "You can also type a keyword to search online for the video that best fits your document. To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other.",
+    "placeholderTag": "Manufacturing1",
+    "expectedFieldCode": "CITATION Manufacturing1 \\l 1033",
+    "requirePlaceholderOnlySource": true
+  },
+  {
+    "taskId": "T09",
+    "titleKey": "P21_T09_TITLE",
+    "instructionKey": "P21_T09_INST",
+    "assertionType": "SmartArtAltTextDescriptionEquals",
+    "sectionHeading": "Manufacturing Process",
+    "sectionEndHeading": "This event begins at 7pm on January 16",
+    "expectedDescription": "Process flow",
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/hierarchy2",
+      "textItems": [],
+      "logicalNodes": [
+        {
+          "text": "",
+          "children": [
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                },
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "text": "",
+              "children": [
+                {
+                  "text": "",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "taskId": "T10",
+    "titleKey": "P21_T10_TITLE",
+    "instructionKey": "P21_T10_INST",
+    "assertionType": "ParagraphFormattingMatches",
+    "sourceParagraph": "Video provides a powerful way to help you prove your point. When you click Online Video, you can paste in the embed code for the video you want to add. You can also type a keyword to search online for the video that best fits your document.",
+    "destinationParagraph": "To make your document look professionally produced, Word provides header, footer, cover page, and text box designs that complement each other. For example, you can add a matching cover page, header, and sidebar. Click Insert and then choose the elements you want from the different galleries.",
+    "compareEffectiveFormatting": true,
+    "expectedRunFormatting": {
+      "font.ascii": "Calibri",
+      "font.hAnsi": "Calibri",
+      "sz": "val=24",
+      "szCs": "val=24",
+      "color": "000000"
+    },
+    "expectedParagraphFormatting": {
+      "spacing": "after=200;line=276;lineRule=auto",
+      "jc": "val=left"
+    },
+    "sectionStartText": "Kids love dinosaurs",
+    "sectionEndText": "Top Sellers",
+    "sectionStartKind": "paragraph",
+    "sectionEndKind": "paragraph"
+  },
+  {
+    "taskId": "T11",
+    "titleKey": "P21_T11_TITLE",
+    "instructionKey": "P21_T11_INST",
+    "assertionType": "TableRowsEqual",
+    "targetHeaderRow": [
+      "Dinosaur",
+      "GeologicPeriod"
+    ],
+    "expectedTableRows": [
+      [
+        "Dinosaur",
+        "GeologicPeriod"
+      ],
+      [
+        "keyword",
+        "code"
+      ],
+      [
+        "provides",
+        "help"
+      ],
+      [
+        "point",
+        "Online"
+      ],
+      [
+        "video",
+        "search"
+      ]
+    ],
+    "expectedHeaderCellParagraphs": [
+      [
+        "Dinosaur"
+      ],
+      [
+        "Geologic",
+        "Period"
+      ]
+    ]
+  },
+  {
+    "taskId": "T12",
+    "titleKey": "P21_T12_TITLE",
+    "instructionKey": "P21_T12_INST",
+    "assertionType": "ListLevelEquals",
+    "targetParagraph": "Velociraptor",
+    "requireParagraphOrder": true,
+    "expectedParagraphLevels": [
+      {
+        "text": "Velociraptor",
+        "level": 3
+      },
+      {
+        "text": "Meaning",
+        "level": 2
+      },
+      {
+        "text": "Size",
+        "level": 2
+      },
+      {
+        "text": "wieght",
+        "level": 2
+      }
+    ]
+  }
 ]
