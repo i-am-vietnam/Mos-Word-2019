@@ -128,6 +128,7 @@
     <Folder Include="Projects\Word2019_P20\assets\" />
     <Folder Include="Projects\Word2019_P21\assets\" />
     <Folder Include="Projects\Word2019_P22\assets\" />
+    <Folder Include="Projects\Word2019_P23\assets\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Projects\Word2019_P01\starter.docx">
@@ -434,6 +435,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Projects\Word2019_P22\tasks.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Projects\Word2019_P23\lang\en.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Projects\Word2019_P23\lang\vi.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Projects\Word2019_P23\meta.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Projects\Word2019_P23\starter.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Projects\Word2019_P23\tasks.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,15 +1,495 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P22_T01_TITLE",
+    "instructionKey": "P22_T01_INST",
+    "assertionType": "TableRowsEqual",
+    "targetHeaderRow": [
+      "Division",
+      "Levels",
+      "Time"
+    ],
+    "expectedTableRows": [
+      [
+        "Division",
+        "Levels",
+        "Time"
+      ],
+      [
+        "Division E",
+        "No formal experience as a hockey player",
+        "Fridays"
+      ],
+      [
+        "Division A",
+        "Professional or Semi professional",
+        "Mondays"
+      ],
+      [
+        "Coed Division A",
+        "Men and women’s teams (more competitive than B)",
+        "Saturdays"
+      ],
+      [
+        "Coed Division B",
+        "Men and women’s teams (less competitive",
+        "Sundays"
+      ],
+      [
+        "Division D",
+        "Select league or House league",
+        "Thursdays"
+      ],
+      [
+        "Division B",
+        "Canadian University OR NCAA",
+        "Tuesdays"
+      ],
+      [
+        "Division C",
+        "Junior B/C, Rep AAA, Rep AA, or Rep A",
+        "Wednesdays"
+      ]
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P22_T02_TITLE",
+    "instructionKey": "P22_T02_INST",
+    "assertionType": "TableFirstRowIsHeader",
+    "targetHeaderRow": [
+      "Division",
+      "Levels",
+      "Time"
+    ],
+    "expectedTableRows": [
+      [
+        "Division",
+        "Levels",
+        "Time"
+      ],
+      [
+        "Division B",
+        "Canadian University OR NCAA",
+        "Tuesdays"
+      ],
+      [
+        "Division D",
+        "Select league or House league",
+        "Thursdays"
+      ],
+      [
+        "Coed Division A",
+        "Men and women’s teams (more competitive than B)",
+        "Saturdays"
+      ],
+      [
+        "Division E",
+        "No formal experience as a hockey player",
+        "Fridays"
+      ],
+      [
+        "Division A",
+        "Professional or Semi professional",
+        "Mondays"
+      ],
+      [
+        "Division C",
+        "Junior B/C, Rep AAA, Rep AA, or Rep A",
+        "Wednesdays"
+      ],
+      [
+        "Coed Division B",
+        "Men and women’s teams (less competitive",
+        "Sundays"
+      ]
+    ],
+    "ignoreDataRowOrder": true
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P22_T03_TITLE",
+    "instructionKey": "P22_T03_INST",
+    "assertionType": "TextConvertedToTable",
+    "sourceBlockConversion": true,
+    "sourceBlockStartsAtSectionBoundary": true,
+    "sectionStartText": "\nPlaces to Play",
+    "sectionEndText": "Programs",
+    "sectionStartKind": "paragraph",
+    "sectionEndKind": "paragraph",
+    "sourceParagraphs": [
+      "Bruce\tBritish Columbia\tUnited States",
+      "Burlington\tArmstrong\tFort Wayne",
+      "Etobicoke\tBurnaby\tRomeoville",
+      "Gotham"
+    ],
+    "expectedRows": 4,
+    "expectedColumns": 3,
+    "expectedTableRows": [
+      [
+        "Bruce",
+        "British Columbia",
+        "United States"
+      ],
+      [
+        "Burlington",
+        "Armstrong",
+        "Fort Wayne"
+      ],
+      [
+        "Etobicoke",
+        "Burnaby",
+        "Romeoville"
+      ],
+      [
+        "Gotham",
+        "",
+        ""
+      ]
+    ],
+    "requireAutoFitWindow": true,
+    "preservedBodySequences": [
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "1C746A8D937A4BD0C5D77B1D16AB74A7EB2E73C8C85CADE67F804A9ADFF2ABBD",
+      "93859378C9025013D6DA89483A3D9BBFD2EB993EB7FB95D3F1286DDBED8BC506"
+    ],
+    "protectedTextBoxParagraphs": [
+      "CHAMPION LEAGUE"
+    ],
+    "protectedParagraphBreaks": [
+      {
+        "text": "Places to Play",
+        "types": [
+          "textWrapping"
+        ]
+      }
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P22_T04_TITLE",
+    "instructionKey": "P22_T04_INST",
+    "assertionType": "Footnote",
+    "anchorText": "Places to Play",
+    "referenceAfterText": "Places to Play",
+    "expectedText": "We will be adding more locations soon!",
+    "movedFromHeading": "Our Motto",
+    "preservedBodySequences": [
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "1C746A8D937A4BD0C5D77B1D16AB74A7EB2E73C8C85CADE67F804A9ADFF2ABBD",
+      "93859378C9025013D6DA89483A3D9BBFD2EB993EB7FB95D3F1286DDBED8BC506"
+    ],
+    "protectedTextBoxParagraphs": [
+      "CHAMPION LEAGUE"
+    ],
+    "protectedParagraphBreaks": [
+      {
+        "text": "Places to Play",
+        "types": [
+          "textWrapping"
+        ]
+      }
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P22_T05_TITLE",
+    "instructionKey": "P22_T05_INST",
+    "assertionType": "SmartArtInserted",
+    "precedingParagraph": "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+    "followingHeading": "Our Motto",
+    "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/hChevron3",
+    "expectedLogicalNodes": [
+      {
+        "text": "Make friends",
+        "children": []
+      },
+      {
+        "text": "Play safe",
+        "children": []
+      },
+      {
+        "text": "Have fun!",
+        "children": []
+      }
+    ],
+    "expectedDataReversed": false,
+    "preservedBodySequences": [
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "BruceBritish ColumbiaUnited States",
+        "BurlingtonArmstrongFort Wayne",
+        "EtobicokeBurnabyRomeoville",
+        "Gotham",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto",
+        "We will be adding more locations soon!"
+      ],
+      [
+        "WHY PLAY IN THE ASHL?",
+        "PLAYER’S BENCH:",
+        "Our award-winning player management tool enhances your ASHL experience anytime you’re not on the ice.",
+        "EASY REGISTRATION:",
+        "Get on the ice faster with online, secure payments via PayPal and more.",
+        "REAL-TIME GAME DATA:",
+        "Statistics, scheduling, standings, player attendance tracking – all in real time. Manage your team like never before!",
+        "REWARDS PROGRAM:",
+        "The only hockey league with a true rewards program. Earn Puck Bucks & pay down your league fees!",
+        "LEAGUE SCHEDULE AND DIVISIONS:Whether you’re new to hockey or you’ve been playing all your life, chances are we’ve got the right division for you.  You might wonder how we tier our divisions by skill, and we’d be happy to give you an overview of how teams are structured within. Each division has its own preferred days of the week as seen in the table below:",
+        "Division Types",
+        "Places to Play",
+        "Programs",
+        "A program is a collection of instructions that performs a specific task when executed by a computer. A computer requires programs to function. A computer program is usually written by a computer programmer in a programming language.",
+        "Our Motto"
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "1C746A8D937A4BD0C5D77B1D16AB74A7EB2E73C8C85CADE67F804A9ADFF2ABBD",
+      "93859378C9025013D6DA89483A3D9BBFD2EB993EB7FB95D3F1286DDBED8BC506"
+    ],
+    "protectedTextBoxParagraphs": [
+      "CHAMPION LEAGUE"
+    ],
+    "protectedParagraphBreaks": [
+      {
+        "text": "Places to Play",
+        "types": [
+          "textWrapping"
+        ]
+      }
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P22_T06_TITLE",
+    "instructionKey": "P22_T06_INST",
+    "assertionType": "CorePropertyEquals",
+    "propertyName": "subject",
+    "propertyNamespace": "dc",
+    "expectedValue": "Clark and Lois"
+  },
+  {
+    "taskId": "T07",
+    "titleKey": "P22_T07_TITLE",
+    "instructionKey": "P22_T07_INST",
+    "assertionType": "FormattingMarksVisible",
+    "expectedFormattingMarks": {
+      "tabs": true,
+      "spaces": false,
+      "paragraphs": false,
+      "hiddenText": false,
+      "optionalHyphens": false,
+      "objectAnchors": false,
+      "showAll": false
+    }
+  }
 ]

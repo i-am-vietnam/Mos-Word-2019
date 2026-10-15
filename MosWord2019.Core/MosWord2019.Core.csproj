@@ -33,6 +33,7 @@
     <Compile Include="Interfaces\IWordController.cs" />
     <Compile Include="Interfaces\IWordDocumentState.cs" />
     <Compile Include="Interfaces\IWordSaveFormat.cs" />
+    <Compile Include="Interfaces\IWordViewState.cs" />
     <Compile Include="Interfaces\IWordExportCheckpoint.cs" />
     <Compile Include="Interfaces\IWordWindowLayout.cs" />
     <Compile Include="Models\ProjectMeta.cs" />
@@ -41,6 +42,7 @@
     <Compile Include="Models\TaskGradeOutcome.cs" />
     <Compile Include="Models\TaskGradeResult.cs" />
     <Compile Include="Models\TrainingGradeContext.cs" />
+    <Compile Include="Models\WordFormattingMarksSnapshot.cs" />
     <Compile Include="Models\ValidationIssue.cs" />
     <Compile Include="Models\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

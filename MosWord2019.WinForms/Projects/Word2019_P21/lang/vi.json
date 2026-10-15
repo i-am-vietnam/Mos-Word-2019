@@ -22,5 +22,5 @@
   "P21_T11_TITLE": "Tác vụ 11",
   "P21_T11_INST": "Trong phần \"Geologic\", sắp xếp dữ liệu trong bảng theo \"Geologic period\" tăng dần, sau đó theo \"Dinosaur\" tăng dần.",
   "P21_T12_TITLE": "Tác vụ 12",
-  "P21_T12_INST": "Trong phần \"More dinosaur facts\", thay đổi cấp danh sách của mục \"Velociraptor\" thành Level 3."
+  "P21_T12_INST": "Trong phần \"More dinosaur facts\", đặt con trỏ trong Velociraptor hoặc chỉ chọn mục này, rồi chọn Change List Level > Level 3. Giữ Meaning, Size và wieght ở Level 2; không chọn cả danh sách."
 }

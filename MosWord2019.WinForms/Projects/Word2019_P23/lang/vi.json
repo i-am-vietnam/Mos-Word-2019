@@ -1,0 +1,15 @@
+﻿
+{
+  "P23_T01_TITLE": "Tác vụ 1",
+  "P23_T01_INST": "Áp dụng đường viền trang kiểu Box cho toàn bộ tài liệu, có độ dày 3 pt và màu Blue, Accent 5.",
+  "P23_T02_TITLE": "Tác vụ 2",
+  "P23_T02_INST": "Tạo dấu trang (Bookmark) cho tiêu đề \"Moaning about Mondays\" với tên \"Mondays\".",
+  "P23_T03_TITLE": "Tác vụ 3",
+  "P23_T03_INST": "Xóa toàn bộ định dạng khỏi tiêu đề \"Facts about Saturday and Sunday\".",
+  "P23_T04_TITLE": "Tác vụ 4",
+  "P23_T04_INST": "Kiểm tra tài liệu (Inspect Document) và xóa toàn bộ thông tin cá nhân.",
+  "P23_T05_TITLE": "Tác vụ 5",
+  "P23_T05_INST": "Trong phần \"Facts about the Days of the Week\", áp dụng kiểu Intense Emphasis cho đoạn văn bắt đầu bằng \"The days of the week...\" và kết thúc bằng \"those names.\"",
+  "P23_T06_TITLE": "Tác vụ 6",
+  "P23_T06_INST": "Trên trang 1, thêm văn bản thay thế (Alt Text) cho bảng. Đặt Title là \"History of days\" và Description là \"You can find everything in the website www.office.com\"."
+}

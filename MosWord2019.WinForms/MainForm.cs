@@ -355,6 +355,11 @@ namespace MosWord2019
                 return;
             }
 
+            if (task.AssertionType == WordFormattingMarksSnapshot.AssertionType)
+            {
+                try { context.FormattingMarks = (word as IWordViewState)?.ReadFormattingMarks(); }
+                catch (Exception ex) { AppLogger.Write("Training grade view snapshot unavailable task " + task.TaskId, ex); }
+            }
             TaskGradeResult result = grading.CheckTask(savedPath, task, context);
             AppLogger.Write("Training grade " + task.TaskId + " " + result.Outcome + " " + result.Message);
             if (result.Outcome == TaskGradeOutcome.Pass)

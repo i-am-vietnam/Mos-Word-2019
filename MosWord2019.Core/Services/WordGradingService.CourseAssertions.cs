@@ -181,6 +181,24 @@ namespace MosWord2019.Core.Services
                     match &= tables.Count(table => TableRowsEqual(table, cells)) == 1;
                 }
             }
+            if (task.Extra.ContainsKey("preservedBodySequences"))
+            {
+                var actual = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() && !p.Ancestors(W + "txbxContent").Any())
+                    .Select(ParagraphTextOutsideTextBoxes).Where(t => t.Length > 0).ToList();
+                var sequences = RequiredArray(task, "preservedBodySequences");
+                if (sequences.Any(s => !(s is JArray) || ((JArray)s).Any(t => t.Type != JTokenType.String)))
+                    throw new InvalidDataException("Invalid preserved body sequences.");
+                match &= sequences.Cast<JArray>().Any(s => actual.SequenceEqual(s.Values<string>()));
+            }
+            if (task.Extra.ContainsKey("protectedParagraphBreaks"))
+                foreach (JObject expected in RequiredArray(task, "protectedParagraphBreaks"))
+                {
+                    var paragraphs = body.Elements(W + "p").Where(p => VisibleText(p) == (string)expected["text"]).ToList();
+                    if (paragraphs.Count != 1) return false;
+                    var breaks = paragraphs[0].Descendants(W + "br").ToList();
+                    match &= breaks.Select(b => (string)b.Attribute(W + "type") ?? "textWrapping").SequenceEqual(((JArray)expected["types"]).Values<string>()) &&
+                        breaks.All(b => !b.ElementsBeforeSelf(W + "t").Any() && !b.Parent.ElementsBeforeSelf(W + "r").Descendants(W + "t").Any());
+                }
             if (task.Extra.ContainsKey("protectedPictureSha256s"))
                 match &= RequiredStrings(task, "protectedPictureSha256s").All(hash => FindPictureDrawing(package, new[] { hash }) != null);
             if (task.Extra.ContainsKey("protectedTextBoxParagraphs"))

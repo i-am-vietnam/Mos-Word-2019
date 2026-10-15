@@ -1,0 +1,15 @@
+
+{
+  "P23_T01_TITLE": "Task 1",
+  "P23_T01_INST": "Apply a Box page border to the entire document with a width of 3 pt and a color of Blue, Accent 5.",
+  "P23_T02_TITLE": "Task 2",
+  "P23_T02_INST": "Bookmark the heading \"Moaning about Mondays\" and name the bookmark \"Mondays\".",
+  "P23_T03_TITLE": "Task 3",
+  "P23_T03_INST": "Clear all formatting from the heading \"Facts about Saturday and Sunday\".",
+  "P23_T04_TITLE": "Task 4",
+  "P23_T04_INST": "Inspect the document and remove all personal information.",
+  "P23_T05_TITLE": "Task 5",
+  "P23_T05_INST": "In the \"Facts about the Days of the Week\" section, apply the Intense Emphasis style to the text beginning with \"The days of the week...\" and ending with \"those names.\"",
+  "P23_T06_TITLE": "Task 6",
+  "P23_T06_INST": "On page 1, add alternative text to the table. Set the Title to \"History of days\" and the Description to \"You can find everything in the website www.office.com\"."
+}

@@ -22,5 +22,5 @@
   "P21_T11_TITLE": "Task 11",
   "P21_T11_INST": "In the \"Geologic\" section, sort the table data by \"Geologic period\" (Ascending) and then by \"Dinosaur\" (Ascending).",
   "P21_T12_TITLE": "Task 12",
-  "P21_T12_INST": "In the \"More dinosaur facts\" section, change the list level for \"Velociraptor\" to Level 3."
+  "P21_T12_INST": "In the \"More dinosaur facts\" section, place the caret in Velociraptor or select only that item, then choose Change List Level > Level 3. Keep Meaning, Size and wieght at Level 2; do not select the whole list."
 }

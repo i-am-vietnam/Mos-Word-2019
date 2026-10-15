@@ -48,7 +48,8 @@ namespace MosWord2019.Core.Services
             "ModernWordDocumentFormat", "HeaderTextEffectEquals", "BookmarkAtParagraphStart",
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
-            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation"
+            "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
+            WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -67,6 +68,24 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task.AssertionType == WordFormattingMarksSnapshot.AssertionType)
+                {
+                    var state = context?.FormattingMarks;
+                    var actual = state == null ? null : new Dictionary<string, bool?>
+                    {
+                        { "tabs", state.Tabs }, { "spaces", state.Spaces }, { "paragraphs", state.Paragraphs },
+                        { "hiddenText", state.HiddenText }, { "optionalHyphens", state.OptionalHyphens },
+                        { "objectAnchors", state.ObjectAnchors }, { "showAll", state.ShowAll }
+                    };
+                    if (actual == null || actual.Values.Any(v => !v.HasValue))
+                        return Error(task, "The owned Word window's formatting-mark snapshot is unavailable.");
+                    var expected = task.Extra.ContainsKey("expectedFormattingMarks") ? task.Extra["expectedFormattingMarks"] as JObject : null;
+                    if (expected == null || expected.Count != actual.Count || actual.Keys.Any(k => expected[k]?.Type != JTokenType.Boolean))
+                        throw new InvalidDataException("Expected formatting-mark flags are missing or invalid.");
+                    bool passed = actual.All(pair => pair.Value.Value == (bool)expected[pair.Key]);
+                    return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
+                        "The observed owned Word view must match every declared formatting-mark flag, including Show All.", task.AssertionType, task.TaskId);
+                }
                 if (task.AssertionType == ExternalOutputLocation.OwnedPlainTextAssertionType)
                 {
                     bool passed = ExternalOutputLocation.CheckOwnedPlainText(task, context);
@@ -138,6 +157,7 @@ namespace MosWord2019.Core.Services
                         case "CitationPlaceholderAtParagraphEnd": passed = CheckCitationPlaceholder(package, task, out detail); break;
                         case "SmartArtDirectionEquals": passed = CheckSmartArtDirection(package, task, out detail); break;
                         case "SmartArtAltTextDescriptionEquals": passed = CheckSmartArtAltText(package, task, out detail); break;
+                        case "SmartArtInserted": passed = CheckInsertedSmartArt(package, task, out detail); break;
                         case "CorePropertyEquals": passed = CheckCoreProperty(package, task, out detail); break;
                         case "ParagraphFormattingMatches": passed = CheckParagraphFormatting(package, task, out detail); break;
                         case "TableAccessibilityFirstRow": passed = CheckTableAccessibilityFirstRow(package, task, out detail); break;
@@ -307,6 +327,16 @@ namespace MosWord2019.Core.Services
                 if (previous?.Name != W + "p" || ParagraphText(previous) != RequiredString(task, "precedingHeading"))
                 { detail = "The footnote is not in the first paragraph immediately below the required heading."; return false; }
             }
+            if (task.Extra.ContainsKey("movedFromHeading"))
+            {
+                var sourceHeadings = document.Root.Element(W + "body").Elements(W + "p")
+                    .Where(p => VisibleText(p) == RequiredString(task, "movedFromHeading")).ToList();
+                if (sourceHeadings.Count != 1 || MainParagraphs(package).Any(p => VisibleText(p).Contains(expected)) ||
+                    footnotes.Root.Elements(W + "footnote").Count(f => f.Attribute(W + "type") == null && VisibleText(f).TrimStart() == expected) != 1)
+                { detail = "The note text must be moved from the preserved source heading into one linked footnote."; return false; }
+            }
+            if (!CheckPreservedStoryObjects(package, task))
+            { detail = "The footnote's protected source content or objects changed."; return false; }
             detail = "The exact footnote is attached at the required logical text position in the unchanged paragraph.";
             return true;
         }
@@ -1420,7 +1450,17 @@ namespace MosWord2019.Core.Services
             string property = RequiredString(task, "propertyName");
             string expected = RequiredString(task, "expectedValue");
             XDocument core = package.Xml("docProps/core.xml");
-            string actual = (string)core.Root?.Element(Cp + property);
+            XNamespace propertyNamespace = Cp;
+            if (task.Extra.ContainsKey("propertyNamespace"))
+            {
+                string declared = RequiredString(task, "propertyNamespace");
+                if (declared != "dc" || !new[] { "title", "subject", "creator", "description", "language" }.Contains(property))
+                    throw new InvalidDataException("Unsupported built-in core-property namespace mapping.");
+                propertyNamespace = Dc;
+            }
+            string actual = (string)core.Root?.Element(propertyNamespace + property);
+            if (task.Extra.ContainsKey("propertyNamespace") && core.Root?.Elements(propertyNamespace + property).Count() != 1)
+                actual = null;
             bool match = string.Equals(actual, expected, StringComparison.Ordinal);
             detail = match ? "The requested built-in file property has the exact value."
                 : "The requested value is missing from the correct built-in file property.";

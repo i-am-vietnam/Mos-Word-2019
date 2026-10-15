@@ -1,6 +1,13 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-14.
+Reviewed: 2026-10-15.
+
+## Project 22 and P21-T12 verification limits
+
+- **P21 original attempt unavailable:** the reported screenshot/log does not retain the saved answer; the inspected working document was an untouched starter. Single-item native Bullets/Multilevel Level3 and actual production F5 pass. Broad selection reproduces changed peers and the same level-mismatch failure. This supports an EN/VI selection clarification, not a conclusive diagnosis of the original report. No correct-state false negative or legitimate numId split was reproduced; no list-grader relaxation was made. Evidence: `artifacts/p21-t12-fix/REPORT.md`.
+- **Live display state:** P22-T07 requires the owned Word window, not DOCX bytes. A missing/unreadable snapshot is Error. Display preferences can persist through Go/Restart/switch/relaunch; a baseline may legitimately already pass. Production code does not reset them or make a task pass. Test-induced changes were restored to the recorded original flags; unrelated unsaved Word/opposite flags are covered by EN/VI integration.
+- **P22 manual GUI coverage:** native Convert Text to Table, Closed Chevron Process, Subject and Display samples, plus production F5 EN/VI representative grading, are verified separately from API/synthetic results. Full seven-task manual GUI completion and all-seven native Vietnamese edits remain open. API/MainForm combined7/7 does not close that gap. Evidence: `artifacts/p22/REPORT.md`.
+- **Source break semantics:** the guide's page2 locator is not the actual OOXML break type. The original Places to Play heading has an untyped `w:br` (textWrapping). It is preserved exactly; no hard page break was inserted or required. The original incomplete Coed Division B wording and two empty Gotham cells are intentional source contracts.
 
 ## Project 21 verified limitations
 

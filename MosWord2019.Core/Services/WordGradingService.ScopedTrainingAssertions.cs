@@ -185,6 +185,35 @@ namespace MosWord2019.Core.Services
             return true;
         }
 
+        private static bool CheckInsertedSmartArt(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            detail = "One real SmartArt with the declared layout, logical content and location is required.";
+            var diagrams = AllSmartArts(package);
+            if (diagrams.Count != 1) return false;
+            var document = diagrams[0].Container.Document;
+            var children = document.Root.Element(W + "body").Elements().ToList();
+            var starts = children.Where(e => e.Name == W + "p" && StoryParagraphText(e) == RequiredString(task, "precedingParagraph")).ToList();
+            var ends = children.Where(e => e.Name == W + "p" && StoryParagraphText(e) == RequiredString(task, "followingHeading")).ToList();
+            if (starts.Count != 1 || ends.Count != 1) return false;
+            int first = children.IndexOf(starts[0]), last = children.IndexOf(ends[0]);
+            var paragraph = BodyChild(diagrams[0].Container.Ancestors(W + "p").FirstOrDefault());
+            if (first >= last || paragraph == null || children.IndexOf(paragraph) <= first || children.IndexOf(paragraph) >= last) return false;
+            if (children.Skip(first + 1).Take(last - first - 1).Any(e => e.Name != W + "p" || StoryParagraphText(e).Length > 0 ||
+                (e != paragraph && e.Descendants().Any(n => n.Name == W + "drawing" || n.Name == W + "pict" || n.Name == W + "object")))) return false;
+            var ids = diagrams[0].Container.Descendants(Dgm + "relIds").First();
+            string layout = package.RelatedPart("word/document.xml", (string)ids.Attribute(R + "lo"));
+            var data = package.Xml(diagrams[0].DataPart);
+            if (layout == null || (string)package.Xml(layout).Root.Attribute("uniqueId") != RequiredString(task, "expectedLayoutId") ||
+                !SmartArtLogicalNodesMatch(data, RequiredArray(task, "expectedLogicalNodes"))) return false;
+            if (task.Extra.ContainsKey("expectedDataReversed"))
+            {
+                bool reversed = data.Root.Element(Dgm + "ptLst")?.Elements(Dgm + "pt").Where(p => (string)p.Attribute("type") == "doc")
+                    .Any(p => (string)p.Element(Dgm + "prSet")?.Element(Dgm + "presLayoutVars")?.Element(Dgm + "dir")?.Attribute("val") == "rev") ?? false;
+                if (reversed != OptionalBool(task, "expectedDataReversed", false)) return false;
+            }
+            return CheckPreservedStoryObjects(package, task);
+        }
+
         // Read each logical story paragraph once: an outer drawing paragraph must
         // not acquire its nested textbox text, and Choice/Fallback are alternatives.
         private static List<XElement> ScopedStoryParagraphs(XDocument document, string scope)
@@ -339,10 +368,14 @@ namespace MosWord2019.Core.Services
             var section = DeclaredBodySection(package.Xml("word/document.xml"), task);
             detail = "The declared source block, heading, surrounding prose or converted table differs.";
             if (section == null) return false;
-            var intros = section.Where(e => e.Name == W + "p" && StoryParagraphText(e) == RequiredString(task, "introParagraph")).ToList();
-            var ends = section.Where(e => e.Name == W + "p" && MatchesDeclaredText(task, "followingParagraph", StoryParagraphText(e))).ToList();
-            if (intros.Count != 1 || ends.Count != 1 || section.IndexOf(intros[0]) >= section.IndexOf(ends[0])) return false;
-            var block = section.Skip(section.IndexOf(intros[0]) + 1).Take(section.IndexOf(ends[0]) - section.IndexOf(intros[0]) - 1).ToList();
+            var block = section;
+            if (!OptionalBool(task, "sourceBlockStartsAtSectionBoundary", false))
+            {
+                var intros = section.Where(e => e.Name == W + "p" && StoryParagraphText(e) == RequiredString(task, "introParagraph")).ToList();
+                var ends = section.Where(e => e.Name == W + "p" && MatchesDeclaredText(task, "followingParagraph", StoryParagraphText(e))).ToList();
+                if (intros.Count != 1 || ends.Count != 1 || section.IndexOf(intros[0]) >= section.IndexOf(ends[0])) return false;
+                block = section.Skip(section.IndexOf(intros[0]) + 1).Take(section.IndexOf(ends[0]) - section.IndexOf(intros[0]) - 1).ToList();
+            }
             var tables = block.Where(e => e.Name == W + "tbl").ToList();
             bool match = tables.Count == 1 && block.Where(e => e.Name != W + "tbl").All(e =>
                 e.Name == W + "bookmarkStart" || e.Name == W + "bookmarkEnd" ||
@@ -354,7 +387,7 @@ namespace MosWord2019.Core.Services
                 match = TableRowsEqual(table, RequiredStringMatrix(task, "expectedTableRows")) &&
                     table.Elements(W + "tr").Count() == RequiredInt(task, "expectedRows") &&
                     table.Element(W + "tblGrid")?.Elements(W + "gridCol").Count() == RequiredInt(task, "expectedColumns") &&
-                    !table.Descendants().Any(e => e.Name == W + "gridSpan" || e.Name == W + "vMerge");
+                    !table.Descendants().Any(e => e.Name == W + "gridSpan" || e.Name == W + "vMerge" || e.Name == W + "hMerge");
                 if (task.Extra.ContainsKey("expectedTableLayout"))
                 {
                     XElement layout = table.Element(W + "tblPr")?.Element(W + "tblLayout");
@@ -364,10 +397,17 @@ namespace MosWord2019.Core.Services
                     match &= (layout == null && OptionalBool(task, "allowOmittedTableLayout", false)) ||
                         ((string)layout?.Attribute(W + "type") ?? "autofit") == RequiredString(task, "expectedTableLayout");
                 }
+                if (OptionalBool(task, "requireAutoFitWindow", false))
+                {
+                    string widthDetail;
+                    match &= CheckWindowTableWidths(package, table, out widthDetail);
+                }
             }
             var source = RequiredStrings(task, "sourceParagraphs");
-            match &= !MainParagraphs(package).Any(p => source.Contains(StoryParagraphText(p)));
+            match &= !MainParagraphs(package).Where(p => !OptionalBool(task, "sourceBlockStartsAtSectionBoundary", false) || !p.Ancestors(W + "tbl").Any())
+                .Any(p => source.Contains(StoryParagraphText(p)));
             match &= SectionParagraphsPreserved(section, task);
+            match &= CheckPreservedStoryObjects(package, task);
             if (match) detail = "Only the declared tab-delimited source block is converted, preserving its heading and neighboring prose.";
             return match;
         }

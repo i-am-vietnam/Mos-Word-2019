@@ -10,7 +10,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint, IWordViewState
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;

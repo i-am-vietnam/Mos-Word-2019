@@ -7,5 +7,6 @@ namespace MosWord2019.Core.Models
         public bool SavedFromCurrentWorkingDocument { get; set; }
         public string OwnedDocumentPath { get; set; }
         public int? OwnedDocumentSaveFormat { get; set; }
+        public WordFormattingMarksSnapshot FormattingMarks { get; set; }
     }
 }

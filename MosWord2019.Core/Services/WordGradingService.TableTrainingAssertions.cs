@@ -30,6 +30,18 @@ namespace MosWord2019.Core.Services
                 for (int j = 0; j < columns; j++)
                     if (!string.IsNullOrEmpty(expected[i][j]) && string.Join("\n", rows[i].Elements(W + "tc").ElementAt(j).Elements(W + "p").Select(ParagraphText)) != expected[i][j])
                     { detail = "Labels: required text is missing from its declared cell."; return false; }
+            if (!CheckWindowTableWidths(package, table, out detail)) return false;
+            detail = "The table has the required location, dimensions, labels and native AutoFit Window semantics.";
+            return true;
+        }
+
+        private static bool CheckWindowTableWidths(PackageSnapshot package, XElement table, out string detail)
+        {
+            detail = "The table's native AutoFit Window widths differ.";
+            var rows = table.Elements(W + "tr").ToList();
+            var grid = table.Element(W + "tblGrid")?.Elements(W + "gridCol").ToList();
+            int columns = grid?.Count ?? 0;
+            if (columns == 0 || rows.Any(r => r.Elements(W + "tc").Count() != columns)) return false;
             var properties = new XElement(W + "tblPr");
             var direct = table.Element(W + "tblPr");
             string styleId = (string)direct?.Element(W + "tblStyle")?.Attribute(W + "val");
