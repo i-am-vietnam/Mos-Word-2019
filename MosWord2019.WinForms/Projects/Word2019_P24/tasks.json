@@ -1,15 +1,1492 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "assertionType": "DocumentMarginsEquals",
+    "topTwips": 720,
+    "bottomTwips": 720,
+    "leftTwips": 720,
+    "rightTwips": 720,
+    "taskId": "T01",
+    "titleKey": "P24_T01_TITLE",
+    "instructionKey": "P24_T01_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "assertionType": "TextBoxAssemblyWithPosition",
+    "expectedText": "MOS, 2021",
+    "anchorGallery": "Cover Pages",
+    "expectedHorizontalRelativeFrom": "margin",
+    "expectedVerticalRelativeFrom": "margin",
+    "expectedHorizontalAlignment": "center",
+    "expectedVerticalAlignment": "bottom",
+    "expectedWidthEmu": 3566160,
+    "expectedBandHeightEmu": 270605,
+    "expectedBandThemeColor": "accent1",
+    "taskId": "T02",
+    "titleKey": "P24_T02_TITLE",
+    "instructionKey": "P24_T02_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "assertionType": "TableOfContentsLevels",
+    "headingRange": "1-3",
+    "expectedEntryTitles": [
+      "Proposal for Tan’s Office"
+    ],
+    "requireRefreshedEntries": true,
+    "expectedFieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+    "precedingParagraph": "Assignment 3",
+    "followingHeading": "Proposal for Tan’s Office",
+    "taskId": "T03",
+    "titleKey": "P24_T03_TITLE",
+    "instructionKey": "P24_T03_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "assertionType": "BodyContentBeforeHeading",
+    "followingHeading": "Proposal for Tan’s Office",
+    "expectedParagraphs": [
+      "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+      "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours."
+    ],
+    "taskId": "T04",
+    "titleKey": "P24_T04_TITLE",
+    "instructionKey": "P24_T04_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "assertionType": "DocumentBackgroundColor",
+    "expectedThemeColor": "accent3",
+    "expectedThemeRgb": "A5A5A5",
+    "expectedTint": "33",
+    "expectedRgb": "EDEDED",
+    "allowOmittedThemeColor": true,
+    "taskId": "T05",
+    "titleKey": "P24_T05_TITLE",
+    "instructionKey": "P24_T05_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  },
+  {
+    "assertionType": "HeadersFootersWatermarksRemovedByState",
+    "useDeclaredCategoryPreservation": true,
+    "taskId": "T06",
+    "titleKey": "P24_T06_TITLE",
+    "instructionKey": "P24_T06_INST",
+    "preserveSourceContent": true,
+    "preservedBodySequences": [
+      [
+        "Assignment 3 ",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ],
+      [
+        "Assignment 3 ",
+        "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "Proposal for Tan’s Office",
+        "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "The steps I recommend consist of the following: ",
+        "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. "
+      ]
+    ],
+    "ignoreGeneratedTocInPreservedBody": true,
+    "preserveStoryWhitespace": true,
+    "protectedTableStates": [
+      {
+        "header": [
+          "",
+          "Sam’s Office",
+          "Surfwtw",
+          "Sali Kaceli"
+        ],
+        "rowVariants": [
+          [
+            [
+              "",
+              "Sam’s Office",
+              "Surfwtw",
+              "Sali Kaceli"
+            ],
+            [
+              "Subscribers",
+              "200~",
+              "5,000~",
+              "55,000~"
+            ],
+            [
+              "# of views on most popular video",
+              "1,300~",
+              "477,000~",
+              "2,500,000~"
+            ],
+            [
+              "Total Channel Views",
+              "16,800~",
+              "2,300,000~",
+              "10,800,000~"
+            ],
+            [
+              "Key Focus",
+              " Teaching people how to become a Microsoft Office professional",
+              "Excel Music covers",
+              "MoodleExcelWordPowerPointOutlook Access"
+            ],
+            [
+              "First day a Microsoft related video was posted",
+              "August 1, 2014",
+              "May 17, 2012",
+              "November 15, 2011"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "protectedPictureSha256s": [
+      "D66731A088C7FAF05BF6DBFDC02D020404CFA248385F5C4D0FF8E2943DFCFCAB",
+      "9D624F44D703DEC8A9FFA8E283BF73E5BA7BF07A163582316783E87F98C5386A",
+      "0249EA984FACC3DF99458BDF3E5616B93CBD79CF8C80D4A1963D6C22F47F3E4C"
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2008/layout/VerticalCurvedList",
+      "textItems": [
+        "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+        "Having closed captioning for every single video on the Youtube channel",
+        "Creating timestamps in the video description for the tutorial videos ",
+        "Having a section dedicated to beginner tutorials",
+        "Being consistent! "
+      ],
+      "logicalNodes": [
+        {
+          "text": "Assisting with the textbook instructions from New Perspectives Microsoft Office 365 & Excel 2016: Intermediate",
+          "children": []
+        },
+        {
+          "text": "Having closed captioning for every single video on the Youtube channel",
+          "children": []
+        },
+        {
+          "text": "Creating timestamps in the video description for the tutorial videos ",
+          "children": []
+        },
+        {
+          "text": "Having a section dedicated to beginner tutorials",
+          "children": []
+        },
+        {
+          "text": "Being consistent! ",
+          "children": []
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ],
+    "preservedCoverGallery": "Cover Pages",
+    "preservedToc": {
+      "fieldCode": "TOC \\o \"1-3\" \\h \\z \\u",
+      "precedingParagraph": "Assignment 3",
+      "followingHeading": "Proposal for Tan’s Office"
+    },
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}subject",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}keywords",
+        "value": ""
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}description",
+        "value": ""
+      },
+      {
+        "name": "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}category",
+        "value": ""
+      }
+    ],
+    "preservedThemeColors": {
+      "dk1": "000000",
+      "lt1": "FFFFFF",
+      "dk2": "44546A",
+      "lt2": "E7E6E6",
+      "accent1": "5B9BD5",
+      "accent2": "ED7D31",
+      "accent3": "A5A5A5",
+      "accent4": "FFC000",
+      "accent5": "4472C4",
+      "accent6": "70AD47",
+      "hlink": "0563C1",
+      "folHlink": "954F72"
+    },
+    "preservedOutlineLevels": [
+      {
+        "text": "Assignment 3 ",
+        "level": 9
+      },
+      {
+        "text": "Proposal for Tan’s Office",
+        "level": 0
+      },
+      {
+        "text": "\tFrom the table, it is clear that the two other Youtube channels have more overall subscribers, numbers of views on their most popular video, and total channel views. This, however, does make sense. The reason for this is because Sali Kaceli’s channel for example, has the most amount of subscribers. I believe the reason for this is that his channel his started posting Microsoft related videos. This means his viewers have been able to count on him over the last six years to keep producing quality content on a consistent basis. For Surfwtw’s channel, he began making Microsoft videos a little later than Kaceli did. Surfwtw’s channel also isn’t just solely dedicated to helping people with Microsoft. It is also a channel that he dedicates to making music covers. With a split interest displayed on his channel, it is quite possible that his current subscribers are going to look elsewhere for help going forward. ",
+        "level": 9
+      },
+      {
+        "text": "\tAt the moment, your channel among the three, is the newest. This means there is plenty of room for growth as well as improvements! ",
+        "level": 9
+      },
+      {
+        "text": "The steps I recommend consist of the following: ",
+        "level": 9
+      },
+      {
+        "text": "Regarding the first suggestion of textbook assisting, many students at Centennial College find that the wording of the textbook to be misleading and even at times, confusing. One of the suggestions is that in addition to leading students through the steps visually, you could also reword the instructions for them. Going forward, this could better enable students to understand what the textbook was attempting to convey. Additionally, you could have a video explaining as well as demonstrating some of the wordier instructions from the textbook. You could comprise a list of said instructions from your current semester’s students as it is likely that future students will run into similar issues. This may take a good chunk of time to accomplish but I guarantee students around the world will be thankful for the time and effort you put into furthering their education. ",
+        "level": 9
+      },
+      {
+        "text": "Secondly, the suggestion of including closed captioning in every video is an important one. Currently, some of your videos offer that option but I noticed that it is not consistent with every single video offering it. As is, your channel is more geared towards aural and visual learners. That is already phenomenal but what would make it excel would be adding closed captioning to every video. If you decide to incorporate that, it opens the door for a whole other group of people that learn in a verbal-oriented way. This is another action that may take some time to be fully integrated into the channel but it’s efinitely one of those actions that you’ll feel the positive effects of long after you’ve completed the captioning. ",
+        "level": 9
+      },
+      {
+        "text": "Thirdly, I noticed that some of your videos are a considerable length of time. This is a great quality to have as it means you thoroughly go over every aspect of the topic being discussed in each respective video. One minor adjustment you could make to each video is having timestamps in the description. This could enable students who are short on time to easily maneuver their way through your videos to find the content they require. Additionally, if those students find your time stamped videos useful, they may just link it to their friends which will help your channel/videos gain views! ",
+        "level": 9
+      },
+      {
+        "text": "Fourthly, I have noticed that not all people begin with an understanding of how any of the Microsoft applications work. It can be safe to say that tutorials for beginners would be beneficial to people who are trying to either return to the workforce after a long time or for someone who has never encountered these applications before. It can be complicated to try and figure out what sort of things a beginner may or may not know as you take for granted the knowledge you already have. Starting with simple actions such as teaching someone how to save a documented in a specific folder or renaming it a specific name can be a starting point to ease into. Students who previously lacked the beginner knowledge will be extremely thankful once they understand the basics and can make use of your more advanced videos to further enhance their technological skills. ",
+        "level": 9
+      },
+      {
+        "text": "Lastly, I believe it will overall benefit you as well as your channel to stay consistent. Consistency provides a sense of security and is comforting to most people as they will be more inclined to stick with you if you’re someone they can count on. Providing this feeling of support will ensure loyal subscribers. ",
+        "level": 9
+      },
+      {
+        "text": "Remember that the You in Youtube is referring to the viewers rather than the owner of the channel; the viewers are what keep a channel afloat after all! Keep on trying to improve even when everything seems to be going well as there is no limit as to what someone can achieve. If you keep striving for excellence and bettering your methods of teaching, there is nothing but success coming your way. ",
+        "level": 9
+      },
+      {
+        "text": "I write this proposal to you in hopes that you will consider some of these changes in order to help enhance the current Youtube channel you have now. At the moment, your channel is great as is – in that it’s highly beneficial to the students around the world who are viewers. I, myself, am one of said subscribers but I am more of a passive one than an actively engaged one. After considering making some of the following suggestions, I believe your channel will thrive even more than it currently is. ",
+        "level": 9
+      },
+      {
+        "text": "\tCurrently, despite how much your channel is currently thriving, there are multiple steps you can choose to take to improve upon it. The table below compares your channel to channels that operate with similar goals to yours.",
+        "level": 9
+      }
+    ]
+  }
 ]

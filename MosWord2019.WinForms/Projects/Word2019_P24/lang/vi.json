@@ -1,14 +1,14 @@
-﻿{
-  "P24_T01_TITLE": "Câu 1",
-  "P24_T01_INST": "Thay đổi lề trang thành Narrow.",
-  "P24_T02_TITLE": "Câu 2",
-  "P24_T02_INST": "Chèn Banded Quote tại vị trí chính giữa phía dưới trang bìa và nhập văn bản \"MOS, 2021\".",
-  "P24_T03_TITLE": "Câu 3",
-  "P24_T03_INST": "Trên trang 2, cập nhật mục lục.",
-  "P24_T04_TITLE": "Câu 4",
-  "P24_T04_INST": "Chèn nội dung của tệp Introduction.docx vào tài liệu, phía trên tiêu đề \"Proposal for Tan’s Office\".",
-  "P24_T05_TITLE": "Câu 5",
-  "P24_T05_INST": "Thay đổi màu nền trang thành Gray, Accent 3, Lighter 80%.",
-  "P24_T06_TITLE": "Câu 6",
-  "P24_T06_INST": "Kiểm tra tài liệu và xóa mọi đầu trang, chân trang hoặc hình mờ được tìm thấy."
+{
+    "P24_T01_TITLE": "Câu 1",
+    "P24_T01_INST": "Thay đổi lề trang thành Narrow.",
+    "P24_T02_TITLE": "Câu 2",
+    "P24_T02_INST": "Chèn Banded Quote tại vị trí chính giữa phía dưới trang bìa và nhập văn bản \"MOS, 2021\".",
+    "P24_T03_TITLE": "Câu 3",
+    "P24_T03_INST": "Trên trang 2, cập nhật mục lục.",
+    "P24_T04_TITLE": "Câu 4",
+    "P24_T04_INST": "Chèn nội dung của tệp Introduction.docx vào tài liệu, phía trên tiêu đề \"Proposal for Tan’s Office\".",
+    "P24_T05_TITLE": "Câu 5",
+    "P24_T05_INST": "Thay đổi màu nền trang thành Gray, Accent 3, Lighter 80%.",
+    "P24_T06_TITLE": "Câu 6",
+    "P24_T06_INST": "Kiểm tra tài liệu và xóa mọi đầu trang, chân trang hoặc hình mờ được tìm thấy."
 }

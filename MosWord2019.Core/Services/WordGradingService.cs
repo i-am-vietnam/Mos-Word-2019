@@ -49,7 +49,8 @@ namespace MosWord2019.Core.Services
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
             "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
-            WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved"
+            WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved",
+            "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -68,6 +69,9 @@ namespace MosWord2019.Core.Services
             if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (RequiresTocLayout(task) && (context?.TocLayout == null ||
+                    !string.Equals(Path.GetFullPath(documentPath), Path.GetFullPath(context.TocLayout.DocumentPath), StringComparison.OrdinalIgnoreCase)))
+                    return Error(task, "The owned document's current TOC layout snapshot is unavailable.");
                 if (task.AssertionType == WordFormattingMarksSnapshot.AssertionType)
                 {
                     var state = context?.FormattingMarks;
@@ -182,7 +186,11 @@ namespace MosWord2019.Core.Services
                         case "ModernWordDocumentFormat": passed = CheckModernWordFormat(package, documentPath, task, out detail); break;
                         case "HeaderTextEffectEquals": passed = CheckHeaderTextEffect(package, task, out detail); break;
                         case "BookmarkAtParagraphStart": passed = CheckBookmarkStart(package, task, out detail); break;
-                        case "TableOfContentsLevels": passed = CheckTocLevels(package, task, out detail); break;
+                        case "TableOfContentsLevels": passed = RequiresTocLayout(task)
+                            ? CheckRefreshedToc(package, task, context.TocLayout, out detail) : CheckTocLevels(package, task, out detail); break;
+                        case "TextBoxAssemblyWithPosition": passed = CheckTextBoxAssembly(package, task, out detail); break;
+                        case "BodyContentBeforeHeading": passed = CheckBodyContentBeforeHeading(package, task, out detail); break;
+                        case "DocumentBackgroundColor": passed = CheckDocumentBackground(package, task, out detail); break;
                         case "FootnotesConvertedToEndnotes": passed = CheckEndnoteConversion(package, task, out detail); break;
                         case "DocumentMarginsEquals": passed = CheckDocumentMargins(package, task, out detail); break;
                         case "InsertedTableAutoFitWindow": passed = CheckInsertedWindowTable(package, task, out detail); break;
@@ -1192,6 +1200,13 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckHeadersFootersWatermarksRemoved(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "useDeclaredCategoryPreservation", false))
+            {
+                bool empty = ActiveHeaderFooterStoriesEmpty(package);
+                detail = empty ? "All effective active header/footer stories are empty; declared source preservation is required."
+                    : "An effective header, footer or watermark still contains content.";
+                return empty && CheckPreservedStoryObjects(package, task);
+            }
             string expectedBodyHash = RequiredString(task, "expectedMainBodyTextSha256");
             string targetCommentParagraph = RequiredString(task, "targetCommentParagraph");
             string expectedCommentText = RequiredString(task, "expectedCommentText");

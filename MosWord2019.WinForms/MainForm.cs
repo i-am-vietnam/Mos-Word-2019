@@ -360,6 +360,11 @@ namespace MosWord2019
                 try { context.FormattingMarks = (word as IWordViewState)?.ReadFormattingMarks(); }
                 catch (Exception ex) { AppLogger.Write("Training grade view snapshot unavailable task " + task.TaskId, ex); }
             }
+            if (WordGradingService.RequiresTocLayout(task))
+            {
+                try { context.TocLayout = (word as IWordTocLayout)?.ReadTocLayout(); }
+                catch (Exception ex) { AppLogger.Write("Training grade TOC layout snapshot unavailable task " + task.TaskId, ex); }
+            }
             TaskGradeResult result = grading.CheckTask(savedPath, task, context);
             AppLogger.Write("Training grade " + task.TaskId + " " + result.Outcome + " " + result.Message);
             if (result.Outcome == TaskGradeOutcome.Pass)

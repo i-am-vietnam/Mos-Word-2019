@@ -191,8 +191,11 @@ namespace MosWord2019.Core.Services
             }
             if (task.Extra.ContainsKey("preservedBodySequences"))
             {
+                var generated = OptionalBool(task, "ignoreGeneratedTocInPreservedBody", false) ? GeneratedTocParagraphs(body) : new HashSet<XElement>();
                 var actual = body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() && !p.Ancestors(W + "txbxContent").Any())
-                    .Select(ParagraphTextOutsideTextBoxes).Where(t => t.Length > 0).ToList();
+                    .Where(p => !generated.Contains(p)).Select(p => OptionalBool(task, "preserveStoryWhitespace", false)
+                        ? LogicalParagraphText(p) : ParagraphTextOutsideTextBoxes(p))
+                    .Where(t => OptionalBool(task, "preserveStoryWhitespace", false) ? t.Trim().Length > 0 : t.Length > 0).ToList();
                 var sequences = RequiredArray(task, "preservedBodySequences");
                 if (sequences.Any(s => !(s is JArray) || ((JArray)s).Any(t => t.Type != JTokenType.String)))
                     throw new InvalidDataException("Invalid preserved body sequences.");
@@ -215,7 +218,7 @@ namespace MosWord2019.Core.Services
                     .Select(StoryParagraphText).Where(t => t.Length > 0).Distinct().ToList();
                 match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
             }
-            return match && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task);
+            return match && CheckDeclaredDocumentPreservation(package, task) && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task);
         }
 
         private static bool IsBlankTableBoundary(XElement element)
