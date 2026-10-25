@@ -138,6 +138,20 @@ namespace MosWord2019.Core.Services
                         document.Descendants().SkipWhile(e => e != bookmarks[0]).Contains(ends[0]) &&
                         !range.Any(e => (e.Name == W + "t" && e.Value.Length > 0) || e.Name == W + "tab" || e.Name == W + "br" || e.Name == W + "drawing");
                 }
+                if (match && OptionalBool(task, "requireFullParagraphText", false))
+                {
+                    var ordered = document.Descendants().ToList();
+                    int first = ordered.IndexOf(bookmarks[0]), last = ordered.IndexOf(ends[0]);
+                    var range = ordered.Skip(first + 1).Take(Math.Max(0, last - first - 1)).ToList();
+                    var endParagraph = ends[0].Ancestors(W + "p").FirstOrDefault();
+                    var next = paragraphs[0].ElementsAfterSelf().FirstOrDefault();
+                    bool nativeParagraphEnd = endParagraph == paragraphs[0] || ends[0] == next ||
+                        (endParagraph == next && next?.Name == W + "p" &&
+                         !next.Descendants().TakeWhile(e => e != ends[0]).Any(e => e.Name == W + "t" && e.Value.Length > 0));
+                    match = last > first && nativeParagraphEnd &&
+                        string.Concat(range.Where(e => e.Name == W + "t").Select(e => e.Value)) == RequiredString(task, "targetParagraph") &&
+                        !range.Any(e => e.Name == W + "tab" || e.Name == W + "br" || e.Name == W + "drawing" || e.Name == W + "object" || e.Name == W + "sym");
+                }
             }
             detail = match ? "The exact bookmark starts at logical offset zero of the unchanged target paragraph."
                 : "The required bookmark is missing, misnamed, misplaced or the paragraph changed.";

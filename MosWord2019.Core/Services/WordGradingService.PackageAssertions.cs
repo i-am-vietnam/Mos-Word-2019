@@ -385,6 +385,21 @@ namespace MosWord2019.Core.Services
             match &= covered == target.Length;
             if (match && task.Extra.ContainsKey("expectedAlignment"))
                 match = EffectiveParagraphAlignment(package, paragraphs[0]) == RequiredString(task, "expectedAlignment");
+            if (match && task.Extra.ContainsKey("expectedParagraphFormatting"))
+            {
+                var required = task.Extra["expectedParagraphFormatting"] as JObject;
+                if (required == null) throw new InvalidDataException("Missing expected paragraph formatting.");
+                var actual = EffectiveParagraphFormatting(package, paragraphs[0]);
+                match = actual.Count == required.Count && required.Properties().All(p => actual.ContainsKey(p.Name) && actual[p.Name] == (string)p.Value);
+            }
+            if (match && OptionalBool(task, "checkParagraphMarkFormatting", false))
+            {
+                var properties = paragraphs[0].Element(W + "pPr")?.Element(W + "rPr");
+                var mark = new XElement(W + "r", properties == null ? null : new XElement(properties));
+                var actual = EffectiveRunFormatting(package, paragraphs[0], mark);
+                match = (OptionalBool(task, "allowAdditionalFormatting", false) || actual.Count == expected.Count) &&
+                    expected.Properties().All(p => actual.ContainsKey(p.Name) && actual[p.Name] == (string)p.Value);
+            }
             detail = match ? "Every character of the unchanged target range has the verified effective formatting."
                 : "The target text changed or one or more characters retain incorrect effective formatting.";
             return match;

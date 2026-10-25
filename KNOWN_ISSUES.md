@@ -2,6 +2,12 @@
 
 Reviewed: 2026-10-15.
 
+## Project 23 verification limits
+
+- **Native Vietnamese coverage:** all-six native Vietnamese edits remain unverified. The previous Inspector gap is closed: after explicit user confirmation, category-only GUI Remove All and Reinspect passed before and after ordinary Save/close/reopen; the manually completed copy grades6/6, with Custom XML and other task effects preserved. Production F5 covers representative EN T03 and VI T06; API/MainForm EN/VI115/115 is separate integration evidence. See `artifacts/p23/REPORT.md`.
+- **Native category scope and persistence:** Word regenerates created/modified/revision after removal and retains valid core/app parts; requiring their absence or fixed timestamps would reject correct answers. It sets document-local removePersonalInformation/removeDateAndTime; incomplete property removal or flags alone fail. No native post-Save persistence failure was observed. Supplemental comments/revisions become Author/A without losing their content/anchors. Document variables and bibliography Custom XML survive this category, so no blanket metadata wipe is prescribed. Other Office builds/localized anonymous-author labels remain unverified.
+- **Source locators:** Mondays contains only a cached lastRenderedPageBreak, not a required hard break. The Days table begins Tuesday with Day Number1 and ends Sunday6; source data must not be corrected. The cleared heading's native result is Normal/minor Arial11, not the inherited Heading2 Arial13/themed color and not P16's Georgia11. These are confirmed source/native facts, not new bugs.
+
 ## Project 22 and P21-T12 verification limits
 
 - **P21 original attempt unavailable:** the reported screenshot/log does not retain the saved answer; the inspected working document was an untouched starter. Single-item native Bullets/Multilevel Level3 and actual production F5 pass. Broad selection reproduces changed peers and the same level-mismatch failure. This supports an EN/VI selection clarification, not a conclusive diagnosis of the original report. No correct-state false negative or legitimate numId split was reproduced; no list-grader relaxation was made. Evidence: `artifacts/p21-t12-fix/REPORT.md`.

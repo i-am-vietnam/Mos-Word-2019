@@ -35,7 +35,7 @@ namespace MosWord2019.Core.Services
             string layout = package.RelatedPart("word/document.xml", (string)ids?.Attribute(R + "lo"));
             var data = package.Xml(diagram.DataPart);
             return layout != null && (string)package.Xml(layout).Root.Attribute("uniqueId") == (string)expected["layoutId"] &&
-                data.Descendants(A + "t").Select(t => t.Value).SequenceEqual(((JArray)expected["textItems"]).Values<string>()) &&
+                ((bool?)expected["useLogicalNodeOrder"] == true || data.Descendants(A + "t").Select(t => t.Value).SequenceEqual(((JArray)expected["textItems"]).Values<string>())) &&
                 SmartArtLogicalNodesMatch(data, expected["logicalNodes"] as JArray);
         }
 

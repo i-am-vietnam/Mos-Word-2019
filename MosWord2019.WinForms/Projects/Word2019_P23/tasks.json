@@ -1,15 +1,2558 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "taskId": "T01",
+    "titleKey": "P23_T01_TITLE",
+    "instructionKey": "P23_T01_INST",
+    "assertionType": "DocumentPageBorder",
+    "colorExpectationConfirmed": true,
+    "expectedColor": "4472C4",
+    "expectedThemeColor": "accent5",
+    "allowOmittedThemeColor": true,
+    "expectedStyle": "single",
+    "expectedSizeEighthPoints": 24,
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "taskId": "T02",
+    "titleKey": "P23_T02_TITLE",
+    "instructionKey": "P23_T02_INST",
+    "assertionType": "BookmarkAtParagraphStart",
+    "bookmarkName": "Mondays",
+    "targetParagraph": "Moaning about Mondays",
+    "requireFullParagraphText": true,
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "taskId": "T03",
+    "titleKey": "P23_T03_TITLE",
+    "instructionKey": "P23_T03_INST",
+    "assertionType": "TextRangeFormattingEquals",
+    "targetParagraph": "Facts about Saturday and Sunday",
+    "targetText": "Facts about Saturday and Sunday",
+    "expectedFormatting": {
+      "font.ascii": "Arial",
+      "font.hAnsi": "Arial",
+      "sz": "val=22",
+      "szCs": "val=22"
+    },
+    "expectedParagraphFormatting": {
+      "spacing": "after=160;line=259;lineRule=auto",
+      "jc": "val=left"
+    },
+    "checkParagraphMarkFormatting": true,
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "taskId": "T04",
+    "titleKey": "P23_T04_TITLE",
+    "instructionKey": "P23_T04_INST",
+    "assertionType": "DocumentPersonalInformationRemoved",
+    "corePropertiesToClear": [
+      "dc:title",
+      "dc:subject",
+      "dc:creator",
+      "dc:description",
+      "cp:keywords",
+      "cp:lastModifiedBy",
+      "cp:category",
+      "cp:contentStatus",
+      "cp:lastPrinted"
+    ],
+    "appPropertiesToClear": [
+      "Company",
+      "Manager",
+      "HyperlinkBase"
+    ],
+    "allowedTemplateNames": [
+      "Normal",
+      "Normal.dotm",
+      ""
+    ],
+    "requiredPrivacyFlags": [
+      "removePersonalInformation",
+      "removeDateAndTime"
+    ],
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "taskId": "T05",
+    "titleKey": "P23_T05_TITLE",
+    "instructionKey": "P23_T05_INST",
+    "assertionType": "CharacterStyleAppliedToParagraph",
+    "expectedParagraph": "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+    "characterStyleId": "IntenseEmphasis",
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "taskId": "T06",
+    "titleKey": "P23_T06_TITLE",
+    "instructionKey": "P23_T06_INST",
+    "assertionType": "TableAltTextEquals",
+    "targetHeaderRow": [
+      "Days",
+      "Original Name",
+      "Day Origin Story",
+      "Day Number"
+    ],
+    "expectedTableRows": [
+      [
+        "Days",
+        "Original Name",
+        "Day Origin Story",
+        "Day Number"
+      ],
+      [
+        "Tuesday",
+        "Tiw’s Day",
+        "Tiw was a Norse god known for his sense of justice",
+        "1"
+      ],
+      [
+        "Wednesday",
+        "Woden’s Day",
+        "Woden or Odin was the most powerful Norse god",
+        "2"
+      ],
+      [
+        "Thursday",
+        "Thor’s Day",
+        "Thor was a Norse god who wielded a giant hammer",
+        "3"
+      ],
+      [
+        "Friday",
+        "Frigg’s Day",
+        "Frigg was a Norse god equal to Odin",
+        "4"
+      ],
+      [
+        "Saturday",
+        "Seater’s day or Saturn’s day",
+        "Saturn was a Roman god",
+        "5"
+      ],
+      [
+        "Sunday",
+        "Sun’s day",
+        "They named the last day of the week after the Sun",
+        "6"
+      ]
+    ],
+    "expectedColumns": 4,
+    "expectedTitle": "History of days",
+    "expectedDescription": "You can find everything in the website www.office.com",
+    "preserveSourceContent": true,
+    "preservedStoryParagraphs": [
+      "Days of the Week",
+      "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+      "Days of the Week",
+      "Table 1-Days of the week",
+      "Facts about the Days of the Week",
+      "The days of the week were named after Norse gods and giant objects in the sky.  These names come to us originally from the Greeks and Romans, who named the days of the week after their gods. The Anglo-Saxons, who invaded Britain hundreds of years ago, adopted this idea but substituted their own gods. The English language has inherited and changed those names a bit, but the ones we use today resemble those names.",
+      "Facts about Saturday and Sunday",
+      "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+      "Figure 1-All the days",
+      "Moaning about Mondays",
+      "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+      "Which day of the week is the favourite?",
+      "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+      "Sunday:\t10%",
+      "Saturday:\t59%",
+      "Friday:\t\t27%",
+      "Thursday:\t3%",
+      "Wednesday:\t0.0000002%",
+      "Tuesday:\t0.0000001%",
+      "  NOTE: The names of the days are based on the seven celestial bodies (the Sun, the Moon, Mars, Mercury, Jupiter, Venus, and Saturn), believed at that time to revolve around Earth and influence its events. Most of Western Europe adopted the Roman nomenclature. The Germanic languages substituted Germanic equivalents for the names of four of the Roman gods: Tiw, the god of war, replaced Mars; Woden, the god of wisdom, replaced Mercury; Thor, the god of thunder, replaced Jupiter; and Frigg, the goddess of love, replaced Venus."
+    ],
+    "protectedTableRows": [
+      [
+        [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        [
+          "Tuesday",
+          "Tiw’s Day",
+          "Tiw was a Norse god known for his sense of justice",
+          "1"
+        ],
+        [
+          "Wednesday",
+          "Woden’s Day",
+          "Woden or Odin was the most powerful Norse god",
+          "2"
+        ],
+        [
+          "Thursday",
+          "Thor’s Day",
+          "Thor was a Norse god who wielded a giant hammer",
+          "3"
+        ],
+        [
+          "Friday",
+          "Frigg’s Day",
+          "Frigg was a Norse god equal to Odin",
+          "4"
+        ],
+        [
+          "Saturday",
+          "Seater’s day or Saturn’s day",
+          "Saturn was a Roman god",
+          "5"
+        ],
+        [
+          "Sunday",
+          "Sun’s day",
+          "They named the last day of the week after the Sun",
+          "6"
+        ]
+      ]
+    ],
+    "protectedPictureSha256s": [
+      "C0E1C1DE36686B0CBF121E4DD7E5906CE971C731AC0187E9521B89CE5FECDA1D"
+    ],
+    "protectedTextBoxParagraphs": [
+      ": The seven-day week originated in ancient Mesopotamia and became part of the Roman calendar in C.E.321."
+    ],
+    "preservedDiagram": {
+      "layoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList2",
+      "textItems": [
+        "Weekdays",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Weekend!",
+        "Saturday",
+        "Sunday",
+        "Monday"
+      ],
+      "logicalNodes": [
+        {
+          "text": "Weekdays",
+          "children": [
+            {
+              "text": "Monday",
+              "children": []
+            },
+            {
+              "text": "Tuesday",
+              "children": []
+            },
+            {
+              "text": "Wednesday",
+              "children": []
+            },
+            {
+              "text": "Thursday",
+              "children": []
+            },
+            {
+              "text": "Friday",
+              "children": []
+            }
+          ]
+        },
+        {
+          "text": "Weekend!",
+          "children": [
+            {
+              "text": "Saturday",
+              "children": []
+            },
+            {
+              "text": "Sunday",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "useLogicalNodeOrder": true
+    },
+    "preservedBookmarks": [
+      {
+        "name": "Days",
+        "paragraph": "Days of the Week",
+        "text": "Days of the Week",
+        "startOffset": 0,
+        "precedingParagraph": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!"
+      },
+      {
+        "name": "_Which_day_of",
+        "paragraph": "Which day of the week is the favourite?",
+        "text": "",
+        "startOffset": 0,
+        "precedingParagraph": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:"
+      }
+    ],
+    "preservedParagraphFormats": [
+      {
+        "text": "The days of the week have special names, but do you ever stop and wonder where they came from?  This blog will explain all of that and more!",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Table 1-Days of the week",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Facts about the Days of the Week",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=40;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=1",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=26",
+          "szCs": "val=26"
+        }
+      },
+      {
+        "text": "It wasn't until the Industrial Revolution of the late 1800s that the concept of a two-day “weekend\" began to take shape. At this time, large factories that produced consumer goods were beginning to transform the traditional farming economy into an industrial one.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Figure 1-All the days",
+        "paragraphFormatting": {
+          "spacing": "after=200;line=240;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "i": "1",
+          "iCs": "1",
+          "color": "44546A",
+          "sz": "val=18",
+          "szCs": "val=18"
+        }
+      },
+      {
+        "text": "Moaning about Mondays",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Monday is probably the most hated day of the week.  Below is a list of some not so fun facts about Mondays and some fun to optimistic facts about Mondays.  At least it most likely won’t rain that day!  Also, to get over the Monday blues, people tend to do a lot of online shopping that day.  Here are some interesting facts (positive and negative) about Mondays:",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Which day of the week is the favourite?",
+        "paragraphFormatting": {
+          "spacing": "after=0;before=240;line=259;lineRule=auto",
+          "keepNext": "",
+          "keepLines": "",
+          "outlineLvl": "val=0",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "color": "44749F",
+          "sz": "val=32",
+          "szCs": "val=32"
+        }
+      },
+      {
+        "text": "Based on a popular vote that was taken recently, it would appear that everyone’s favourite day of the week is Saturday!  This might be because it is because it is right in the middle of the weekend.  People who are very active tend to like Saturday’s the best out of all the days of the week.  On the other hand, those who were less active in the study claimed to enjoy Sundays the most.  Also, those who were the most industrious tended to enjoy Fridays the most because they could finish what they needed to at work, and then enjoy the weekend.",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Sunday:10%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Thursday:3%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      },
+      {
+        "text": "Tuesday:0.0000001%",
+        "paragraphFormatting": {
+          "spacing": "after=160;line=259;lineRule=auto",
+          "ind": "left=720",
+          "contextualSpacing": "",
+          "numPr": "",
+          "jc": "val=left"
+        },
+        "runFormatting": {
+          "font.ascii": "Arial",
+          "font.hAnsi": "Arial",
+          "sz": "val=22",
+          "szCs": "val=22"
+        }
+      }
+    ],
+    "protectedTableStates": [
+      {
+        "header": [
+          "Days",
+          "Original Name",
+          "Day Origin Story",
+          "Day Number"
+        ],
+        "rowVariants": [
+          [
+            [
+              "Days",
+              "Original Name",
+              "Day Origin Story",
+              "Day Number"
+            ],
+            [
+              "Tuesday",
+              "Tiw’s Day",
+              "Tiw was a Norse god known for his sense of justice",
+              "1"
+            ],
+            [
+              "Wednesday",
+              "Woden’s Day",
+              "Woden or Odin was the most powerful Norse god",
+              "2"
+            ],
+            [
+              "Thursday",
+              "Thor’s Day",
+              "Thor was a Norse god who wielded a giant hammer",
+              "3"
+            ],
+            [
+              "Friday",
+              "Frigg’s Day",
+              "Frigg was a Norse god equal to Odin",
+              "4"
+            ],
+            [
+              "Saturday",
+              "Seater’s day or Saturn’s day",
+              "Saturn was a Roman god",
+              "5"
+            ],
+            [
+              "Sunday",
+              "Sun’s day",
+              "They named the last day of the week after the Sun",
+              "6"
+            ]
+          ]
+        ],
+        "tableStyleId": "GridTable4-Accent1",
+        "lookAttributes": {
+          "val": "04A0",
+          "firstRow": "1",
+          "lastRow": "0",
+          "firstColumn": "1",
+          "lastColumn": "0",
+          "noHBand": "0",
+          "noVBand": "1"
+        }
+      }
+    ],
+    "preservedCustomXml": [
+      {
+        "root": "{http://schemas.openxmlformats.org/officeDocument/2006/bibliography}Sources",
+        "text": ""
+      }
+    ]
+  }
 ]

@@ -49,7 +49,7 @@ namespace MosWord2019.Core.Services
             "TableOfContentsLevels", "FootnotesConvertedToEndnotes", "DocumentMarginsEquals",
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
             "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
-            WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted"
+            WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -193,8 +193,12 @@ namespace MosWord2019.Core.Services
                         case "TrackedChangesDisposition": passed = CheckTrackedChangesDisposition(package, task, out detail); break;
                         case "InsertedTableAutoFitContents": passed = CheckInsertedAutoFitTable(package, task, out detail); break;
                         case "NumberedListSequence": passed = CheckNumberedSequence(package, task, out detail); break;
+                        case "TableAltTextEquals": passed = CheckTableAltText(package, task, out detail); break;
+                        case "DocumentPersonalInformationRemoved": passed = CheckPersonalInformationRemoved(package, task, out detail); break;
                         default: return Error(task, "Unsupported assertion type: " + task.AssertionType);
                     }
+                    if (passed && OptionalBool(task, "preserveSourceContent", false) && !CheckPreservedStoryObjects(package, task))
+                    { passed = false; detail = "Protected source text, objects, bookmarks or table content changed."; }
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
                         detail, task.AssertionType, task.TaskId);
                 }

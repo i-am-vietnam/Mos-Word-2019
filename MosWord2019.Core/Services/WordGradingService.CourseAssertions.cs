@@ -168,6 +168,14 @@ namespace MosWord2019.Core.Services
                 match &= actual.Count == declared.Count && actual.Select((text, i) => i < declared.Count &&
                     (declared[i].Type == JTokenType.String ? text == (string)declared[i] : ((JArray)declared[i]).Values<string>().Contains(text))).All(v => v);
             }
+            if (task.Extra.ContainsKey("preservedStoryParagraphs"))
+                match &= body.Descendants(W + "p").Where(p => !p.Ancestors(W + "tbl").Any() && !p.Ancestors(W + "txbxContent").Any())
+                    .Select(StoryParagraphText).Where(t => t.Length > 0).SequenceEqual(RequiredStrings(task, "preservedStoryParagraphs"));
+            if (task.Extra.ContainsKey("preservedCustomXml"))
+                foreach (JObject expected in RequiredArray(task, "preservedCustomXml"))
+                    match &= package.EntryNames.Where(n => n.StartsWith("customXml/item", StringComparison.Ordinal) && n.EndsWith(".xml", StringComparison.Ordinal))
+                        .Select(n => package.Xml(n).Root).Count(root => root.Name.ToString() == (string)expected["root"] &&
+                            string.Concat(root.DescendantNodes().OfType<XText>().Select(t => t.Value)) == (string)expected["text"]) == 1;
             if (task.Extra.ContainsKey("protectedTableRows"))
             {
                 var tables = body.Descendants(W + "tbl").ToList();
@@ -207,7 +215,7 @@ namespace MosWord2019.Core.Services
                     .Select(StoryParagraphText).Where(t => t.Length > 0).Distinct().ToList();
                 match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
             }
-            return match && CheckDeclaredObjectPreservation(package, task);
+            return match && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task);
         }
 
         private static bool IsBlankTableBoundary(XElement element)
