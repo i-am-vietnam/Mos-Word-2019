@@ -1,14 +1,14 @@
 {
-    "P24_T01_TITLE": "Task 1",
-    "P24_T01_INST": "Change the page margins to Narrow.",
-    "P24_T02_TITLE": "Task 2",
-    "P24_T02_INST": "On the cover page, insert the built-in Banded Quote into the document body and replace its placeholder with \"MOS, 2021\".",
-    "P24_T03_TITLE": "Task 3",
-    "P24_T03_INST": "On page 2, update the table of contents.",
-    "P24_T04_TITLE": "Task 4",
-    "P24_T04_INST": "Above the heading “Proposal for Tan’s Office” insert the contents of Introduction.docx in the Gmetrix Templates folder.",
-    "P24_T05_TITLE": "Task 5",
-    "P24_T05_INST": "Change the background color to Gray, Accent 3, Lighter 80%.",
-    "P24_T06_TITLE": "Task 6",
-    "P24_T06_INST": "Inspect the document and remove any headers, footers, or watermarks that are found."
+  "P24_T01_TITLE": "Task 1",
+  "P24_T01_INST": "Change the page margins to Narrow.",
+  "P24_T02_TITLE": "Task 2",
+  "P24_T02_INST": "Insert a Banded Quote at the bottom center of the cover page and enter the text \"MOS, 2021\".",
+  "P24_T03_TITLE": "Task 3",
+  "P24_T03_INST": "On page 2, update the table of contents.",
+  "P24_T04_TITLE": "Task 4",
+  "P24_T04_INST": "Insert the contents of Introduction.docx above the heading \"Proposal for Tan’s Office\" in the document.",
+  "P24_T05_TITLE": "Task 5",
+  "P24_T05_INST": "Change the page background color to Gray, Accent 3, Lighter 80%.",
+  "P24_T06_TITLE": "Task 6",
+  "P24_T06_INST": "Inspect the document and remove any headers, footers, or watermarks that are found."
 }

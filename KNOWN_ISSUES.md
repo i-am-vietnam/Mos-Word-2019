@@ -1,6 +1,23 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-15.
+Reviewed: 2026-10-25.
+
+## P24 T02 screenshot-family correction
+
+- Confirmed false negatives for Page/Page positioning and exact text entered into the colored band were reproduced with native Word API samples, including Save/reopen. The focused generic opt-ins now admit the user-authorized screenshot family and preserve legacy defaults and genuine-assembly/source guards. Lower text in the band variant must remain the exact native placeholder; arbitrary rewritten lower content is not accepted.
+- The user's original saved answer was not available after normal session shutdown restored the starter. Evidence recreates the shown state with native Word API; it is not a claim of testing that original file or manually repeating the entire Ribbon workflow. Details and new results: `artifacts/p24/t02-fix/REPORT.md`.
+
+## Current asset cleanup limits and question integrity
+
+- The confirmed default-asset retention defect is corrected: unchanged copies created by the current service/session are removed on normal project/session close and normal application exit without requiring a P12 manifest. Pre-existing identical files remain unowned; modified/replaced/locked files are intentionally protected. A locked file or abnormal termination can leave a copy behind; no crash-recovery ownership registry or forced deletion is implemented. Old leftovers cannot safely be claimed from filename/hash alone.
+- P24 EN/VI question edits are reverted byte-for-byte to the pre-implementation baseline080ca9d. P01–P23 packages remain untouched. Prior F5 screenshots contain the earlier clarified wording; they do not prove the restored question text was manually rechecked in native F5. New actual MainForm EN/VI lifecycle checks are recorded separately in `artifacts/p24/principles-audit/REPORT.md`.
+
+## Project 24 verification limits and native workflow
+
+- **TOC freshness requires the owned layout:** saved OOXML alone cannot establish current pagination. T03 requires a fresh optional owned-document snapshot; missing/unreadable/wrong-document context is Error. Layout/import changes may make cached page results stale, so the learner must Update entire table again. Page2 is a locator, not a fixed grading page. The stale source has18 entries but only one current legitimate heading. Native page-number-only API update rebuilt this particular broken cache into current entries; state-based grading correctly accepts that result. A retained obsolete/static/wrong-link/stale-page cache still fails. Section restart7 and lower-Roman `ii` were verified; other Office builds and untested numbering formats remain outside the native evidence.
+- **Native coverage:** all six tasks were completed through native GUI on one disposable answer; production F5 separately covers EN T03 Incorrect→Correct and VI T01 Sai→Đúng, six tabs/readable instructions and same owned PID. Full six-task native Vietnamese editing is unverified. API/synthetic/MainForm matrices are labeled separately in `artifacts/p24/REPORT.md`; they do not imply all-native VI completion.
+- **Environment verification:** a late sandbox Word launch failed with COM80070520 (no valid logon session), while Visual Studio F5 on the interactive desktop worked. Rerunning through the interactive execution context passes current-code MainForm145/145, and native Inspector after reopen plus production grading passes6/6. Failed sandbox attempts are retained separately. Visual Studio's already-loaded wildcard project required solution reload to discover the new Word partial; command-line MSBuild included it correctly. This was an environment/IDE cache gap, not a production ownership fix.
+- **Inspector source variants:** T06 accepts either untouched original body or the complete authorized Introduction variant so it remains valid before T04; it preserves the cover, original comparison table/graphics, live TOC, Custom XML and unrelated core metadata. It cannot infer that a previously completed independent task was later undone. Combined T02/T04 reject missing quote/import. Native category removal leaves valid empty/unused parts acceptable; inactive header-story variants across other Word builds have not been independently sampled.
 
 ## Project 23 verification limits
 
@@ -66,7 +83,7 @@ P20 has eleven implemented tasks and native API saved/reopened combined11/11 ans
 - P13 separate Project 13.docx was not available for starter comparison. The supplied Desktop guide was read and used as reference. Confirm its original source file when available; do not silently replace the production starter.
 
 - P12 assets are staged before open and never inserted automatically. Cleanup owns only copies created during the current Training session, checks hash and Windows file identity on an exclusive deletion handle, and preserves pre-existing, modified, replaced or locked files. Cleanup failures are logged and may leave a copy behind. Session ownership is not persisted across abnormal termination; crash-resume cleanup is not promised. Redirected/reparse asset paths are refused.
-- P12 cleanup is explicitly opt-in via meta.assetStaging/OnProjectClose. Older P04 Documents-only Glasses.obj staging and existing P06/P07 template-output cleanup contracts remain unchanged. Close or reset errors cancel transitions before asset cleanup; Restart retains assets during a valid session.
+- P12's meta.assetStaging configures its additional Pictures copy. As of the2026-10-25 user-requested shared correction, cleanup also covers newly created default Documents copies, including P04 Glasses.obj, without editing those packages. Existing P06/P07 template-output cleanup contracts remain unchanged. Close or reset errors cancel transitions before asset cleanup; Restart retains assets during a valid session.
 - P12 T05 positive is native Word API preset transfer with the original header font/size/language restored. Exact local gallery selection of Fill: Green, Accent color 1; Shadow still needs manual confirmation; API evidence is not GUI evidence.
 - P12 supplied guide is read and consistent with actual starter content. The separate Word - Project 12.docx was not available for byte comparison; the production starter was independently opened/saved/reopened only through disposable copies.
 

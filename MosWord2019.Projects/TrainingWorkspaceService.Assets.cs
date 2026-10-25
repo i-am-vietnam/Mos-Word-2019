@@ -88,7 +88,7 @@ namespace MosWord2019.Projects
                             using (var output = new FileStream(destination, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None))
                             {
                                 var entry = new StagedAsset { Source = source, Destination = destination, Root = root, Hash = hash,
-                                    Created = true, Cleanup = options != null, Identity = AssetIdentity(output.SafeFileHandle) };
+                                    Created = true, Identity = AssetIdentity(output.SafeFileHandle) };
                                 operation.Add(entry); ledger.Add(entry);
                                 try { input.Position = 0; input.CopyTo(output); output.Flush(); }
                                 catch { entry.Hash = AssetHash(output); throw; }
@@ -116,7 +116,7 @@ namespace MosWord2019.Projects
             string key = Path.GetFullPath(package.ProjectFolderPath);
             List<StagedAsset> ledger;
             if (!stagedAssets.TryGetValue(key, out ledger)) return;
-            foreach (var entry in ledger.Where(e => e.Created && e.Cleanup)) CleanupAsset(entry, log);
+            foreach (var entry in ledger.Where(e => e.Created)) CleanupAsset(entry, log);
             stagedAssets.Remove(key);
         }
 
@@ -187,7 +187,7 @@ namespace MosWord2019.Projects
         private sealed class StagedAsset
         {
             internal string Source, Destination, Root, Hash, Identity;
-            internal bool Created, Cleanup;
+            internal bool Created;
         }
         [StructLayout(LayoutKind.Sequential)]
         private struct FileIdentity

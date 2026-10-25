@@ -17,5 +17,8 @@ Read AGENTS.md, PROJECT_STATUS.md, KNOWN_ISSUES.md, CODEX_CONTEXT.md, then only 
 13. Update PROJECT_STATUS.md after each completed phase.
 14. Update CODEX_CONTEXT.md when architecture changes. Record only confirmed issues, constraints, and verification gaps in KNOWN_ISSUES.md.
 15. Do not commit or push unless explicitly requested. Preserve existing changes. Expected Word origin: https://github.com/i-am-vietnam/Mos-Word-2019.git.
+16. When implementing a new project, do not edit completed older project packages or change their accepted grading behavior. An explicit user request to fix an older project or a shared lifecycle rule is a separate authorized scope; verify affected regressions.
+17. Treat supplied question dictionaries (`lang/en.json`, `lang/vi.json`, or `vn.json` if supplied) as immutable exercise content. Do not rewrite, translate, expand or add workflow hints. Put implementation notes and verified workflow guidance in developer documentation/evidence instead. Restore changes only when explicitly requested and identify the baseline.
+18. Stage packaged assets into Documents through the existing safe service. On normal project/session close, including normal application exit, remove only unchanged copies created by that service in the current session. Preserve pre-existing, modified, replaced, locked and unrelated personal files; log cleanup failures. Additional configured Pictures copies follow the same ownership safeguards. Never edit packaged assets or infer ownership from filename/hash alone.
 
 Implement only the phase authorized by the current user request. Lifecycle is Phase 2; packages Phase 3; grading Phase 5 onward. Do not inherit the Excel rule to build MosTrainer or reuse its GradingService in this independent product.

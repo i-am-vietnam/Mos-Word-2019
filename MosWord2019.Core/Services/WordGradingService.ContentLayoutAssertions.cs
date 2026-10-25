@@ -91,12 +91,16 @@ namespace MosWord2019.Core.Services
                 if (coverAnchor && sdt != null)
                     coverAnchor = !cover[0].Descendants(W + "br").Where(b => !b.Ancestors(W + "txbxContent").Any() &&
                         (string)b.Attribute(W + "type") == "page").Any(b => XNode.CompareDocumentOrder(b, anchorParagraph) < 0);
+                string horizontalReference = (string)anchor?.Element(Wp + "positionH")?.Attribute("relativeFrom");
+                string verticalReference = (string)anchor?.Element(Wp + "positionV")?.Attribute("relativeFrom");
+                bool positionReferenceMatches = horizontalReference == RequiredString(task, "expectedHorizontalRelativeFrom") &&
+                    verticalReference == RequiredString(task, "expectedVerticalRelativeFrom") ||
+                    OptionalBool(task, "allowPageRelativePosition", false) && horizontalReference == "page" && verticalReference == "page";
                 match = anchor != null && !anchor.Ancestors(W + "txbxContent").Any() && coverAnchor &&
                     shapes.Count == 2 && group.Elements(Wpg + "wgp").Count() == 0 &&
                     anchor.Element(Wp + "wrapSquare") != null && (string)anchor.Attribute("behindDoc") != "1" &&
-                    (string)anchor.Element(Wp + "positionH")?.Attribute("relativeFrom") == RequiredString(task, "expectedHorizontalRelativeFrom") &&
+                    positionReferenceMatches &&
                     (string)anchor.Element(Wp + "positionH")?.Element(Wp + "align") == RequiredString(task, "expectedHorizontalAlignment") &&
-                    (string)anchor.Element(Wp + "positionV")?.Attribute("relativeFrom") == RequiredString(task, "expectedVerticalRelativeFrom") &&
                     (string)anchor.Element(Wp + "positionV")?.Element(Wp + "align") == RequiredString(task, "expectedVerticalAlignment") &&
                     NearDrawingValue(anchor.Element(Wp + "extent"), "cx", RequiredInt(task, "expectedWidthEmu"), 2540);
                 if (match)
@@ -106,6 +110,11 @@ namespace MosWord2019.Core.Services
                     var bandTransform = bandPr?.Element(A + "xfrm"); var textTransform = textPr?.Element(A + "xfrm");
                     var frame = group.Element(Wpg + "grpSpPr")?.Element(A + "xfrm");
                     int width = RequiredInt(task, "expectedWidthEmu");
+                    var bandParagraphs = band.Descendants(W + "p").Select(LogicalParagraphText).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+                    var bodyParagraphs = text.Descendants(W + "p").Select(LogicalParagraphText).Where(t => t.Length > 0).ToList();
+                    bool quoteTextMatches = bandParagraphs.Count == 0 && bodyParagraphs.SequenceEqual(new[] { expected }) ||
+                        OptionalBool(task, "allowExpectedTextInBand", false) && bandParagraphs.SequenceEqual(new[] { expected }) &&
+                        bodyParagraphs.SequenceEqual(RequiredStrings(task, "expectedQuotePlaceholderParagraphs"));
                     match = bandTransform != null && textTransform != null && frame != null && UntransformedDrawing(frame) &&
                         NearDrawingValue(frame.Element(A + "off"), "x", 0, 2540) && NearDrawingValue(frame.Element(A + "off"), "y", 0, 2540) &&
                         NearDrawingValue(frame.Element(A + "chOff"), "x", 0, 2540) && NearDrawingValue(frame.Element(A + "chOff"), "y", 0, 2540) &&
@@ -127,8 +136,7 @@ namespace MosWord2019.Core.Services
                         NearDrawingValue(frame.Element(A + "ext"), "cy", DrawingInteger(frame.Element(A + "chExt"), "cy", -10000), 2540) &&
                         NearDrawingValue(frame.Element(A + "chExt"), "cy", DrawingInteger(textTransform.Element(A + "off"), "y", -10000) +
                             DrawingInteger(textTransform.Element(A + "ext"), "cy", -10000), 2540) &&
-                        band.Descendants(W + "p").All(p => string.IsNullOrWhiteSpace(LogicalParagraphText(p))) &&
-                        text.Descendants(W + "p").Select(LogicalParagraphText).Where(t => t.Length > 0).SequenceEqual(new[] { expected }) &&
+                        quoteTextMatches &&
                         (string)band.Element(Wps + "bodyPr")?.Attribute("anchor") == "ctr" &&
                         text.Element(Wps + "bodyPr")?.Element(A + "spAutoFit") != null;
                 }
