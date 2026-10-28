@@ -220,7 +220,8 @@ namespace MosWord2019.Core.Services
                     .Select(StoryParagraphText).Where(t => t.Length > 0).Distinct().ToList();
                 match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
             }
-            return match && CheckDeclaredDocumentPreservation(package, task) && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task);
+            return match && CheckDeclaredDocumentPreservation(package, task) && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task) &&
+                CheckPreservedSmartArt(package, task) && PreservedStoryGraphicsMatch(package, task);
         }
 
         private static bool IsBlankTableBoundary(XElement element)
@@ -357,6 +358,13 @@ namespace MosWord2019.Core.Services
             if ((indexes[0] > 0 && HasNumbering(paragraphs[indexes[0] - 1])) ||
                 (indexes.Last() + 1 < paragraphs.Count && HasNumbering(paragraphs[indexes.Last() + 1])))
             { detail = "The list includes a neighboring paragraph outside the target block."; return false; }
+            if (OptionalBool(task, "checkEffectiveNeighbors", false) &&
+                new[] { indexes[0] - 1, indexes.Last() + 1 }.Where(i => i >= 0 && i < paragraphs.Count).Any(i =>
+                {
+                    string id = (string)EffectiveNumberProperties(package, paragraphs[i]).Element(W + "numId")?.Attribute(W + "val");
+                    return id != null && id != "0";
+                }))
+            { detail = "A neighboring paragraph has effective numbering outside the target block."; return false; }
             detail = geometry ? "The exact bullet list has the required position and hanging distance." : "All exact items form one genuine bullet list.";
             return true;
         }

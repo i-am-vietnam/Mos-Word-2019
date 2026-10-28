@@ -1,0 +1,12 @@
+{
+  "P27_T01_TITLE": "Task 1",
+  "P27_T01_INST": "Change all text in the table to Sentence case.",
+  "P27_T02_TITLE": "Task 2",
+  "P27_T02_INST": "Insert a Scroll: Horizontal (Horizontal Scroll) shape containing the text \"Begin in October!\". Position the shape at the bottom center of the page.",
+  "P27_T03_TITLE": "Task 3",
+  "P27_T03_INST": "Apply Turquoise text highlighting to all text in the row beginning with \"Prince\".",
+  "P27_T04_TITLE": "Task 4",
+  "P27_T04_INST": "Format the title \"Athletic Scholarships\" as a WordArt text box using the Gold fill, Accent 4, Soft Bevel style.",
+  "P27_T05_TITLE": "Task 5",
+  "P27_T05_INST": "Use Find and Replace to replace all instances of \"Football\" with \"Soccer\". Do not change any other settings."
+}

@@ -1,15 +1,669 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "preserveSourceContent": true,
+    "preserveStoryWhitespace": true,
+    "preservedBodySequences": [
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break."
+      ],
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break.",
+        "Part 3: Service Standards: ",
+        "The following is a list of service standards that we promise to our customers.",
+        "Please visit website https://office.com to view details."
+      ]
+    ],
+    "protectedTextBoxParagraphs": [
+      "COFFEE",
+      "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee."
+    ],
+    "preservedSmartArt": {
+      "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+      "expectedReverse": false,
+      "expectedNodePictures": [
+        {
+          "text": "Speed",
+          "imageSha256s": [
+            "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+          ]
+        },
+        {
+          "text": "Accessibility",
+          "imageSha256s": [
+            "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+          ]
+        },
+        {
+          "text": "Artists",
+          "imageSha256s": [
+            "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+          ]
+        },
+        {
+          "text": "Accuracy",
+          "imageSha256s": [
+            "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+          ]
+        }
+      ],
+      "allowedLogicalOrders": [
+        [
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          },
+          {
+            "text": "Accessibility",
+            "children": []
+          }
+        ],
+        [
+          {
+            "text": "Accessibility",
+            "children": []
+          },
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          }
+        ]
+      ]
+    },
+    "textBoxHeading": "COFFEE",
+    "textBoxParagraph": "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee.",
+    "textBoxShapeCount": 3,
+    "textBoxFillRgb": "008000",
+    "preservedConnectorAnchor": "*Each shift comes with a 30-minute paid break.",
+    "preservedConnectorThemeColor": "accent1",
+    "preservedConnectorRgb": "E48312",
+    "preservedConnectorWidthEmu": 3874770,
+    "preservedThemeColors": {
+      "accent1": "E48312"
+    },
+    "assertionType": "BodyContentBeforeSmartArt",
+    "precedingParagraph": "*Each shift comes with a 30-minute paid break.",
+    "followingSmartArtLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+    "expectedParagraphs": [
+      "Part 3: Service Standards: ",
+      "The following is a list of service standards that we promise to our customers.",
+      "Please visit website https://office.com to view details."
+    ],
+    "taskId": "T01",
+    "titleKey": "P26_T01_TITLE",
+    "instructionKey": "P26_T01_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "preserveStoryWhitespace": true,
+    "preservedBodySequences": [
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break."
+      ],
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break.",
+        "Part 3: Service Standards: ",
+        "The following is a list of service standards that we promise to our customers.",
+        "Please visit website https://office.com to view details."
+      ]
+    ],
+    "protectedTextBoxParagraphs": [
+      "COFFEE",
+      "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee."
+    ],
+    "preservedSmartArt": {
+      "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+      "expectedReverse": false,
+      "expectedNodePictures": [
+        {
+          "text": "Speed",
+          "imageSha256s": [
+            "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+          ]
+        },
+        {
+          "text": "Accessibility",
+          "imageSha256s": [
+            "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+          ]
+        },
+        {
+          "text": "Artists",
+          "imageSha256s": [
+            "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+          ]
+        },
+        {
+          "text": "Accuracy",
+          "imageSha256s": [
+            "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+          ]
+        }
+      ],
+      "allowedLogicalOrders": [
+        [
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          },
+          {
+            "text": "Accessibility",
+            "children": []
+          }
+        ],
+        [
+          {
+            "text": "Accessibility",
+            "children": []
+          },
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          }
+        ]
+      ]
+    },
+    "textBoxHeading": "COFFEE",
+    "textBoxParagraph": "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee.",
+    "textBoxShapeCount": 3,
+    "textBoxFillRgb": "008000",
+    "preservedConnectorAnchor": "*Each shift comes with a 30-minute paid break.",
+    "preservedConnectorThemeColor": "accent1",
+    "preservedConnectorRgb": "E48312",
+    "preservedConnectorWidthEmu": 3874770,
+    "preservedThemeColors": {
+      "accent1": "E48312"
+    },
+    "assertionType": "SmartArtLogicalOrder",
+    "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+    "expectedReverse": false,
+    "expectedNodePictures": [
+      {
+        "text": "Speed",
+        "imageSha256s": [
+          "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+        ]
+      },
+      {
+        "text": "Accessibility",
+        "imageSha256s": [
+          "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+        ]
+      },
+      {
+        "text": "Artists",
+        "imageSha256s": [
+          "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+        ]
+      },
+      {
+        "text": "Accuracy",
+        "imageSha256s": [
+          "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+        ]
+      }
+    ],
+    "expectedLogicalNodes": [
+      {
+        "text": "Accessibility",
+        "children": []
+      },
+      {
+        "text": "Speed",
+        "children": []
+      },
+      {
+        "text": "Accuracy",
+        "children": []
+      },
+      {
+        "text": "Artists",
+        "children": []
+      }
+    ],
+    "taskId": "T02",
+    "titleKey": "P26_T02_TITLE",
+    "instructionKey": "P26_T02_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "preserveStoryWhitespace": true,
+    "preservedBodySequences": [
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break."
+      ],
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break.",
+        "Part 3: Service Standards: ",
+        "The following is a list of service standards that we promise to our customers.",
+        "Please visit website https://office.com to view details."
+      ]
+    ],
+    "protectedTextBoxParagraphs": [
+      "COFFEE",
+      "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee."
+    ],
+    "preservedSmartArt": {
+      "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+      "expectedReverse": false,
+      "expectedNodePictures": [
+        {
+          "text": "Speed",
+          "imageSha256s": [
+            "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+          ]
+        },
+        {
+          "text": "Accessibility",
+          "imageSha256s": [
+            "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+          ]
+        },
+        {
+          "text": "Artists",
+          "imageSha256s": [
+            "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+          ]
+        },
+        {
+          "text": "Accuracy",
+          "imageSha256s": [
+            "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+          ]
+        }
+      ],
+      "allowedLogicalOrders": [
+        [
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          },
+          {
+            "text": "Accessibility",
+            "children": []
+          }
+        ],
+        [
+          {
+            "text": "Accessibility",
+            "children": []
+          },
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          }
+        ]
+      ]
+    },
+    "textBoxHeading": "COFFEE",
+    "textBoxParagraph": "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee.",
+    "textBoxShapeCount": 3,
+    "textBoxFillRgb": "008000",
+    "preservedConnectorAnchor": "*Each shift comes with a 30-minute paid break.",
+    "preservedConnectorThemeColor": "accent1",
+    "preservedConnectorRgb": "E48312",
+    "preservedConnectorWidthEmu": 3874770,
+    "preservedThemeColors": {
+      "accent1": "E48312"
+    },
+    "assertionType": "TextBoxPictureBevel",
+    "targetImageSha256s": [
+      "7C0EC0B6D4ECCAAE10291C7658F17C43367830154DB57373A61257A20E33354D"
+    ],
+    "expectedBevelPreset": "softRound",
+    "taskId": "T03",
+    "titleKey": "P26_T03_TITLE",
+    "instructionKey": "P26_T03_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "preserveStoryWhitespace": true,
+    "preservedBodySequences": [
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break."
+      ],
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break.",
+        "Part 3: Service Standards: ",
+        "The following is a list of service standards that we promise to our customers.",
+        "Please visit website https://office.com to view details."
+      ]
+    ],
+    "protectedTextBoxParagraphs": [
+      "COFFEE",
+      "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee."
+    ],
+    "preservedSmartArt": {
+      "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+      "expectedReverse": false,
+      "expectedNodePictures": [
+        {
+          "text": "Speed",
+          "imageSha256s": [
+            "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+          ]
+        },
+        {
+          "text": "Accessibility",
+          "imageSha256s": [
+            "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+          ]
+        },
+        {
+          "text": "Artists",
+          "imageSha256s": [
+            "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+          ]
+        },
+        {
+          "text": "Accuracy",
+          "imageSha256s": [
+            "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+          ]
+        }
+      ],
+      "allowedLogicalOrders": [
+        [
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          },
+          {
+            "text": "Accessibility",
+            "children": []
+          }
+        ],
+        [
+          {
+            "text": "Accessibility",
+            "children": []
+          },
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          }
+        ]
+      ]
+    },
+    "textBoxHeading": "COFFEE",
+    "textBoxParagraph": "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee.",
+    "textBoxShapeCount": 3,
+    "textBoxFillRgb": "008000",
+    "preservedConnectorAnchor": "*Each shift comes with a 30-minute paid break.",
+    "preservedConnectorThemeColor": "accent1",
+    "preservedConnectorRgb": "E48312",
+    "preservedConnectorWidthEmu": 3874770,
+    "preservedThemeColors": {
+      "accent1": "E48312"
+    },
+    "assertionType": "BulletedList",
+    "exactTargetParagraphs": true,
+    "targetParagraphs": [
+      "Early Morning: 5 a.m. to 10 a.m.",
+      "Early Afternoon: 10 a.m. to 3 p.m.",
+      "Late Afternoon: 3 p.m. to 8 p.m."
+    ],
+    "checkIndentation": false,
+    "checkEffectiveNeighbors": true,
+    "taskId": "T04",
+    "titleKey": "P26_T04_TITLE",
+    "instructionKey": "P26_T04_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "preserveStoryWhitespace": true,
+    "preservedBodySequences": [
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break."
+      ],
+      [
+        "Himalayan Coffee House",
+        "According to legend, ancestors of today's Oromo people in a region of Kaffa in Ethiopia were believed to have been the first to recognize the energizing effect of the coffee plant. However, there is no direct evidence that has been found earlier than the 15th century indicating where in Africa coffee first grew or who among the native populations might have used it as a stimulant. The story of Kaldi, the 9th-century Ethiopian goatherd who discovered coffee when he noticed how excited his goats became after eating the beans from a coffee plant, did not appear in writing until 1671 and is probably apocryphal.",
+        "Part 1: About Us ",
+        "Himalayan Coffee House has been open for just over two years.  We wanted to be different than most coffee shops, so we decided to add a little something to our lattes-art! ",
+        "Part 2: Schedules",
+        "Himalayan Coffee house has three groups of five-hour shifts for all employees.  These are:",
+        "Early Morning: 5 a.m. to 10 a.m.",
+        "Early Afternoon: 10 a.m. to 3 p.m. ",
+        "Late Afternoon: 3 p.m. to 8 p.m. ",
+        "*Each shift comes with a 30-minute paid break.",
+        "Part 3: Service Standards: ",
+        "The following is a list of service standards that we promise to our customers.",
+        "Please visit website https://office.com to view details."
+      ]
+    ],
+    "protectedTextBoxParagraphs": [
+      "COFFEE",
+      "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee."
+    ],
+    "preservedSmartArt": {
+      "expectedLayoutId": "urn:microsoft.com/office/officeart/2005/8/layout/vList3",
+      "expectedReverse": false,
+      "expectedNodePictures": [
+        {
+          "text": "Speed",
+          "imageSha256s": [
+            "DD1B797A60F83C9E2B1FF879ADE9C74F5652BA87FB609F888841BEEF9B806095"
+          ]
+        },
+        {
+          "text": "Accessibility",
+          "imageSha256s": [
+            "37FF48DBE58F84F766EBC6578CC0B13ADC2FBE2B9CB572AC89B1233313B98BC8"
+          ]
+        },
+        {
+          "text": "Artists",
+          "imageSha256s": [
+            "44F6A7344C74C1F9F5C70E677313A8320C9BDD8829F1E43297252F5604220F42"
+          ]
+        },
+        {
+          "text": "Accuracy",
+          "imageSha256s": [
+            "A7DF0FDA11D5156666C09FDC70D6FBA0782347E37A1235C23128509CD5F257F7"
+          ]
+        }
+      ],
+      "allowedLogicalOrders": [
+        [
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          },
+          {
+            "text": "Accessibility",
+            "children": []
+          }
+        ],
+        [
+          {
+            "text": "Accessibility",
+            "children": []
+          },
+          {
+            "text": "Speed",
+            "children": []
+          },
+          {
+            "text": "Accuracy",
+            "children": []
+          },
+          {
+            "text": "Artists",
+            "children": []
+          }
+        ]
+      ]
+    },
+    "textBoxHeading": "COFFEE",
+    "textBoxParagraph": "Coffee is a brewed drink prepared from roasted coffee beans, the seeds of berries from certain Coffee species. The genus Coffee is native to tropical Africa (specifically having its origin in Ethiopia and Sudan) and Madagascar, the Comoros, Mauritius, and Réunion in the Indian Ocean. Coffee plants are now cultivated in over 70 countries, primarily in the equatorial regions of the Americas, Southeast Asia, Indian subcontinent, and Africa. The two most commonly grown are C. arabica and C. robusta. Once ripe, coffee berries are picked, processed, and dried. Dried coffee seeds (referred to as \"beans\") are roasted to varying degrees, depending on the desired flavor. Roasted beans are ground and then brewed with near-boiling water to produce the beverage known as coffee.",
+    "textBoxShapeCount": 3,
+    "textBoxFillRgb": "008000",
+    "preservedConnectorAnchor": "*Each shift comes with a 30-minute paid break.",
+    "preservedConnectorThemeColor": "accent1",
+    "preservedConnectorRgb": "E48312",
+    "preservedConnectorWidthEmu": 3874770,
+    "preservedThemeColors": {
+      "accent1": "E48312"
+    },
+    "assertionType": "TextWatermark",
+    "expectedText": "MOS Word",
+    "expectedFont": "Arial",
+    "taskId": "T05",
+    "titleKey": "P26_T05_TITLE",
+    "instructionKey": "P26_T05_INST"
+  }
 ]

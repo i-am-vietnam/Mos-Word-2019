@@ -21,5 +21,6 @@ namespace MosWord2019.Core.Models
     {
         public string Source { get; set; } = "";
         public string Destination { get; set; } = "";
+        public string DestinationFileName { get; set; }
     }
 }

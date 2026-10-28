@@ -50,7 +50,8 @@ namespace MosWord2019.Core.Services
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
             "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
             WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved",
-            "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor", "SectionBreakBeforeHeading"
+            "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor", "SectionBreakBeforeHeading",
+            "BodyContentBeforeSmartArt", "SmartArtLogicalOrder", "TextBoxPictureBevel", "TextWatermark"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -191,6 +192,10 @@ namespace MosWord2019.Core.Services
                             ? CheckRefreshedToc(package, task, context.TocLayout, out detail) : CheckTocLevels(package, task, out detail); break;
                         case "TextBoxAssemblyWithPosition": passed = CheckTextBoxAssembly(package, task, out detail); break;
                         case "BodyContentBeforeHeading": passed = CheckBodyContentBeforeHeading(package, task, out detail); break;
+                        case "BodyContentBeforeSmartArt": passed = CheckBodyContentBeforeSmartArt(package, task, out detail); break;
+                        case "SmartArtLogicalOrder": passed = CheckSmartArtLogicalOrder(package, task, out detail); break;
+                        case "TextBoxPictureBevel": passed = CheckTextBoxPictureBevel(package, task, out detail); break;
+                        case "TextWatermark": passed = CheckTextWatermark(package, task, out detail); break;
                         case "DocumentBackgroundColor": passed = CheckDocumentBackground(package, task, out detail); break;
                         case "FootnotesConvertedToEndnotes": passed = CheckEndnoteConversion(package, task, out detail); break;
                         case "DocumentMarginsEquals": passed = CheckDocumentMargins(package, task, out detail); break;

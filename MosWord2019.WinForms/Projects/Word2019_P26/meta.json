@@ -2,5 +2,16 @@
   "projectId": "Word2019_P26",
   "officeVersion": "Word2019",
   "version": "1.0.0",
-  "starter": "starter.docx"
+  "starter": "starter.docx",
+  "assetStaging": {
+    "copyAssetsToDocuments": true,
+    "additionalCopies": [
+      {
+        "source": "Coffee_Sam.jpg",
+        "destination": "Documents",
+        "destinationFileName": "Coffee Sam.jpg"
+      }
+    ],
+    "cleanupPolicy": "OnProjectClose"
+  }
 }

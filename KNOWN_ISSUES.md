@@ -2,6 +2,12 @@
 
 Reviewed: 2026-10-28.
 
+## Project 26 verification limits
+
+- Native Word GUI evidence covers Soft Round picture bevel and the custom MOS Word/Arial watermark, each saved/reopened. Import, Move Up, bullets, combined answers and EN/VI MainForm lifecycle use the owned Word API; visible combined layout/order/photo were inspected. This does not claim a complete manual Ribbon/F5/VI run or sampling other Office builds.
+- Photo matching currently uses the unchanged supplied media hash; no re-encoded image equivalent is admitted without native evidence. Watermark recognition covers the observed native VML textpath form, not speculative alternate WordArt serialization.
+- Eleven retained P20 expectations first returned Error because a historical temporary template was gone; all11 passed after reconstructing an isolated context from retained combined.dotx. These are fresh runs on historical fixtures, not new manual P20 answers. P26 artifacts and reproducible checks: `artifacts/p26/REPORT.md`.
+
 ## Project 25 verification limits
 
 - Native Banded and five task answers were generated with owned Word2019 API on disposable copies, saved/reopened/resaved; production MainForm API integration passes all five in EN/VI with isolated workspaces. This does not establish full manual Ribbon/F5 or all-native Vietnamese GUI execution. Other Office builds/localized Banded serialization have not been sampled; recognition uses saved structure/property binding rather than gallery captions.

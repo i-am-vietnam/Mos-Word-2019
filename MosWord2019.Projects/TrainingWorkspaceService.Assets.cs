@@ -27,11 +27,21 @@ namespace MosWord2019.Projects
             if (options.CleanupPolicy != "OnProjectClose" || options.AdditionalCopies == null)
                 throw new InvalidDataException("Unsupported asset staging policy.");
             var copies = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            string assetsRoot = Path.Combine(package.ProjectFolderPath, "assets");
+            if (options.CopyAssetsToDocuments && Directory.Exists(assetsRoot))
+                foreach (string source in Directory.GetFiles(assetsRoot, "*", SearchOption.TopDirectoryOnly))
+                {
+                    string name = Path.GetFileName(source);
+                    if (!SafeAssetName(name) || !copies.Add("Documents/" + name))
+                        throw new InvalidDataException("Asset copies require unique safe destination filenames.");
+                }
             foreach (var copy in options.AdditionalCopies)
             {
-                if (copy == null || !SafeAssetName(copy.Source) || copy.Destination != "Pictures" ||
-                    !copies.Add(copy.Destination + "/" + copy.Source))
-                    throw new InvalidDataException("Asset copies require unique top-level filenames and the Pictures destination.");
+                if (copy == null || !SafeAssetName(copy.Source) ||
+                    !SafeAssetName(copy.DestinationFileName ?? copy.Source) ||
+                    (copy.Destination != "Pictures" && copy.Destination != "Documents") ||
+                    !copies.Add(copy.Destination + "/" + (copy.DestinationFileName ?? copy.Source)))
+                    throw new InvalidDataException("Asset copies require unique safe top-level filenames and a Documents or Pictures destination.");
                 string source = Path.Combine(package.ProjectFolderPath, "assets", copy.Source);
                 if (!File.Exists(source)) throw new InvalidDataException("Declared asset does not exist: " + copy.Source);
             }
@@ -46,13 +56,15 @@ namespace MosWord2019.Projects
             if (!Directory.Exists(assetsRoot)) return available;
             RejectReparsePath(assetsRoot);
             var options = package.Meta.AssetStaging;
-            var requests = new List<Tuple<string, string>>();
+            var requests = new List<Tuple<string, string, string>>();
             if (options == null || options.CopyAssetsToDocuments)
                 requests.AddRange(Directory.GetFiles(assetsRoot, "*", SearchOption.TopDirectoryOnly)
-                    .OrderBy(p => p, StringComparer.OrdinalIgnoreCase).Select(p => Tuple.Create(p, documentsRootPath)));
+                    .OrderBy(p => p, StringComparer.OrdinalIgnoreCase).Select(p => Tuple.Create(p, documentsRootPath, Path.GetFileName(p))));
             if (options != null)
                 requests.AddRange(options.AdditionalCopies.Select(copy =>
-                    Tuple.Create(Path.Combine(assetsRoot, copy.Source), picturesRootPath)));
+                    Tuple.Create(Path.Combine(assetsRoot, copy.Source),
+                        copy.Destination == "Pictures" ? picturesRootPath : documentsRootPath,
+                        copy.DestinationFileName ?? copy.Source)));
 
             List<StagedAsset> ledger;
             if (!stagedAssets.TryGetValue(key, out ledger)) stagedAssets[key] = ledger = new List<StagedAsset>();
@@ -62,7 +74,7 @@ namespace MosWord2019.Projects
                 foreach (var request in requests)
                 {
                     string source = Path.GetFullPath(request.Item1), root = request.Item2;
-                    string name = Path.GetFileName(source);
+                    string name = request.Item3;
                     if (!SafeAssetName(name)) throw new InvalidDataException("Invalid asset filename.");
                     EnsureContained(assetsRoot, source, "Asset source escapes its package.");
                     RejectReparsePath(source);
@@ -150,7 +162,7 @@ namespace MosWord2019.Projects
 
         private static bool SafeAssetName(string name)
         {
-            string stem = Path.GetFileNameWithoutExtension(name ?? "").ToUpperInvariant();
+            string stem = (name ?? "").Split('.')[0].TrimEnd(' ').ToUpperInvariant();
             if (new[] { "CON", "PRN", "AUX", "NUL", "CLOCK$" }.Contains(stem) ||
                 System.Text.RegularExpressions.Regex.IsMatch(stem, @"^(COM|LPT)[1-9]$")) return false;
             return !string.IsNullOrWhiteSpace(name) && name != "." && name != ".." && !Path.IsPathRooted(name) &&

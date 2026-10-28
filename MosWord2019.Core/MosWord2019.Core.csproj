@@ -60,6 +60,9 @@
     <Compile Include="Services\WordGradingService.ScopedTrainingAssertions.cs" />
     <Compile Include="Services\WordGradingService.MetadataAssertions.cs" />
     <Compile Include="Services\WordGradingService.ContentLayoutAssertions.cs" />
+    <Compile Include="Services\WordGradingService.SmartArtOrder.cs" />
+    <Compile Include="Services\WordGradingService.StoryGraphics.cs" />
+    <Compile Include="Services\WordGradingService.TextWatermark.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

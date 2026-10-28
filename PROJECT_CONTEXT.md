@@ -16,7 +16,7 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 - `LoginForm` hiện chỉ chọn chế độ/ngôn ngữ, không phải đăng nhập tài khoản hay xác thực.
 - `AppMode` có giá trị `Testing`, nhưng giao diện chỉ cho chọn Training; `MainForm` từ chối Testing vì chưa triển khai.
 - Chưa có thi có tính giờ, tổng điểm, nộp bài, lưu lịch sử vào database hoặc installer/release workflow hoàn chỉnh.
-- Có **25 package P01–P25, tổng196 task**, không áp đặt mọi project phải có cùng số task.
+- Có **26 package P01–P26, tổng201 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
@@ -83,7 +83,7 @@ Lỗi COM/session desktop là lỗi hạ tầng, không phải đáp án sai. CO
 
 ### 2.3. Chấm bài và context chỉ đọc
 
-`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **69 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới.
+`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **73 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới.
 
 - Phần saved-content chấm bằng ZIP/OOXML, relationships, styles/theme/effective formatting, logical text. Không mở/attach Word bên trong Core, không chấm theo click history hoặc IDs/XML/runs cố định khi Word có thể tái sinh chúng.
 - Grade thông thường gọi owned `Save()` và `PreserveSaveAsWork()` trước khi đọc đáp án. Save lỗi thì báo Error và giữ Word để phục hồi bài.
@@ -106,7 +106,7 @@ Không tự Update TOC/fields, Repaginate, chạy Inspector, chèn Introduction 
 - Package gốc nằm ở `MosWord2019.WinForms/Projects/`; runtime đọc `Projects` cạnh executable. `.csproj` copy từng file bằng `PreserveNewest`; thêm file phải bảo đảm inclusion/copy đúng một lần, không sửa trực tiếp bin để coi là sửa nguồn.
 - Working root mặc định: `<Documents>/MosWord2019/Working/<ProjectId>/work.docx` hoặc `work.doc` theo starter. `PrepareWorkingCopy()` là entry point tương thích nhưng vẫn gọi fresh reset.
 - Reset xác minh containment/reparse/lock, phục hồi starter qua file tạm và atomic replace/move; chỉ xử lý đúng tên reserved `work.doc`, `work.docx`, `work.docm`, `export-checkpoint.docx`. Không xóa đệ quy hoặc đụng arbitrary exports.
-- Assets top-level được stage vào Documents qua `TrainingWorkspaceService.Assets.cs`; P12 có thêm bản Map.png trong Pictures qua metadata. Không tự chèn assets vào tài liệu.
+- Assets top-level được stage vào Documents qua `TrainingWorkspaceService.Assets.cs`; P12 có thêm bản Map.png trong Pictures qua metadata; P26 thêm alias Coffee Sam.jpg trong Documents, giữ nguyên Coffee_Sam.jpg và Information.docx. Alias đi qua cùng ledger, kiểm tra tên an toàn/collision/containment/no-overwrite/rollback và cleanup identity/hash. Không tự chèn assets vào tài liệu.
 - **Quy tắc hiện tại:** mọi bản sao do service tạo trong phiên được cleanup khi kết thúc project/phiên hoặc thoát bình thường, kể cả package không có `assetStaging`. Chỉ xóa bản sao còn đúng hash và Windows file identity, qua exclusive handle. Bản có sẵn cùng hash được tái sử dụng nhưng không nhận sở hữu; khác hash thì chặn, không ghi đè.
 - File đã sửa/thay thế/khóa và dữ liệu cá nhân phải được bảo vệ. Crash hoặc cleanup lỗi có thể để lại file; không nhận quyền xóa từ tên/hash của file tồn từ phiên trước. Ghi log, không hứa cleanup tuyệt đối sau force-stop.
 - Đừng nhầm staged assets với output bài tập. P09 Memo.txt không có cleanup giống assets. P06/P07 có `TemplateOutputCleanupService` riêng, xóa đúng tên template đã đăng ký sau khi Word đóng an toàn; registry tên được giữ qua chuyển project. Notes.dotx của P20 có thể bị quy tắc P07 tác động nếu đã ghé P07 trong cùng phiên; đây là hành vi đã kiểm chứng, không tự sửa.
@@ -138,7 +138,7 @@ MosWord2019.WinForms/Projects/Word2019_P24/
 | Model / vị trí | Các trường và mục đích chính |
 |---|---|
 | `ProjectMeta` — Core/Models | `ProjectId`, `OfficeVersion`, `Version`, `Starter`, optional `AssetStaging`. |
-| `AssetStagingOptions` / `AssetDestinationCopy` | `CopyAssetsToDocuments`, `AdditionalCopies` (`Source`, `Destination`), `CleanupPolicy`. Cleanup owned default assets hiện không đòi manifest opt-in. |
+| `AssetStagingOptions` / `AssetDestinationCopy` | `CopyAssetsToDocuments`, `AdditionalCopies` (`Source`, `Destination`, optional `DestinationFileName`), `CleanupPolicy`. Cleanup owned default assets hiện không đòi manifest opt-in. |
 | `TaskDefinition` — Core/Models | `TaskId`, `TitleKey`, `InstructionKey`, `AssertionType`; `ProjectId` được gán khi load, không serialize. `[JsonExtensionData] IDictionary<string,JToken> Extra` giữ metadata assertion; không mở rộng schema cứng cho từng project. |
 | `ProjectPackage` — Core/Models | `Meta`, `List<TaskDefinition> Tasks`, `Dictionary<string,string> Lang`, `ProjectFolderPath`; `DisplayName` suy từ ProjectId. |
 | `AppSession` — WinForms | Immutable `Mode`, `Language`; chỉ lựa chọn shell, không phải tài khoản hoặc exam session, chưa có SessionId thi. |
@@ -204,15 +204,20 @@ Testing tương lai bắt buộc dùng working copies riêng theo **SessionId**,
 | P23 | 6 |
 | P24 | 6 |
 | P25 | 5 |
-| **Tổng25 project** | **196 task** |
+| P26 | 5 |
+| **Tổng26 project** | **201 task** |
 
-Training đã có package discovery/validation, EN/VI, task tabs, điều hướng, fresh-start/reset, owned Word lifecycle, Save/Save As khi Grade, assets staging/cleanup và69 generic assertions. Trạng thái này không đồng nghĩa mọi task ở mọi project đã được kiểm thử đầy đủ qua GUI tiếng Việt; xem giới hạn riêng trong KNOWN_ISSUES.md.
+Training đã có package discovery/validation, EN/VI, task tabs, điều hướng, fresh-start/reset, owned Word lifecycle, Save/Save As khi Grade, assets staging/cleanup và73 generic assertions. Trạng thái này không đồng nghĩa mọi task ở mọi project đã được kiểm thử đầy đủ qua GUI tiếng Việt; xem giới hạn riêng trong KNOWN_ISSUES.md.
 
-### 5.2. P25 và các hợp đồng P24 được giữ
+### 5.2. P26 và các hợp đồng P24/P25 được giữ
+
+P26 hoàn thành đúng năm task: nhập đủ ba đoạn Information giữa note/đường cam và SmartArt; thứ tự logic Accessibility/Speed/Accuracy/Artists với ảnh/layout gốc; đúng Coffee Sam.jpg bên trong Sidebar dưới chữ, bevel Soft Round trên chính ảnh; bullets thật cho đúng ba shift, note ngoài list; watermark chữ MOS Word/Arial trong effective header story. Bốn route chung mới và opt-in preservation giữ defaults cũ, không sửa UI/Interop/lifecycle hoặc package P01–P25.
+
+Kiểm chứng mới P26: matrix72/72, SmartArt43/43, watermark44/44, review13/13, staging/lifecycle172/172, MainForm EN/VI103/103; combined5/5 sau lưu/mở lại. Hồi quy cũ682 ca đúng trên đường dẫn giữ lại;11 ca P20 thiếu template tạm đã chạy lại11/11 bằng context cô lập, P25 thêm123/123. Debug/Release Rebuild0 lỗi/0 cảnh báo; source/hai outputs26 package/201 task EN/VI0/0. Hash giữ52 dictionaries,26 starters,8 assets;139 file khớp mỗi output và7 P26 copy entries không đổi. Native GUI/API/fixture và giới hạn được phân biệt trong artifacts/p26/REPORT.md.
 
 P25 hoàn thành đúng T01–T05: Double480/auto cho toàn bộ main story với effective inheritance; genuine Strong riêng cụm Environmental School Project trong đoạn Introduction đã khai báo; native Banded header chỉ ẩn ở trang đầu tài liệu, vẫn hiện trên References; Expanded2pt (+40) cho toàn đoạn thứ hai dưới Suggestions; Next Page section boundary ngay trước References, chấp nhận native paragraph-end/empty-boundary và omitted default type. Các opt-in giữ defaults cũ; route generic mới là `SectionBreakBeforeHeading`. Không đổi câu hỏi/starter/assets, UI/Interop/lifecycle hay P01–P24.
 
-Kiểm chứng mới28/10: matrix123/123, MainForm/owned Word API EN/VI91/91, hồi quy dùng fixture lưu lại693/693 (gồm P24 saved-state336 và T02 variants29); Debug/Release Rebuild0 lỗi/0 cảnh báo; source/hai outputs EN/VI0/0,25 package/196 task. Giữ nguyên50 dictionaries,25 starters,6 assets theo hash đầu phiên;132 package files khớp mỗi output. Full manual GUI/F5/VI và Office build khác chưa được khẳng định. Chi tiết: `artifacts/p25/REPORT.md`. Các kết quả26/10 và P24 bên dưới giữ ngày/provenance lịch sử.
+Đợt P25 trước đó28/10: matrix123/123, MainForm/owned Word API EN/VI91/91, hồi quy dùng fixture lưu lại693/693 (gồm P24 saved-state336 và T02 variants29); Debug/Release Rebuild0 lỗi/0 cảnh báo; source/hai outputs EN/VI0/0,25 package/196 task. Giữ nguyên50 dictionaries,25 starters,6 assets theo hash đầu phiên;132 package files khớp mỗi output. Full manual GUI/F5/VI và Office build khác chưa được khẳng định. Chi tiết: `artifacts/p25/REPORT.md`. Các kết quả26/10 và P24 bên dưới giữ ngày/provenance lịch sử.
 
 P24 hoàn thành sáu task: Narrow margins toàn tài liệu; Banded Quote `MOS, 2021` dưới giữa bìa; cập nhật TOC thật với headings/links/page hiện tại; chèn đủ hai đoạn Introduction trước `Proposal for Tan’s Office`; Page Color Gray/Accent3/Lighter80%; Inspector xóa đúng Headers/Footers/Watermarks.
 
@@ -227,9 +232,9 @@ Giữ các mốc tương thích: P05 Inspector guards; P06/P07 templates và P07
 
 ### 5.3. Bằng chứng kiểm chứng và giới hạn
 
-**Kiểm tra mới khi lập tài liệu này:** đối chiếu các project/nguồn, xác nhận191 task và68 routes; chạy lại ProjectValidator cho source P01–P24 EN/VI: **0 lỗi, 0 cảnh báo**, discovery đúng Project1–24. Data hiện không có implementation database. Đây là lượt rà soát/tạo tài liệu, không chạy lại toàn bộ GUI/build.
+**Lịch sử kiểm tra khi lập tài liệu26/10:** đối chiếu các project/nguồn, xác nhận191 task và68 routes; chạy lại ProjectValidator cho source P01–P24 EN/VI: **0 lỗi, 0 cảnh báo**, discovery đúng Project1–24. Data hiện không có implementation database. Đây là lượt rà soát/tạo tài liệu, không chạy lại toàn bộ GUI/build.
 
-**Lượt sửa T02 trước đó**, có log tại `artifacts/p24/t02-fix/REPORT.md`: native13/13, T02 cases29/29, production MainForm/Word EN/VI157/157, P24 saved-state336/336, synthetic71/71; hồi quy cũ362/362. Ba ca tồn tại file P06/P07/P09 không chạy lại vì fixture cần ghi vào Documents cá nhân; không gắn nhãn tổng lịch sử365/365 là lượt chạy mới. Debug/Release Any CPU Rebuild khi sửa T02 đều0 lỗi/0 cảnh báo; package output127 file khớp source và24 starter/29 hash bất biến không đổi.
+**Lượt sửa T02 trước đó**, có log tại `artifacts/p24/t02-fix/REPORT.md`: native13/13, T02 cases29/29, production MainForm/Word EN/VI157/157, P24 saved-state336/336, synthetic72/72; hồi quy cũ362/362. Ba ca tồn tại file P06/P07/P09 không chạy lại vì fixture cần ghi vào Documents cá nhân; không gắn nhãn tổng lịch sử365/365 là lượt chạy mới. Debug/Release Any CPU Rebuild khi sửa T02 đều0 lỗi/0 cảnh báo; package output127 file khớp source và24 starter/29 hash bất biến không đổi.
 
 Giới hạn còn phải nhớ:
 
@@ -241,6 +246,6 @@ Giới hạn còn phải nhớ:
 
 ### 5.4. Điểm bắt đầu cho phiên tiếp theo
 
-HEAD đầu lượt P25: `main` tại **`78007dfb97adc6bb30d346f696c23327eb39b7b3`**, “Bo sung Project 25”, parent `8c04b49634db01d64ab0cc2f95cb833e5190d437`. Phần triển khai P25 và cập nhật tài liệu hiện chưa commit. Giữ bốn dictionaries P22/P23 dirty có sẵn, phần bổ sung PROJECT_STATUS có sẵn và CONVERSATION_HANDOFF chưa track; không restore/ghi đè. Trợ lý không commit/push.
+HEAD đầu và cuối lượt P26: `main` tại **`a7e9673f03d1c3bd8e31fbe9b76486db48b84448`**, “Cap nhat p26”; worktree đầu lượt sạch, P25 đã có implementation. Thay đổi P26/code/docs hiện chưa commit; toàn bộ package P01–P25 và câu hỏi/starter/assets giữ nguyên baseline này. Mô tả dirty P22/P23/HEAD78007df trong handoff cũ là lịch sử. Trợ lý không commit/push/pull/reset.
 
-Phiên sau phải kiểm tra HEAD/status lại, đọc yêu cầu mới và xem diff trước khi chọn việc tiếp theo. Testing/database/project tiếp theo không tự trở thành phạm vi được phép chỉ vì P25 đã xong. Khi được yêu cầu tiếp tục, dùng source hiện tại và các quyết định trên làm nền, giữ nguyên nội dung câu hỏi và thành quả của project đã hoàn tất.
+Phiên sau phải kiểm tra HEAD/status lại, đọc yêu cầu mới và xem diff trước khi chọn việc tiếp theo. Testing/database/project tiếp theo không tự trở thành phạm vi được phép chỉ vì P26 đã xong. Khi được yêu cầu tiếp tục, dùng source hiện tại và các quyết định trên làm nền, giữ nguyên nội dung câu hỏi và thành quả của project đã hoàn tất.

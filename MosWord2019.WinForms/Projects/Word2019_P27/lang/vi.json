@@ -1,0 +1,12 @@
+﻿{
+  "P27_T01_TITLE": "Câu 1",
+  "P27_T01_INST": "Chuyển toàn bộ văn bản trong bảng sang kiểu chữ Sentence case.",
+  "P27_T02_TITLE": "Câu 2",
+  "P27_T02_INST": "Chèn hình dạng Scroll: Horizontal (Horizontal Scroll) chứa văn bản \"Begin in October!\". Đặt hình dạng tại vị trí chính giữa phía dưới trang.",
+  "P27_T03_TITLE": "Câu 3",
+  "P27_T03_INST": "Tô sáng toàn bộ văn bản trong hàng bắt đầu bằng \"Prince\" bằng màu Turquoise.",
+  "P27_T04_TITLE": "Câu 4",
+  "P27_T04_INST": "Định dạng tiêu đề \"Athletic Scholarships\" thành hộp văn bản WordArt, sử dụng kiểu Gold fill, Accent 4, Soft Bevel.",
+  "P27_T05_TITLE": "Câu 5",
+  "P27_T05_INST": "Sử dụng Find and Replace để thay thế tất cả các lần xuất hiện của \"Football\" bằng \"Soccer\". Không thay đổi các thiết lập khác."
+}
