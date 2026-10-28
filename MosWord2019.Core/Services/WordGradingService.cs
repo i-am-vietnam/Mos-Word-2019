@@ -50,7 +50,7 @@ namespace MosWord2019.Core.Services
             "InsertedTableAutoFitWindow", "TableRowCharacterStyle", "TableCellSpacingEquals", "PictureBorderColorEquals", "TrackedChangesDisposition",
             "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
             WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved",
-            "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor"
+            "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor", "SectionBreakBeforeHeading"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -169,6 +169,7 @@ namespace MosWord2019.Core.Services
                         case "ListLevelEquals": passed = CheckListLevels(package, task, out detail); break;
                         case "InlineModel3D": passed = CheckInlineModel3D(package, task, out detail); break;
                         case "ContinuousSectionBreakBeforeHeading": passed = CheckContinuousSectionBreak(package, task, out detail); break;
+                        case "SectionBreakBeforeHeading": passed = CheckParagraphEndSectionBreak(package, task, out detail, RequiredString(task, "expectedSectionType")); break;
                         case "SmartArtAllNodesBevelEquals": passed = CheckSmartArtNodeBevel(package, task, out detail); break;
                         case "DocumentParagraphLineSpacingMultiple": passed = CheckDocumentParagraphLineSpacingMultiple(package, task, out detail); break;
                         case "ContinuedNumberingSequence": passed = CheckContinuedNumberingSequence(package, task, out detail); break;
@@ -517,6 +518,12 @@ namespace MosWord2019.Core.Services
                 {
                     string part;
                     effective.TryGetValue(type, out part);
+                    if (task.Extra.ContainsKey("expectedHeaderBand"))
+                    {
+                        if (string.IsNullOrEmpty(part) || !HeaderBandMatches(package, package.Xml(part).Root, task))
+                        { detail = "Section " + (index + 1) + " has a missing or incorrect effective " + type + " banded header."; return false; }
+                        continue;
+                    }
                     if (task.Extra.ContainsKey("expectedHeaderCellThemeFills"))
                     {
                         if (string.IsNullOrEmpty(part) || !HeaderCellStructureMatches(package.Xml(part).Root, task))
@@ -831,6 +838,8 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckCharacterStyle(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("targetText"))
+                return CheckRangeCharacterStyle(package, task, out detail);
             string expectedParagraph = RequiredString(task, "expectedParagraph");
             string style = RequiredString(task, "characterStyleId");
             XDocument document = package.Xml("word/document.xml");
@@ -1012,6 +1021,8 @@ namespace MosWord2019.Core.Services
             bool match = paragraphs.All(paragraph =>
             {
                 XElement spacing = paragraph.Element(W + "pPr")?.Element(W + "spacing");
+                if (OptionalBool(task, "compareEffectiveLineSpacing", false))
+                    spacing = EffectiveLineSpacing(package, paragraph);
                 if (Twips(spacing, "line", -1) == expectedLine &&
                     string.Equals((string)spacing?.Attribute(W + "lineRule"), expectedRule, StringComparison.Ordinal)) return true;
                 // Later tasks may declare an exact spacing override; this never exempts arbitrary spacing.
@@ -1021,7 +1032,10 @@ namespace MosWord2019.Core.Services
                     Twips(spacing, "line", -1) == (int)value["expectedLineTwips"] &&
                     (string)spacing?.Attribute(W + "lineRule") == (string)value["expectedLineRule"]);
             });
-            detail = match ? (allowed.Count == 0 && !OptionalBool(task, "ignoreGeneratedTocResultParagraphs", false)
+            detail = OptionalBool(task, "compareEffectiveLineSpacing", false)
+                ? (match ? "Every applicable main-story paragraph has the declared effective automatic line spacing."
+                    : "One or more main-story paragraphs have incorrect effective line spacing.")
+                : match ? (allowed.Count == 0 && !OptionalBool(task, "ignoreGeneratedTocResultParagraphs", false)
                 ? "Every paragraph in the main document story uses the verified Multiple 1.4 line spacing."
                 : "Every applicable main-story paragraph uses the declared Multiple spacing or an explicit later-task override.")
                 : "One or more main-story paragraphs do not use Multiple 1.4 line spacing.";

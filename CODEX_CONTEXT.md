@@ -1,5 +1,13 @@
 # Technical Context
 
+## Project 25 opt-ins — 2026-10-28
+
+P01–P25 now contain196 tasks; supported identifiers total69. P25 adds `SectionBreakBeforeHeading`, registered in Core and structurally accepted by the existing validator (support is checked separately). It reuses the paragraph-end boundary helper with explicit `expectedSectionType`; the following section governs the break, omitted type means nextPage, and the existing Continuous route keeps its default. The complete preceding paragraph, intervening empty boundaries and original heading are checked; source-preservation metadata retains all original main-story text/whitespace.
+
+`DocumentParagraphLineSpacingMultiple/compareEffectiveLineSpacing=true` merges document defaults, paragraph style chains and direct spacing, treating omitted lineRule as auto; old direct-spacing defaults remain unchanged. `CharacterStyleAppliedToParagraph/targetText` selects a unique exact paragraph/range and resolves `characterStyleName` against genuine built-in character styles rather than generated style IDs. Full split-run coverage is required; `requireExactStyleRange` also excludes surrounding quotation marks. Without targetText the old whole-paragraph/style-ID contract remains unchanged. Existing `TextRangeFormattingEquals/allowAdditionalFormatting=true` checks only declared spacing40, preserving unrelated font/color and independent Double.
+
+`HeaderDifferentFirstPage/checkAllSections/expectedHeaderBand` reuses the inherited effective default/first/even-header traversal. Native Banded recognition checks a real centered rectangular Accent1 band, native relative width/height/top percentages, coherent frame geometry/wrap, visible unchanged fill, centered white caps Title control and namespace-resolved core-properties/DC binding. Prefix/store/drawing IDs and custom title text are not fixed. Empty first header is required only for document page1; a new-page References section with inherited empty first header fails. Invisible/transparent/recolored lookalikes and spoofed binding namespaces fail. Legacy Integral/Retrospect metadata is unaffected. No new context, COM, UI or lifecycle code is introduced. Native/API/fixture evidence and limitations: `artifacts/p25/REPORT.md`.
+
 For the consolidated Vietnamese project overview, Interop ownership rules, actual models and current checkpoint, read [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md). The sections below retain detailed technical contracts and dated historical context.
 
 ## Current exercise-content and asset lifecycle rules — 2026-10-25

@@ -1,6 +1,11 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-25.
+Reviewed: 2026-10-28.
+
+## Project 25 verification limits
+
+- Native Banded and five task answers were generated with owned Word2019 API on disposable copies, saved/reopened/resaved; production MainForm API integration passes all five in EN/VI with isolated workspaces. This does not establish full manual Ribbon/F5 or all-native Vietnamese GUI execution. Other Office builds/localized Banded serialization have not been sampled; recognition uses saved structure/property binding rather than gallery captions.
+- Sandbox COM activation failed with80070520 before opening a document. Interactive owned-STA runs succeeded and closed all test-owned Word instances while preserving an independent unsaved document. No production ownership/security workaround was added. Fresh results: `artifacts/p25/REPORT.md`.
 
 ## P24 T02 screenshot-family correction
 

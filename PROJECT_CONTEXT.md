@@ -1,6 +1,6 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
-Cập nhật: **26/10/2026** (Asia/Bangkok). Tài liệu dành cho lập trình viên và trợ lý đọc trước khi tiếp tục công việc, tổng hợp từ mã nguồn hiện tại và các quyết định đã được người dùng chấp thuận.
+Cập nhật: **28/10/2026** (Asia/Bangkok). Tài liệu dành cho lập trình viên và trợ lý đọc trước khi tiếp tục công việc, tổng hợp từ mã nguồn hiện tại và các quyết định đã được người dùng chấp thuận.
 
 Thứ tự đọc đầu phiên: `AGENTS.md` → `PROJECT_STATUS.md` → `KNOWN_ISSUES.md` → `CODEX_CONTEXT.md` → tài liệu này → các file nguồn liên quan trực tiếp. Yêu cầu hiện tại của người dùng quyết định phạm vi; khi tài liệu mô tả khác mã nguồn, kiểm tra mã nguồn và sửa tài liệu có liên quan. Không tự coi mô tả lịch sử là yêu cầu mới.
 
@@ -16,7 +16,7 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 - `LoginForm` hiện chỉ chọn chế độ/ngôn ngữ, không phải đăng nhập tài khoản hay xác thực.
 - `AppMode` có giá trị `Testing`, nhưng giao diện chỉ cho chọn Training; `MainForm` từ chối Testing vì chưa triển khai.
 - Chưa có thi có tính giờ, tổng điểm, nộp bài, lưu lịch sử vào database hoặc installer/release workflow hoàn chỉnh.
-- Có **24 package P01–P24, tổng191 task**, không áp đặt mọi project phải có cùng số task.
+- Có **25 package P01–P25, tổng196 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
@@ -83,7 +83,7 @@ Lỗi COM/session desktop là lỗi hạ tầng, không phải đáp án sai. CO
 
 ### 2.3. Chấm bài và context chỉ đọc
 
-`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **68 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới.
+`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **69 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới.
 
 - Phần saved-content chấm bằng ZIP/OOXML, relationships, styles/theme/effective formatting, logical text. Không mở/attach Word bên trong Core, không chấm theo click history hoặc IDs/XML/runs cố định khi Word có thể tái sinh chúng.
 - Grade thông thường gọi owned `Save()` và `PreserveSaveAsWork()` trước khi đọc đáp án. Save lỗi thì báo Error và giữ Word để phục hồi bài.
@@ -131,7 +131,7 @@ MosWord2019.WinForms/Projects/Word2019_P24/
 
 `meta.json` định danh package và starter; `tasks.json` là mảng task theo thứ tự hiển thị; mỗi task trỏ tới khóa trong dictionary ngôn ngữ. Ví dụ tên khóa `P24_T02_TITLE`/`P24_T02_INST`, task ID `T02`, project ID `Word2019_P24`. Giữ nguyên ID thật của project; P19 cố ý không có T02, không đánh số lại cho liên tục.
 
-`ProjectValidator.Validate()` kiểm tra folder/meta/starter/JSON/task IDs, sự hiện diện của `assertionType`, language keys và asset options trước khi package được nạp. Validator hiện chưa tự đối chiếu identifier với tập assertion hỗ trợ; cần kiểm tra riêng bằng `WordGradingService.IsAssertionTypeSupported()` khi kiểm chứng package/routing. Nó cũng chưa xác minh toàn bộ nội dung OOXML hoặc mọi metadata riêng của assertion. `ProjectLoader.LoadAll()` bỏ package có validation errors, sắp theo ProjectId; với tập hiện tại kết quả là Project1–24. Không tự nhận một package chắc chắn chấm được chỉ vì loader nạp thành công.
+`ProjectValidator.Validate()` kiểm tra folder/meta/starter/JSON/task IDs, sự hiện diện của `assertionType`, language keys và asset options trước khi package được nạp. Validator hiện chưa tự đối chiếu identifier với tập assertion hỗ trợ; cần kiểm tra riêng bằng `WordGradingService.IsAssertionTypeSupported()` khi kiểm chứng package/routing. Nó cũng chưa xác minh toàn bộ nội dung OOXML hoặc mọi metadata riêng của assertion. `ProjectLoader.LoadAll()` bỏ package có validation errors, sắp theo ProjectId; với tập hiện tại kết quả là Project1–25. Không tự nhận một package chắc chắn chấm được chỉ vì loader nạp thành công.
 
 ### 3.3. Model đang dùng
 
@@ -203,11 +203,16 @@ Testing tương lai bắt buộc dùng working copies riêng theo **SessionId**,
 | P22 | 7 |
 | P23 | 6 |
 | P24 | 6 |
-| **Tổng24 project** | **191 task** |
+| P25 | 5 |
+| **Tổng25 project** | **196 task** |
 
-Training đã có package discovery/validation, EN/VI, task tabs, điều hướng, fresh-start/reset, owned Word lifecycle, Save/Save As khi Grade, assets staging/cleanup và68 generic assertions. Trạng thái này không đồng nghĩa mọi task ở mọi project đã được kiểm thử đầy đủ qua GUI tiếng Việt; xem giới hạn riêng trong KNOWN_ISSUES.md.
+Training đã có package discovery/validation, EN/VI, task tabs, điều hướng, fresh-start/reset, owned Word lifecycle, Save/Save As khi Grade, assets staging/cleanup và69 generic assertions. Trạng thái này không đồng nghĩa mọi task ở mọi project đã được kiểm thử đầy đủ qua GUI tiếng Việt; xem giới hạn riêng trong KNOWN_ISSUES.md.
 
-### 5.2. P24 và thay đổi gần nhất
+### 5.2. P25 và các hợp đồng P24 được giữ
+
+P25 hoàn thành đúng T01–T05: Double480/auto cho toàn bộ main story với effective inheritance; genuine Strong riêng cụm Environmental School Project trong đoạn Introduction đã khai báo; native Banded header chỉ ẩn ở trang đầu tài liệu, vẫn hiện trên References; Expanded2pt (+40) cho toàn đoạn thứ hai dưới Suggestions; Next Page section boundary ngay trước References, chấp nhận native paragraph-end/empty-boundary và omitted default type. Các opt-in giữ defaults cũ; route generic mới là `SectionBreakBeforeHeading`. Không đổi câu hỏi/starter/assets, UI/Interop/lifecycle hay P01–P24.
+
+Kiểm chứng mới28/10: matrix123/123, MainForm/owned Word API EN/VI91/91, hồi quy dùng fixture lưu lại693/693 (gồm P24 saved-state336 và T02 variants29); Debug/Release Rebuild0 lỗi/0 cảnh báo; source/hai outputs EN/VI0/0,25 package/196 task. Giữ nguyên50 dictionaries,25 starters,6 assets theo hash đầu phiên;132 package files khớp mỗi output. Full manual GUI/F5/VI và Office build khác chưa được khẳng định. Chi tiết: `artifacts/p25/REPORT.md`. Các kết quả26/10 và P24 bên dưới giữ ngày/provenance lịch sử.
 
 P24 hoàn thành sáu task: Narrow margins toàn tài liệu; Banded Quote `MOS, 2021` dưới giữa bìa; cập nhật TOC thật với headings/links/page hiện tại; chèn đủ hai đoạn Introduction trước `Proposal for Tan’s Office`; Page Color Gray/Accent3/Lighter80%; Inspector xóa đúng Headers/Footers/Watermarks.
 
@@ -236,6 +241,6 @@ Giới hạn còn phải nhớ:
 
 ### 5.4. Điểm bắt đầu cho phiên tiếp theo
 
-HEAD được kiểm tra cuối khi viết: `main` tại **`8c04b49634db01d64ab0cc2f95cb833e5190d437`**, commit “Sua loi p24”, parent `6ae8775a2960b63251a4665d4664b3c5d4aeaea3`. Commit mới do người dùng/bên ngoài phiên trợ lý tạo trong lúc lập tài liệu, đã chứa phần khôi phục câu hỏi, cleanup assets và sửa T02. Trợ lý không chạy commit/push. Worktree hiện còn các chỉnh sửa tài liệu của lượt này, gồm file ngữ cảnh mới; kiểm tra status/diff lại ở phiên tiếp theo, không reset/ghi đè.
+HEAD đầu lượt P25: `main` tại **`78007dfb97adc6bb30d346f696c23327eb39b7b3`**, “Bo sung Project 25”, parent `8c04b49634db01d64ab0cc2f95cb833e5190d437`. Phần triển khai P25 và cập nhật tài liệu hiện chưa commit. Giữ bốn dictionaries P22/P23 dirty có sẵn, phần bổ sung PROJECT_STATUS có sẵn và CONVERSATION_HANDOFF chưa track; không restore/ghi đè. Trợ lý không commit/push.
 
-Phiên sau phải kiểm tra HEAD/status lại, đọc yêu cầu mới và xem diff trước khi chọn việc tiếp theo. P25/Testing/database không tự trở thành phạm vi được phép chỉ vì P24 đã xong. Khi được yêu cầu tiếp tục, dùng source hiện tại và các quyết định trên làm nền, giữ nguyên nội dung câu hỏi và thành quả của project đã hoàn tất.
+Phiên sau phải kiểm tra HEAD/status lại, đọc yêu cầu mới và xem diff trước khi chọn việc tiếp theo. Testing/database/project tiếp theo không tự trở thành phạm vi được phép chỉ vì P25 đã xong. Khi được yêu cầu tiếp tục, dùng source hiện tại và các quyết định trên làm nền, giữ nguyên nội dung câu hỏi và thành quả của project đã hoàn tất.

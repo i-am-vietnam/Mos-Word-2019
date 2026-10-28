@@ -98,6 +98,120 @@ namespace MosWord2019.Core.Services
             return true;
         }
 
+        private static XElement EffectiveLineSpacing(PackageSnapshot package, XElement paragraph)
+        {
+            var styles = package.Xml("word/styles.xml").Root;
+            string defaultStyle = (string)styles.Elements(W + "style").FirstOrDefault(s =>
+                (string)s.Attribute(W + "type") == "paragraph" && IsOnAttribute(s, "default"))?.Attribute(W + "styleId") ?? "Normal";
+            var sources = new[] { styles.Element(W + "docDefaults")?.Element(W + "pPrDefault")?.Element(W + "pPr") }
+                .Concat(StyleChain(styles, (string)paragraph.Element(W + "pPr")?.Element(W + "pStyle")?.Attribute(W + "val") ?? defaultStyle).Select(s => s.Element(W + "pPr")))
+                .Concat(new[] { paragraph.Element(W + "pPr") });
+            var spacing = new XElement(W + "spacing");
+            foreach (var source in sources.Where(s => s != null))
+                foreach (var attribute in source.Element(W + "spacing")?.Attributes() ?? Enumerable.Empty<XAttribute>())
+                    spacing.SetAttributeValue(attribute.Name, attribute.Value);
+            if (spacing.Attribute(W + "lineRule") == null) spacing.SetAttributeValue(W + "lineRule", "auto");
+            return spacing;
+        }
+
+        private static bool IsOnAttribute(XElement element, string name)
+        { return element?.Attribute(W + name) != null && !new[] { "0", "false", "off" }.Contains((string)element.Attribute(W + name)); }
+
+        private static bool CheckRangeCharacterStyle(PackageSnapshot package, TaskDefinition task, out string detail)
+        {
+            string text = RequiredString(task, "expectedParagraph"), target = RequiredString(task, "targetText");
+            string name = RequiredString(task, "characterStyleName");
+            var paragraphs = MainParagraphs(package).Where(p => ParagraphText(p) == text).ToList();
+            int start = text.IndexOf(target, StringComparison.Ordinal), end = start + target.Length;
+            if (target.Length == 0) throw new InvalidDataException("The character-style range is empty.");
+            bool match = paragraphs.Count == 1 && start >= 0 && text.IndexOf(target, end, StringComparison.Ordinal) < 0;
+            var styles = package.Xml("word/styles.xml").Root;
+            var identities = styles.Elements(W + "style").Where(s => (string)s.Attribute(W + "type") == "character" &&
+                !IsOnAttribute(s, "customStyle") && string.Equals((string)s.Element(W + "name")?.Attribute(W + "val"), name, StringComparison.OrdinalIgnoreCase))
+                .Select(s => (string)s.Attribute(W + "styleId")).ToList();
+            int offset = 0, covered = 0;
+            if (match)
+                foreach (var run in paragraphs[0].Descendants(W + "r").Where(r => !r.Ancestors(W + "del").Any()))
+                {
+                    int length = VisibleText(run).Length;
+                    int overlap = Math.Max(0, Math.Min(offset + length, end) - Math.Max(offset, start));
+                    bool styled = identities.Count == 1 && identities.Contains((string)run.Element(W + "rPr")?.Element(W + "rStyle")?.Attribute(W + "val"));
+                    if (overlap > 0) { match &= styled; covered += overlap; }
+                    if (OptionalBool(task, "requireExactStyleRange", false) && length > overlap && styled) match = false;
+                    offset += length;
+                }
+            match &= covered == target.Length;
+            detail = match ? "The complete unchanged target range carries the genuine declared character style."
+                : "The character style identity, target range or complete coverage is incorrect.";
+            return match;
+        }
+
+        private static bool HeaderBandMatches(PackageSnapshot package, XElement header, TaskDefinition task)
+        {
+            var expected = task.Extra["expectedHeaderBand"] as JObject;
+            if (expected == null || expected["fillScheme"]?.Type != JTokenType.String ||
+                new[] { "widthPercent", "heightPercent", "topPercent" }.Any(k => expected[k]?.Type != JTokenType.Integer) ||
+                !(expected["bindingPath"] is JArray) || !(expected["bindingNamespaces"] is JArray) ||
+                expected["bindingPath"].Count() != expected["bindingNamespaces"].Count() ||
+                expected["bindingPath"].Count() == 0 || expected["bindingPath"].Concat(expected["bindingNamespaces"]).Any(t => t.Type != JTokenType.String))
+                throw new InvalidDataException("Invalid header band metadata.");
+            XNamespace wp14 = "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing";
+            var anchors = header.Descendants(Wp + "anchor").Where(e => !e.Ancestors(Mc + "Fallback").Any()).ToList();
+            if (anchors.Count != 1 || header.Descendants(W + "tbl").Any() || header.Descendants(Wp + "inline").Any()) return false;
+            var anchor = anchors[0];
+            if (anchor.DescendantsAndSelf().Any(e => !e.Ancestors(Mc + "Fallback").Any() &&
+                new[] { "1", "true", "on" }.Contains((string)e.Attribute("hidden")))) return false;
+            var ownerRun = anchor.Ancestors(W + "r").FirstOrDefault();
+            var ownerParagraph = ownerRun?.Ancestors(W + "p").FirstOrDefault();
+            if (ownerParagraph == null || EffectiveRunFormatting(package, ownerParagraph, ownerRun).ContainsKey("vanish")) return false;
+            var shapes = anchor.Descendants(Wps + "wsp").ToList();
+            if (shapes.Count != 1) return false;
+            var shape = shapes[0]; var properties = shape.Element(Wps + "spPr");
+            var transform = properties?.Element(A + "xfrm");
+            var offset = transform?.Element(A + "off"); var size = transform?.Element(A + "ext"); var extent = anchor.Element(Wp + "extent");
+            var fill = properties?.Element(A + "solidFill")?.Element(A + "schemeClr");
+            long width, height;
+            if ((string)properties?.Element(A + "prstGeom")?.Attribute("prst") != "rect" ||
+                (string)fill?.Attribute("val") != (string)expected["fillScheme"] ||
+                fill.Elements().Any(e => e.Name != A + "alpha" || (string)e.Attribute("val") != "100000") ||
+                properties.Element(A + "ln")?.Element(A + "noFill") == null ||
+                transform == null || transform.Attributes().Any(a => new[] { "rot", "flipH", "flipV" }.Contains(a.Name.LocalName) && !new[] { "0", "false" }.Contains(a.Value)) ||
+                (string)offset?.Attribute("x") != "0" || (string)offset?.Attribute("y") != "0" ||
+                !long.TryParse((string)extent?.Attribute("cx"), out width) || width <= 0 ||
+                !long.TryParse((string)extent?.Attribute("cy"), out height) || height <= 0 ||
+                (string)size?.Attribute("cx") != (string)extent.Attribute("cx") || (string)size?.Attribute("cy") != (string)extent.Attribute("cy") ||
+                anchor.Element(Wp + "wrapSquare") == null || (string)anchor.Element(Wp + "positionH")?.Attribute("relativeFrom") != "margin" ||
+                (string)anchor.Element(Wp + "positionH")?.Element(Wp + "align") != "center") return false;
+            var vertical = anchor.Descendants(Wp + "positionV").Where(p => !p.Ancestors(Mc + "Fallback").Any()).ToList();
+            if (vertical.Count != 1 || (string)vertical[0].Attribute("relativeFrom") != "page" ||
+                (string)vertical[0].Element(wp14 + "pctPosVOffset") != expected["topPercent"].ToString() ||
+                (string)anchor.Element(wp14 + "sizeRelH")?.Attribute("relativeFrom") != "margin" ||
+                (string)anchor.Element(wp14 + "sizeRelH")?.Element(wp14 + "pctWidth") != expected["widthPercent"].ToString() ||
+                (string)anchor.Element(wp14 + "sizeRelV")?.Attribute("relativeFrom") != "page" ||
+                (string)anchor.Element(wp14 + "sizeRelV")?.Element(wp14 + "pctHeight") != expected["heightPercent"].ToString()) return false;
+            var controls = shape.Descendants(W + "sdt").ToList();
+            if (controls.Count != 1) return false;
+            var control = controls[0]; var pr = control.Element(W + "sdtPr");
+            var binding = pr?.Element(W + "dataBinding");
+            string xpath = (string)binding?.Attribute(W + "xpath"), mappings = (string)binding?.Attribute(W + "prefixMappings");
+            if (xpath == null || mappings == null || !IsOn(pr.Element(W + "rPr")?.Element(W + "caps"))) return false;
+            // Word regenerates prefix/store IDs; the expanded names must still bind to the real document property.
+            var namespaces = XElement.Parse("<bindings " + mappings + "/>");
+            var path = xpath.Split('/').Where(s => s.Length > 0).Select(s => s.Split('[')[0]).ToList();
+            if (path.Count != expected["bindingPath"].Count() || path.Where((step, i) => {
+                var name = step.Split(':');
+                XNamespace ns = name.Length == 2 ? namespaces.GetNamespaceOfPrefix(name[0]) : namespaces.GetDefaultNamespace();
+                return name.Last() != (string)expected["bindingPath"][i] || ns?.NamespaceName != (string)expected["bindingNamespaces"][i];
+            }).Any()) return false;
+            var paragraphs = control.Descendants(W + "p").ToList();
+            return paragraphs.Count > 0 && paragraphs.All(p => EffectiveParagraphAlignment(package, p) == "center" &&
+                p.Descendants(W + "r").Where(r => VisibleText(r).Length > 0).All(r => {
+                    var format = EffectiveRunFormatting(package, p, r);
+                    return !format.ContainsKey("vanish") && format.ContainsKey("caps") && format["caps"] == "1" && format.ContainsKey("color") && format["color"] == "FFFFFF";
+                })) && !header.Descendants(W + "t").Any(t => !t.Ancestors(W + "sdt").Contains(control) &&
+                    !t.Ancestors(Mc + "Fallback").Any() && !string.IsNullOrWhiteSpace(t.Value));
+        }
+
         private static Dictionary<string, string> EffectiveParagraphFormatting(PackageSnapshot package, XElement paragraph)
         {
             var styles = package.Xml("word/styles.xml").Root;

@@ -77,8 +77,10 @@ namespace MosWord2019.Core.Services
                 RequiredStrings(task, key + "Alternatives").Contains(actual));
         }
 
-        private static bool CheckParagraphEndSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail)
+        private static bool CheckParagraphEndSectionBreak(PackageSnapshot package, TaskDefinition task, out string detail, string expectedType = "continuous")
         {
+            if (!new[] { "nextPage", "continuous", "oddPage", "evenPage" }.Contains(expectedType))
+                throw new InvalidDataException("Invalid expected section break type.");
             var document = package.Xml("word/document.xml");
             var children = document.Root.Element(W + "body").Elements().ToList();
             var anchors = children.Where(p => p.Name == W + "p" &&
@@ -97,11 +99,11 @@ namespace MosWord2019.Core.Services
                 {
                     int index = sections.FindIndex(s => s.Content.Contains(p));
                     return index >= 0 && index + 1 < sections.Count &&
-                        (string)sections[index + 1].Properties.Element(W + "type")?.Attribute(W + "val") == "continuous";
+                        ((string)sections[index + 1].Properties.Element(W + "type")?.Attribute(W + "val") ?? "nextPage") == expectedType;
                 });
             }
-            detail = match ? "A real Continuous boundary follows the complete unchanged narrative before the declared heading."
-                : "The paragraph-end boundary is absent, misplaced, non-Continuous or its narrative changed.";
+            detail = match ? "A real " + expectedType + " section boundary follows the complete unchanged narrative before the declared heading."
+                : "The paragraph-end section boundary is absent, misplaced, has the wrong type or its narrative changed.";
             return match;
         }
 
