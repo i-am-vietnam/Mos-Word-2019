@@ -1,5 +1,7 @@
 # Project Status
 
+Project context document added on2026-10-26 (Asia/Bangkok): [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md), covering the five requested areas from actual source. A fresh source validation/support-check run confirms Project1–24 EN/VI with0 errors/0 warnings,191 tasks total and68 supported assertion routes. This documentation-only follow-up changes no application/package source and does not claim a new build or GUI run. AGENTS.md now includes the document in the startup reading order. During this follow-up, HEAD advanced externally to `8c04b49634db01d64ab0cc2f95cb833e5190d437` ("Sua loi p24"), containing the preceding nine-file fixes; that state is preserved. The remaining worktree changes belong to this documentation follow-up, and188 application/package source files retain their initial bytes.
+
 ## Current checkpoint — P24 T02 screenshot-family false negative, 2026-10-25
 
 The user explicitly requested this focused grading correction. `CheckTextBoxAssembly` previously required both position references to be margin, an empty band and exact requested text only in the lower text region. The screenshot instead shows whole-group center/bottom relative to Page and exact `MOS, 2021` in the band with the native lower placeholder retained. Native Word API reproduction confirms those variants incorrectly failed on Save and reopen. The original reported saved answer was unavailable: normal shutdown had restored work.docx to the untouched starter; no claim is made that a copy of the user's original answer was tested.

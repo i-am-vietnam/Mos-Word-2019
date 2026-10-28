@@ -1,6 +1,6 @@
 # MOS Word 2019 Agent Guide
 
-Read AGENTS.md, PROJECT_STATUS.md, KNOWN_ISSUES.md, CODEX_CONTEXT.md, then only relevant source. The actual source wins over handoff documentation; the current user request controls scope.
+Read AGENTS.md, PROJECT_STATUS.md, KNOWN_ISSUES.md, CODEX_CONTEXT.md, then [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) for the consolidated overview, then only relevant source. The actual source wins over handoff documentation; the current user request controls scope.
 
 1. MOS Excel 2019 is read-only architectural reference.
 2. Never modify files or Git metadata in the MOS Excel repository. Its actual local Git root is the parent directory; its WinForms project is ../MosTrainer. Do not build or clean the reference as part of Word work.
@@ -20,5 +20,6 @@ Read AGENTS.md, PROJECT_STATUS.md, KNOWN_ISSUES.md, CODEX_CONTEXT.md, then only 
 16. When implementing a new project, do not edit completed older project packages or change their accepted grading behavior. An explicit user request to fix an older project or a shared lifecycle rule is a separate authorized scope; verify affected regressions.
 17. Treat supplied question dictionaries (`lang/en.json`, `lang/vi.json`, or `vn.json` if supplied) as immutable exercise content. Do not rewrite, translate, expand or add workflow hints. Put implementation notes and verified workflow guidance in developer documentation/evidence instead. Restore changes only when explicitly requested and identify the baseline.
 18. Stage packaged assets into Documents through the existing safe service. On normal project/session close, including normal application exit, remove only unchanged copies created by that service in the current session. Preserve pre-existing, modified, replaced, locked and unrelated personal files; log cleanup failures. Additional configured Pictures copies follow the same ownership safeguards. Never edit packaged assets or infer ownership from filename/hash alone.
+19. Keep PROJECT_CONTEXT.md synchronized when architecture, models, lifecycle rules or the current project checkpoint change. It is the consolidated handoff, not a replacement for source, detailed contracts or the focused status/issue documents.
 
 Implement only the phase authorized by the current user request. Lifecycle is Phase 2; packages Phase 3; grading Phase 5 onward. Do not inherit the Excel rule to build MosTrainer or reuse its GradingService in this independent product.

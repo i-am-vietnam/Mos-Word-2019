@@ -1,5 +1,7 @@
 # Technical Context
 
+For the consolidated Vietnamese project overview, Interop ownership rules, actual models and current checkpoint, read [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md). The sections below retain detailed technical contracts and dated historical context.
+
 ## Current exercise-content and asset lifecycle rules — 2026-10-25
 
 Question dictionaries are supplied exercise content and must remain unchanged, including wording, translations and workflow detail. P24 EN/VI were restored exactly from080ca9d at the user's request; workflow findings belong in developer notes/evidence. When implementing a new project, preserve completed older packages and their accepted grading behavior. The latest explicit shared-lifecycle correction is separate authorized work.

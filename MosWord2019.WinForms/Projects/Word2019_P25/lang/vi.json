@@ -1,0 +1,12 @@
+﻿{
+  "P25_T01_TITLE": "Câu 1",
+  "P25_T01_INST": "Thay đổi giãn dòng của toàn bộ tài liệu thành Double.",
+  "P25_T02_TITLE": "Câu 2",
+  "P25_T02_INST": "Áp dụng kiểu Strong cho văn bản \"Environmental School Project\" trong đoạn văn đầu tiên.",
+  "P25_T03_TITLE": "Câu 3",
+  "P25_T03_INST": "Chèn đầu trang Banded và thiết lập để đầu trang này không xuất hiện trên trang đầu tiên.",
+  "P25_T04_TITLE": "Câu 4",
+  "P25_T04_INST": "Sử dụng tính năng Go To để di chuyển đến tiêu đề thứ năm. Đặt khoảng cách ký tự của đoạn văn thứ hai bên dưới tiêu đề đó thành Expanded by 2 pt.",
+  "P25_T05_TITLE": "Câu 5",
+  "P25_T05_INST": "Chèn ngắt phần Next Page ngay trước tiêu đề \"References\"."
+}

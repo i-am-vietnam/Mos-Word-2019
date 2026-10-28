@@ -1,0 +1,12 @@
+{
+  "P25_T01_TITLE": "Task 1",
+  "P25_T01_INST": "Change the line spacing for the entire document to Double.",
+  "P25_T02_TITLE": "Task 2",
+  "P25_T02_INST": "Apply the Strong style to the text \"Environmental School Project\" in the first paragraph.",
+  "P25_T03_TITLE": "Task 3",
+  "P25_T03_INST": "Insert a Banded header that does not appear on the first page.",
+  "P25_T04_TITLE": "Task 4",
+  "P25_T04_INST": "Use the Go To feature to navigate to the fifth heading. Set the character spacing of the second paragraph under that heading to Expanded by 2 pt.",
+  "P25_T05_TITLE": "Task 5",
+  "P25_T05_INST": "Insert a Next Page section break immediately before the \"References\" heading."
+}
