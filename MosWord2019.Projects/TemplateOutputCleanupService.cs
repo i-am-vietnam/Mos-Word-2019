@@ -14,18 +14,21 @@ namespace MosWord2019.Projects
         private readonly string documentsFolder;
         private readonly Func<string> templateFolder;
         private readonly Action<string> log;
+        private readonly SessionRecoveryJournal journal;
         private readonly List<OutputOwnershipLedger> ledgers = new List<OutputOwnershipLedger>();
 
         public TemplateOutputCleanupService()
             : this(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)) { }
 
-        public TemplateOutputCleanupService(string documentsFolder, Func<string> templateFolder = null, Action<string> log = null)
+        public TemplateOutputCleanupService(string documentsFolder, Func<string> templateFolder = null, Action<string> log = null,
+            SessionRecoveryJournal journal = null)
         {
             if (string.IsNullOrWhiteSpace(documentsFolder) || !Path.IsPathRooted(documentsFolder))
                 throw new ArgumentException("An absolute Documents folder is required.", nameof(documentsFolder));
             this.documentsFolder = Path.GetFullPath(documentsFolder);
             this.templateFolder = templateFolder ?? (() => TemplateFolderResolver.Resolve());
             this.log = log ?? (message => AppLogger.Write(message));
+            this.journal = journal;
         }
 
         public OutputOwnershipLedger CurrentLedger { get; private set; }
@@ -35,7 +38,7 @@ namespace MosWord2019.Projects
         {
             if (CurrentLedger != null) throw new InvalidOperationException("Close the preceding output session before registering another.");
             bool templates = package.Tasks.Any(t => t.AssertionType == TemplateOutputLocation.AssertionType || t.AssertionType == "SavedWordTemplate");
-            var ledger = new OutputOwnershipLedger(package, documentsFolder, templates ? templateFolder() : null, log);
+            var ledger = new OutputOwnershipLedger(package, documentsFolder, templates ? templateFolder() : null, log, journal: journal);
             ledgers.Add(ledger);
             CurrentLedger = ledger;
         }

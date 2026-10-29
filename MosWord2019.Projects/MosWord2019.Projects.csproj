@@ -32,6 +32,8 @@
     <Compile Include="ProjectValidator.cs" />
     <Compile Include="TemplateOutputCleanupService.cs" />
     <Compile Include="OutputOwnershipLedger.cs" />
+    <Compile Include="SessionRecoveryJournal.cs" />
+    <Compile Include="ApplicationLifetime.cs" />
     <Compile Include="TrainingWorkspaceService.cs" />
     <Compile Include="TrainingWorkspaceService.Assets.cs" />
     <Compile Include="TrainingWorkspaceService.SavedCopy.cs" />

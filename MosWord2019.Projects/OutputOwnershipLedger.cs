@@ -18,15 +18,17 @@ namespace MosWord2019.Projects
     {
         private readonly Dictionary<string, Entry> entries = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
         private readonly Action<string> log;
+        private readonly SessionRecoveryJournal journal;
 
         public OutputOwnershipLedger(ProjectPackage package, string documentsFolder, string templateFolder,
-            Action<string> log = null, string sessionId = null)
+            Action<string> log = null, string sessionId = null, SessionRecoveryJournal journal = null)
         {
             if (package == null || package.Tasks == null) throw new ArgumentNullException(nameof(package));
             DocumentsFolder = AbsoluteFolder(documentsFolder);
             SessionId = sessionId ?? Guid.NewGuid().ToString("N");
             SessionStartedUtc = DateTime.UtcNow;
             this.log = log ?? (message => AppLogger.Write(message));
+            this.journal = journal;
             foreach (var task in package.Tasks)
             {
                 bool template = task.AssertionType == TemplateOutputLocation.AssertionType || task.AssertionType == "SavedWordTemplate";
@@ -73,8 +75,7 @@ namespace MosWord2019.Projects
                 var observed = Read(entry.Path);
                 if (observed.Exists)
                 {
-                    entry.Claim = observed; // Never refresh: later replacement/modification must remain personal.
-                    log("Training output claimed " + entry.Path + " session=" + SessionId);
+                    Claim(entry, observed);
                 }
             }
             catch (Exception ex) when (Recoverable(ex))
@@ -87,17 +88,24 @@ namespace MosWord2019.Projects
             {
                 if (!ownedDocumentClosed)
                 { log("Preserved output; cleanup deferred while owned Word is live " + entry.Path); continue; }
-                if (entry.Baseline.Exists || entry.Claim == null)
-                { log("Preserved pre-existing or unclaimed output " + entry.Path); continue; }
                 try
                 {
+                    if (!entry.Baseline.Exists && entry.Claim == null)
+                    {
+                        var observed = Read(entry.Path);
+                        if (observed.Exists && observed.CreatedUtc >= entry.Baseline.ObservedUtc)
+                            Claim(entry, observed);
+                    }
+                    if (entry.Baseline.Exists || entry.Claim == null)
+                    { log("Preserved pre-existing or unclaimed output " + entry.Path); continue; }
                     RejectReparsePath(entry.Path);
                     using (var handle = Open(entry.Path, 0x80010000, 0, IntPtr.Zero, 3, 0x00200000, IntPtr.Zero))
                     {
                         if (handle.IsInvalid)
                         {
                             int error = Marshal.GetLastWin32Error();
-                            if (error == 2 || error == 3) { log("Owned output already absent " + entry.Path); continue; }
+                            if (error == 2 || error == 3)
+                            { journal?.Forget(entry.Path, entry.Claim.Identity); log("Owned output already absent " + entry.Path); continue; }
                             throw new Win32Exception(error);
                         }
                         using (var stream = new FileStream(handle, FileAccess.Read))
@@ -105,17 +113,29 @@ namespace MosWord2019.Projects
                             var state = ReadHandle(entry.Path, handle, stream, true);
                             RejectReparsePath(entry.Path);
                             if (state.Identity != entry.Claim.Identity || state.Sha256 != entry.Claim.Sha256)
-                            { log("Preserved changed/replaced output " + entry.Path); continue; }
+                            { journal?.Forget(entry.Path, entry.Claim.Identity); log("Preserved changed/replaced output " + entry.Path); continue; }
                             var disposition = new FileDisposition { DeleteFile = true };
                             if (!SetDisposition(handle, 4, ref disposition, Marshal.SizeOf(disposition)))
                                 throw new Win32Exception(Marshal.GetLastWin32Error());
                         }
                     }
+                    journal?.Forget(entry.Path, entry.Claim.Identity);
                     log("Removed owned output " + entry.Path + " session=" + SessionId);
                 }
                 catch (Exception ex) when (Recoverable(ex))
                 { log("Preserved output; cleanup failed " + entry.Path + ": " + ex.Message); }
             }
+        }
+
+        private void Claim(Entry entry, OutputFileState observed)
+        {
+            if (entry.Baseline.Exists || entry.Claim != null) return;
+            // This attempt proved absence before Word opened, so a prior attempt's exact-path claim is obsolete.
+            journal?.Forget(entry.Path);
+            // Persist the first claim before cleanup; later edits must never refresh its fingerprint.
+            journal?.Track(entry.Path, observed.Identity, observed.Sha256, "output", SessionId);
+            entry.Claim = observed;
+            log("Training output claimed " + entry.Path + " session=" + SessionId);
         }
 
         private static OutputFileState Read(string path)
@@ -155,8 +175,10 @@ namespace MosWord2019.Projects
                 info.Attributes != after.Attributes)
                 throw new IOException("Output changed during observation: " + path);
             long written = ((long)info.Written.dwHighDateTime << 32) | (uint)info.Written.dwLowDateTime;
+            long created = ((long)info.Created.dwHighDateTime << 32) | (uint)info.Created.dwLowDateTime;
             return new OutputFileState(path, true, ((long)info.SizeHigh << 32) | info.SizeLow, hash,
-                DateTime.FromFileTimeUtc(written), info.Volume + ":" + info.IndexHigh + ":" + info.IndexLow, DateTime.UtcNow);
+                DateTime.FromFileTimeUtc(written), info.Volume + ":" + info.IndexHigh + ":" + info.IndexLow, DateTime.UtcNow,
+                creationUtc: DateTime.FromFileTimeUtc(created));
         }
 
         private static string AbsoluteFolder(string folder)

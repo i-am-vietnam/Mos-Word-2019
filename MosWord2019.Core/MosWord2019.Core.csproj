@@ -33,6 +33,7 @@
     <Compile Include="Interfaces\IWordController.cs" />
     <Compile Include="Interfaces\IWordDocumentState.cs" />
     <Compile Include="Interfaces\IWordSaveFormat.cs" />
+    <Compile Include="Interfaces\IWordSaveEvents.cs" />
     <Compile Include="Interfaces\IWordViewState.cs" />
     <Compile Include="Interfaces\IWordTocLayout.cs" />
     <Compile Include="Interfaces\IWordExportCheckpoint.cs" />

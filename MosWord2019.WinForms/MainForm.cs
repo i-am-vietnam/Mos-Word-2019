@@ -36,10 +36,11 @@ namespace MosWord2019
         private bool controllerDisposed;
         private bool displayEventsSubscribed;
         private bool arranging;
+        private readonly Timer savedOutputMonitor = new Timer { Interval = 1000 };
 
         public MainForm(AppSession session) : this(session,
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects"),
-            new TrainingWorkspaceService(), new WordController()) { }
+            Program.Workspace ?? new TrainingWorkspaceService(Program.Journal), new WordController()) { }
 
         // The form owns the controller. Injection keeps verification packages out of production.
         public MainForm(AppSession session, string projectRoot, TrainingWorkspaceService workspace,
@@ -50,7 +51,13 @@ namespace MosWord2019
             if (session.Mode != AppMode.Training) throw new NotSupportedException("Testing is not implemented.");
             this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
             this.word = word ?? throw new ArgumentNullException(nameof(word));
-            templateOutputs = outputCleanup ?? new TemplateOutputCleanupService(workspace.DocumentsRootPath);
+            templateOutputs = outputCleanup ?? new TemplateOutputCleanupService(workspace.DocumentsRootPath, journal: Program.Journal);
+            if (word is IWordSaveEvents saveEvents)
+            {
+                saveEvents.OwnedDocumentSaving += OwnedDocumentSaving;
+                saveEvents.WorkingFileWritten += workspace.RecordOwnedWorkingFile;
+            }
+            savedOutputMonitor.Tick += (sender, args) => ObserveAfterSave();
             this.confirmRestart = confirmRestart ?? (message => MessageBox.Show(this, message, Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes);
             this.notify = notify ?? (message => MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
@@ -300,11 +307,38 @@ namespace MosWord2019
             catch (Exception ex) { AppLogger.Write("Training output ownership could not be observed; preserve unclaimed outputs", ex); }
         }
 
+        private void OwnedDocumentSaving(string ownedPath)
+        {
+            // The callback already verified COM identity. Do not query the controller from that callback.
+            templateOutputs.ObserveOwnedDocument(ownedPath);
+            workspace.ObserveWorkingFiles(ownedPath);
+            if (IsDisposed || Disposing || !IsHandleCreated) return;
+            BeginInvoke((Action)(() =>
+            {
+                if (IsDisposed || Disposing || controllerDisposed) return;
+                ObserveAfterSave(); // Next owning-STA UI tick, after the save callback has returned.
+                savedOutputMonitor.Start(); // Also observe saves completed after a modeless/dialog message pump.
+            }));
+        }
+
+        private void ObserveAfterSave()
+        {
+            if (controllerDisposed || IsDisposed || Disposing) return;
+            ObserveOwnedOutput();
+            try
+            {
+                if (word.IsOpened) workspace.ObserveWorkingFiles((word as IWordDocumentState)?.CurrentDocumentPath);
+            }
+            catch (Exception ex) { AppLogger.Write("Owned working save could not be observed", ex); }
+        }
+
         private void CloseOwnedOutputDocument()
         {
+            savedOutputMonitor.Stop();
             ObserveOwnedOutput();
             word.CloseDocument();
             bool closed = !word.IsOpened;
+            if (closed) workspace.ObserveWorkingFiles();
             templateOutputs.Cleanup(closed); // Memo.txt may have been the live owned document until this close.
             if (!closed) throw new InvalidOperationException("The owned Word document is still open; output cleanup and reset were deferred.");
         }
@@ -373,6 +407,7 @@ namespace MosWord2019
                 context.DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState?.DefaultTemplateFolder : null;
                 context.SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase);
                 context.OutputOwnership = templateOutputs.Capture(documentState?.CurrentDocumentPath);
+                workspace.ObserveWorkingFiles(documentState?.CurrentDocumentPath);
                 AppLogger.Write("Training grade source " + savedPath + " task " + task.TaskId);
             }
             catch (Exception ex)
@@ -486,6 +521,7 @@ namespace MosWord2019
                 word.Dispose();
                 controllerDisposed = true;
                 templateOutputs.Cleanup(true); // Successful disposal proves closure; never inspect a disposed controller.
+                workspace.CleanupWorkingFiles();
                 AppLogger.Write("Training session closed");
                 completed = true;
             });
@@ -508,8 +544,28 @@ namespace MosWord2019
                 word.Dispose();
                 controllerDisposed = true;
                 templateOutputs.Cleanup(true);
+                workspace.CleanupWorkingFiles();
+            }
+            if (disposing)
+            {
+                savedOutputMonitor.Dispose();
+                if (word is IWordSaveEvents saveEvents)
+                {
+                    saveEvents.OwnedDocumentSaving -= OwnedDocumentSaving;
+                    saveEvents.WorkingFileWritten -= workspace.RecordOwnedWorkingFile;
+                }
             }
             base.Dispose(disposing);
+        }
+
+        internal void CloseOwnedForRecovery()
+        {
+            savedOutputMonitor.Stop();
+            ObserveOwnedOutput();
+            if (!controllerDisposed) { word.Dispose(); controllerDisposed = true; }
+            templateOutputs.Cleanup(true);
+            if (currentProject != null) workspace.CleanupProjectAssets(currentProject);
+            workspace.CleanupWorkingFiles();
         }
     }
 }

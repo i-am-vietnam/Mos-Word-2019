@@ -2,17 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace MosWord2019.Core.Models
 {
     /// <summary>Plain file facts captured by Projects; Core never discovers external outputs.</summary>
     public sealed class OutputFileState
     {
+        private static long nextObservationSequence;
+
         public OutputFileState(string path, bool exists, long length, string sha256,
-            DateTime lastWriteUtc, string identity, DateTime observedUtc)
+            DateTime lastWriteUtc, string identity, DateTime observedUtc,
+            long? observationSequence = null, DateTime creationUtc = default(DateTime))
         {
             Path = path; Exists = exists; Length = length; Sha256 = sha256;
             LastWriteUtc = lastWriteUtc; Identity = identity; ObservedUtc = observedUtc;
+            ObservationSequence = observationSequence ?? Interlocked.Increment(ref nextObservationSequence);
+            CreatedUtc = creationUtc;
         }
 
         public string Path { get; }
@@ -22,6 +28,8 @@ namespace MosWord2019.Core.Models
         public DateTime LastWriteUtc { get; }
         public string Identity { get; }
         public DateTime ObservedUtc { get; }
+        public long ObservationSequence { get; }
+        public DateTime CreatedUtc { get; }
     }
 
     public sealed class DeclaredOutputSnapshot

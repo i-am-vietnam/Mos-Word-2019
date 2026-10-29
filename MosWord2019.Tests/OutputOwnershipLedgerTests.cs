@@ -26,6 +26,9 @@ namespace MosWord2019.Tests
                 Assert.IsFalse(string.IsNullOrWhiteSpace(baseline.Identity));
                 Assert.AreEqual(File.GetLastWriteTimeUtc(path), baseline.LastWriteUtc);
                 Assert.AreEqual(DateTimeKind.Utc, baseline.ObservedUtc.Kind);
+                Assert.AreEqual(File.GetCreationTimeUtc(path), baseline.CreatedUtc);
+                Assert.IsTrue(baseline.ObservationSequence > 0);
+                Assert.IsTrue(ledger.Capture().Outputs.Single().Current.ObservationSequence > baseline.ObservationSequence);
                 string absent = Path.Combine(workspace.Folder, "missing", "nested");
                 var missing = new OutputOwnershipLedger(Package("SavedWordTemplate", "Notes.dotx"), workspace.Folder, absent);
                 Assert.IsFalse(missing.Capture().Outputs.Single().Baseline.Exists);
@@ -50,7 +53,7 @@ namespace MosWord2019.Tests
         }
 
         [TestMethod]
-        public void NewOutputIsPreservedWithoutVerifiedOwnedDocumentPath()
+        public void NewlyCreatedDeclaredOutputIsClaimedAtCleanupWithoutOwnedDocumentObservation()
         {
             using (var workspace = new TestWorkspace())
             {
@@ -58,7 +61,117 @@ namespace MosWord2019.Tests
                 string path = Write(workspace, "answer.txt", "external");
                 ledger.Capture(Path.Combine(workspace.Folder, "unrelated.docx"));
                 ledger.Cleanup(true);
-                Assert.IsTrue(File.Exists(path));
+                Assert.IsFalse(File.Exists(path));
+            }
+        }
+
+        [TestMethod]
+        public void FutureDatedPreexistingOutputRemainsProtected()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string path = Write(workspace, "answer.txt", "personal");
+                File.SetCreationTimeUtc(path, DateTime.UtcNow.AddDays(1));
+                var ledger = Ledger(workspace, Package("FileExistsInDocuments", "answer.txt"));
+                ledger.Cleanup(true);
+                Assert.AreEqual("personal", File.ReadAllText(path));
+            }
+        }
+
+        [TestMethod]
+        public void OlderFileMovedIntoAbsentDeclaredPathIsNotClaimedAtCleanup()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string source = Write(workspace, "personal.txt", "personal");
+                File.SetCreationTimeUtc(source, DateTime.UtcNow.AddDays(-1));
+                var ledger = Ledger(workspace, Package("FileExistsInDocuments", "answer.txt"));
+                string path = Path.Combine(workspace.Folder, "answer.txt");
+                File.Move(source, path);
+                ledger.Cleanup(true);
+                Assert.AreEqual("personal", File.ReadAllText(path));
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("unchanged")]
+        [DataRow("modified")]
+        [DataRow("replaced")]
+        [DataRow("missing")]
+        public void OutputClaimsAreJournaledImmediatelyAndForgottenAtTerminalCleanup(string scenario)
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                var journal = new SessionRecoveryJournal(Path.Combine(workspace.Folder, "journal.json"), _ => { });
+                var ledger = new OutputOwnershipLedger(Package("FileExistsInDocuments", "answer.txt"),
+                    workspace.Folder, null, _ => { }, journal: journal);
+                string path = Write(workspace, "answer.txt", "original");
+                ledger.ObserveOwnedDocument(path);
+                Assert.AreEqual(1, new SessionRecoveryJournal(Path.Combine(workspace.Folder, "journal.json"), _ => { }).Count);
+                if (scenario == "modified") File.WriteAllText(path, "personal edit");
+                if (scenario == "replaced")
+                {
+                    File.Move(path, Path.Combine(workspace.Folder, "held.txt"));
+                    File.WriteAllText(path, "original");
+                }
+                if (scenario == "missing") File.Delete(path);
+                ledger.Cleanup(true);
+                Assert.AreEqual(0, journal.Count);
+                Assert.AreEqual(scenario == "modified" || scenario == "replaced", File.Exists(path));
+            }
+        }
+
+        [TestMethod]
+        public void CleanupTimeClaimIsPersistedBeforeLockedDeleteAndRecoveredLater()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string journalPath = Path.Combine(workspace.Folder, "journal.json");
+                var journal = new SessionRecoveryJournal(journalPath, _ => { });
+                var ledger = new OutputOwnershipLedger(Package("FileExistsInDocuments", "answer.txt"),
+                    workspace.Folder, null, _ => { }, journal: journal);
+                string path = Write(workspace, "answer.txt", "new unobserved output");
+                using (var locked = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                {
+                    ledger.Cleanup(true);
+                    Assert.IsTrue(File.Exists(path));
+                    Assert.AreEqual(1, journal.Count);
+                    var recovery = new SessionRecoveryJournal(journalPath, _ => { });
+                    recovery.Recover();
+                    Assert.AreEqual(1, recovery.Count);
+                }
+                var retry = new SessionRecoveryJournal(journalPath, _ => { });
+                retry.Recover();
+                Assert.AreEqual(0, retry.Count);
+                Assert.IsFalse(File.Exists(path));
+            }
+        }
+
+        [TestMethod]
+        public void NewAbsentBaselineCanReplaceAnObsoletePriorSessionJournalClaim()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string journalPath = Path.Combine(workspace.Folder, "journal.json");
+                var journal = new SessionRecoveryJournal(journalPath, _ => { });
+                var package = Package("FileExistsInDocuments", "answer.txt");
+                var previous = new OutputOwnershipLedger(package, workspace.Folder, null, _ => { }, journal: journal);
+                string path = Write(workspace, "answer.txt", "previous session output");
+                previous.ObserveOwnedDocument(path);
+                using (var held = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    previous.Cleanup(true);
+                Assert.AreEqual(1, journal.Count);
+                File.Delete(path);
+                var current = new OutputOwnershipLedger(package, workspace.Folder, null, _ => { }, journal: journal);
+                Assert.IsFalse(current.Capture().Outputs.Single().Baseline.Exists);
+                Write(workspace, "answer.txt", "new session output");
+                current.ObserveOwnedDocument(path);
+                var saved = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(journalPath));
+                Assert.AreEqual(current.SessionId, (string)saved["entries"][0]["sessionId"]);
+                Assert.AreEqual(1, journal.Count);
+                current.Cleanup(true);
+                Assert.IsFalse(File.Exists(path));
+                Assert.AreEqual(0, journal.Count);
             }
         }
 

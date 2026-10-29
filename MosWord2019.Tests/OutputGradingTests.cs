@@ -23,7 +23,7 @@ namespace MosWord2019.Tests
 
         [DataTestMethod]
         [DynamicData(nameof(ExistenceCases), DynamicDataSourceType.Method)]
-        public void ExactDeclaredOutputRequiresFreshContent(string projectId, string scenario)
+        public void ExactDeclaredOutputRequiresFreshObservation(string projectId, string scenario)
         {
             using (var workspace = new TestWorkspace())
             {
@@ -46,7 +46,8 @@ namespace MosWord2019.Tests
                 OutputFileState current = ReadState(path, DateTime.UtcNow,
                     scenario.StartsWith("replacement-", StringComparison.Ordinal) ? "different-file" : "original-file");
                 TrainingGradeContext context = Context(workspace, templates, started, new DeclaredOutputSnapshot(baseline, current));
-                TaskGradeOutcome expected = scenario == "new" || scenario == "hash-changed" || scenario == "replacement-changed"
+                TaskGradeOutcome expected = scenario == "new" || scenario == "hash-changed" || scenario == "replacement-changed" ||
+                    scenario == "mtime-only" || scenario == "replacement-same-hash"
                     ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail;
                 AssertOutcome(workspace, task, context, expected);
             }
@@ -55,7 +56,7 @@ namespace MosWord2019.Tests
         public static IEnumerable<object[]> InvalidContexts()
         {
             foreach (string project in new[] { "Word2019_P09", "Word2019_P06", "Word2019_P07" })
-                foreach (string problem in new[] { "no-context", "no-ownership", "no-entry", "unreadable", "blank-session", "default-start", "current-before-start", "baseline-after-current", "wrong-path", "duplicate", "no-baseline", "no-current" })
+                foreach (string problem in new[] { "no-context", "no-ownership", "no-entry", "unreadable", "blank-session", "default-start", "zero-baseline-sequence", "negative-current-sequence", "equal-sequence", "reversed-sequence", "wrong-path", "duplicate", "no-baseline", "no-current" })
                     yield return new object[] { project, problem };
         }
 
@@ -74,8 +75,10 @@ namespace MosWord2019.Tests
                 OutputFileState current = ReadState(path, DateTime.UtcNow, "original-file");
                 string session = Guid.NewGuid().ToString("N");
                 if (problem == "blank-session") session = " ";
-                if (problem == "current-before-start") current = At(current, started.AddSeconds(-1));
-                if (problem == "baseline-after-current") baseline = At(baseline, current.ObservedUtc.AddSeconds(1));
+                if (problem == "zero-baseline-sequence") baseline = At(baseline, baseline.ObservedUtc, sequence: 0);
+                if (problem == "negative-current-sequence") current = At(current, current.ObservedUtc, sequence: -1);
+                if (problem == "equal-sequence") current = At(current, current.ObservedUtc, sequence: baseline.ObservationSequence);
+                if (problem == "reversed-sequence") current = At(current, current.ObservedUtc, sequence: baseline.ObservationSequence - 1);
                 if (problem == "wrong-path")
                 {
                     baseline = At(baseline, baseline.ObservedUtc, path + ".wrong");
@@ -94,6 +97,50 @@ namespace MosWord2019.Tests
                 };
                 if (problem == "no-ownership") context.OutputOwnership = null;
                 AssertOutcome(workspace, task, problem == "no-context" ? null : context, TaskGradeOutcome.Error);
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("Word2019_P09", true)]
+        [DataRow("Word2019_P09", false)]
+        [DataRow("Word2019_P06", true)]
+        [DataRow("Word2019_P07", true)]
+        public void BackwardWallClockUsesSequenceAndRetainsStaleFail(string projectId, bool createNew)
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                TaskDefinition task = LoadTask(projectId, "T08");
+                string templates = TemplateRoot(workspace);
+                string path = ExpectedPath(workspace, templates, task);
+                if (!createNew) File.WriteAllText(path, "stale");
+                DateTime started = DateTime.UtcNow;
+                var baseline = ReadState(path, started.AddHours(-1));
+                if (createNew) File.WriteAllText(path, "new output");
+                var current = ReadState(path, started.AddHours(-2));
+                AssertOutcome(workspace, task, Context(workspace, templates, started,
+                    new DeclaredOutputSnapshot(baseline, current)), createNew ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail);
+            }
+        }
+
+        [TestMethod]
+        public void IdenticalOverwriteWithLaterWriteTimeIsFresh()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                TaskDefinition task = LoadTask("Word2019_P09", "T08");
+                string templates = TemplateRoot(workspace);
+                string path = ExpectedPath(workspace, templates, task);
+                File.WriteAllText(path, "same bytes");
+                File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddHours(-1));
+                DateTime started = DateTime.UtcNow;
+                var baseline = ReadState(path, started);
+                File.WriteAllText(path, "same bytes");
+                var current = ReadState(path, DateTime.UtcNow);
+                Assert.AreEqual(baseline.Sha256, current.Sha256);
+                Assert.AreEqual(baseline.Identity, current.Identity);
+                Assert.IsTrue(current.LastWriteUtc > baseline.LastWriteUtc);
+                AssertOutcome(workspace, task, Context(workspace, templates, started,
+                    new DeclaredOutputSnapshot(baseline, current)), TaskGradeOutcome.Pass);
             }
         }
 
@@ -276,10 +323,10 @@ namespace MosWord2019.Tests
             return new OutputFileState(path, true, info.Length, digest, info.LastWriteTimeUtc, identity, observed);
         }
 
-        private static OutputFileState At(OutputFileState state, DateTime observed, string path = null)
+        private static OutputFileState At(OutputFileState state, DateTime observed, string path = null, long? sequence = null)
         {
             return new OutputFileState(path ?? state.Path, state.Exists, state.Length, state.Sha256,
-                state.LastWriteUtc, state.Identity, observed);
+                state.LastWriteUtc, state.Identity, observed, sequence ?? state.ObservationSequence, state.CreatedUtc);
         }
 
         private static void AssertOutcome(TestWorkspace workspace, TaskDefinition task, TrainingGradeContext context, TaskGradeOutcome expected)

@@ -154,6 +154,32 @@ namespace MosWord2019.Tests
             }
         }
 
+        [TestMethod]
+        public void ClosedSessionRetainsLockedOutputClaimInDurableJournal()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string journalPath = Path.Combine(workspace.Folder, "journal.json");
+                var journal = new SessionRecoveryJournal(journalPath, _ => { });
+                var service = new TemplateOutputCleanupService(workspace.Folder, () => workspace.Folder, _ => { }, journal);
+                service.Register(Load("Word2019_P09"));
+                string path = Path.Combine(workspace.Folder, "Memo.txt");
+                File.WriteAllText(path, "new session memo");
+                service.ObserveOwnedDocument(path);
+                Assert.AreEqual(1, journal.Count);
+                using (var held = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    service.Cleanup(true);
+                    Assert.IsNull(service.CurrentLedger);
+                    Assert.AreEqual(1, new SessionRecoveryJournal(journalPath, _ => { }).Count);
+                }
+                var recovery = new SessionRecoveryJournal(journalPath, _ => { });
+                recovery.Recover();
+                Assert.IsFalse(File.Exists(path));
+                Assert.AreEqual(0, recovery.Count);
+            }
+        }
+
         private static ProjectPackage Load(string projectId) =>
             new ProjectLoader().Load(Path.Combine(TestCaseData.ProjectsRoot, projectId), "en");
 

@@ -62,17 +62,25 @@ namespace MosWord2019.Projects
                     try
                     {
                         using (var output = File.Create(temporary))
-                        using (var target = new ZipArchive(output, ZipArchiveMode.Create))
-                            foreach (var entry in zip.Entries)
-                                using (var destination = target.CreateEntry(entry.FullName).Open())
-                                {
-                                    if (entry.FullName == "[Content_Types].xml") types.Save(destination);
-                                    else using (var input = entry.Open()) input.CopyTo(destination);
-                                }
+                        {
+                            try
+                            {
+                                using (var target = new ZipArchive(output, ZipArchiveMode.Create, true))
+                                    foreach (var entry in zip.Entries)
+                                        using (var destination = target.CreateEntry(entry.FullName).Open())
+                                        {
+                                            if (entry.FullName == "[Content_Types].xml") types.Save(destination);
+                                            else using (var input = entry.Open()) input.CopyTo(destination);
+                                        }
+                                output.Flush(true);
+                            }
+                            finally { RecordWorkingFile(temporary, output); }
+                        }
                         if (File.Exists(paths.WorkingPath)) File.Replace(temporary, paths.WorkingPath, null);
                         else File.Move(temporary, paths.WorkingPath);
+                        MoveWorkingRecord(temporary, paths.WorkingPath);
                     }
-                    finally { if (File.Exists(temporary)) File.Delete(temporary); }
+                    finally { if (File.Exists(temporary)) { File.Delete(temporary); ForgetWorkingFile(temporary); } }
                 }
             }
         }

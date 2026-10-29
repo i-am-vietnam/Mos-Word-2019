@@ -36,6 +36,9 @@
     <Compile Include="OutputOwnershipLedgerTests.cs" />
     <Compile Include="OutputGradingTests.cs" />
     <Compile Include="OutputSessionTests.cs" />
+    <Compile Include="SessionRecoveryJournalTests.cs" />
+    <Compile Include="WorkspaceRecoveryTests.cs" />
+    <Compile Include="ApplicationLifetimeTests.cs" />
     <None Include="packages.config" />
     <Content Include="Fixtures\**\*"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>
     <Content Include="..\MosWord2019.WinForms\Projects\**\*"><Link>Projects\%(RecursiveDir)%(Filename)%(Extension)</Link><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content>

@@ -33,15 +33,17 @@ namespace MosWord2019.Core.Services
             var current = entry.Current;
             if (current == null || !string.Equals(current.Path, outputPath, StringComparison.OrdinalIgnoreCase) ||
                 baseline.ObservedUtc.Kind != DateTimeKind.Utc || current.ObservedUtc.Kind != DateTimeKind.Utc ||
-                baseline.ObservedUtc < ownership.SessionStartedUtc || current.ObservedUtc < baseline.ObservedUtc)
+                baseline.ObservationSequence <= 0 || current.ObservationSequence <= baseline.ObservationSequence)
                 throw new InvalidDataException("The declared output observation does not belong to the current baseline.");
             foreach (var state in new[] { baseline, current }.Where(s => s.Exists))
                 if (state.Length < 0 || string.IsNullOrWhiteSpace(state.Identity) || state.Sha256 == null ||
                     state.Sha256.Length != 64 || state.Sha256.Any(c => !Uri.IsHexDigit(c)))
                     throw new InvalidDataException("The declared output observation is incomplete: " + name);
-            detail = "The declared output must exist and be new or have changed content since this session's baseline.";
+            detail = "The declared output must exist and be new, replaced, rewritten or have changed content since this session's baseline.";
             return current.Exists && (!baseline.Exists ||
-                !string.Equals(current.Sha256, baseline.Sha256, StringComparison.OrdinalIgnoreCase));
+                !string.Equals(current.Sha256, baseline.Sha256, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(current.Identity, baseline.Identity, StringComparison.Ordinal) ||
+                current.LastWriteUtc > baseline.LastWriteUtc);
         }
     }
 }

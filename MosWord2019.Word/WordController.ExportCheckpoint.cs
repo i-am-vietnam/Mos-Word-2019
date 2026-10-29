@@ -14,6 +14,8 @@ namespace MosWord2019.Word
         private string exportCheckpointPath;
         private volatile bool writingCheckpoint;
         public event Action<string> ExportCheckpointFailed;
+        public event Action<string> OwnedDocumentSaving;
+        public event Action<string> WorkingFileWritten;
 
         public void ConfigureExportCheckpoint(string checkpointPath)
         {
@@ -29,13 +31,15 @@ namespace MosWord2019.Word
 
         private void BeforeDocumentSave(Wd.Document document, ref bool saveAsUi, ref bool cancel)
         {
-            if (exportCheckpointPath == null || writingCheckpoint || session?.Document == null) return;
+            if (writingCheckpoint || session?.Document == null) return;
             IntPtr incoming = IntPtr.Zero, owned = IntPtr.Zero;
             try
             {
                 incoming = Marshal.GetIUnknownForObject(document);
                 owned = Marshal.GetIUnknownForObject(session.Document);
                 if (incoming != owned) return; // Never inspect an unrelated document, even in the owned application.
+                OwnedDocumentSaving?.Invoke(document.FullName); // Plain owned facts only; the UI queues the post-save check.
+                if (exportCheckpointPath == null) return;
                 // Office supplies this document to its connection-point callback on an RPC thread.
                 // Read only that event argument (confirmed owned by COM identity), then write its
                 // immutable serialization. Never call the held-session lifecycle from this callback
@@ -105,12 +109,14 @@ namespace MosWord2019.Word
                     }
                     using (var output = zip.CreateEntry("[Content_Types].xml").Open()) types.Save(output);
                 }
+                WorkingFileWritten?.Invoke(temporary);
                 if (File.Exists(exportCheckpointPath))
                 {
                     if ((File.GetAttributes(exportCheckpointPath) & FileAttributes.ReparsePoint) != 0) throw new IOException("Checkpoint cannot be a reparse point.");
                     File.Replace(temporary, exportCheckpointPath, null);
                 }
                 else File.Move(temporary, exportCheckpointPath);
+                WorkingFileWritten?.Invoke(exportCheckpointPath);
                 return exportCheckpointPath;
             }
             finally { writingCheckpoint = false; if (File.Exists(temporary)) File.Delete(temporary); }

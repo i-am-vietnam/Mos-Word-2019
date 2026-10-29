@@ -102,8 +102,12 @@ namespace MosWord2019.Projects
                                 var entry = new StagedAsset { Source = source, Destination = destination, Root = root, Hash = hash,
                                     Created = true, Identity = AssetIdentity(output.SafeFileHandle) };
                                 operation.Add(entry); ledger.Add(entry);
-                                try { input.Position = 0; input.CopyTo(output); output.Flush(); }
-                                catch { entry.Hash = AssetHash(output); throw; }
+                                try { input.Position = 0; input.CopyTo(output); output.Flush(true); }
+                                finally
+                                {
+                                    entry.Hash = AssetHash(output);
+                                    journal?.Track(destination, entry.Identity, entry.Hash, "asset");
+                                }
                                 if (AssetHash(output) != hash) throw new IOException("Asset copy hash mismatch: " + name);
                             }
                             AppLogger.Write("Training asset created " + destination + " source=" + source + " sha256=" + hash);
@@ -132,14 +136,14 @@ namespace MosWord2019.Projects
             stagedAssets.Remove(key);
         }
 
-        private static void CleanupAsset(StagedAsset entry, Action<string> log)
+        private void CleanupAsset(StagedAsset entry, Action<string> log)
         {
             log = log ?? (message => AppLogger.Write(message));
             try
             {
                 EnsureContained(entry.Root, entry.Destination, "Asset cleanup escapes its approved root.");
                 RejectReparsePath(entry.Destination);
-                if (!File.Exists(entry.Destination)) return;
+                if (!File.Exists(entry.Destination)) { journal?.Forget(entry.Destination, entry.Identity); return; }
                 // Hash and delete the same exclusive file handle. Replacing the path or modifying
                 // bytes between verification and deletion cannot delete a different personal file.
                 using (var handle = OpenAssetForDeletion(entry.Destination, 0x80010000, 0, IntPtr.Zero, 3, 0x00200000, IntPtr.Zero))
@@ -148,12 +152,13 @@ namespace MosWord2019.Projects
                     using (var file = new FileStream(handle, FileAccess.Read))
                     {
                         if (AssetIdentity(handle) != entry.Identity || AssetHash(file) != entry.Hash)
-                        { log?.Invoke("Preserved changed/replaced staged asset " + entry.Destination); return; }
+                        { journal?.Forget(entry.Destination, entry.Identity); log?.Invoke("Preserved changed/replaced staged asset " + entry.Destination); return; }
                         var disposition = new FileDisposition { DeleteFile = true };
                         if (!SetAssetDisposition(handle, 4, ref disposition, Marshal.SizeOf(disposition)))
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                     }
                 }
+                journal?.Forget(entry.Destination, entry.Identity);
                 log?.Invoke("Removed owned staged asset " + entry.Destination + " source=" + entry.Source + " sha256=" + entry.Hash);
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is Win32Exception || ex is InvalidOperationException)
