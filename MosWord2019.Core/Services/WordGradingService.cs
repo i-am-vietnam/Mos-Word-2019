@@ -113,21 +113,24 @@ namespace MosWord2019.Core.Services
                 }
                 if (task.AssertionType == ExternalOutputLocation.DocumentsAssertionType)
                 {
-                    bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName"), documentsRoot()));
+                    RequiredString(task, "expectedFileName");
+                    string outputPath, detail;
+                    bool exists = CheckOutputFreshness(task, context, documentsRoot(), out outputPath, out detail);
                     return new TaskGradeResult(exists ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
-                        "The exact task-declared file must exist in Documents.", task.AssertionType, task.TaskId);
+                        detail, task.AssertionType, task.TaskId);
                 }
                 if (task.AssertionType == "PlainTextDocumentExport")
                 {
                     string detail;
-                    bool passed = CheckPlainTextExport(task, documentsRoot(), out detail);
+                    bool passed = CheckPlainTextExport(task, documentsRoot(), context, out detail);
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail, detail, task.AssertionType, task.TaskId);
                 }
                 if (task.AssertionType == TemplateOutputLocation.AssertionType)
                 {
-                    string output = TemplateOutputLocation.Resolve(RequiredString(task, "expectedFileName"), documentsRoot());
-                    return new TaskGradeResult(File.Exists(output) ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
-                        "The exact declared template file must exist in Documents/Custom Office Templates.", task.AssertionType, task.TaskId);
+                    string outputPath, detail;
+                    bool exists = CheckOutputFreshness(task, context, null, out outputPath, out detail);
+                    return new TaskGradeResult(exists ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
+                        detail, task.AssertionType, task.TaskId);
                 }
                 if (string.Equals(Path.GetExtension(documentPath), ".doc", StringComparison.OrdinalIgnoreCase))
                 {

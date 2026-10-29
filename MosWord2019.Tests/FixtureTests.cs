@@ -46,9 +46,11 @@ namespace MosWord2019.Tests
                     case "":
                         break;
                     case "SavedTemplate":
+                        var templateLedger = new OutputOwnershipLedger(package, workspace.Folder, workspace.Folder, _ => { });
                         path = workspace.Copy(source, data.OutputFileName ?? (string)task.Extra["expectedFileName"]);
                         context.DefaultTemplateFolder = workspace.Folder;
                         context.SavedFromCurrentWorkingDocument = data.SavedFromCurrentWorkingDocument ?? true;
+                        context.OutputOwnership = templateLedger.Capture(path);
                         break;
                     case "Toc":
                         var snapshot = JsonConvert.DeserializeObject<WordTocLayoutSnapshot>(
@@ -69,11 +71,14 @@ namespace MosWord2019.Tests
                     case "DocumentsExistence":
                     case "TemplatesExistence":
                         Assert.IsTrue(data.OutputExists.HasValue, "Output-existence fixture state is required.");
+                        var outputLedger = new OutputOwnershipLedger(package, workspace.Folder,
+                            Path.Combine(workspace.Folder, "Custom Office Templates"), _ => { });
                         if (data.OutputExists.Value)
                             workspace.Copy(data.OutputSource == null ? source : TestCaseData.FixturePath(data.OutputSource),
                                 data.OutputFileName ?? (string)task.Extra["expectedFileName"],
                                 data.ContextKind == "TemplatesExistence");
                         grader = new WordGradingService(() => workspace.Folder);
+                        context.OutputOwnership = outputLedger.Capture();
                         break;
                     default:
                         Assert.Fail("Unsupported fixture context: " + data.ContextKind);
@@ -89,7 +94,7 @@ namespace MosWord2019.Tests
         {
             string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             Assert.AreEqual(Path.Combine(documents, "Memo.txt"), ExternalOutputLocation.ResolveDocuments("Memo.txt"));
-            Assert.AreEqual(Path.Combine(documents, "Custom Office Templates", "Notes.dotx"),
+            Assert.AreEqual(Path.Combine(TemplateFolderResolver.Resolve(), "Notes.dotx"),
                 TemplateOutputLocation.Resolve("Notes.dotx"));
         }
 
@@ -121,13 +126,15 @@ namespace MosWord2019.Tests
             using (var first = new TestWorkspace())
             using (var second = new TestWorkspace())
             {
+                var firstLedger = new OutputOwnershipLedger(package, first.Folder, Path.Combine(first.Folder, "Custom Office Templates"), _ => { });
+                var secondLedger = new OutputOwnershipLedger(package, second.Folder, Path.Combine(second.Folder, "Custom Office Templates"), _ => { });
                 first.Copy(Path.Combine(package.ProjectFolderPath, package.Meta.Starter),
                     (string)task.Extra["expectedFileName"], customOfficeTemplate);
                 var firstGrader = new WordGradingService(() => first.Folder);
                 var secondGrader = new WordGradingService(() => second.Folder);
-                Assert.AreEqual(TaskGradeOutcome.Pass, firstGrader.CheckTask(null, task).Outcome);
-                Assert.AreEqual(TaskGradeOutcome.Fail, secondGrader.CheckTask(null, task).Outcome);
-                Assert.AreEqual(TaskGradeOutcome.Pass, firstGrader.CheckTask(null, task).Outcome);
+                Assert.AreEqual(TaskGradeOutcome.Pass, firstGrader.CheckTask(null, task, new TrainingGradeContext { OutputOwnership = firstLedger.Capture() }).Outcome);
+                Assert.AreEqual(TaskGradeOutcome.Fail, secondGrader.CheckTask(null, task, new TrainingGradeContext { OutputOwnership = secondLedger.Capture() }).Outcome);
+                Assert.AreEqual(TaskGradeOutcome.Pass, firstGrader.CheckTask(null, task, new TrainingGradeContext { OutputOwnership = firstLedger.Capture() }).Outcome);
                 PublicOutputResolversKeepTheWindowsDocumentsDefault();
             }
         }

@@ -9,5 +9,6 @@ namespace MosWord2019.Core.Models
         public int? OwnedDocumentSaveFormat { get; set; }
         public WordFormattingMarksSnapshot FormattingMarks { get; set; }
         public WordTocLayoutSnapshot TocLayout { get; set; }
+        public OutputOwnershipSnapshot OutputOwnership { get; set; }
     }
 }

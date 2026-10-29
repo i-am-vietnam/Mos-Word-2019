@@ -1,46 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MosWord2019.Core.Diagnostics;
 using MosWord2019.Core.Models;
 using MosWord2019.Core.Services;
 
 namespace MosWord2019.Projects
 {
-    /// <summary>Call only after the owned Word document/application has closed successfully.</summary>
+    /// <summary>Declared-output sessions. Cleanup requires the caller's successful owned-document close.</summary>
     public sealed class TemplateOutputCleanupService
     {
-        private readonly HashSet<string> targets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly string documentsFolder;
+        private readonly Func<string> templateFolder;
+        private readonly Action<string> log;
+        private readonly List<OutputOwnershipLedger> ledgers = new List<OutputOwnershipLedger>();
 
-        public void Register(ProjectPackage package)
+        public TemplateOutputCleanupService()
+            : this(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)) { }
+
+        public TemplateOutputCleanupService(string documentsFolder, Func<string> templateFolder = null, Action<string> log = null)
         {
-            foreach (var task in package.Tasks)
-            {
-                if (task.AssertionType != TemplateOutputLocation.AssertionType) continue;
-                Newtonsoft.Json.Linq.JToken name;
-                if (task.Extra == null || !task.Extra.TryGetValue("expectedFileName", out name))
-                    throw new InvalidDataException("Missing template output name.");
-                targets.Add(TemplateOutputLocation.Resolve((string)name));
-            }
+            if (string.IsNullOrWhiteSpace(documentsFolder) || !Path.IsPathRooted(documentsFolder))
+                throw new ArgumentException("An absolute Documents folder is required.", nameof(documentsFolder));
+            this.documentsFolder = Path.GetFullPath(documentsFolder);
+            this.templateFolder = templateFolder ?? (() => TemplateFolderResolver.Resolve());
+            this.log = log ?? (message => AppLogger.Write(message));
         }
 
-        public void Cleanup()
+        public OutputOwnershipLedger CurrentLedger { get; private set; }
+
+        // Call after closing/cleaning the previous attempt, and before opening Word on Go or Restart.
+        public void Register(ProjectPackage package)
         {
-            foreach (string path in targets)
+            if (CurrentLedger != null) throw new InvalidOperationException("Close the preceding output session before registering another.");
+            bool templates = package.Tasks.Any(t => t.AssertionType == TemplateOutputLocation.AssertionType || t.AssertionType == "SavedWordTemplate");
+            var ledger = new OutputOwnershipLedger(package, documentsFolder, templates ? templateFolder() : null, log);
+            ledgers.Add(ledger);
+            CurrentLedger = ledger;
+        }
+
+        public void ObserveOwnedDocument(string path) { CurrentLedger?.ObserveOwnedDocument(path); }
+        public OutputOwnershipSnapshot Capture(string ownedDocumentPath = null) => CurrentLedger?.Capture(ownedDocumentPath);
+
+        // The legacy parameterless call cannot prove that Word released its document.
+        public void Cleanup() { Cleanup(false); }
+
+        public void Cleanup(bool ownedDocumentClosed)
+        {
+            foreach (var ledger in ledgers) ledger.Cleanup(ownedDocumentClosed);
+            if (ownedDocumentClosed)
             {
-                try
-                {
-                    if (!File.Exists(path)) continue;
-                    if ((File.GetAttributes(Path.GetDirectoryName(path)) & FileAttributes.ReparsePoint) != 0 ||
-                        (File.GetAttributes(path) & (FileAttributes.ReparsePoint | FileAttributes.Directory)) != 0)
-                        throw new IOException("Refusing to clean a redirected template output.");
-                    File.Delete(path); // Exact declared file only; never recursive.
-                    AppLogger.Write("Training template output removed " + path);
-                }
-                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException)
-                {
-                    AppLogger.Write("Training template output cleanup failed " + path, ex);
-                }
+                ledgers.Clear();
+                CurrentLedger = null;
             }
         }
     }

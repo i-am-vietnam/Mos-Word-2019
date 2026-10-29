@@ -1,7 +1,9 @@
 using System.IO;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MosWord2019.Core.Models;
 using MosWord2019.Core.Services;
+using MosWord2019.Projects;
 using Newtonsoft.Json.Linq;
 
 namespace MosWord2019.Tests
@@ -47,8 +49,11 @@ namespace MosWord2019.Tests
             {
                 TaskDefinition task = ExportTask();
                 if (alternatives != null) task.Extra["textSegmentAlternatives"] = JToken.Parse(alternatives);
+                var ledger = new OutputOwnershipLedger(new ProjectPackage { Tasks = new List<TaskDefinition> { task } },
+                    workspace.Folder, null, _ => { });
                 File.WriteAllText(Path.Combine(workspace.Folder, "Answer.txt"), content);
-                TaskGradeResult result = new WordGradingService(() => workspace.Folder).CheckTask(null, task);
+                TaskGradeResult result = new WordGradingService(() => workspace.Folder).CheckTask(null, task,
+                    new TrainingGradeContext { OutputOwnership = ledger.Capture() });
                 Assert.AreEqual(expected, result.Outcome, result.Message);
             }
         }

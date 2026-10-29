@@ -1,5 +1,13 @@
 # Project Status
 
+## A3a — Declared output ownership and safe cleanup, 2026-10-29
+
+Completed A3a only from clean main b96a2df. Shared TemplateFolderResolver honors Word PersonalTemplates with the standard fallback. OutputOwnershipLedger captures exact declared-output baselines before Go/Restart opens Word; immutable facts pass through TrainingGradeContext. P06/P07/P09 existence tasks require new/changed bytes; P20 SavedWordTemplate retains content/Save As checks plus freshness and exact snapshot-path binding. Missing observations remain Error, stale files Fail. Core does not discover output files.
+
+Cleanup now requires a baseline-absent path observed from owned Word, successful close, and unchanged first identity/hash on one exclusive delete handle. Personal/pre-existing, changed, replaced, locked and unclaimed files are preserved/logged. P20 Notes.dotx is registered directly and cannot leave a stale PASS for P07. Live Memo.txt is closed before cleanup; P16 arbitrary-folder TXT stays outside declared cleanup. Assets/packages are unchanged. No A3b journal/recovery/mutex/Working cleanup or A4 changes.
+
+Fresh full-solution VS MSBuild Debug/Release Rebuilds each0 warnings/0 errors; headless VSTest403/403 in each,0 skipped (all273 A1/A2 cases retained). Fresh replay1151/1151 on retained inputs, with one isolated SavedWordTemplate ownership-context reconstruction. Source/Debug/Release EN/VI validation:28 packages/212 tasks/78 supported routes,0 errors/warnings. All149 package files and both output lists/hashes remain unchanged:56 dictionaries/28 starters/8 assets. All215 saved DOCX fixtures unchanged and below2 MB. Focused RED/GREEN covers stale-output behavior, registry fallback, shared live-file observation and cross-folder template provenance. Attempted owned Word API activation failed0x80070520 before opening a document; no fresh native/GUI result is claimed. Evidence: artifacts/a3a/ (ignored); reproducible headless tests are tracked. Local commit only; stop before A3b.
+
 ## A2 — Grading and package-loading robustness, 2026-10-29
 
 Completed A2 only from clean `main`967578b. CheckTask converts all nonfatal grading exceptions to Error with type/message and task identity; OOM/StackOverflow escape. TXT metadata uses validated string arrays/matrices, with malformed shapes reported as InvalidDataException. Valid answer decisions and the shared RequiredStrings blank-filtering contract remain unchanged. Validator rejects unsupported routes; LoadAll logs rejected package issue codes and exposes LastRejectedCount; MainForm reports the count in EN/VI without dictionary edits. No A3/A4, Word adapter/COM, cleanup, ownership or package-content changes.

@@ -80,11 +80,14 @@ namespace MosWord2019.Tests
             using (var workspace = new TestWorkspace())
             {
                 var grader = new WordGradingService(() => workspace.Folder);
+                var outputLedger = new OutputOwnershipLedger(new ProjectPackage { Tasks = new List<TaskDefinition> { original } },
+                    workspace.Folder, workspace.Folder, _ => { });
                 if (data.AssertionType == "FileExistsInDocuments")
                     workspace.Copy(fixture, (string)original.Extra["expectedFileName"]);
-                Assert.AreEqual(TaskGradeOutcome.Pass, grader.CheckTask(fixture, original).Outcome,
+                var context = new TrainingGradeContext { OutputOwnership = outputLedger.Capture() };
+                Assert.AreEqual(TaskGradeOutcome.Pass, grader.CheckTask(fixture, original, context).Outcome,
                     "The unchanged task must reach and pass its original assertion on the same saved fixture.");
-                var result = grader.CheckTask(fixture, changed);
+                var result = grader.CheckTask(fixture, changed, context);
                 Assert.AreEqual(TaskGradeOutcome.Error, result.Outcome, id + ": " + result.Message);
                 StringAssert.Contains(result.Message, data.MetadataKey, "Identify the malformed metadata key.");
                 Assert.AreEqual(original.TaskId, result.TaskId);

@@ -464,7 +464,7 @@ namespace MosWord2019.Core.Services
                 points.Where(p => p.Attribute("type") == null || (string)p.Attribute("type") == "node").All(p => visited.Contains((string)p.Attribute("modelId")));
         }
 
-        private static bool CheckPlainTextExport(TaskDefinition task, string documentsFolder, out string detail)
+        private static bool CheckPlainTextExport(TaskDefinition task, string documentsFolder, TrainingGradeContext context, out string detail)
         {
             string name = RequiredString(task, "expectedFileName");
             if (name != Path.GetFileName(name) || Path.IsPathRooted(name) || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
@@ -481,7 +481,8 @@ namespace MosWord2019.Core.Services
                 if (alternativeGroups.Any(group => group.Any(string.IsNullOrWhiteSpace)))
                     throw new InvalidDataException("Invalid grading metadata: textSegmentAlternatives must contain nonempty strings.");
             }
-            string path = Path.Combine(documentsFolder, name);
+            string path;
+            if (!CheckOutputFreshness(task, context, documentsFolder, out path, out detail)) return false;
             detail = "The exact Documents export must be readable plain text containing the document's declared content.";
             if (!File.Exists(path)) return false;
             byte[] bytes;

@@ -31,7 +31,7 @@ namespace MosWord2019
         private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
         private ProjectPackage currentProject;
         private string currentWorkPath;
-        private readonly TemplateOutputCleanupService templateOutputs = new TemplateOutputCleanupService();
+        private readonly TemplateOutputCleanupService templateOutputs;
         private int taskIndex;
         private bool controllerDisposed;
         private bool displayEventsSubscribed;
@@ -43,12 +43,14 @@ namespace MosWord2019
 
         // The form owns the controller. Injection keeps verification packages out of production.
         public MainForm(AppSession session, string projectRoot, TrainingWorkspaceService workspace,
-            IWordController word, Func<string, bool> confirmRestart = null, Action<string> notify = null)
+            IWordController word, Func<string, bool> confirmRestart = null, Action<string> notify = null,
+            TemplateOutputCleanupService outputCleanup = null)
         {
             this.session = session ?? throw new ArgumentNullException(nameof(session));
             if (session.Mode != AppMode.Training) throw new NotSupportedException("Testing is not implemented.");
             this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
             this.word = word ?? throw new ArgumentNullException(nameof(word));
+            templateOutputs = outputCleanup ?? new TemplateOutputCleanupService(workspace.DocumentsRootPath);
             this.confirmRestart = confirmRestart ?? (message => MessageBox.Show(this, message, Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes);
             this.notify = notify ?? (message => MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
@@ -130,7 +132,6 @@ namespace MosWord2019
             var selected = projects.SelectedItem as ProjectPackage;
             if (selected == null) return;
             ValidateTranslations(selected);
-            templateOutputs.Register(selected); // Retain exact targets even after switching projects.
             AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
             EndTrainingSession();
             status.Text = T("Opening project...", "Đang mở dự án...");
@@ -140,6 +141,7 @@ namespace MosWord2019
                     AppLogger.Write("Training project asset available " + stagedAsset);
                 string path = workspace.PrepareFreshWorkingCopy(selected);
                 AppLogger.Write("Training working copy prepared " + path);
+                templateOutputs.Register(selected); // Baseline before the owned document opens, never inherited from a previous Go.
                 word.OpenDocument(path);
                 AppLogger.Write("Training Word open " + path);
                 currentProject = selected;
@@ -147,7 +149,11 @@ namespace MosWord2019
             }
             catch
             {
-                if (!word.IsOpened) workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                if (!word.IsOpened)
+                {
+                    templateOutputs.Cleanup(true);
+                    workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                }
                 throw;
             }
             ConfigureExportCheckpoint();
@@ -284,10 +290,29 @@ namespace MosWord2019
             return false;
         }
 
+        private void ObserveOwnedOutput()
+        {
+            if (templateOutputs.CurrentLedger == null) return;
+            try
+            {
+                if (word.IsOpened) templateOutputs.ObserveOwnedDocument((word as IWordDocumentState)?.CurrentDocumentPath);
+            }
+            catch (Exception ex) { AppLogger.Write("Training output ownership could not be observed; preserve unclaimed outputs", ex); }
+        }
+
+        private void CloseOwnedOutputDocument()
+        {
+            ObserveOwnedOutput();
+            word.CloseDocument();
+            bool closed = !word.IsOpened;
+            templateOutputs.Cleanup(closed); // Memo.txt may have been the live owned document until this close.
+            if (!closed) throw new InvalidOperationException("The owned Word document is still open; output cleanup and reset were deferred.");
+        }
+
         private void EndTrainingSession()
         {
             if (currentProject == null) return;
-            word.CloseDocument(); // Ownership-safe discard; never save merely for leaving Training.
+            CloseOwnedOutputDocument(); // Ownership-safe discard; never save merely for leaving Training.
             AppLogger.Write("Training document discarded " + currentWorkPath);
             // Retain project/path/assets until reset succeeds, so a failed reset is retryable.
             workspace.ResetWorkingCopy(currentProject);
@@ -301,11 +326,12 @@ namespace MosWord2019
             if (!confirmRestart(T("Restart this project?\nYour current changes will be discarded.",
                 "Làm lại dự án này?\nCác thay đổi hiện tại sẽ bị xóa."))) return;
             var project = currentProject;
-            word.CloseDocument(); // Explicit confirmed discard; do not save.
+            CloseOwnedOutputDocument(); // Explicit confirmed discard; do not save.
             // Keep validated project state/assets if reset or reopen fails; the next action can retry safely.
             foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
                 AppLogger.Write("Training project asset available after restart " + stagedAsset);
             string path = workspace.ResetWorkingCopy(project);
+            templateOutputs.Register(project); // Restart is a new output baseline, captured before Word opens.
             word.OpenDocument(path);
             currentWorkPath = path;
             ConfigureExportCheckpoint();
@@ -346,6 +372,7 @@ namespace MosWord2019
                     savedPath = ((IWordExportCheckpoint)word).SaveFormattedCheckpoint();
                 context.DefaultTemplateFolder = task.AssertionType == "SavedWordTemplate" ? documentState?.DefaultTemplateFolder : null;
                 context.SavedFromCurrentWorkingDocument = !string.Equals(savedPath, currentWorkPath, StringComparison.OrdinalIgnoreCase);
+                context.OutputOwnership = templateOutputs.Capture(documentState?.CurrentDocumentPath);
                 AppLogger.Write("Training grade source " + savedPath + " task " + task.TaskId);
             }
             catch (Exception ex)
@@ -455,9 +482,10 @@ namespace MosWord2019
             Run(() =>
             {
                 EndTrainingSession();
+                ObserveOwnedOutput();
                 word.Dispose();
                 controllerDisposed = true;
-                templateOutputs.Cleanup();
+                templateOutputs.Cleanup(true); // Successful disposal proves closure; never inspect a disposed controller.
                 AppLogger.Write("Training session closed");
                 completed = true;
             });
@@ -476,9 +504,10 @@ namespace MosWord2019
             if (disposing && !controllerDisposed)
             {
                 EndTrainingSession();
+                ObserveOwnedOutput();
                 word.Dispose();
                 controllerDisposed = true;
-                templateOutputs.Cleanup();
+                templateOutputs.Cleanup(true);
             }
             base.Dispose(disposing);
         }

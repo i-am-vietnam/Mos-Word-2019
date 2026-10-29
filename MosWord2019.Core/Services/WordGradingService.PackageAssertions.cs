@@ -409,8 +409,13 @@ namespace MosWord2019.Core.Services
         {
             if (context == null || string.IsNullOrWhiteSpace(context.DefaultTemplateFolder))
                 throw new InvalidDataException("Template grading requires the owned document's Save As context.");
+            string outputPath;
+            if (!CheckOutputFreshness(task, context, null, out outputPath, out detail)) return false;
             string expectedPath = Path.Combine(context.DefaultTemplateFolder, RequiredString(task, "expectedFileName"));
-            bool match = context.SavedFromCurrentWorkingDocument && string.Equals(Path.GetFullPath(path), Path.GetFullPath(expectedPath), StringComparison.OrdinalIgnoreCase);
+            string actualPath = Path.GetFullPath(path);
+            bool match = context.SavedFromCurrentWorkingDocument &&
+                string.Equals(actualPath, Path.GetFullPath(expectedPath), StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(actualPath, outputPath, StringComparison.OrdinalIgnoreCase);
             XNamespace ct = "http://schemas.openxmlformats.org/package/2006/content-types";
             var types = package.Xml("[Content_Types].xml").Root;
             match &= types.Elements(ct + "Override").Any(t => (string)t.Attribute("PartName") == "/word/document.xml" &&

@@ -22,7 +22,9 @@ Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord201
 
 A1 bổ sung `MosWord2019.Tests`: project MSTest classic net472/C#7.3, chạy VSTest không cần Word, nạp task gốc qua `ProjectLoader`. Fixture được lưu trong Git, có Pass/Fail cho77 loại assertion đang dùng và các near miss cho context/output. Constructor nội bộ được duyệt cho phép truyền riêng thư mục Documents của từng test; constructor công khai giữ nguyên. WinForms copy package bằng một wildcard `Projects\**\*` với PreserveNewest. Hướng dẫn chạy: `MosWord2019.Tests/README.md`.
 
-A2 chuyển ngoại lệ chấm bài không nghiêm trọng thành Error có chẩn đoán, kiểm tra metadata TXT, từ chối assertion không hỗ trợ từ bước validation, ghi log package bị loại và hiển thị số lượng bằng EN/VI. Test bổ sung đối chứng đúng/near-miss cho đủ28 task thuộc năm nhóm assertion dùng nhiều, cùng fixture Error và thử nghiệm ngoại lệ. Dữ liệu hợp lệ vẫn giữ kết quả cũ; provenance file đầu ra, cleanup, COM và A3–A4 chưa thay đổi.
+A2 chuyển ngoại lệ chấm bài không nghiêm trọng thành Error có chẩn đoán, kiểm tra metadata TXT, từ chối assertion không hỗ trợ từ bước validation, ghi log package bị loại và hiển thị số lượng bằng EN/VI. Test bổ sung đối chứng đúng/near-miss cho đủ28 task thuộc năm nhóm assertion dùng nhiều, cùng fixture Error và thử nghiệm ngoại lệ. A2 giữ kết quả dữ liệu hợp lệ; A3a bên dưới thay riêng provenance/cleanup đầu ra. A3b và A4 chưa triển khai.
+
+A3a dùng chung `TemplateFolderResolver` (PersonalTemplates theo phiên bản Office, fallback Documents/Custom Office Templates). `OutputOwnershipLedger` chụp baseline trước OpenDocument trên Go/Restart, nhận diện đúng các output khai báo của P06/P07/P09/P20; `TrainingGradeContext.OutputOwnership` truyền snapshot thuần dữ liệu vào Core. File cũ không đổi không còn PASS; nội dung SavedWordTemplate/PlainTextDocumentExport vẫn phải đúng. Cleanup chỉ sau khi đóng Word, với file vốn chưa tồn tại, được quan sát từ tài liệu sở hữu và vẫn khớp identity/hash đầu tiên trên exclusive delete handle. File cá nhân/cũ/đổi/khóa không bị xóa. P16-T02 chọn thư mục tự do nên không thuộc cleanup. Journal/crash recovery thuộc A3b, chưa làm.
 
 ### 1.2. Luồng người dùng và trạng thái bài làm
 
@@ -58,7 +60,7 @@ Word nằm phía trên, panel Trainer phía dưới vùng làm việc. Không th
 | `MosWord2019.WinForms` | Giao diện và điều phối: `Program`, `LoginForm`, `MainForm`, `AppSession`. Namespace mã hiện tại là `MosWord2019`; không đổi namespace hàng loạt theo tên thư mục. |
 | `MosWord2019.Core` | Model, interface, `WordGradingService` và các partial assertions, chẩn đoán. Đọc nội dung đã lưu bằng OOXML; không chứa Word COM objects. |
 | `MosWord2019.Word` | Adapter Word desktop: `WordController`, `WordSession`, `WinApiProcessHelper`, các partial đọc trạng thái/context và xử lý checkpoint. |
-| `MosWord2019.Projects` | `ProjectLoader`, `ProjectValidator`, `TrainingWorkspaceService` và các partial SavedCopy/Assets, `TemplateOutputCleanupService`. |
+| `MosWord2019.Projects` | `ProjectLoader`, `ProjectValidator`, `TrainingWorkspaceService` và các partial SavedCopy/Assets, `TemplateOutputCleanupService`, `OutputOwnershipLedger`. |
 | `MosWord2019.Data` | Assembly dự phòng; hiện chỉ có khung project/AssemblyInfo, chưa có database/repository/ORM. |
 
 Nền tảng cố định: **C#7.3, WinForms, .NET Framework4.7.2**, classic `.csproj`, Visual Studio MSBuild. Không chuyển sang .NET mới/WPF/web, nâng dependency hoặc viết lại kiến trúc khi chưa được yêu cầu.
@@ -107,13 +109,13 @@ Không tự Update TOC/fields, Repaginate, chạy Inspector, chèn Introduction 
 
 ### 2.4. Working copy, assets và output ngoài tài liệu
 
-- Package gốc nằm ở `MosWord2019.WinForms/Projects/`; runtime đọc `Projects` cạnh executable. `.csproj` copy từng file bằng `PreserveNewest`; thêm file phải bảo đảm inclusion/copy đúng một lần, không sửa trực tiếp bin để coi là sửa nguồn.
+- Package gốc nằm ở `MosWord2019.WinForms/Projects/`; runtime đọc `Projects` cạnh executable. `.csproj` dùng wildcard `Projects\**\*` với `PreserveNewest`; thêm file phải bảo đảm inclusion/copy đúng một lần, không sửa trực tiếp bin để coi là sửa nguồn.
 - Working root mặc định: `<Documents>/MosWord2019/Working/<ProjectId>/work.docx` hoặc `work.doc` theo starter. `PrepareWorkingCopy()` là entry point tương thích nhưng vẫn gọi fresh reset.
 - Reset xác minh containment/reparse/lock, phục hồi starter qua file tạm và atomic replace/move; chỉ xử lý đúng tên reserved `work.doc`, `work.docx`, `work.docm`, `export-checkpoint.docx`. Không xóa đệ quy hoặc đụng arbitrary exports.
 - Assets top-level được stage vào Documents qua `TrainingWorkspaceService.Assets.cs`; P12 có thêm bản Map.png trong Pictures qua metadata; P26 thêm alias Coffee Sam.jpg trong Documents, giữ nguyên Coffee_Sam.jpg và Information.docx. Alias đi qua cùng ledger, kiểm tra tên an toàn/collision/containment/no-overwrite/rollback và cleanup identity/hash. Không tự chèn assets vào tài liệu.
 - **Quy tắc hiện tại:** mọi bản sao do service tạo trong phiên được cleanup khi kết thúc project/phiên hoặc thoát bình thường, kể cả package không có `assetStaging`. Chỉ xóa bản sao còn đúng hash và Windows file identity, qua exclusive handle. Bản có sẵn cùng hash được tái sử dụng nhưng không nhận sở hữu; khác hash thì chặn, không ghi đè.
 - File đã sửa/thay thế/khóa và dữ liệu cá nhân phải được bảo vệ. Crash hoặc cleanup lỗi có thể để lại file; không nhận quyền xóa từ tên/hash của file tồn từ phiên trước. Ghi log, không hứa cleanup tuyệt đối sau force-stop.
-- Đừng nhầm staged assets với output bài tập. P09 Memo.txt không có cleanup giống assets. P06/P07 có `TemplateOutputCleanupService` riêng, xóa đúng tên template đã đăng ký sau khi Word đóng an toàn; registry tên được giữ qua chuyển project. Notes.dotx của P20 có thể bị quy tắc P07 tác động nếu đã ghé P07 trong cùng phiên; đây là hành vi đã kiểm chứng, không tự sửa.
+- Staged assets giữ ledger riêng hiện có. Output khai báo dùng OutputOwnershipLedger qua TemplateOutputCleanupService; đóng Word thành công trước cleanup/reset. P20 Notes.dotx được đăng ký trực tiếp; file còn từ phiên trước không làm P07 PASS và không bị nhận sở hữu. Không scan/xóa thư mục tự chọn của P16. A3b journal chưa có; output bị khóa/đổi/không nhận sở hữu được giữ và ghi log.
 
 ## 3. Cấu trúc Database/Model
 
@@ -146,7 +148,8 @@ MosWord2019.WinForms/Projects/Word2019_P24/
 | `TaskDefinition` — Core/Models | `TaskId`, `TitleKey`, `InstructionKey`, `AssertionType`; `ProjectId` được gán khi load, không serialize. `[JsonExtensionData] IDictionary<string,JToken> Extra` giữ metadata assertion; không mở rộng schema cứng cho từng project. |
 | `ProjectPackage` — Core/Models | `Meta`, `List<TaskDefinition> Tasks`, `Dictionary<string,string> Lang`, `ProjectFolderPath`; `DisplayName` suy từ ProjectId. |
 | `AppSession` — WinForms | Immutable `Mode`, `Language`; chỉ lựa chọn shell, không phải tài khoản hoặc exam session, chưa có SessionId thi. |
-| `TrainingGradeContext` — Core/Models | `DefaultTemplateFolder`, `SavedFromCurrentWorkingDocument`, `OwnedDocumentPath`, nullable `OwnedDocumentSaveFormat`, `FormattingMarks`, `TocLayout`. Context do owner cung cấp, không tin provenance tự khai trong task JSON. |
+| `TrainingGradeContext` — Core/Models | `DefaultTemplateFolder`, `SavedFromCurrentWorkingDocument`, `OwnedDocumentPath`, nullable `OwnedDocumentSaveFormat`, `FormattingMarks`, `TocLayout`, `OutputOwnership`. Context do owner cung cấp, không tin provenance tự khai trong task JSON. |
+| `OutputOwnershipSnapshot` / `DeclaredOutputSnapshot` / `OutputFileState` — Core/Models | Snapshot immutable: session/baseline/current, đường dẫn khai báo, size/hash/UTC/identity hoặc lỗi quan sát; Core không tự tìm output. |
 | `TaskGradeResult` / `TaskGradeOutcome` | Immutable outcome/message/assertion type/task ID; phân biệt Pass/Fail/Error. |
 | `ValidationResult` / `ValidationIssue` | Meta/tasks/languages đã đọc, danh sách lỗi/cảnh báo, mã lỗi và số lượng để chặn package lỗi. |
 | `WordSession` — Word, internal | COM application/document và verified process handle, không đưa sang Core/UI public models. |

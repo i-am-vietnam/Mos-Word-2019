@@ -45,14 +45,7 @@ namespace MosWord2019.Word
             {
                 EnsureUsable();
                 if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
-                // Word's personal-template setting is independent of Normal.dotm/UserTemplatesPath.
-                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Office\" + session.Application.Version + @"\Word\Options"))
-                {
-                    string configured = key?.GetValue("PersonalTemplates") as string;
-                    if (!string.IsNullOrWhiteSpace(configured)) return Path.GetFullPath(Environment.ExpandEnvironmentVariables(configured));
-                }
-                // Verified Word 2019 Save As fallback when PersonalTemplates is unset.
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Custom Office Templates");
+                return MosWord2019.Core.Services.TemplateFolderResolver.Resolve(session.Application.Version);
             }
         }
 
