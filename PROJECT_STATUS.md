@@ -1,5 +1,13 @@
 # Project Status
 
+## A2 — Grading and package-loading robustness, 2026-10-29
+
+Completed A2 only from clean `main`967578b. CheckTask converts all nonfatal grading exceptions to Error with type/message and task identity; OOM/StackOverflow escape. TXT metadata uses validated string arrays/matrices, with malformed shapes reported as InvalidDataException. Valid answer decisions and the shared RequiredStrings blank-filtering contract remain unchanged. Validator rejects unsupported routes; LoadAll logs rejected package issue codes and exposes LastRejectedCount; MainForm reports the count in EN/VI without dictionary edits. No A3/A4, Word adapter/COM, cleanup, ownership or package-content changes.
+
+Tracked tests add six saved Error fixtures (five metadata helpers plus the new catch path), eleven recoverable exception injections, fatal escape controls, TXT metadata/content cases and correct/near-miss pairs for all28 tasks in the five requested assertion families. Inventory guards retain28 packages/212 tasks/77 used types and name the constants to update. Original171 A1 tests remain included.
+
+Fresh final full-solution VS MSBuild Debug/Release Rebuilds each report0 warnings/0 errors; VSTest273/273 in each,0 skipped. Retained shared/P24–P28 expectations1151/1151 freshly replay. Source and both outputs validate EN/VI:28 packages/212 tasks/78 supported routes,0 validation errors/warnings; all149 package files/hashes match baseline, including56 dictionaries/28 starters/8 assets. All215 fixture DOCX stay under2 MB (maximum1,975,683 bytes). RED tests reproduced unsupported-route acceptance, escaped exceptions and malformed TXT decisions before fixes; A1 also caught and protected P23's blank-entry contract. These are headless tests/replays, not fresh native Word/UI or disk-log checks. Evidence: `artifacts/a2/` and `artifacts/a2-nearmiss/` (ignored); reproducible tests/fixtures are tracked. Local commit only; stop before A3.
+
 ## A1 — Repository hygiene and headless test foundation, 2026-10-29
 
 Completed A1 only. P28 implementation already existed in clean HEAD208cf73; prerequisite commit `P28 completion` records fresh verification. Added explicit CRLF/binary attributes and separate `Normalize line endings` marker (renormalization was a no-op; whitespace-insensitive diff is empty). Replaced149 explicit package-copy entries with one PreserveNewest wildcard; all149 filenames/hashes in both outputs exactly match the before-change snapshots. All56 dictionaries,28 starters and8 assets retain their initial bytes.

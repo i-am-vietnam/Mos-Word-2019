@@ -20,7 +20,9 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
-A1 bổ sung `MosWord2019.Tests`: project MSTest classic net472/C#7.3, chạy VSTest không cần Word, nạp task gốc qua `ProjectLoader`. Fixture được lưu trong Git, có Pass/Fail cho77 loại assertion đang dùng và các near miss cho context/output. Constructor nội bộ được duyệt cho phép truyền riêng thư mục Documents của từng test; constructor công khai và cách chấm hiện tại giữ nguyên. WinForms copy package bằng một wildcard `Projects\**\*` với PreserveNewest. Hướng dẫn chạy: `MosWord2019.Tests/README.md`. A2–A4 chưa triển khai.
+A1 bổ sung `MosWord2019.Tests`: project MSTest classic net472/C#7.3, chạy VSTest không cần Word, nạp task gốc qua `ProjectLoader`. Fixture được lưu trong Git, có Pass/Fail cho77 loại assertion đang dùng và các near miss cho context/output. Constructor nội bộ được duyệt cho phép truyền riêng thư mục Documents của từng test; constructor công khai giữ nguyên. WinForms copy package bằng một wildcard `Projects\**\*` với PreserveNewest. Hướng dẫn chạy: `MosWord2019.Tests/README.md`.
+
+A2 chuyển ngoại lệ chấm bài không nghiêm trọng thành Error có chẩn đoán, kiểm tra metadata TXT, từ chối assertion không hỗ trợ từ bước validation, ghi log package bị loại và hiển thị số lượng bằng EN/VI. Test bổ sung đối chứng đúng/near-miss cho đủ28 task thuộc năm nhóm assertion dùng nhiều, cùng fixture Error và thử nghiệm ngoại lệ. Dữ liệu hợp lệ vẫn giữ kết quả cũ; provenance file đầu ra, cleanup, COM và A3–A4 chưa thay đổi.
 
 ### 1.2. Luồng người dùng và trạng thái bài làm
 
@@ -133,7 +135,7 @@ MosWord2019.WinForms/Projects/Word2019_P24/
 
 `meta.json` định danh package và starter; `tasks.json` là mảng task theo thứ tự hiển thị; mỗi task trỏ tới khóa trong dictionary ngôn ngữ. Ví dụ tên khóa `P24_T02_TITLE`/`P24_T02_INST`, task ID `T02`, project ID `Word2019_P24`. Giữ nguyên ID thật của project; P19 cố ý không có T02, không đánh số lại cho liên tục.
 
-`ProjectValidator.Validate()` kiểm tra folder/meta/starter/JSON/task IDs, sự hiện diện của `assertionType`, language keys và asset options trước khi package được nạp. Validator hiện chưa tự đối chiếu identifier với tập assertion hỗ trợ; cần kiểm tra riêng bằng `WordGradingService.IsAssertionTypeSupported()` khi kiểm chứng package/routing. Nó cũng chưa xác minh toàn bộ nội dung OOXML hoặc mọi metadata riêng của assertion. `ProjectLoader.LoadAll()` bỏ package có validation errors, sắp theo ProjectId; với tập hiện tại kết quả là Project1–25. Không tự nhận một package chắc chắn chấm được chỉ vì loader nạp thành công.
+`ProjectValidator.Validate()` kiểm tra folder/meta/starter/JSON/task IDs, identifier assertion qua `WordGradingService.IsAssertionTypeSupported()`, language keys và asset options trước khi nạp. Identifier không hỗ trợ có mã `ASSERTION_UNSUPPORTED`; validator chưa xác minh toàn bộ OOXML hoặc mọi metadata riêng của assertion. `ProjectLoader.LoadAll()` ghi log từng package bị loại cùng mã lỗi, cung cấp `LastRejectedCount` cho trạng thái EN/VI và sắp package hợp lệ theo ProjectId; hiện có Project1–28. Không tự nhận một package chắc chắn chấm được chỉ vì loader nạp thành công.
 
 ### 3.3. Model đang dùng
 

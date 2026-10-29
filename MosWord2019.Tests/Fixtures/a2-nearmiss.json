@@ -1,0 +1,254 @@
+[
+  {
+    "id": "A2_Word2019_P01_T03",
+    "projectId": "Word2019_P01",
+    "taskId": "T03",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P01/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P01/T03/nearmiss-a2.docx",
+    "defect": "The linked footnote has an extra terminal period: actual \"includes Address.\"; expected \"includes Address\"."
+  },
+  {
+    "id": "A2_Word2019_P01_T05",
+    "projectId": "Word2019_P01",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P01/T05/pass.docx",
+    "nearMissFixture": "Word2019_P01/T05/nearmiss-a2.docx",
+    "defect": "The symbol keeps its character and anchor but uses the wrong font."
+  },
+  {
+    "id": "A2_Word2019_P02_T02",
+    "projectId": "Word2019_P02",
+    "taskId": "T02",
+    "assertionType": "TextReplaceAll",
+    "positiveFixture": "Word2019_P02/T02/pass.docx",
+    "nearMissFixture": "Word2019_P02/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Basic Informaticsx instead of Basic Informatics; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P06_T05",
+    "projectId": "Word2019_P06",
+    "taskId": "T05",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P06/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P06/T05/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled connectivityx instead of connectivity; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P06_T07",
+    "projectId": "Word2019_P06",
+    "taskId": "T07",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P06/T07/pass-a2.docx",
+    "nearMissFixture": "Word2019_P06/T07/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=28; target text and other formatting are retained."
+  },
+  {
+    "id": "A2_Word2019_P07_T06",
+    "projectId": "Word2019_P07",
+    "taskId": "T06",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P07/T06/pass-a2.docx",
+    "nearMissFixture": "Word2019_P07/T06/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled ltthocx instead of ltthoc; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P08_T01",
+    "projectId": "Word2019_P08",
+    "taskId": "T01",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P08/T01/pass.docx",
+    "nearMissFixture": "Word2019_P08/T01/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged."
+  },
+  {
+    "id": "A2_Word2019_P08_T04",
+    "projectId": "Word2019_P08",
+    "taskId": "T04",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P08/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P08/T04/nearmiss-a2.docx",
+    "defect": "Clear Formatting applies only to the first half of the target paragraph."
+  },
+  {
+    "id": "A2_Word2019_P10_T02",
+    "projectId": "Word2019_P10",
+    "taskId": "T02",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P10/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled mosx instead of mos; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P10_T04",
+    "projectId": "Word2019_P10",
+    "taskId": "T04",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P10/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T04/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is placed before Microsoft Certified Trainer instead of immediately after it."
+  },
+  {
+    "id": "A2_Word2019_P10_T12",
+    "projectId": "Word2019_P10",
+    "taskId": "T12",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P10/T12/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T12/nearmiss-a2.docx",
+    "defect": "The exact footnote is linked after (United States) instead of immediately after Certiport."
+  },
+  {
+    "id": "A2_Word2019_P10_T13",
+    "projectId": "Word2019_P10",
+    "taskId": "T13",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P10/T13/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T13/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=22; target text and other formatting are retained."
+  },
+  {
+    "id": "A2_Word2019_P11_T03",
+    "projectId": "Word2019_P11",
+    "taskId": "T03",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P11/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P11/T03/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is inserted after the sentence instead of before it."
+  },
+  {
+    "id": "A2_Word2019_P13_T02",
+    "projectId": "Word2019_P13",
+    "taskId": "T02",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P13/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P13/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Woodgrove Plusx instead of Woodgrove Plus; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P14_T05",
+    "projectId": "Word2019_P14",
+    "taskId": "T05",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P14/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P14/T05/nearmiss-a2.docx",
+    "defect": "The exact requested note is an endnote instead of a footnote."
+  },
+  {
+    "id": "A2_Word2019_P15_T02",
+    "projectId": "Word2019_P15",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P15/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P15/T02/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is inserted after the anchor instead of before it."
+  },
+  {
+    "id": "A2_Word2019_P16_T05",
+    "projectId": "Word2019_P16",
+    "taskId": "T05",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P16/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P16/T05/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=22; target text and other formatting are retained."
+  },
+  {
+    "id": "A2_Word2019_P17_T02",
+    "projectId": "Word2019_P17",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P17/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P17/T02/nearmiss-a2.docx",
+    "defect": "The correctly positioned symbol retains its character code but uses Wingdings instead of Webdings."
+  },
+  {
+    "id": "A2_Word2019_P18_T01",
+    "projectId": "Word2019_P18",
+    "taskId": "T01",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P18/T01/pass.docx",
+    "nearMissFixture": "Word2019_P18/T01/nearmiss-a2.docx",
+    "defect": "Every replacement uses Esp instead of the required uppercase ESP."
+  },
+  {
+    "id": "A2_Word2019_P19_T05",
+    "projectId": "Word2019_P19",
+    "taskId": "T05",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P19/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P19/T05/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged."
+  },
+  {
+    "id": "A2_Word2019_P20_T03",
+    "projectId": "Word2019_P20",
+    "taskId": "T03",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P20/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P20/T03/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Woodgrove plusx instead of Woodgrove plus; all other content is retained."
+  },
+  {
+    "id": "A2_Word2019_P20_T11",
+    "projectId": "Word2019_P20",
+    "taskId": "T11",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P20/T11/pass-a2.docx",
+    "nearMissFixture": "Word2019_P20/T11/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged."
+  },
+  {
+    "id": "A2_Word2019_P21_T05",
+    "projectId": "Word2019_P21",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P21/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P21/T05/nearmiss-a2.docx",
+    "defect": "The correctly positioned symbol retains its character code but uses Wingdings instead of Webdings."
+  },
+  {
+    "id": "A2_Word2019_P22_T04",
+    "projectId": "Word2019_P22",
+    "taskId": "T04",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P22/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P22/T04/nearmiss-a2.docx",
+    "defect": "The correct linked footnote is copied while the original source note remains in the body."
+  },
+  {
+    "id": "A2_Word2019_P23_T03",
+    "projectId": "Word2019_P23",
+    "taskId": "T03",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P23/T03/pass.docx",
+    "nearMissFixture": "Word2019_P23/T03/nearmiss-a2.docx",
+    "defect": "Clear Formatting covers only the first five characters of the target heading."
+  },
+  {
+    "id": "A2_Word2019_P25_T04",
+    "projectId": "Word2019_P25",
+    "taskId": "T04",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P25/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P25/T04/nearmiss-a2.docx",
+    "defect": "One middle target run has character spacing 20 instead of the required 40."
+  },
+  {
+    "id": "A2_Word2019_P27_T05",
+    "projectId": "Word2019_P27",
+    "taskId": "T05",
+    "assertionType": "TextReplaceAll",
+    "positiveFixture": "Word2019_P27/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P27/T05/nearmiss-a2.docx",
+    "defect": "Three Soccer replacements are correct; the Prince row still contains football."
+  },
+  {
+    "id": "A2_Word2019_P28_T02",
+    "projectId": "Word2019_P28",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P28/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P28/T02/nearmiss-a2.docx",
+    "defect": "The correctly positioned Registered Sign is changed to the adjacent Unicode character, retaining the surrounding sentence."
+  }
+]

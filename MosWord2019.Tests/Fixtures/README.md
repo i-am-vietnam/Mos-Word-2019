@@ -1,5 +1,11 @@
 # Saved-package fixtures
 
+## A2 bổ sung
+
+`a2-nearmiss.json` khai báo cặp đúng/near-miss cho đủ28 task thuộc BodyTextReplaceAll, TextReplaceAll, TextRangeFormattingEquals, Footnote và SymbolInserted. Cả hai dùng nguyên task được ProjectLoader nạp. Có13 near-miss đã lưu từ kiểm chứng trước và15 biến thể OOXML tập trung; provenance phân biệt rõ hai nguồn, thay đổi archive entry và hash. Riêng fixture P11 nén ảnh PNG không mất dữ liệu để dưới2 MB; hash pixel RGBA giải mã bằng nhau. Chỉ bản fixture thay đổi, không sửa tài nguyên package. Hai fixture P20 chuyển content type từ template sang document và ghi rõ trong provenance.
+
+`a2-errors.json` giữ sáu DOCX có byte giống fixture đúng: một dùng cho nhánh ngoại lệ mới và năm dùng cho RequiredString/Int/Array/StringMatrix/Bool. Nhãn Error mô tả exception/context hoặc metadata task sai, không phải đáp án học viên sai. Test clone metadata của task đã nạp và chỉ thay một trường; kiểm tra đối chứng task gốc vẫn Pass và không bị sửa. Callback Documents nội bộ tiêm11 loại ngoại lệ; OOM/StackOverflow chỉ được ném bằng object thử nghiệm, không làm cạn bộ nhớ hoặc đệ quy thật. Các manifest A1 bên dưới giữ nguyên.
+
 `fixtures.json` lưu 158 ca kiểm thử cho đủ 77 `assertionType` đang được 28 package sử dụng: 146 ca cho 73 loại chấm nội dung OOXML, cộng 12 ca context/output cho bốn loại còn lại. Mỗi loại OOXML có một Pass và một Fail trên cùng `projectId`/`taskId` gốc; mỗi loại context/output có Pass, Fail và near miss. Mỗi file DOCX nhỏ hơn 2.000.000 byte. Dữ liệu được đưa vào Git để checkout mới có thể chạy kiểm thử mà không cần Word, Office Interop, GUI hay thư mục `artifacts/`.
 
 Test phải nạp task thật bằng `ProjectLoader` từ package được copy vào output, rồi gọi public `WordGradingService.CheckTask` trên fixture đã lưu. Core chỉ đọc file; output/template cần tạo được copy vào thư mục riêng và dọn sau mỗi ca. Không lấy task từ manifest, không thay metadata kỳ vọng và không sửa package/câu hỏi/starter. `expected` chỉ là kết quả kiểm thử, không tham gia chấm đáp án.

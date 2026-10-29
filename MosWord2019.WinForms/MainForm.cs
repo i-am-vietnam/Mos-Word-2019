@@ -110,13 +110,16 @@ namespace MosWord2019
             ClearProject();
             Run(() =>
             {
-                var available = new ProjectLoader().LoadAll(projectRoot, session.Language)
+                var loader = new ProjectLoader();
+                var available = loader.LoadAll(projectRoot, session.Language)
                     .Where(p => string.Equals(Path.GetExtension(p.Meta.Starter), ".docx", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(Path.GetExtension(p.Meta.Starter), ".doc", StringComparison.OrdinalIgnoreCase)).ToArray();
                 projects.Items.AddRange(available);
                 if (available.Length > 0) projects.SelectedIndex = 0;
                 go.Enabled = available.Length > 0;
                 status.Text = available.Length == 0 ? T("No available projects", "Chưa có dự án khả dụng") : T("Ready", "Sẵn sàng");
+                if (loader.LastRejectedCount > 0)
+                    status.Text += " — " + loader.LastRejectedCount + T(" project(s) could not be loaded", " dự án không thể tải");
             });
         }
 

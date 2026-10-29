@@ -1,0 +1,1024 @@
+[
+  {
+    "id": "A2_Word2019_P01_T03",
+    "projectId": "Word2019_P01",
+    "taskId": "T03",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P01/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P01/T03/nearmiss-a2.docx",
+    "defect": "The linked footnote has an extra terminal period: actual \"includes Address.\"; expected \"includes Address\".",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/phase5/variants/t03-punctuation.docx",
+    "sourceSha256": "d5930e1d3b30e47a7f9e785669fda4dc7d74ed533a5d6e45564e7c73f6528c8d",
+    "fixtureSha256": "1a40a8fa7d93022d6f16cbc94bc497fcda524a4d4d2732fa64f4662d303c9d05",
+    "size": 939744,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/phase5/combined-correct.docx",
+    "positiveOriginalSha256": "10989aa6f5842b30d52e08c42d1c5a6f079ed2c056518e2d26a856378e31df51",
+    "positiveFixtureSha256": "c447762efe874688b9d4b9344ad7fc236f2ca6192d647fa1615b8978a89b2835",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P01/tasks.json",
+    "originalTaskMetadataSha256": "8a61834647f0648c0dc0c76a9958902c1ec5a089d94db32183f6924f814680d1",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P01_T05",
+    "projectId": "Word2019_P01",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P01/T05/pass.docx",
+    "nearMissFixture": "Word2019_P01/T05/nearmiss-a2.docx",
+    "defect": "The symbol keeps its character and anchor but uses the wrong font.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/phase5/variants/t05-wrong-font.docx",
+    "sourceSha256": "cfa1dbac0f33fb9aadd97bfeae091409c2682d0827509fd818cf97f41a94ed8b",
+    "fixtureSha256": "bd5029d488ca0ba20c3e8c15cb13649b96d5b181018958312976e2f2305e3c7e",
+    "size": 939744,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "MosWord2019.Tests/Fixtures/Word2019_P01/T05/pass.docx",
+    "positiveOriginalSha256": "10989aa6f5842b30d52e08c42d1c5a6f079ed2c056518e2d26a856378e31df51",
+    "positiveFixtureSha256": "10989aa6f5842b30d52e08c42d1c5a6f079ed2c056518e2d26a856378e31df51",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P01/tasks.json",
+    "originalTaskMetadataSha256": "8a61834647f0648c0dc0c76a9958902c1ec5a089d94db32183f6924f814680d1",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P02_T02",
+    "projectId": "Word2019_P02",
+    "taskId": "T02",
+    "assertionType": "TextReplaceAll",
+    "positiveFixture": "Word2019_P02/T02/pass.docx",
+    "nearMissFixture": "Word2019_P02/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Basic Informaticsx instead of Basic Informatics; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P02/T02/pass.docx",
+    "sourceSha256": "20bfc8da4b67b75085cc38da969aeed070a3589769774e538f2bff110ae475e0",
+    "fixtureSha256": "e72024b55be64c7f9b2b94eb31cbce3fbe2e3ca9e8fd39faca0531c0eb451d7a",
+    "size": 995537,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "732d312da42e229b0eb3d967450543b63266a0cc89a80dce79b3e72ba9f96625",
+        "fixtureSha256": "6e51b001c0cc76d59119cc9527a96d55eb8c576752b038b287a8b3ed63a23860"
+      }
+    ],
+    "positiveOriginalArtifact": "MosWord2019.Tests/Fixtures/Word2019_P02/T02/pass.docx",
+    "positiveOriginalSha256": "20bfc8da4b67b75085cc38da969aeed070a3589769774e538f2bff110ae475e0",
+    "positiveFixtureSha256": "20bfc8da4b67b75085cc38da969aeed070a3589769774e538f2bff110ae475e0",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P02/tasks.json",
+    "originalTaskMetadataSha256": "9a76cbb2a780544936bf80d4a8fe1041432bde4f153289742e4a1421efba6e4f",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P06_T05",
+    "projectId": "Word2019_P06",
+    "taskId": "T05",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P06/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P06/T05/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled connectivityx instead of connectivity; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P06/T05/pass-a2.docx",
+    "sourceSha256": "5b15cbe20f3a5de77814f30ce67af6849bc1349eefc608f9fc0e9527addbfce5",
+    "fixtureSha256": "3d9f291284992bfc1a5579a4f6ac518662e0f29640fa312f7fa1ff992fcd9b63",
+    "size": 1512818,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "ccb85763bfef821e0db6574879bc0b369963897408f39814e6bbc6b0fd799bba",
+        "fixtureSha256": "8feadef7c82a4ddfeefb9a66e9172cc28db6f383db637d7f7869473c9293c357"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/phase11-p07/p06-combined.docx",
+    "positiveOriginalSha256": "1c9e182dc13eb22477fbdbb1fe040b65e4e47575809e321afc85ac49291a3bdb",
+    "positiveFixtureSha256": "5b15cbe20f3a5de77814f30ce67af6849bc1349eefc608f9fc0e9527addbfce5",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P06/tasks.json",
+    "originalTaskMetadataSha256": "143f1903d1a041203c6f3f31cad9a7eed65bac71b03121f195a6e6bb4828b860",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P06_T07",
+    "projectId": "Word2019_P06",
+    "taskId": "T07",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P06/T07/pass-a2.docx",
+    "nearMissFixture": "Word2019_P06/T07/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=28; target text and other formatting are retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P06/T07/pass-a2.docx",
+    "sourceSha256": "5b15cbe20f3a5de77814f30ce67af6849bc1349eefc608f9fc0e9527addbfce5",
+    "fixtureSha256": "3f7f9209682eaf8cadb75d2f15fc410fbb5a804c5dc91027954dbeaf5e2b14ac",
+    "size": 1512824,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "ccb85763bfef821e0db6574879bc0b369963897408f39814e6bbc6b0fd799bba",
+        "fixtureSha256": "196490be91f29ea378e82060ebf31805caa76aa57d26f97c37d315c06ef57c45"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/phase11-p07/p06-combined.docx",
+    "positiveOriginalSha256": "1c9e182dc13eb22477fbdbb1fe040b65e4e47575809e321afc85ac49291a3bdb",
+    "positiveFixtureSha256": "5b15cbe20f3a5de77814f30ce67af6849bc1349eefc608f9fc0e9527addbfce5",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P06/tasks.json",
+    "originalTaskMetadataSha256": "143f1903d1a041203c6f3f31cad9a7eed65bac71b03121f195a6e6bb4828b860",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P07_T06",
+    "projectId": "Word2019_P07",
+    "taskId": "T06",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P07/T06/pass-a2.docx",
+    "nearMissFixture": "Word2019_P07/T06/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled ltthocx instead of ltthoc; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P07/T06/pass-a2.docx",
+    "sourceSha256": "22f946ff5c09484e3119d9f777367cadac7319e7d12f7dc932f9849c2076ca38",
+    "fixtureSha256": "422c9437d37cce7b1560583a725c527701127501d6d84eb0279b4da193f053a6",
+    "size": 580371,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "2ad878093e9626fe29c23bcd681302cf207b0b6923bf8ec5e867c81788598236",
+        "fixtureSha256": "dc8837f192a22b79a5337630b7834aeb74ed0a6ee6681aecf3b24c98bde4202d"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/phase11-p07/combined-correct.docx",
+    "positiveOriginalSha256": "88c70d77a5b6df09f241bd2e7f42f12bba0ba07e210822a6655cebc62592d550",
+    "positiveFixtureSha256": "22f946ff5c09484e3119d9f777367cadac7319e7d12f7dc932f9849c2076ca38",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P07/tasks.json",
+    "originalTaskMetadataSha256": "9caa6f57be5535561e6ab0f3bf9517c225fe1e819db472b8bd8a1dd02716f10c",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P08_T01",
+    "projectId": "Word2019_P08",
+    "taskId": "T01",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P08/T01/pass.docx",
+    "nearMissFixture": "Word2019_P08/T01/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P08/T01/pass.docx",
+    "sourceSha256": "57875dc3655711ea3a967918a3d1d3025841c2ac297f52160591f3d65d389ed9",
+    "fixtureSha256": "00d2d1fb16d9e9d73d4508dc4f2eb2da582a2b453670a9090ec642b78367f284",
+    "size": 676891,
+    "changedArchiveEntries": [
+      "word/footnotes.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/footnotes.xml",
+        "sourceSha256": "2d62a692f5189a0a474ffbe5cfe885b774c6293a7492da64e1f8450e1bf098b3",
+        "fixtureSha256": "7723554995c17856cb5959d252a4d46dd56bdde34cc8cbaa230cbf4e04deec66"
+      }
+    ],
+    "positiveOriginalArtifact": "MosWord2019.Tests/Fixtures/Word2019_P08/T01/pass.docx",
+    "positiveOriginalSha256": "57875dc3655711ea3a967918a3d1d3025841c2ac297f52160591f3d65d389ed9",
+    "positiveFixtureSha256": "57875dc3655711ea3a967918a3d1d3025841c2ac297f52160591f3d65d389ed9",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P08/tasks.json",
+    "originalTaskMetadataSha256": "933fd0dcdafcf5f05a2cb467dbe5e5df38e44ed0522a877beab0f9430c832121",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P08_T04",
+    "projectId": "Word2019_P08",
+    "taskId": "T04",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P08/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P08/T04/nearmiss-a2.docx",
+    "defect": "Clear Formatting applies only to the first half of the target paragraph.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/phase12-p08/t04-half-cleared.docx",
+    "sourceSha256": "43bfc4a7044125cd8159bcbbeb0bbef590a5fd030f04281e46a89070247acf67",
+    "fixtureSha256": "77c1764af950d84d0669b3506d25474161a2973552d574e5a8f2101fa9faffad",
+    "size": 677549,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/phase12-p08/combined-correct.docx",
+    "positiveOriginalSha256": "57875dc3655711ea3a967918a3d1d3025841c2ac297f52160591f3d65d389ed9",
+    "positiveFixtureSha256": "32d09cb439fcad51320243e33a320e0ebfc86fd2e911a6695bc528ab8aaef72a",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P08/tasks.json",
+    "originalTaskMetadataSha256": "933fd0dcdafcf5f05a2cb467dbe5e5df38e44ed0522a877beab0f9430c832121",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P10_T02",
+    "projectId": "Word2019_P10",
+    "taskId": "T02",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P10/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled mosx instead of mos; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P10/T02/pass-a2.docx",
+    "sourceSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "fixtureSha256": "0075a33e812f920f9f92283a1443afcd55f84fe367857f50bfae0c0fc0673079",
+    "size": 1033247,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "8bb0c09dda781a3c5e1f5e4162e72b7fecad103aa5ecb0b46b6230c53583ef80",
+        "fixtureSha256": "56aca304ad1bdfafc6110550f8bd48c1927f5eb55964ba05b72cc7beff095d2a"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/remove-p11-20261007/p10-combined-correct.docx",
+    "positiveOriginalSha256": "b7b8174eb2418f052e66a614f592bde356b1d951ae7ef82276c63d40db155213",
+    "positiveFixtureSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P10/tasks.json",
+    "originalTaskMetadataSha256": "721cb1dfd7db1eb8f058e74ebd6f949e59e0c4b5fc5513221ad02ef97296effd",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P10_T04",
+    "projectId": "Word2019_P10",
+    "taskId": "T04",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P10/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T04/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is placed before Microsoft Certified Trainer instead of immediately after it.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/phase14-p10/t04-near-miss.docx",
+    "sourceSha256": "fcdfe8dfd2f7b7ac90f7938010ad1176950580ed1b39a3581902ebb109fe38a0",
+    "fixtureSha256": "4139f2f7d2a646da1368c9603e4fd7b70d2f0adf5fb76a1d37ffc5f218f795f9",
+    "size": 1469877,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/remove-p11-20261007/p10-combined-correct.docx",
+    "positiveOriginalSha256": "b7b8174eb2418f052e66a614f592bde356b1d951ae7ef82276c63d40db155213",
+    "positiveFixtureSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P10/tasks.json",
+    "originalTaskMetadataSha256": "721cb1dfd7db1eb8f058e74ebd6f949e59e0c4b5fc5513221ad02ef97296effd",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P10_T12",
+    "projectId": "Word2019_P10",
+    "taskId": "T12",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P10/T12/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T12/nearmiss-a2.docx",
+    "defect": "The exact footnote is linked after (United States) instead of immediately after Certiport.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/phase14-p10/t12-near-miss.docx",
+    "sourceSha256": "75204decd03defe4d24921b70fc415f7c237ae274ad7913597a04168da100e4a",
+    "fixtureSha256": "cac53bde46e59536a01ad9b84afe417c192e8368ce581b1ed44aab926cb46b39",
+    "size": 1457976,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/remove-p11-20261007/p10-combined-correct.docx",
+    "positiveOriginalSha256": "b7b8174eb2418f052e66a614f592bde356b1d951ae7ef82276c63d40db155213",
+    "positiveFixtureSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P10/tasks.json",
+    "originalTaskMetadataSha256": "721cb1dfd7db1eb8f058e74ebd6f949e59e0c4b5fc5513221ad02ef97296effd",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P10_T13",
+    "projectId": "Word2019_P10",
+    "taskId": "T13",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P10/T13/pass-a2.docx",
+    "nearMissFixture": "Word2019_P10/T13/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=22; target text and other formatting are retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P10/T13/pass-a2.docx",
+    "sourceSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "fixtureSha256": "9384070a40e91312fe6d62b4ac962d0926367b4bf999911157438f3951639a06",
+    "size": 1033254,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "8bb0c09dda781a3c5e1f5e4162e72b7fecad103aa5ecb0b46b6230c53583ef80",
+        "fixtureSha256": "bdebf4938e9194d83c5f96ed5b356c507bf2fb428a42956401be4bb7ac6ae587"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/remove-p11-20261007/p10-combined-correct.docx",
+    "positiveOriginalSha256": "b7b8174eb2418f052e66a614f592bde356b1d951ae7ef82276c63d40db155213",
+    "positiveFixtureSha256": "8f3401a67dd454b1ebb017d378bd61f1c2f1b8d910f518f7237a1ed189c8c36d",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P10/tasks.json",
+    "originalTaskMetadataSha256": "721cb1dfd7db1eb8f058e74ebd6f949e59e0c4b5fc5513221ad02ef97296effd",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P11_T03",
+    "projectId": "Word2019_P11",
+    "taskId": "T03",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P11/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P11/T03/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is inserted after the sentence instead of before it.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p11-new/t03-near-miss.docx",
+    "sourceSha256": "cb17b700fe0eed786b15dcddb2c6e6da95bbcc7e976be5a3665a3ba8c10a5484",
+    "fixtureSha256": "64db206a9a26f3d6b0c5672047f856ea021d9327397ce9fb024b3f3347fdca6e",
+    "size": 1856432,
+    "changedArchiveEntries": [
+      "word/media/image3.png",
+      "word/media/image4.png",
+      "word/media/image6.png",
+      "word/media/image7.png",
+      "word/media/image5.png",
+      "word/media/image1.png",
+      "word/media/image2.png"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/media/image3.png",
+        "sourceSha256": "132b887009861c924ccf86e04d6b0c22b1bfcdb504430bb760e6ffd8ad85a28b",
+        "fixtureSha256": "03f0d69fb3bf9c9183aa1fd4ada5c7d8141972febd549a65b5855a6223c7f3fc",
+        "dimensions": [
+          712,
+          401
+        ],
+        "sourceRgbaPixelSha256": "5c7ceb91d409f848a68fe1304e5f37fae8c8bfa068daaa8b5880d65fb23c3bab",
+        "fixtureRgbaPixelSha256": "5c7ceb91d409f848a68fe1304e5f37fae8c8bfa068daaa8b5880d65fb23c3bab",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image4.png",
+        "sourceSha256": "9db8c377cc3e1fb8dcd46a34edd79af7832f4e7142bd8a1d582177ec9ab07669",
+        "fixtureSha256": "abc6fba9f38f72cb8a57e7fc9264845591fddd2029de42dec875750708eb7060",
+        "dimensions": [
+          642,
+          355
+        ],
+        "sourceRgbaPixelSha256": "ac44dc4a69e72fabcbba8d0dca0b9381e8724bac1fb156b06a03f3b80b2b5d8c",
+        "fixtureRgbaPixelSha256": "ac44dc4a69e72fabcbba8d0dca0b9381e8724bac1fb156b06a03f3b80b2b5d8c",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image6.png",
+        "sourceSha256": "c42818698292044504018b5c8d0b8f1305d077a2f0db5763fe7c7177995ecb4e",
+        "fixtureSha256": "ab85139676288c2f2ac3e6959d90f5c1461cdbe880c42183a02d97e891eba40a",
+        "dimensions": [
+          470,
+          332
+        ],
+        "sourceRgbaPixelSha256": "c1b37f87950faa4ac22e340916070c864854070929b96f6481a21a877123cb77",
+        "fixtureRgbaPixelSha256": "c1b37f87950faa4ac22e340916070c864854070929b96f6481a21a877123cb77",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image7.png",
+        "sourceSha256": "46de21d6998a4400a63c33df29d8ff343a77bb2786ed921f8bb4731533dc3b84",
+        "fixtureSha256": "dccb5332d7369d0e10cbba6013d94aa03120be22924292c74985b20485dbbec4",
+        "dimensions": [
+          664,
+          367
+        ],
+        "sourceRgbaPixelSha256": "6e6ef3933c5d02167d6acd31641db3948254fe57ef57e3b0cb668f5cc507d5cc",
+        "fixtureRgbaPixelSha256": "6e6ef3933c5d02167d6acd31641db3948254fe57ef57e3b0cb668f5cc507d5cc",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image5.png",
+        "sourceSha256": "cd3b2a1a4e9c089905665975771ad82d8e9a2279869e2b53d4d5aa869e43c64d",
+        "fixtureSha256": "0cba74d85a90d6966d51ff2cb88c36e6e95e346c24aa7f4f3c02c4b01178cec6",
+        "dimensions": [
+          620,
+          380
+        ],
+        "sourceRgbaPixelSha256": "8c19e1cd093b899610d4886c590495185eb56d71f1b6af2eb5470fd853f28891",
+        "fixtureRgbaPixelSha256": "8c19e1cd093b899610d4886c590495185eb56d71f1b6af2eb5470fd853f28891",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image1.png",
+        "sourceSha256": "ed5d318a4385594f284962a8b4b975ae2187007caab28e084d7eb715a8049772",
+        "fixtureSha256": "600aab352bc83cc4d94a16d9d4c88c176f4a9c967f22f66624f83256c6d15aaa",
+        "dimensions": [
+          554,
+          367
+        ],
+        "sourceRgbaPixelSha256": "86e22991f27527ac221e7132525fada00ce1cc974db5037348539c50264607b5",
+        "fixtureRgbaPixelSha256": "86e22991f27527ac221e7132525fada00ce1cc974db5037348539c50264607b5",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image2.png",
+        "sourceSha256": "72c20ee9efade38191153de74c8a01a9307b250fcee6758cd14d6726e50df8bb",
+        "fixtureSha256": "39ace889b0aecbbf7c0e4a24d3cec02fa9a6999e8dece79b3a21c013c337deef",
+        "dimensions": [
+          486,
+          241
+        ],
+        "sourceRgbaPixelSha256": "deac430d6f6c451086d5fc8c64e1a1836d7ca5cf8d404f4b6ace980ead27976a",
+        "fixtureRgbaPixelSha256": "deac430d6f6c451086d5fc8c64e1a1836d7ca5cf8d404f4b6ace980ead27976a",
+        "allDecodedPixelsIdentical": true
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p11-new/t03-correct.docx",
+    "positiveOriginalSha256": "78f0d00680130c9941d9d4108574da0aab0c53bc7bfa9737c9d9cc9cf0a016aa",
+    "positiveFixtureSha256": "f5e1a79b754b584222de044f6f357c85c87f58213ae07a4f54596e04fcd88f7f",
+    "positiveChangedArchiveEntries": [
+      "word/media/image3.png",
+      "word/media/image4.png",
+      "word/media/image6.png",
+      "word/media/image7.png",
+      "word/media/image5.png",
+      "word/media/image1.png",
+      "word/media/image2.png"
+    ],
+    "positiveChangedEntryEvidence": [
+      {
+        "entry": "word/media/image3.png",
+        "sourceSha256": "132b887009861c924ccf86e04d6b0c22b1bfcdb504430bb760e6ffd8ad85a28b",
+        "fixtureSha256": "03f0d69fb3bf9c9183aa1fd4ada5c7d8141972febd549a65b5855a6223c7f3fc",
+        "dimensions": [
+          712,
+          401
+        ],
+        "sourceRgbaPixelSha256": "5c7ceb91d409f848a68fe1304e5f37fae8c8bfa068daaa8b5880d65fb23c3bab",
+        "fixtureRgbaPixelSha256": "5c7ceb91d409f848a68fe1304e5f37fae8c8bfa068daaa8b5880d65fb23c3bab",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image4.png",
+        "sourceSha256": "9db8c377cc3e1fb8dcd46a34edd79af7832f4e7142bd8a1d582177ec9ab07669",
+        "fixtureSha256": "abc6fba9f38f72cb8a57e7fc9264845591fddd2029de42dec875750708eb7060",
+        "dimensions": [
+          642,
+          355
+        ],
+        "sourceRgbaPixelSha256": "ac44dc4a69e72fabcbba8d0dca0b9381e8724bac1fb156b06a03f3b80b2b5d8c",
+        "fixtureRgbaPixelSha256": "ac44dc4a69e72fabcbba8d0dca0b9381e8724bac1fb156b06a03f3b80b2b5d8c",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image6.png",
+        "sourceSha256": "c42818698292044504018b5c8d0b8f1305d077a2f0db5763fe7c7177995ecb4e",
+        "fixtureSha256": "ab85139676288c2f2ac3e6959d90f5c1461cdbe880c42183a02d97e891eba40a",
+        "dimensions": [
+          470,
+          332
+        ],
+        "sourceRgbaPixelSha256": "c1b37f87950faa4ac22e340916070c864854070929b96f6481a21a877123cb77",
+        "fixtureRgbaPixelSha256": "c1b37f87950faa4ac22e340916070c864854070929b96f6481a21a877123cb77",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image7.png",
+        "sourceSha256": "46de21d6998a4400a63c33df29d8ff343a77bb2786ed921f8bb4731533dc3b84",
+        "fixtureSha256": "dccb5332d7369d0e10cbba6013d94aa03120be22924292c74985b20485dbbec4",
+        "dimensions": [
+          664,
+          367
+        ],
+        "sourceRgbaPixelSha256": "6e6ef3933c5d02167d6acd31641db3948254fe57ef57e3b0cb668f5cc507d5cc",
+        "fixtureRgbaPixelSha256": "6e6ef3933c5d02167d6acd31641db3948254fe57ef57e3b0cb668f5cc507d5cc",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image5.png",
+        "sourceSha256": "cd3b2a1a4e9c089905665975771ad82d8e9a2279869e2b53d4d5aa869e43c64d",
+        "fixtureSha256": "0cba74d85a90d6966d51ff2cb88c36e6e95e346c24aa7f4f3c02c4b01178cec6",
+        "dimensions": [
+          620,
+          380
+        ],
+        "sourceRgbaPixelSha256": "8c19e1cd093b899610d4886c590495185eb56d71f1b6af2eb5470fd853f28891",
+        "fixtureRgbaPixelSha256": "8c19e1cd093b899610d4886c590495185eb56d71f1b6af2eb5470fd853f28891",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image1.png",
+        "sourceSha256": "ed5d318a4385594f284962a8b4b975ae2187007caab28e084d7eb715a8049772",
+        "fixtureSha256": "600aab352bc83cc4d94a16d9d4c88c176f4a9c967f22f66624f83256c6d15aaa",
+        "dimensions": [
+          554,
+          367
+        ],
+        "sourceRgbaPixelSha256": "86e22991f27527ac221e7132525fada00ce1cc974db5037348539c50264607b5",
+        "fixtureRgbaPixelSha256": "86e22991f27527ac221e7132525fada00ce1cc974db5037348539c50264607b5",
+        "allDecodedPixelsIdentical": true
+      },
+      {
+        "entry": "word/media/image2.png",
+        "sourceSha256": "72c20ee9efade38191153de74c8a01a9307b250fcee6758cd14d6726e50df8bb",
+        "fixtureSha256": "39ace889b0aecbbf7c0e4a24d3cec02fa9a6999e8dece79b3a21c013c337deef",
+        "dimensions": [
+          486,
+          241
+        ],
+        "sourceRgbaPixelSha256": "deac430d6f6c451086d5fc8c64e1a1836d7ca5cf8d404f4b6ace980ead27976a",
+        "fixtureRgbaPixelSha256": "deac430d6f6c451086d5fc8c64e1a1836d7ca5cf8d404f4b6ace980ead27976a",
+        "allDecodedPixelsIdentical": true
+      }
+    ],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P11/tasks.json",
+    "originalTaskMetadataSha256": "f6a133e3f45ff8702202b8330a0eda5a634478b85363e0399a7f2909aedf7c99",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Fully opaque PNGs losslessly optimized from RGBA to RGB storage to meet the size cap; dimensions and every decoded RGBA pixel verified identical."
+  },
+  {
+    "id": "A2_Word2019_P13_T02",
+    "projectId": "Word2019_P13",
+    "taskId": "T02",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P13/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P13/T02/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Woodgrove Plusx instead of Woodgrove Plus; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P13/T02/pass-a2.docx",
+    "sourceSha256": "72136c96e35dcea1da21f59fbc889dccb2d7af896659744b820c2bc10dec048e",
+    "fixtureSha256": "8acc5b36ee7b0c267a325b24182cecda05bf4074c741fe62de030ed8603c3b76",
+    "size": 47122,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "5314dfb0cd6b6f23c715968e283848b251ea65c17987ec750a8a912d69a4f4fb",
+        "fixtureSha256": "0b824d8b5c77d81ae723db9da551a73eab8c99bfb42233f73dae38587485d798"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p13/combined-correct.docx",
+    "positiveOriginalSha256": "90165b8fa7c0f81c81071573df0219fa0202a0c0683de30f0b22f69635417ee5",
+    "positiveFixtureSha256": "72136c96e35dcea1da21f59fbc889dccb2d7af896659744b820c2bc10dec048e",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P13/tasks.json",
+    "originalTaskMetadataSha256": "60174c4e916cb32fbab673f9a14a557ead1402f4b532d1fbbad14b8b07ab2025",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P14_T05",
+    "projectId": "Word2019_P14",
+    "taskId": "T05",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P14/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P14/T05/nearmiss-a2.docx",
+    "defect": "The exact requested note is an endnote instead of a footnote.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p14/t05-nearmiss.docx",
+    "sourceSha256": "3b031c476f66c0ad0ba0a0dbc8629761309b2c404333b9b43d0f1363e402ae6a",
+    "fixtureSha256": "59d3aafb2dd433358f7da51ebcf4454b06149f1c5e436b7e6035d188810681dd",
+    "size": 340492,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/p14/combined-correct.docx",
+    "positiveOriginalSha256": "800946303b256b8664e1266a0a6785303cc81178832a816a9b4826b9d566ecd9",
+    "positiveFixtureSha256": "055a1ae67f716eb39ff064d6e75192932db61a8c4a08aa25d0321390cd5b6efd",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P14/tasks.json",
+    "originalTaskMetadataSha256": "45fef88fc1ee136d054e1b8f5ccd3fdc170ec1deae832e1938db4c0b3290e400",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P15_T02",
+    "projectId": "Word2019_P15",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P15/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P15/T02/nearmiss-a2.docx",
+    "defect": "The correct Webdings symbol is inserted after the anchor instead of before it.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p15/t02-nearmiss.docx",
+    "sourceSha256": "eb83e4d60c9eaa7bda911d0bd8bc3e7745443613b3d80f5d4661b706ba1d672e",
+    "fixtureSha256": "bb739627efcb95837ac8855d9f7fa1e89f06758477f2a9fa37f1360b5df7228d",
+    "size": 1724822,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/p15/t02-correct.docx",
+    "positiveOriginalSha256": "1b9deba16d6fbbecd1b2f296348d14988fa190d88ceeffd945e2266b7acab1ce",
+    "positiveFixtureSha256": "c6b91d8cb9b4cf8ca7b54317f98e96bae46d42b672547aff82923582755d766b",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P15/tasks.json",
+    "originalTaskMetadataSha256": "b9f20caf2d461451cfc040a256ab9dc8227ae9bdace57e99b4b4f53fb2e023b5",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P16_T05",
+    "projectId": "Word2019_P16",
+    "taskId": "T05",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P16/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P16/T05/nearmiss-a2.docx",
+    "defect": "One middle target run has font size 26 half-points instead of the required val=22; target text and other formatting are retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P16/T05/pass-a2.docx",
+    "sourceSha256": "60c9e772c851ab368f3d3f9b0918fb86b235873dca61e2e15bf770f44b42beab",
+    "fixtureSha256": "83b5a8a3fb27a128fe60d8e90ce8e234c1628c65b7cdb2b6015f6572498d6ce4",
+    "size": 968861,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "b5735aa14429aedfb4821fe4a8b755ce817ac53b1a9008ffa142d5646baa2049",
+        "fixtureSha256": "84c2af98737bb0a971d95c661b2bd4f212204f1f0f90f8dc218e7e532a406360"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p16/combined-native.docx",
+    "positiveOriginalSha256": "ee9a2beb7bfb4a44967a655b675cd089d24aefe1a0cb5b21ed581695589db3d5",
+    "positiveFixtureSha256": "60c9e772c851ab368f3d3f9b0918fb86b235873dca61e2e15bf770f44b42beab",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P16/tasks.json",
+    "originalTaskMetadataSha256": "7b8f10ca9b8c874cdf27e9252b92e7e75aebc4ec1efedbf5e8fa9d69d70a6040",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P17_T02",
+    "projectId": "Word2019_P17",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P17/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P17/T02/nearmiss-a2.docx",
+    "defect": "The correctly positioned symbol retains its character code but uses Wingdings instead of Webdings.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P17/T02/pass-a2.docx",
+    "sourceSha256": "13eb4141957eeb4fcac65af1b7206026604c112a3e5b758e6c819c32181d7659",
+    "fixtureSha256": "4c2bc419a9e62b10e632f6024121b51fca670cb944fccbcf9a4456a9d9bddbab",
+    "size": 173700,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "166c42053666d0763c0cb2b328d6efb89466d38da2b186442640c55c81fb8d19",
+        "fixtureSha256": "a7871dd6d5778cab5141a51a43ed1340891758bd658439992390851edf1f55cd"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p17/combined-native.docx",
+    "positiveOriginalSha256": "7a667b8a4a9f31929b4fc922ede9b4905d1040864e03f8909b3ef2a103e3c595",
+    "positiveFixtureSha256": "13eb4141957eeb4fcac65af1b7206026604c112a3e5b758e6c819c32181d7659",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P17/tasks.json",
+    "originalTaskMetadataSha256": "95d6beddc9ab75a7e73a1f2a7a5324fc18fe46009ec07d1ceafbac3a86a4f2ef",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P18_T01",
+    "projectId": "Word2019_P18",
+    "taskId": "T01",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P18/T01/pass.docx",
+    "nearMissFixture": "Word2019_P18/T01/nearmiss-a2.docx",
+    "defect": "Every replacement uses Esp instead of the required uppercase ESP.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p18/t1-nearmiss.docx",
+    "sourceSha256": "a138aa336f7d707a035ca0fa01357f27c9dfc2799aa42016907812531b32b9c0",
+    "fixtureSha256": "f33b56682df5750ae41723915e573d4b9211ffb2d802255932c316e75ef0358a",
+    "size": 25094,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "MosWord2019.Tests/Fixtures/Word2019_P18/T01/pass.docx",
+    "positiveOriginalSha256": "310446d9fae76f24283c753a16b4171a096152a43cade5dccddbd42fb93db434",
+    "positiveFixtureSha256": "310446d9fae76f24283c753a16b4171a096152a43cade5dccddbd42fb93db434",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P18/tasks.json",
+    "originalTaskMetadataSha256": "eb0640f73a6a4945f6fdc806901c60ecfde1e4adaabb31010529eb72ea90f7ba",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P19_T05",
+    "projectId": "Word2019_P19",
+    "taskId": "T05",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P19/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P19/T05/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P19/T05/pass-a2.docx",
+    "sourceSha256": "ad7bcc2ca147fbf2e5d143c742123b17ba55679fdae95f3d5cd7be58b90671cd",
+    "fixtureSha256": "8873a1115dbcd128a2905a59a6e5b80c7ea16bd5156fa2b5fa55900ee0b34e51",
+    "size": 702289,
+    "changedArchiveEntries": [
+      "word/footnotes.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/footnotes.xml",
+        "sourceSha256": "d93b022a76f77dcb523bd73d3b09a6d969f83e813e1cc71fac741251460f2a3c",
+        "fixtureSha256": "620255874ae45601e10752870979f6c101c4eede781fd160004c3d9634611cf9"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p20/p19-five.docx",
+    "positiveOriginalSha256": "10698645c88c225bba571901bf152bafd764666f8349611fd353910ba74ab977",
+    "positiveFixtureSha256": "ad7bcc2ca147fbf2e5d143c742123b17ba55679fdae95f3d5cd7be58b90671cd",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P19/tasks.json",
+    "originalTaskMetadataSha256": "d06effec6d4b604975d7a43a1519f8255eef5735dde58736f2c4bbd76123102a",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P20_T03",
+    "projectId": "Word2019_P20",
+    "taskId": "T03",
+    "assertionType": "BodyTextReplaceAll",
+    "positiveFixture": "Word2019_P20/T03/pass-a2.docx",
+    "nearMissFixture": "Word2019_P20/T03/nearmiss-a2.docx",
+    "defect": "Exactly one requested replacement is misspelled Woodgrove plusx instead of Woodgrove plus; all other content is retained.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P20/T03/pass-a2.docx",
+    "sourceSha256": "fd2f3ffcb0753250f54b741cefec3861ad3c48197512342dce769ba738d946c0",
+    "fixtureSha256": "84bc446ee4c9d847c9b0a22a9892c6012ca0f8fbb403408cd5fa3867a3e94c26",
+    "size": 20058,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "a61b040fc6449a2c6a8ddb8326b693329442f31d8fcb8d1a46ff10d4e19c6fa0",
+        "fixtureSha256": "71a2786564b54cd3697acdb87f30d8853d093228b95251986917153e7164755e"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p28/regression-template-context/Notes.dotx",
+    "positiveOriginalSha256": "0f5e1539c85c8efeb2c3de165664e9f465fba9f2847228527defd7cc05251842",
+    "positiveFixtureSha256": "fd2f3ffcb0753250f54b741cefec3861ad3c48197512342dce769ba738d946c0",
+    "positiveChangedArchiveEntries": [
+      "[Content_Types].xml"
+    ],
+    "positiveChangedEntryEvidence": [
+      {
+        "entry": "[Content_Types].xml",
+        "sourceSha256": "d72761e5b122a73822fc4aa5190f8ce1352bc6f34501b48e76abd70b160f072f",
+        "fixtureSha256": "5dc3c6cd519447ad530ae867d097c556e33cd8cb3e1b2439a804a5584673fc7c"
+      }
+    ],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P20/tasks.json",
+    "originalTaskMetadataSha256": "78228ea8726a4346993ec9a7960c49db78474c6b779ea43e750c44b9fbe11add",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes. The retained template main content type was normalized to document for the DOCX fixture; all document/story content remains unchanged."
+  },
+  {
+    "id": "A2_Word2019_P20_T11",
+    "projectId": "Word2019_P20",
+    "taskId": "T11",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P20/T11/pass-a2.docx",
+    "nearMissFixture": "Word2019_P20/T11/nearmiss-a2.docx",
+    "defect": "The correctly linked and positioned footnote gains one extra final period; its anchor and other document content are unchanged.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P20/T11/pass-a2.docx",
+    "sourceSha256": "fd2f3ffcb0753250f54b741cefec3861ad3c48197512342dce769ba738d946c0",
+    "fixtureSha256": "837cca55280ff6d868b240e1060df9929ec5a2b9c7f024be888a6a8957d19aaf",
+    "size": 20056,
+    "changedArchiveEntries": [
+      "word/footnotes.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/footnotes.xml",
+        "sourceSha256": "00c10f16603ffa659d84fff23848c1374ae69ea9598c78938078858d64b3fb0c",
+        "fixtureSha256": "ca6fc7a3ae80191baff6b178593a01e7a132ce6886275937f3d9e8378dc6e5b8"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p28/regression-template-context/Notes.dotx",
+    "positiveOriginalSha256": "0f5e1539c85c8efeb2c3de165664e9f465fba9f2847228527defd7cc05251842",
+    "positiveFixtureSha256": "fd2f3ffcb0753250f54b741cefec3861ad3c48197512342dce769ba738d946c0",
+    "positiveChangedArchiveEntries": [
+      "[Content_Types].xml"
+    ],
+    "positiveChangedEntryEvidence": [
+      {
+        "entry": "[Content_Types].xml",
+        "sourceSha256": "d72761e5b122a73822fc4aa5190f8ce1352bc6f34501b48e76abd70b160f072f",
+        "fixtureSha256": "5dc3c6cd519447ad530ae867d097c556e33cd8cb3e1b2439a804a5584673fc7c"
+      }
+    ],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P20/tasks.json",
+    "originalTaskMetadataSha256": "78228ea8726a4346993ec9a7960c49db78474c6b779ea43e750c44b9fbe11add",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes. The retained template main content type was normalized to document for the DOCX fixture; all document/story content remains unchanged."
+  },
+  {
+    "id": "A2_Word2019_P21_T05",
+    "projectId": "Word2019_P21",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P21/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P21/T05/nearmiss-a2.docx",
+    "defect": "The correctly positioned symbol retains its character code but uses Wingdings instead of Webdings.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P21/T05/pass-a2.docx",
+    "sourceSha256": "6ab16ce53cc3bd8c144bdddc6068b786c1e3629c13b8b266915910f7677f4cde",
+    "fixtureSha256": "f8eb5d64db76945ced77b797d30494c09e2709ab085011e8e9784a162f403076",
+    "size": 341277,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "97c53a6e3c97475ccb87de2aefde32dc5bf9060bd69bff3520bfa29a5ea0da32",
+        "fixtureSha256": "2acea067d621b984005188997ff5299663b404c42ae5492095257f567451abaa"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p21/combined-native.docx",
+    "positiveOriginalSha256": "8c65849735f65255dd15071e88037e7d84c40994eadead8cd451a59afed2b1b8",
+    "positiveFixtureSha256": "6ab16ce53cc3bd8c144bdddc6068b786c1e3629c13b8b266915910f7677f4cde",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P21/tasks.json",
+    "originalTaskMetadataSha256": "f39f72b18975d0d6f38c366ab888dd18b6a78fddd1405e6e01e9ee0dba277e08",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P22_T04",
+    "projectId": "Word2019_P22",
+    "taskId": "T04",
+    "assertionType": "Footnote",
+    "positiveFixture": "Word2019_P22/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P22/T04/nearmiss-a2.docx",
+    "defect": "The correct linked footnote is copied while the original source note remains in the body.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p22/t4-nearmiss.docx",
+    "sourceSha256": "4afa616f9637160b4a07124d02569f6bc126c94e23d8a5b091c3dd389a094682",
+    "fixtureSha256": "a600c0be8529786822bcaf96176495b37ab9139895ce3d1348f914428248a9ec",
+    "size": 202163,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/p22/t4-positive.docx",
+    "positiveOriginalSha256": "48c091b28443076a879fd5cafca497a1edd527d9815b551c4d7fb554de27980e",
+    "positiveFixtureSha256": "b25b5c5a5d1a6fcdb90a71d5e19e7012e6c0e5084e17c92159a769ce1d745bc9",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P22/tasks.json",
+    "originalTaskMetadataSha256": "076ab31d5175fbafba5c6674677315bde87c6a64545827e798341879f02dc418",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P23_T03",
+    "projectId": "Word2019_P23",
+    "taskId": "T03",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P23/T03/pass.docx",
+    "nearMissFixture": "Word2019_P23/T03/nearmiss-a2.docx",
+    "defect": "Clear Formatting covers only the first five characters of the target heading.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p23/t3-nearmiss.docx",
+    "sourceSha256": "df71ee4f7ef71f7729206b541e075a0e0aae3050177ee62cbeb81277ff560d64",
+    "fixtureSha256": "f195efb50f1270c3f91e4e3dfa84bca5860e91a145c008fee435cc6a0c4aea17",
+    "size": 60420,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "MosWord2019.Tests/Fixtures/Word2019_P23/T03/pass.docx",
+    "positiveOriginalSha256": "d01583dc31cb3ec49ec03c94fb0930b329633a7e757f93fb19ffd3da63383c12",
+    "positiveFixtureSha256": "d01583dc31cb3ec49ec03c94fb0930b329633a7e757f93fb19ffd3da63383c12",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P23/tasks.json",
+    "originalTaskMetadataSha256": "77d60114d074e49f2959d9c2eb8b726caffdb28f24593c73df18658f1132698e",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P25_T04",
+    "projectId": "Word2019_P25",
+    "taskId": "T04",
+    "assertionType": "TextRangeFormattingEquals",
+    "positiveFixture": "Word2019_P25/T04/pass-a2.docx",
+    "nearMissFixture": "Word2019_P25/T04/nearmiss-a2.docx",
+    "defect": "One middle target run has character spacing 20 instead of the required 40.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p25/expanded-partial.docx",
+    "sourceSha256": "6beb82a9c4593e2bf30783b855b16a7326a9572b0b47feb288fa33a3d6a9e039",
+    "fixtureSha256": "51f51a497cba433afbdc0c21137d9d332e97820937606416af0ea885980a5ee9",
+    "size": 30259,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/p25/expanded-40.docx",
+    "positiveOriginalSha256": "18290c0c5845c0ab8873c6905a3bf1d45ec72516115736b9ddadcb5697c481dc",
+    "positiveFixtureSha256": "98600bdadd54e3d3dacf80c21c037408e0b88a16f3324e55f810689ef3664893",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P25/tasks.json",
+    "originalTaskMetadataSha256": "00cc7024f20bf7ebd05eda0d3ca7dc6643261603bb2d00e14fca123d35c85ee8",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P27_T05",
+    "projectId": "Word2019_P27",
+    "taskId": "T05",
+    "assertionType": "TextReplaceAll",
+    "positiveFixture": "Word2019_P27/T05/pass-a2.docx",
+    "nearMissFixture": "Word2019_P27/T05/nearmiss-a2.docx",
+    "defect": "Three Soccer replacements are correct; the Prince row still contains football.",
+    "synthetic": false,
+    "sourceArtifact": "artifacts/p27/negative/replacement-partial.docx",
+    "sourceSha256": "5ea47597cc53a88cbed3310806424e2e0c1a6674e28c6b62fad36726fb77d16a",
+    "fixtureSha256": "cc28192f0f3d89e84d511d89f7e530f38f93b8bad8aafd38879f61b8426028cd",
+    "size": 12796,
+    "changedArchiveEntries": [],
+    "changedEntryEvidence": [],
+    "positiveOriginalArtifact": "artifacts/p27/replace-original.docx",
+    "positiveOriginalSha256": "2e5b7bb7408525ff0463bcf48e5ceb314ab20ceb980623c0b7915bc83437a6e4",
+    "positiveFixtureSha256": "05cb297725133a26a4b3f45d457d74f4817edbfaf8fed2dbdb1b77b453d181b9",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P27/tasks.json",
+    "originalTaskMetadataSha256": "c3f726b3e9f53f513e3880e93ebd4b87cfb41f0ba6e14b1d7660c0b502cf9bf8",
+    "metadataOverrides": [],
+    "construction": "Retained task-matched saved near-miss; ZIP recompressed. Unmodified archive entries retain their exact bytes."
+  },
+  {
+    "id": "A2_Word2019_P28_T02",
+    "projectId": "Word2019_P28",
+    "taskId": "T02",
+    "assertionType": "SymbolInserted",
+    "positiveFixture": "Word2019_P28/T02/pass-a2.docx",
+    "nearMissFixture": "Word2019_P28/T02/nearmiss-a2.docx",
+    "defect": "The correctly positioned Registered Sign is changed to the adjacent Unicode character, retaining the surrounding sentence.",
+    "synthetic": true,
+    "sourceArtifact": "MosWord2019.Tests/Fixtures/Word2019_P28/T02/pass-a2.docx",
+    "sourceSha256": "6fe9eaa75256cee3dd5666c8bfd80a6276043d2fcc25c3a954d2d13822e0838d",
+    "fixtureSha256": "34291d47979f7cd0dff747e5418c05a52fe5fe531f2eff6104b28be80573e921",
+    "size": 22253,
+    "changedArchiveEntries": [
+      "word/document.xml"
+    ],
+    "changedEntryEvidence": [
+      {
+        "entry": "word/document.xml",
+        "sourceSha256": "b909ebbc31d8f7f448cf36edcc5be652b015473b126458a5deb6898077eeb880",
+        "fixtureSha256": "895c740394f13edd5fe91eb4f86f967cd440da16871e64c8f2801e744257e422"
+      }
+    ],
+    "positiveOriginalArtifact": "artifacts/p28/symbol.docx",
+    "positiveOriginalSha256": "749a7fe0366bd9f6615512bc473200d9fba1ab8e15e12f24fd3e833f3bffbdcb",
+    "positiveFixtureSha256": "6fe9eaa75256cee3dd5666c8bfd80a6276043d2fcc25c3a954d2d13822e0838d",
+    "positiveChangedArchiveEntries": [],
+    "positiveChangedEntryEvidence": [],
+    "originalTaskMetadataFile": "MosWord2019.WinForms/Projects/Word2019_P28/tasks.json",
+    "originalTaskMetadataSha256": "2d79f9f59d74558371b7c76c53833837df1f96790477e4bfce5c7751ee46cc26",
+    "metadataOverrides": [],
+    "construction": "Synthetic focused saved-package mutation; no Word execution. Unmodified archive entries retain their exact bytes."
+  }
+]

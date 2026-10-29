@@ -464,12 +464,24 @@ namespace MosWord2019.Core.Services
                 points.Where(p => p.Attribute("type") == null || (string)p.Attribute("type") == "node").All(p => visited.Contains((string)p.Attribute("modelId")));
         }
 
-        private static bool CheckPlainTextExport(TaskDefinition task, out string detail)
+        private static bool CheckPlainTextExport(TaskDefinition task, string documentsFolder, out string detail)
         {
             string name = RequiredString(task, "expectedFileName");
             if (name != Path.GetFileName(name) || Path.IsPathRooted(name) || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
                 !string.Equals(Path.GetExtension(name), ".txt", StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("A single .txt export filename is required.");
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), name);
+            int minimumCharacters = RequiredInt(task, "minimumCharacters");
+            JArray segments = RequiredArray(task, "requiredTextSegments");
+            if (segments.Any(segment => segment.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)segment)))
+                throw new InvalidDataException("Invalid grading metadata: requiredTextSegments must contain nonempty strings.");
+            string[] requiredSegments = segments.Values<string>().ToArray();
+            string[][] alternativeGroups = null;
+            if (task.Extra.ContainsKey("textSegmentAlternatives"))
+            {
+                alternativeGroups = RequiredStringMatrix(task, "textSegmentAlternatives");
+                if (alternativeGroups.Any(group => group.Any(string.IsNullOrWhiteSpace)))
+                    throw new InvalidDataException("Invalid grading metadata: textSegmentAlternatives must contain nonempty strings.");
+            }
+            string path = Path.Combine(documentsFolder, name);
             detail = "The exact Documents export must be readable plain text containing the document's declared content.";
             if (!File.Exists(path)) return false;
             byte[] bytes;
@@ -495,11 +507,10 @@ namespace MosWord2019.Core.Services
             if (text.TrimStart().StartsWith("{\\rtf", StringComparison.OrdinalIgnoreCase) || text.TrimStart().StartsWith("<?xml", StringComparison.Ordinal) ||
                 text.Any(c => char.IsControl(c) && c != '\r' && c != '\n' && c != '\t' && c != '\f')) return false;
             string normalized = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
-            bool match = normalized.Length >= RequiredInt(task, "minimumCharacters") && RequiredStrings(task, "requiredTextSegments")
+            bool match = normalized.Length >= minimumCharacters && requiredSegments
                 .All(s => normalized.Contains(System.Text.RegularExpressions.Regex.Replace(s, @"\s+", " ").Trim()));
-            JToken alternatives;
-            if (task.Extra.TryGetValue("textSegmentAlternatives", out alternatives))
-                match &= ((JArray)alternatives).All(group => ((JArray)group).Values<string>().Any(s =>
+            if (alternativeGroups != null)
+                match &= alternativeGroups.All(group => group.Any(s =>
                     normalized.Contains(System.Text.RegularExpressions.Regex.Replace(s, @"\s+", " ").Trim())));
             return match;
         }

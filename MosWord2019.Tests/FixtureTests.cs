@@ -138,8 +138,10 @@ namespace MosWord2019.Tests
         public void ProductionPackagesValidate(string language)
         {
             var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
-            Assert.AreEqual(28, packages.Count, "All production packages must load.");
-            Assert.AreEqual(212, packages.Sum(p => p.Tasks.Count), "The accepted task count must remain unchanged.");
+            Assert.AreEqual(TestInventory.ExpectedPackageCount, packages.Count,
+                "When adding a package, update TestInventory.ExpectedPackageCount in TestCaseData.cs after validating its fixtures.");
+            Assert.AreEqual(TestInventory.ExpectedTaskCount, packages.Sum(p => p.Tasks.Count),
+                "When adding tasks, update TestInventory.ExpectedTaskCount in TestCaseData.cs and add their regression fixtures.");
             foreach (var package in packages)
             {
                 ValidationResult result = new ProjectValidator().Validate(package.ProjectFolderPath, language);
@@ -154,7 +156,8 @@ namespace MosWord2019.Tests
             var cases = TestCaseData.LoadAll();
             var used = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, "en")
                 .SelectMany(p => p.Tasks).Select(t => t.AssertionType).Distinct().OrderBy(t => t).ToList();
-            Assert.AreEqual(77, used.Count, "The production assertion inventory changed.");
+            Assert.AreEqual(TestInventory.ExpectedUsedAssertionTypeCount, used.Count,
+                "When adding an assertion type, update TestInventory.ExpectedUsedAssertionTypeCount in TestCaseData.cs and add Pass/Fail fixtures.");
             CollectionAssert.AreEquivalent(used, cases.Select(c => c.AssertionType).Distinct().ToList());
             foreach (string type in used)
             {
@@ -185,7 +188,8 @@ namespace MosWord2019.Tests
             Assert.IsTrue(Directory.Exists(source), "Run the tests from their repository build output.");
             string[] sourceFiles = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
             string[] copiedFiles = Directory.GetFiles(TestCaseData.ProjectsRoot, "*", SearchOption.AllDirectories);
-            Assert.AreEqual(149, sourceFiles.Length, "The accepted production package inventory changed.");
+            Assert.AreEqual(TestInventory.ExpectedPackageFileCount, sourceFiles.Length,
+                "When adding package files, update TestInventory.ExpectedPackageFileCount in TestCaseData.cs after checking output hashes.");
             CollectionAssert.AreEquivalent(sourceFiles.Select(p => p.Substring(source.Length + 1)).ToList(),
                 copiedFiles.Select(p => p.Substring(TestCaseData.ProjectsRoot.Length + 1)).ToList());
             using (var hash = SHA256.Create())

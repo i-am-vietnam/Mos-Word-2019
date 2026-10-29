@@ -1,0 +1,39 @@
+[
+  {
+    "id": "A2_NewRecoverableCatch_Error",
+    "projectId": "Word2019_P09", "taskId": "T08", "assertionType": "FileExistsInDocuments",
+    "fixture": "Word2019_P09/T08/error-exception.docx",
+    "sourceFixture": "Word2019_P09/T08/pass-context.docx",
+    "expected": "Error", "injectedException": "InvalidOperationException"
+  },
+  {
+    "id": "A2_RequiredString_Object_Error",
+    "projectId": "Word2019_P09", "taskId": "T08", "assertionType": "FileExistsInDocuments",
+    "fixture": "Word2019_P09/T08/error-string.docx", "sourceFixture": "Word2019_P09/T08/pass-context.docx",
+    "expected": "Error", "helper": "RequiredString", "metadataKey": "expectedFileName", "badValue": {}
+  },
+  {
+    "id": "A2_RequiredInt_Object_Error",
+    "projectId": "Word2019_P02", "taskId": "T01", "assertionType": "TextRemovedFromParagraph",
+    "fixture": "Word2019_P02/T01/error-int.docx", "sourceFixture": "Word2019_P02/T01/pass.docx",
+    "expected": "Error", "helper": "RequiredInt", "metadataKey": "expectedRemainingCount", "badValue": {}
+  },
+  {
+    "id": "A2_RequiredArray_String_Error",
+    "projectId": "Word2019_P01", "taskId": "T01", "assertionType": "DocumentStyleSet",
+    "fixture": "Word2019_P01/T01/error-array.docx", "sourceFixture": "Word2019_P01/T01/pass.docx",
+    "expected": "Error", "helper": "RequiredArray", "metadataKey": "semanticStyleRequirements", "badValue": "bad"
+  },
+  {
+    "id": "A2_RequiredStringMatrix_NumericCell_Error",
+    "projectId": "Word2019_P22", "taskId": "T01", "assertionType": "TableRowsEqual",
+    "fixture": "Word2019_P22/T01/error-matrix.docx", "sourceFixture": "Word2019_P22/T01/pass.docx",
+    "expected": "Error", "helper": "RequiredStringMatrix", "metadataKey": "expectedTableRows", "badValue": [["Division", 123]]
+  },
+  {
+    "id": "A2_RequiredBool_Object_Error",
+    "projectId": "Word2019_P09", "taskId": "T04", "assertionType": "SmartArtDirectionEquals",
+    "fixture": "Word2019_P09/T04/error-bool.docx", "sourceFixture": "Word2019_P09/T04/pass.docx",
+    "expected": "Error", "helper": "RequiredBool", "metadataKey": "expectedReverse", "badValue": {}
+  }
+]

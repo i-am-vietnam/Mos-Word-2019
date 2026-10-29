@@ -80,10 +80,10 @@ namespace MosWord2019.Core.Services
 
         public TaskGradeResult CheckTask(string documentPath, TaskDefinition task, TrainingGradeContext context)
         {
-            if (task == null) return Error(null, "Task metadata is missing.");
-            if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
             try
             {
+                if (task == null) return Error(null, "Task metadata is missing.");
+                if (!IsAssertionTypeSupported(task.AssertionType)) return Error(task, "Unsupported assertion type: " + task.AssertionType);
                 if (RequiresTocLayout(task) && (context?.TocLayout == null ||
                     !string.Equals(Path.GetFullPath(documentPath), Path.GetFullPath(context.TocLayout.DocumentPath), StringComparison.OrdinalIgnoreCase)))
                     return Error(task, "The owned document's current TOC layout snapshot is unavailable.");
@@ -120,7 +120,7 @@ namespace MosWord2019.Core.Services
                 if (task.AssertionType == "PlainTextDocumentExport")
                 {
                     string detail;
-                    bool passed = CheckPlainTextExport(task, out detail);
+                    bool passed = CheckPlainTextExport(task, documentsRoot(), out detail);
                     return new TaskGradeResult(passed ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail, detail, task.AssertionType, task.TaskId);
                 }
                 if (task.AssertionType == TemplateOutputLocation.AssertionType)
@@ -236,10 +236,9 @@ namespace MosWord2019.Core.Services
                         detail, task.AssertionType, task.TaskId);
                 }
             }
-            catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is UnauthorizedAccessException ||
-                                       ex is System.Xml.XmlException || ex is ArgumentException)
+            catch (Exception ex) when (!(ex is OutOfMemoryException) && !(ex is StackOverflowException))
             {
-                return Error(task, "Unable to inspect the saved Word document: " + ex.Message);
+                return Error(task, "Unable to inspect the saved Word document (" + ex.GetType().Name + "): " + ex.Message);
             }
         }
 
@@ -1859,9 +1858,10 @@ namespace MosWord2019.Core.Services
         private static string RequiredString(TaskDefinition task, string name)
         {
             JToken token;
-            string value = task.Extra != null && task.Extra.TryGetValue(name, out token) ? (string)token : null;
-            if (string.IsNullOrWhiteSpace(value)) throw new InvalidDataException("Missing grading metadata: " + name);
-            return value;
+            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || token == null ||
+                token.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)token))
+                throw new InvalidDataException("Invalid grading metadata: " + name + " must be a nonempty string.");
+            return (string)token;
         }
 
         private static string[] RequiredStrings(TaskDefinition task, string name)
@@ -1877,7 +1877,7 @@ namespace MosWord2019.Core.Services
         {
             JToken token;
             JArray array = task.Extra != null && task.Extra.TryGetValue(name, out token) ? token as JArray : null;
-            if (array == null || array.Count == 0) throw new InvalidDataException("Missing grading metadata: " + name);
+            if (array == null || array.Count == 0) throw new InvalidDataException("Invalid grading metadata: " + name + " must be a nonempty array.");
             return array;
         }
 
@@ -1889,7 +1889,7 @@ namespace MosWord2019.Core.Services
             {
                 JArray row = rowToken as JArray;
                 if (row == null || row.Count == 0 || row.Any(value => value.Type != JTokenType.String))
-                    throw new InvalidDataException("Invalid grading metadata matrix: " + name);
+                    throw new InvalidDataException("Invalid grading metadata: " + name + " must be a nonempty string matrix.");
                 result.Add(row.Values<string>().ToArray());
             }
             return result.ToArray();
@@ -1899,8 +1899,8 @@ namespace MosWord2019.Core.Services
         {
             JToken token;
             int value;
-            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || !int.TryParse(token.ToString(), out value))
-                throw new InvalidDataException("Missing grading metadata: " + name);
+            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || token == null || !int.TryParse(token.ToString(), out value))
+                throw new InvalidDataException("Invalid grading metadata: " + name + " must be an integer.");
             return value;
         }
 
@@ -1923,8 +1923,8 @@ namespace MosWord2019.Core.Services
         {
             JToken token;
             bool value;
-            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || !bool.TryParse(token.ToString(), out value))
-                throw new InvalidDataException("Missing grading metadata: " + name);
+            if (task.Extra == null || !task.Extra.TryGetValue(name, out token) || token == null || !bool.TryParse(token.ToString(), out value))
+                throw new InvalidDataException("Invalid grading metadata: " + name + " must be a boolean.");
             return value;
         }
 

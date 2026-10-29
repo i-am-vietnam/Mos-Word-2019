@@ -52,6 +52,15 @@ namespace MosWord2019.Tests
         }
     }
 
+    internal static class TestInventory
+    {
+        public const int ExpectedPackageCount = 28;
+        public const int ExpectedTaskCount = 212;
+        public const int ExpectedUsedAssertionTypeCount = 77;
+        public const int ExpectedPackageFileCount = 149;
+        public const int ExpectedNearMissTaskCount = 28;
+    }
+
     internal sealed class TestWorkspace : IDisposable
     {
         private readonly string root = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestWorkspaces"));

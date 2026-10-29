@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("MosWord2019.Tests")]
 [assembly: AssemblyTitle("MOS Word 2019 - Projects")]
 [assembly: AssemblyProduct("MOS Word 2019")]
 [assembly: AssemblyVersion("0.1.0.0")]

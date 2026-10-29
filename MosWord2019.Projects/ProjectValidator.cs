@@ -1,4 +1,5 @@
 using MosWord2019.Core.Models;
+using MosWord2019.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -91,6 +92,7 @@ namespace MosWord2019.Projects
                 return;
             }
             var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var grading = new WordGradingService();
             for (int index = 0; index < result.Tasks.Count; index++)
             {
                 TaskDefinition task = result.Tasks[index];
@@ -108,6 +110,10 @@ namespace MosWord2019.Projects
                 Require(result, projectId, task.TaskId, task.TitleKey, "TITLE_KEY_MISSING", "titleKey");
                 Require(result, projectId, task.TaskId, task.InstructionKey, "INSTRUCTION_KEY_MISSING", "instructionKey");
                 Require(result, projectId, task.TaskId, task.AssertionType, "ASSERTION_TYPE_MISSING", "assertionType");
+                if (!string.IsNullOrWhiteSpace(task.AssertionType) &&
+                    !grading.IsAssertionTypeSupported(task.AssertionType))
+                    AddError(result, "ASSERTION_UNSUPPORTED", projectId, task.TaskId,
+                        "Unsupported assertion type: " + task.AssertionType);
             }
         }
 

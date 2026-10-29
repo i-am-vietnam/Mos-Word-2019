@@ -7,6 +7,11 @@ Reviewed: 2026-10-29.
 - Tracked headless fixtures now cover every used assertion type; coverage is not exhaustive for every task/metadata branch. Formatting marks and TOC use explicit recorded snapshots, and output tests create isolated files. These checks do not establish a fresh Word GUI, pagination or shutdown run.
 - The A1 Documents-root seam changes test injection only. Existing P06/P07 template-existence and P09 Memo.txt semantics still accept a matching pre-existing file. Existing template cleanup/path resolution and lack of crash recovery remain unchanged; the authorized A3 fixes have not been started. Do not infer ownership from the new existence-positive fixtures.
 
+## A2 verification limits
+
+- Nonfatal grading exceptions and malformed TXT metadata now produce Error; unsupported packages are rejected with logged issue codes and an exposed count. Tests capture the logger delegate in memory and exercise EN/VI loader inputs without Word. MainForm count strings are implemented in code; no new native UI/Word or disk-log manual run is claimed.
+- Near-miss pairs cover every current task in the five requested assertion families, not every possible metadata branch. Error fixtures intentionally modify test-only metadata/context while retaining valid saved OOXML. Fatal OOM/StackOverflow escape tests manually throw exception objects; they do not simulate actual resource exhaustion. A3/A4 output ownership, recovery and COM behavior remain pending.
+
 ## Project 28 verification limits
 
 - Native GUI observed Grid Table5Dark/Accent2, Banded cover, Insert Caption and File Info Status on Word16.0.14026. Address control deletion, Unicode symbol, orientation and complete/combined workflows use owned native API. The first GUI caption had two separator spaces; it remains negative evidence, with a separately labeled API-corrected positive. Full manual Ribbon/F5/all-native VI and other Office builds are not claimed.
@@ -142,10 +147,10 @@ No unresolved defect was observed in the final Phase 2 lifecycle matrix on the l
 - If another document is opened in the owned Word application, Close preserves that application and reports the reason. The same conservative preservation applies when remaining document ownership cannot be inspected. It relinquishes the process handle; the user must close the remaining Word documents. This intentional protection is not an orphan-cleanup success claim.
 - OpenDocument supports existing writable, unencrypted .docx and legacy .doc working copies. TrainingWorkspaceService can derive `.docx` or `.docm` working names from approved package starters, but Phase 2 does not yet open `.docm`; enabling macro documents requires an explicit lifecycle/security decision.
 - PID capture requires a visible Word OpusApp window on an interactive Windows desktop. The registered Word 16.0 library 8.7 and Office Core 2.8 PIAs are build prerequisites; no hard-coded PIA filesystem path is committed.
-- P01 through P16 starters and EN/VI instructions are supplied and structurally valid. There are61 routed assertion identifiers and all current expected states are confirmed. Structural package validation remains separate from runtime supported-assertion dispatch.
+- P01–P28 contain212 tasks and78 supported identifiers (77 used). Validation now checks each task against the runtime assertion registry with ASSERTION_UNSUPPORTED; structural checks do not perform grading.
 - The current supplied P01 starter serializes the Contact Us target picture with Tight wrapping, so fresh T08 grades Fail as intended. An older Phase 5 blob used Square; the later starter revision is authoritative and must not be reverted. The target-specific assertion still rejects Tight/Inline and does not accept a different Square picture.
 - Package validation checks declared files, JSON, IDs, languages and task keys without opening Word. It does not yet inspect the starter as an OOXML ZIP package; the disposable starter was independently created and opened with Word.
-- ProjectLoader omits invalid packages from its returned list. Call ProjectValidator directly when the UI needs detailed package diagnostics.
+- ProjectLoader omits invalid packages, logs each rejection with its validation issue codes and exposes LastRejectedCount; MainForm shows that count in EN/VI. ProjectValidator remains available for detailed structured issues.
 - The Training workspace service has no awareness of open COM documents. MainForm closes the active document before ResetWorkingCopy.
 - Training runtime exposes .docx and legacy .doc packages; .docm packages are filtered out pending lifecycle verification.
 - P01 tasks.json now links all eight supplied task titles/instructions. The starter and EN/VI instruction meaning are unchanged.
