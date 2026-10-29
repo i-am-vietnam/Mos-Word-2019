@@ -1,5 +1,9 @@
 # Project Status
 
+## A1 prerequisite — P28 completion verified, 2026-10-29
+
+P28 source was already committed in208cf73 when this step began; the worktree was clean. Fresh Debug/Release VS MSBuild Rebuilds each report0 warnings/0 errors; P28 saved-package expectations129/129 and source/outputs EN/VI validation28 packages/212 tasks/78 supported identifiers pass. All149 package files match both outputs and immutable hashes remain unchanged. This prerequisite records verification without rewriting the existing P28 commit. A1 repository/test-foundation work follows separately; A2–A4 are not started. Evidence: `artifacts/a1/p28-*.txt`.
+
 ## Current checkpoint — Project 28, 2026-10-29
 
 Implemented exactly P28 T01–T06 from clean `main` HEAD `0134f06a5d0609d6db477c046f4d624ba8e63f69`: genuine Grid Table5Dark/Accent2 on the exact original4×5 table; Unicode Registered Sign immediately after Michael’s Art Shop; Status in cp:contentStatus; native Table1 SEQ caption below the table; Banded cover with the entire Company Address control removed; and Landscape for the complete original following section while preceding original content stays Portrait. Three generic OOXML routes bring support to78; Unicode/semantic-section opt-ins retain old defaults. UI, Word adapter/staging and P01–P27 packages remain unchanged.
