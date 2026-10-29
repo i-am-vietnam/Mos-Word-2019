@@ -1,5 +1,10 @@
 # Technical Context
 
+## B0 Testing catalog boundary — 2026-10-30
+
+TestingCatalogEntry in Core models only the seven declared catalog fields. TestingCatalogLoader.Load(path, packages) strictly parses JSON, invokes TestingCatalogValidator, and throws InvalidDataException with CATALOG_* diagnostics before returning invalid data. Training ProjectLoader/MainForm are unchanged and never depend on catalog validity. Validator closes overlapping task groups, checks required/excluded IDs, computes feasible4–6 counts and pool DP for exactly7 projects/34–40 tasks, max one conflictGroup/legacy.doc. No seed/composition/scoring/session logic yet. GetSelectableTaskCounts exposes the feasible counts for future composition. Testing metadata belongs solely in root testing-catalog.json; never extend tasks.json for this purpose. Review docs/TESTING_CATALOG_REVIEW.md before B1/B2, especially excluded live-state tasks and Save As snapshots.
+
+
 ## A4 COM resilience and shutdown — 2026-10-30
 
 WordController registers OleMessageFilter lazily on its owner STA before automation, restores the previous filter on Dispose and remains retryable when Close or restoration fails. OLE retries rejected/retry-later calls within a monotonic10-second budget; exhausted calls become WordBusyException through the shared wrapper, preserving other errors. Short nested budgets cap post-save observation attempts. The native0..99 immediate-retry semantics are respected. Close stops before further COM/process cleanup on busy or input-synchronous0x8001010D; it never terminates Word merely for a modal rejection. BeforeDocumentSave releases its event-argument RCW on all paths without FinalReleaseComObject on the held document.
@@ -8,7 +13,7 @@ MainForm uses exact EN/VI busy guidance, MissingTranslationException only for Va
 
 Invalid journals move atomically without overwrite to session-journal.invalid-<UTC yyyyMMddHHmmss>[-suffix].json in the same folder, then a fresh empty valid journal is persisted. Quarantined claims are never recovered. Locked/unsafe quarantine or fresh-write failures remain fail-closed and logged. Existing valid-journal identity/hash safeguards remain unchanged.
 
-MosWord2019.Tests retains its Core/Projects-only dependency guard. MosWord2019.Desktop.Tests is a separate classic net472/C#7.3 MSTest project using the same pinned packages; fake controllers/registrars exercise Windows/STA UI policy without activating Word, plus one real OLE registration/restore check without Office. Manual Word checks remain separate: artifacts/a4/MANUAL_TEST.md (Vietnamese, ignored). No grading routes, packages, dictionaries, assets or Office security preferences change.
+MosWord2019.Tests retains its Core/Projects-only dependency guard. MosWord2019.Desktop.Tests is a separate classic net472/C#7.3 MSTest project using the same pinned packages; fake controllers/registrars exercise Windows/STA UI policy without activating Word, plus one real OLE registration/restore check without Office. Manual Word checks remain separate: docs/MANUAL_TEST.md (Vietnamese, ignored). No grading routes, packages, dictionaries, assets or Office security preferences change.
 
 ## A3b crash recovery and output observation — 2026-10-29
 

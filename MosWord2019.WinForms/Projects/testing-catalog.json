@@ -1,0 +1,276 @@
+[
+  {
+    "projectId": "Word2019_P01",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P02",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P03",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P04",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [
+      "T05"
+    ],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. Excluded T05: already passes on the immutable starter."
+  },
+  {
+    "projectId": "Word2019_P05",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P06",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. B2 must capture owned Save As/output provenance; P16 arbitrary-folder TXT is not scanned or cleaned."
+  },
+  {
+    "projectId": "Word2019_P07",
+    "eligible": true,
+    "conflictGroup": "template-notes",
+    "requiredTaskIds": [
+      "T01"
+    ],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Legacy .doc: T01 conversion is required before OOXML tasks. Notes.dotx conflicts with P20; B2 must capture Save As and ownership context."
+  },
+  {
+    "projectId": "Word2019_P08",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P09",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. B2 must capture owned Save As/output provenance; P16 arbitrary-folder TXT is not scanned or cleaned."
+  },
+  {
+    "projectId": "Word2019_P10",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P11",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P12",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P13",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [
+      "T03"
+    ],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. Excluded T03: already passes on the immutable starter."
+  },
+  {
+    "projectId": "Word2019_P14",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [
+      [
+        "T03",
+        "T04"
+      ]
+    ],
+    "excludedTaskIds": [],
+    "notes": "T03 creates the bullets whose alignment T04 changes; select both together."
+  },
+  {
+    "projectId": "Word2019_P15",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P16",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [
+      "T01"
+    ],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. Excluded T01: already passes on the immutable starter. B2 must capture owned Save As/output provenance; P16 arbitrary-folder TXT is not scanned or cleaned."
+  },
+  {
+    "projectId": "Word2019_P17",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P18",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [
+      [
+        "T05",
+        "T07"
+      ]
+    ],
+    "excludedTaskIds": [],
+    "notes": "T05 creates the table whose header T07 styles; select both together."
+  },
+  {
+    "projectId": "Word2019_P19",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P20",
+    "eligible": true,
+    "conflictGroup": "template-notes",
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. B2 must capture owned Save As/output provenance; P16 arbitrary-folder TXT is not scanned or cleaned."
+  },
+  {
+    "projectId": "Word2019_P21",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P22",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [
+      "T07"
+    ],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. Excluded T07: requires live owned-Word snapshot; reconsider only after B2."
+  },
+  {
+    "projectId": "Word2019_P23",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P24",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [
+      "T03"
+    ],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable. Excluded T03: requires live owned-Word snapshot; reconsider only after B2."
+  },
+  {
+    "projectId": "Word2019_P25",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P26",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P27",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  },
+  {
+    "projectId": "Word2019_P28",
+    "eligible": true,
+    "conflictGroup": null,
+    "requiredTaskIds": [],
+    "taskGroups": [],
+    "excludedTaskIds": [],
+    "notes": "Reviewed all task metadata/instructions and untouched starter; other tasks are independently selectable."
+  }
+]

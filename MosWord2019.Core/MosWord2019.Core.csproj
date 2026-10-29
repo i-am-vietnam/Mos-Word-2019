@@ -50,6 +50,7 @@
     <Compile Include="Models\ValidationIssue.cs" />
     <Compile Include="Models\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\TestingCatalogEntry.cs" />
     <Compile Include="Services\WordGradingService.cs" />
     <Compile Include="Services\WordBusyException.cs" />
     <Compile Include="Services\WordGradingService.OutputOwnership.cs" />

@@ -193,8 +193,10 @@ namespace MosWord2019.Tests
             string source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 "..", "..", "..", "MosWord2019.WinForms", "Projects"));
             Assert.IsTrue(Directory.Exists(source), "Run the tests from their repository build output.");
-            string[] sourceFiles = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
-            string[] copiedFiles = Directory.GetFiles(TestCaseData.ProjectsRoot, "*", SearchOption.AllDirectories);
+            string[] sourceFiles = Directory.GetFiles(source, "*", SearchOption.AllDirectories)
+                .Where(p => p != Path.Combine(source, "testing-catalog.json")).ToArray();
+            string[] copiedFiles = Directory.GetFiles(TestCaseData.ProjectsRoot, "*", SearchOption.AllDirectories)
+                .Where(p => p != Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json")).ToArray();
             Assert.AreEqual(TestInventory.ExpectedPackageFileCount, sourceFiles.Length,
                 "When adding package files, update TestInventory.ExpectedPackageFileCount in TestCaseData.cs after checking output hashes.");
             CollectionAssert.AreEquivalent(sourceFiles.Select(p => p.Substring(source.Length + 1)).ToList(),

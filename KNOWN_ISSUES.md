@@ -1,5 +1,10 @@
 # Known Issues and Verification Items
 
+## B0 Testing readiness boundary — 2026-10-30
+
+Testing remains unimplemented beyond catalog validation. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 must preserve last OOXML plus owned Save As/output provenance (especially TXT P09/P16), isolate SessionId/project copies, and stage/cleanup via Phase A services. Catalog validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
+
+
 Reviewed: 2026-10-30.
 
 ## Headless test scope and current external-output limits
@@ -9,7 +14,7 @@ Reviewed: 2026-10-30.
 
 ## A4 verification and shutdown limits
 
-- Fresh headless tests exercise fake rejection policy/registration, actual native STA filter registration without Word, fake-controller close/defer/shutdown/Dispose, EN/VI messages and journal quarantine. The fresh owned Word activation attempt still failed0x80070520 before opening a document. Font-dialog Grade, actual Task Manager/Windows logoff, native event-RCW lifetime and full real UI workflows are not newly verified. Follow artifacts/a4/MANUAL_TEST.md and record actual results; historical Word checks are not A4 PASS evidence.
+- Fresh headless tests exercise fake rejection policy/registration, actual native STA filter registration without Word, fake-controller close/defer/shutdown/Dispose, EN/VI messages and journal quarantine. The fresh owned Word activation attempt still failed0x80070520 before opening a document. Font-dialog Grade, actual Task Manager/Windows logoff, native event-RCW lifetime and full real UI workflows are not newly verified. Follow docs/MANUAL_TEST.md and record actual results; historical Word checks are not A4 PASS evidence.
 - Retry windows bound COM rejections and post-save attempts; they cannot interrupt an already accepted COM call that hangs indefinitely. On Close Anyway or Windows shutdown, trainer-owned Word can remain open if it could not be safely closed. The journal remains; locked files wait for a later recovery. No unrelated Word process is terminated.
 - Quarantine leaves its listed files intact and does not re-import claims. This intentionally sacrifices automatic cleanup for that corrupt journal. If quarantine/fresh-write is denied or the path is redirected, operations still fail safely rather than overwriting evidence. Local-mutex cross-Windows-session limitations remain unchanged.
 - The user's2026-10-29 input-synchronous close and observation-storm diagnostics informed A4. Fake-controller tests reproduce the error paths; they are not a claim of repeating that real Word session.
