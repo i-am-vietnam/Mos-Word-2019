@@ -221,7 +221,7 @@ namespace MosWord2019.Core.Services
                 match &= text.OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(RequiredStrings(task, "protectedTextBoxParagraphs").Distinct().OrderBy(t => t, StringComparer.Ordinal));
             }
             return match && CheckDeclaredDocumentPreservation(package, task) && PreservedBookmarksMatch(body.Document, task) && PreservedParagraphFormatsMatch(package, task) && CheckDeclaredObjectPreservation(package, task) &&
-                CheckPreservedSmartArt(package, task) && PreservedStoryGraphicsMatch(package, task) && CheckDeclaredBodyContentStates(package, task);
+                CheckPreservedSmartArt(package, task) && PreservedStoryGraphicsMatch(package, task) && CheckDeclaredBodyContentStates(package, task) && CheckDeclaredLetterPreservation(package, task);
         }
 
         private static bool IsBlankTableBoundary(XElement element)

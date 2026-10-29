@@ -16,7 +16,7 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 - `LoginForm` hiện chỉ chọn chế độ/ngôn ngữ, không phải đăng nhập tài khoản hay xác thực.
 - `AppMode` có giá trị `Testing`, nhưng giao diện chỉ cho chọn Training; `MainForm` từ chối Testing vì chưa triển khai.
 - Chưa có thi có tính giờ, tổng điểm, nộp bài, lưu lịch sử vào database hoặc installer/release workflow hoàn chỉnh.
-- Có **27 package P01–P27, tổng206 task**, không áp đặt mọi project phải có cùng số task.
+- Có **28 package P01–P28, tổng212 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
@@ -83,7 +83,7 @@ Lỗi COM/session desktop là lỗi hạ tầng, không phải đáp án sai. CO
 
 ### 2.3. Chấm bài và context chỉ đọc
 
-`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **75 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới. P27 thêm hai route OOXML `TableRowTextFormatting`, `BodyWordArtTextEffect`; tái sử dụng TableRowsEqual/TextReplaceAll với các trạng thái bảng hữu hạn đã xác minh native và mở rộng vị trí shape bằng opt-in. Năm task là Sentence case toàn bảng, Scroll ngang Bottom Center, highlight Turquoise hàng Prince, WordArt Gold Accent4 Soft Bevel cho title và thay bốn Football thành Soccer. Title có thể chuyển khỏi paragraph thường; các task vẫn độc lập và giữ nguyên bảng/note. Hợp đồng chi tiết ở CODEX_CONTEXT.md; evidence mới ở `artifacts/p27/REPORT.md`.
+`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **78 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới. P28 thêm ba route `TableStyleApplied`, `TableCaptionWithSequence`, `CoverPageAssembly`; SymbolInserted thêm Unicode opt-in và SectionOrientationByAnchor thêm nhóm section theo toàn bộ nội dung gốc. Sáu task là table style native Accent2, Registered Sign đúng vị trí, Status contentStatus, caption SEQ bên dưới bảng, cover Banded xóa Address control và Landscape section sau. Bảo toàn thư/list/bảng cho phép các thay đổi độc lập và cả hai thứ tự cover/orientation. P27 và các opt-in cũ giữ nguyên. Hợp đồng ở CODEX_CONTEXT.md; evidence mới ở `artifacts/p28/REPORT.md`.
 
 - Phần saved-content chấm bằng ZIP/OOXML, relationships, styles/theme/effective formatting, logical text. Không mở/attach Word bên trong Core, không chấm theo click history hoặc IDs/XML/runs cố định khi Word có thể tái sinh chúng.
 - Grade thông thường gọi owned `Save()` và `PreserveSaveAsWork()` trước khi đọc đáp án. Save lỗi thì báo Error và giữ Word để phục hồi bài.

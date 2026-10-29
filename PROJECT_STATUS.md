@@ -1,6 +1,16 @@
 # Project Status
 
-## Current checkpoint — Project 27, 2026-10-29
+## Current checkpoint — Project 28, 2026-10-29
+
+Implemented exactly P28 T01–T06 from clean `main` HEAD `0134f06a5d0609d6db477c046f4d624ba8e63f69`: genuine Grid Table5Dark/Accent2 on the exact original4×5 table; Unicode Registered Sign immediately after Michael’s Art Shop; Status in cp:contentStatus; native Table1 SEQ caption below the table; Banded cover with the entire Company Address control removed; and Landscape for the complete original following section while preceding original content stays Portrait. Three generic OOXML routes bring support to78; Unicode/semantic-section opt-ins retain old defaults. UI, Word adapter/staging and P01–P27 packages remain unchanged.
+
+Fresh final evidence: P28 public saved-package matrix129/129; native individual answers and both combined orders6/6 after reopen; actual EN/VI MainForm/owned Word lifecycle103/103; isolated table48/48, caption/section63/63, Unicode/preservation38/38; independent cover/common review7/7 and4/4. Retained regressions freshly execute1022/1022 (693 shared/current P24,123 P25,72 P26,134 P27). The known11 missing historical P20 template-context cases pass after isolated reconstruction, included in693; these are fresh replay results, not fresh manual older-project answers.
+
+Debug/Release VS MSBuild Any CPU Rebuild and final metadata-copy Builds each report0 warnings/0 errors. Source and both outputs validate EN/VI:28 packages/212 tasks,78 routes,0 errors/0 warnings; all149 files match both outputs. All56 dictionaries,28 starters,8 assets and143 P01–P27 package files retain initial bytes; only P28 tasks metadata changes. Its five existing copy entries remain unique. Original/package starter SHA-256 remains D5F08CF903DDFD26E3FA042CF6C38ABC3EE562AD7F6007CF124B332DD8FBB7A8.
+
+Native GUI confirms style gallery, Banded cover insertion, caption dialog and File Info Status; Address deletion and complete task workflows use owned Word API. The first GUI caption attempt added an extra separator space and correctly failed; the GUI-derived positive explicitly records its native API correction. GUI Banded inserts a page break that bare BuildingBlock.Insert omits; the harness now reproduces that saved structure. Native section Landscape normalizes Continuous to omitted/default Next Page. Actual source Visual appeal has one trailing space, preserved exactly despite the supplied two-space description. Full manual Ribbon/F5/VI and other Office builds are unverified. Evidence: `artifacts/p28/REPORT.md`. No commit/push/pull/reset or Excel work; earlier checkpoints remain historical.
+
+## Earlier checkpoint — Project 27, 2026-10-29
 
 Implemented exactly P27 T01–T05 from clean `main` HEAD `b70f63202a8f2c5e852f3e9810b922ef4cde3932`: native Sentence case on all25×4 cells; genuine horizontal Scroll with exact `Begin in October!`, square wrapping and Bottom Center Margin/Margin; effective Turquoise text highlight throughout the Prince row; original title converted to Gold Accent4 Soft Bevel WordArt; and all four native Football→Soccer replacements. Finite native table variants keep each task independent, including either case/replacement order and title movement. Two generic OOXML routes bring support to75 identifiers; narrow table/shape/preservation opt-ins retain old defaults. No UI/Interop/staging changes or P01–P26 package edits.
 

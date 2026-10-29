@@ -65,6 +65,10 @@
     <Compile Include="Services\WordGradingService.TextWatermark.cs" />
     <Compile Include="Services\WordGradingService.TableVariants.cs" />
     <Compile Include="Services\WordGradingService.BodyWordArt.cs" />
+    <Compile Include="Services\WordGradingService.TableStyle.cs" />
+    <Compile Include="Services\WordGradingService.CaptionSection.cs" />
+    <Compile Include="Services\WordGradingService.LetterPreservation.cs" />
+    <Compile Include="Services\WordGradingService.CoverAssembly.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

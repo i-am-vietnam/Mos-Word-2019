@@ -1,15 +1,794 @@
-
 [
-  {  "taskId": "T01",
-     },
-  
-    { "taskId": "T02",
-   },
-  
-  { "taskId": "T03",
-   },
-  
-  { "taskId": "T04",
-   }
-
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "taskId": "T01",
+    "assertionType": "TableStyleApplied",
+    "expectedTableStyleProperties": {
+      "wholeTable/tblPr/tblInd": "type=dxa|w=0",
+      "wholeTable/tblPr/tblCellMar/top": "type=dxa|w=0",
+      "wholeTable/tblPr/tblCellMar/left": "type=dxa|w=108",
+      "wholeTable/tblPr/tblCellMar/bottom": "type=dxa|w=0",
+      "wholeTable/tblPr/tblCellMar/right": "type=dxa|w=108",
+      "wholeTable/pPr/spacing": "after=0|line=240|lineRule=auto",
+      "wholeTable/tblPr/tblStyleRowBandSize": "val=1",
+      "wholeTable/tblPr/tblStyleColBandSize": "val=1",
+      "wholeTable/tblPr/tblBorders/top": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tblPr/tblBorders/left": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tblPr/tblBorders/bottom": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tblPr/tblBorders/right": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tblPr/tblBorders/insideH": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tblPr/tblBorders/insideV": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "wholeTable/tcPr/shd": "color=auto|resolvedFill=F3DCDC|themeFill=accent2|themeFillTint=33|val=clear",
+      "firstRow/rPr/b": "val=1",
+      "firstRow/rPr/bCs": "val=1",
+      "firstRow/rPr/color": "resolvedColor=FFFFFF|themeColor=background1",
+      "firstRow/tcPr/tcBorders/top": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstRow/tcPr/tcBorders/left": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstRow/tcPr/tcBorders/right": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstRow/tcPr/tcBorders/insideH": "val=nil",
+      "firstRow/tcPr/tcBorders/insideV": "val=nil",
+      "firstRow/tcPr/shd": "color=auto|resolvedFill=C0504D|themeFill=accent2|val=clear",
+      "lastRow/rPr/b": "val=1",
+      "lastRow/rPr/bCs": "val=1",
+      "lastRow/rPr/color": "resolvedColor=FFFFFF|themeColor=background1",
+      "lastRow/tcPr/tcBorders/left": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastRow/tcPr/tcBorders/bottom": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastRow/tcPr/tcBorders/right": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastRow/tcPr/tcBorders/insideH": "val=nil",
+      "lastRow/tcPr/tcBorders/insideV": "val=nil",
+      "lastRow/tcPr/shd": "color=auto|resolvedFill=C0504D|themeFill=accent2|val=clear",
+      "firstCol/rPr/b": "val=1",
+      "firstCol/rPr/bCs": "val=1",
+      "firstCol/rPr/color": "resolvedColor=FFFFFF|themeColor=background1",
+      "firstCol/tcPr/tcBorders/top": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstCol/tcPr/tcBorders/left": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstCol/tcPr/tcBorders/bottom": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "firstCol/tcPr/tcBorders/insideV": "val=nil",
+      "firstCol/tcPr/shd": "color=auto|resolvedFill=C0504D|themeFill=accent2|val=clear",
+      "lastCol/rPr/b": "val=1",
+      "lastCol/rPr/bCs": "val=1",
+      "lastCol/rPr/color": "resolvedColor=FFFFFF|themeColor=background1",
+      "lastCol/tcPr/tcBorders/top": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastCol/tcPr/tcBorders/bottom": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastCol/tcPr/tcBorders/right": "resolvedColor=FFFFFF|space=0|sz=4|themeColor=background1|val=single",
+      "lastCol/tcPr/tcBorders/insideV": "val=nil",
+      "lastCol/tcPr/shd": "color=auto|resolvedFill=C0504D|themeFill=accent2|val=clear",
+      "band1Vert/tcPr/shd": "color=auto|resolvedFill=E6B9B8|themeFill=accent2|themeFillTint=66|val=clear",
+      "band1Horz/tcPr/shd": "color=auto|resolvedFill=E6B9B8|themeFill=accent2|themeFillTint=66|val=clear"
+    },
+    "expectedThemeColors": {
+      "accent2": "C0504D"
+    },
+    "titleKey": "P28_T01_TITLE",
+    "instructionKey": "P28_T01_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "assertionType": "SymbolInserted",
+    "unicodeCodePoint": 174,
+    "anchorText": "Award of this scholarship, based on academic merit",
+    "referenceText": "Michael’s Art Shop",
+    "placement": "after",
+    "expectedSentence": "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+    "taskId": "T02",
+    "titleKey": "P28_T02_TITLE",
+    "instructionKey": "P28_T02_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "assertionType": "CorePropertyEquals",
+    "propertyName": "contentStatus",
+    "expectedValue": "New update!",
+    "preservedCoreProperties": [
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}title",
+        "value": "Mos Word 2016"
+      },
+      {
+        "name": "{http://purl.org/dc/elements/1.1/}creator",
+        "value": "Nguyễn Văn Quý"
+      }
+    ],
+    "taskId": "T03",
+    "titleKey": "P28_T03_TITLE",
+    "instructionKey": "P28_T03_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "assertionType": "TableCaptionWithSequence",
+    "taskId": "T04",
+    "titleKey": "P28_T04_TITLE",
+    "instructionKey": "P28_T04_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "assertionType": "CoverPageAssembly",
+    "taskId": "T05",
+    "titleKey": "P28_T05_TITLE",
+    "instructionKey": "P28_T05_INST"
+  },
+  {
+    "preserveSourceContent": true,
+    "expectedLetterParagraphs": [
+      "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+      "The Academic Sam Scholarship provides the following:",
+      "Cost of all Graphic Design Institute tuition and mandatory fees",
+      "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+      "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+      "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+      "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+      "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+      "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+      "Sincerely,",
+      "Will\nOffice of Enrollment Services"
+    ],
+    "letterTableAfterParagraphIndex": 6,
+    "letterBulletedParagraphIndices": [
+      2,
+      3,
+      4
+    ],
+    "letterBulletLevel": 0,
+    "letterBulletText": "",
+    "letterParagraphVariants": {
+      "5": [
+        "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+      ]
+    },
+    "targetHeaderRow": [
+      "Book Title",
+      "Author",
+      "Year Published",
+      "Price",
+      "Course Code"
+    ],
+    "expectedTableRows": [
+      [
+        "Book Title",
+        "Author",
+        "Year Published",
+        "Price",
+        "Course Code"
+      ],
+      [
+        "Design 101",
+        "Maggie Frog",
+        "2017",
+        "$99.99",
+        "GRA 119"
+      ],
+      [
+        "Visual appeal ",
+        "Alan Turnbull",
+        "2015",
+        "$80.00",
+        "GRA 129"
+      ],
+      [
+        "Marketing with style",
+        "Richard Wells",
+        "2016",
+        "$67.89",
+        "MRKT 002"
+      ]
+    ],
+    "expectedCaptionLabel": "Table",
+    "expectedCaptionNumber": "1",
+    "expectedCaptionSuffix": " - Details of books",
+    "followingParagraph": "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+    "expectedCover": {
+      "gallery": "Cover Pages",
+      "bandTheme": "accent1",
+      "titleBackgroundTheme": "bg1",
+      "authorBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}creator"
+      ],
+      "companyBinding": [
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Properties",
+        "{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}Company"
+      ],
+      "titleBinding": [
+        "{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}coreProperties",
+        "{http://purl.org/dc/elements/1.1/}title"
+      ],
+      "addressBinding": [
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CoverPageProperties",
+        "{http://schemas.microsoft.com/office/2006/coverPageProps}CompanyAddress"
+      ],
+      "shapeFrames": {
+        "upper": [
+          0.0,
+          0.0,
+          0.9990059468385497,
+          0.15033658032287509
+        ],
+        "lower": [
+          0.0,
+          0.44876587214945796,
+          0.9990059468385497,
+          0.551234127850542
+        ],
+        "title": [
+          0.0009940531614503153,
+          0.15033658032287509,
+          0.9990059468385497,
+          0.2984292918265829
+        ]
+      }
+    },
+    "semanticSectionOrientation": true,
+    "anchorText": "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+    "expectedOrientation": "landscape",
+    "originalSectionParagraphs": [
+      {
+        "orientation": "portrait",
+        "paragraphs": [
+          "Congratulations on your excellent high school record! Your test scores and class rank indicate you may be eligible for an Academic Sam Scholarship from Graphic Design Institute starting fall 20XX. This scholarship, which is renewable for a total of eight semesters, would make it possible for you to graduate from our school without paying a cent for tuition and fees—and save you a significant portion of the other costs of attending college.",
+          "The Academic Sam Scholarship provides the following:",
+          "Cost of all Graphic Design Institute tuition and mandatory fees",
+          "A cash stipend of $2,000 per semester ($4,000/year) to defray costs of books, supplies, and other expenses.",
+          "A $750 per semester ($1,500/year) award toward rental costs at GDI’s Canyon Ridge student housing complex, if you decide to live on campus",
+          [
+            "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. ",
+            "Award of this scholarship, based on academic merit, would save you and your family more than $100,000 over your four-year undergraduate career at Graphic Design Institute.  This award is donated from Michael’s Art Shop® Additional outside scholarships and any need-based financial aid for which you may qualify would further supplement this support. "
+          ]
+        ]
+      },
+      {
+        "orientation": "landscape",
+        "paragraphs": [
+          "The only costs to you are textbook costs and those will be listed for your first two semesters in the table below:",
+          "To be eligible for the scholarship, you must apply and be admitted to Graphic Design Institute. We encourage you to apply as soon as possible since awards are made on a rolling basis. Please complete the online application at https://office.com. After you submit your completed application for admission, please have your official high school transcript with class rank sent to GDI in a sealed school envelope. Upon acceptance to the university, you will receive an award letter.",
+          "If you have any questions regarding the scholarship program, please contact the Academic Sam Scholarship Coordinator at 636.555.1200 or by e-mail at info@office.com.",
+          "Sincerely,",
+          "Will\nOffice of Enrollment Services"
+        ]
+      }
+    ],
+    "assertionType": "SectionOrientationByAnchor",
+    "taskId": "T06",
+    "titleKey": "P28_T06_TITLE",
+    "instructionKey": "P28_T06_INST"
+  }
 ]

@@ -2,6 +2,12 @@
 
 Reviewed: 2026-10-29.
 
+## Project 28 verification limits
+
+- Native GUI observed Grid Table5Dark/Accent2, Banded cover, Insert Caption and File Info Status on Word16.0.14026. Address control deletion, Unicode symbol, orientation and complete/combined workflows use owned native API. The first GUI caption had two separator spaces; it remains negative evidence, with a separately labeled API-corrected positive. Full manual Ribbon/F5/all-native VI and other Office builds are not claimed.
+- Bare native BuildingBlock.Insert omits the cover page break added by the GUI command. The fixture harness explicitly reproduces it; production does not insert anything. Cover recognition covers observed readable DrawingML plus its VML fallback, not unobserved legacy-only groups. Native Landscape normalizes the Continuous source boundary to default Next Page; grading uses original content membership, not fixed page/section count or a guessed break type.
+- The actual hash-matching source has one trailing space after Visual appeal, and a logical line break in the final signature paragraph. Both are preserved. Retained P20 context reconstruction and older regression replay are labeled separately from new native answers. Evidence: `artifacts/p28/REPORT.md`.
+
 ## Project 27 verification limits
 
 - Native GUI evidence covers Select Table/Sentence case, Scroll: Horizontal/Bottom Center and the Gold Accent4 Soft Bevel WordArt gallery, saved/reopened on Word16.0.14026. Turquoise, normal-default Replace All, combined answers and EN/VI lifecycle use the owned Word API. Both case/replacement orders produce the same verified cell text. This is not a full manual Ribbon/F5/VI workflow or coverage of other Office builds.

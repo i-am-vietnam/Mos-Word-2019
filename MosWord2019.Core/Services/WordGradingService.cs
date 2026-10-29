@@ -52,7 +52,7 @@ namespace MosWord2019.Core.Services
             WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved",
             "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor", "SectionBreakBeforeHeading",
             "BodyContentBeforeSmartArt", "SmartArtLogicalOrder", "TextBoxPictureBevel", "TextWatermark",
-            "TableRowTextFormatting", "BodyWordArtTextEffect"
+            "TableRowTextFormatting", "BodyWordArtTextEffect", "TableStyleApplied", "TableCaptionWithSequence", "CoverPageAssembly"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -167,6 +167,9 @@ namespace MosWord2019.Core.Services
                         case "CorePropertyEquals": passed = CheckCoreProperty(package, task, out detail); break;
                         case "ParagraphFormattingMatches": passed = CheckParagraphFormatting(package, task, out detail); break;
                         case "TableAccessibilityFirstRow": passed = CheckTableAccessibilityFirstRow(package, task, out detail); break;
+                        case "TableStyleApplied": passed = CheckTableStyleApplied(package, task, out detail); break;
+                        case "TableCaptionWithSequence": passed = CheckTableCaptionWithSequence(package, task, out detail); break;
+                        case "CoverPageAssembly": passed = CheckCoverPageAssembly(package, task, out detail); break;
                         case "TableRowsEqual": passed = CheckTableRows(package, task, out detail); break;
                         case "TableRowTextFormatting": passed = CheckTableRowTextFormatting(package, task, out detail); break;
                         case "BodyWordArtTextEffect": passed = CheckBodyWordArtTextEffect(package, task, out detail); break;
@@ -399,6 +402,7 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckSymbol(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("unicodeCodePoint")) return CheckUnicodeSymbol(package, task, out detail);
             string anchor = RequiredString(task, "anchorText");
             string font = RequiredString(task, "symbolFont");
             int code = RequiredInt(task, "symbolCode");
@@ -1408,6 +1412,7 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckSectionOrientation(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (OptionalBool(task, "semanticSectionOrientation", false)) return CheckSemanticSectionOrientation(package, task, out detail);
             string anchor = RequiredString(task, "anchorText");
             int expectedCount = RequiredInt(task, "expectedSectionCount");
             string expected = RequiredString(task, "expectedOrientation");
