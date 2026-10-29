@@ -1,0 +1,15 @@
+*.cs text eol=crlf
+*.csproj text eol=crlf
+*.slnx text eol=crlf
+*.config text eol=crlf
+*.json text eol=crlf
+*.md text eol=crlf
+
+*.docx binary
+*.doc binary
+*.dotx binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.exe binary
+*.dll binary
