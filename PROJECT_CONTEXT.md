@@ -20,6 +20,8 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
+A1 bổ sung `MosWord2019.Tests`: project MSTest classic net472/C#7.3, chạy VSTest không cần Word, nạp task gốc qua `ProjectLoader`. Fixture được lưu trong Git, có Pass/Fail cho77 loại assertion đang dùng và các near miss cho context/output. Constructor nội bộ được duyệt cho phép truyền riêng thư mục Documents của từng test; constructor công khai và cách chấm hiện tại giữ nguyên. WinForms copy package bằng một wildcard `Projects\**\*` với PreserveNewest. Hướng dẫn chạy: `MosWord2019.Tests/README.md`. A2–A4 chưa triển khai.
+
 ### 1.2. Luồng người dùng và trạng thái bài làm
 
 ```text

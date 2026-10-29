@@ -44,11 +44,16 @@ namespace MosWord2019.Core.Services
 
         public static string ResolveDocuments(string fileName)
         {
+            return ResolveDocuments(fileName, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        }
+
+        internal static string ResolveDocuments(string fileName, string documentsRoot)
+        {
             if (string.IsNullOrWhiteSpace(fileName) || Path.IsPathRooted(fileName) || fileName != Path.GetFileName(fileName) ||
                 fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\") ||
                 fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
                 throw new InvalidDataException("A single Documents output file name is required.");
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+            return Path.Combine(documentsRoot, fileName);
         }
 
         public static bool IsDeclaredDocumentsOutput(ProjectPackage package, string livePath)

@@ -13,3 +13,6 @@
 *.gif binary
 *.exe binary
 *.dll binary
+
+# Preserve the exact bytes of native plain-text export fixtures.
+MosWord2019.Tests/Fixtures/**/*.txt binary

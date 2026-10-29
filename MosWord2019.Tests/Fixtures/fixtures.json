@@ -1,0 +1,1343 @@
+[
+  {
+    "id": "AutomaticTableOfContents_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T04",
+    "assertionType": "AutomaticTableOfContents",
+    "fixture": "Word2019_P02/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "AutomaticTableOfContents_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T04",
+    "assertionType": "AutomaticTableOfContents",
+    "fixture": "Word2019_P02/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "BodyContentBeforeHeading_Pass",
+    "projectId": "Word2019_P24",
+    "taskId": "T04",
+    "assertionType": "BodyContentBeforeHeading",
+    "fixture": "Word2019_P24/T04/pass.docx",
+    "expected": "Pass",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T04/pass.toc.json"
+  },
+  {
+    "id": "BodyContentBeforeHeading_Fail",
+    "projectId": "Word2019_P24",
+    "taskId": "T04",
+    "assertionType": "BodyContentBeforeHeading",
+    "fixture": "Word2019_P24/T04/fail.docx",
+    "expected": "Fail",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T04/fail.toc.json"
+  },
+  {
+    "id": "BodyContentBeforeSmartArt_Pass",
+    "projectId": "Word2019_P26",
+    "taskId": "T01",
+    "assertionType": "BodyContentBeforeSmartArt",
+    "fixture": "Word2019_P26/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "BodyContentBeforeSmartArt_Fail",
+    "projectId": "Word2019_P26",
+    "taskId": "T01",
+    "assertionType": "BodyContentBeforeSmartArt",
+    "fixture": "Word2019_P26/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "BodyTextReplaceAll_Pass",
+    "projectId": "Word2019_P18",
+    "taskId": "T01",
+    "assertionType": "BodyTextReplaceAll",
+    "fixture": "Word2019_P18/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "BodyTextReplaceAll_Fail",
+    "projectId": "Word2019_P18",
+    "taskId": "T01",
+    "assertionType": "BodyTextReplaceAll",
+    "fixture": "Word2019_P18/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "BodyWordArtTextEffect_Pass",
+    "projectId": "Word2019_P27",
+    "taskId": "T04",
+    "assertionType": "BodyWordArtTextEffect",
+    "fixture": "Word2019_P27/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "BodyWordArtTextEffect_Fail",
+    "projectId": "Word2019_P27",
+    "taskId": "T04",
+    "assertionType": "BodyWordArtTextEffect",
+    "fixture": "Word2019_P27/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "BookmarkAtParagraphStart_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T01",
+    "assertionType": "BookmarkAtParagraphStart",
+    "fixture": "Word2019_P09/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "BookmarkAtParagraphStart_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T01",
+    "assertionType": "BookmarkAtParagraphStart",
+    "fixture": "Word2019_P09/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "BulletedList_Pass",
+    "projectId": "Word2019_P01",
+    "taskId": "T02",
+    "assertionType": "BulletedList",
+    "fixture": "Word2019_P01/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "BulletedList_Fail",
+    "projectId": "Word2019_P01",
+    "taskId": "T02",
+    "assertionType": "BulletedList",
+    "fixture": "Word2019_P01/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CharacterStyleAppliedToParagraph_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T08",
+    "assertionType": "CharacterStyleAppliedToParagraph",
+    "fixture": "Word2019_P02/T08/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CharacterStyleAppliedToParagraph_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T08",
+    "assertionType": "CharacterStyleAppliedToParagraph",
+    "fixture": "Word2019_P02/T08/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CitationPlaceholderAtParagraphEnd_Pass",
+    "projectId": "Word2019_P03",
+    "taskId": "T04",
+    "assertionType": "CitationPlaceholderAtParagraphEnd",
+    "fixture": "Word2019_P03/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CitationPlaceholderAtParagraphEnd_Fail",
+    "projectId": "Word2019_P03",
+    "taskId": "T04",
+    "assertionType": "CitationPlaceholderAtParagraphEnd",
+    "fixture": "Word2019_P03/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CommentDeletedAtText_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T06",
+    "assertionType": "CommentDeletedAtText",
+    "fixture": "Word2019_P02/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CommentDeletedAtText_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T06",
+    "assertionType": "CommentDeletedAtText",
+    "fixture": "Word2019_P02/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CommentResolved_Pass",
+    "projectId": "Word2019_P18",
+    "taskId": "T03",
+    "assertionType": "CommentResolved",
+    "fixture": "Word2019_P18/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CommentResolved_Fail",
+    "projectId": "Word2019_P18",
+    "taskId": "T03",
+    "assertionType": "CommentResolved",
+    "fixture": "Word2019_P18/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ContinuedNumberingSequence_Pass",
+    "projectId": "Word2019_P10",
+    "taskId": "T15",
+    "assertionType": "ContinuedNumberingSequence",
+    "fixture": "Word2019_P10/T15/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ContinuedNumberingSequence_Fail",
+    "projectId": "Word2019_P10",
+    "taskId": "T15",
+    "assertionType": "ContinuedNumberingSequence",
+    "fixture": "Word2019_P10/T15/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ContinuousSectionBreakBeforeHeading_Pass",
+    "projectId": "Word2019_P12",
+    "taskId": "T06",
+    "assertionType": "ContinuousSectionBreakBeforeHeading",
+    "fixture": "Word2019_P12/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ContinuousSectionBreakBeforeHeading_Fail",
+    "projectId": "Word2019_P12",
+    "taskId": "T06",
+    "assertionType": "ContinuousSectionBreakBeforeHeading",
+    "fixture": "Word2019_P12/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CorePropertyEquals_Pass",
+    "projectId": "Word2019_P22",
+    "taskId": "T06",
+    "assertionType": "CorePropertyEquals",
+    "fixture": "Word2019_P22/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CorePropertyEquals_Fail",
+    "projectId": "Word2019_P22",
+    "taskId": "T06",
+    "assertionType": "CorePropertyEquals",
+    "fixture": "Word2019_P22/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CoverPageAssembly_Pass",
+    "projectId": "Word2019_P28",
+    "taskId": "T05",
+    "assertionType": "CoverPageAssembly",
+    "fixture": "Word2019_P28/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CoverPageAssembly_Fail",
+    "projectId": "Word2019_P28",
+    "taskId": "T05",
+    "assertionType": "CoverPageAssembly",
+    "fixture": "Word2019_P28/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "CustomBulletList_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T07",
+    "assertionType": "CustomBulletList",
+    "fixture": "Word2019_P09/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "CustomBulletList_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T07",
+    "assertionType": "CustomBulletList",
+    "fixture": "Word2019_P09/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "DocumentBackgroundColor_Pass",
+    "projectId": "Word2019_P24",
+    "taskId": "T05",
+    "assertionType": "DocumentBackgroundColor",
+    "fixture": "Word2019_P24/T05/pass.docx",
+    "expected": "Pass",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T05/pass.toc.json"
+  },
+  {
+    "id": "DocumentBackgroundColor_Fail",
+    "projectId": "Word2019_P24",
+    "taskId": "T05",
+    "assertionType": "DocumentBackgroundColor",
+    "fixture": "Word2019_P24/T05/fail.docx",
+    "expected": "Fail",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T05/fail.toc.json"
+  },
+  {
+    "id": "DocumentMarginsEquals_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T02",
+    "assertionType": "DocumentMarginsEquals",
+    "fixture": "Word2019_P08/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "DocumentMarginsEquals_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T02",
+    "assertionType": "DocumentMarginsEquals",
+    "fixture": "Word2019_P08/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "DocumentPageBorder_Pass",
+    "projectId": "Word2019_P23",
+    "taskId": "T01",
+    "assertionType": "DocumentPageBorder",
+    "fixture": "Word2019_P23/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "DocumentPageBorder_Fail",
+    "projectId": "Word2019_P23",
+    "taskId": "T01",
+    "assertionType": "DocumentPageBorder",
+    "fixture": "Word2019_P23/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "DocumentParagraphLineSpacingMultiple_Pass",
+    "projectId": "Word2019_P05",
+    "taskId": "T01",
+    "assertionType": "DocumentParagraphLineSpacingMultiple",
+    "fixture": "Word2019_P05/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "DocumentParagraphLineSpacingMultiple_Fail",
+    "projectId": "Word2019_P05",
+    "taskId": "T01",
+    "assertionType": "DocumentParagraphLineSpacingMultiple",
+    "fixture": "Word2019_P05/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "DocumentPersonalInformationRemoved_Pass",
+    "projectId": "Word2019_P23",
+    "taskId": "T04",
+    "assertionType": "DocumentPersonalInformationRemoved",
+    "fixture": "Word2019_P23/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "DocumentPersonalInformationRemoved_Fail",
+    "projectId": "Word2019_P23",
+    "taskId": "T04",
+    "assertionType": "DocumentPersonalInformationRemoved",
+    "fixture": "Word2019_P23/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "DocumentStyleSet_Pass",
+    "projectId": "Word2019_P01",
+    "taskId": "T01",
+    "assertionType": "DocumentStyleSet",
+    "fixture": "Word2019_P01/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "DocumentStyleSet_Fail",
+    "projectId": "Word2019_P01",
+    "taskId": "T01",
+    "assertionType": "DocumentStyleSet",
+    "fixture": "Word2019_P01/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "Footnote_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T01",
+    "assertionType": "Footnote",
+    "fixture": "Word2019_P08/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "Footnote_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T01",
+    "assertionType": "Footnote",
+    "fixture": "Word2019_P08/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "FootnotesConvertedToEndnotes_Pass",
+    "projectId": "Word2019_P07",
+    "taskId": "T07",
+    "assertionType": "FootnotesConvertedToEndnotes",
+    "fixture": "Word2019_P07/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "FootnotesConvertedToEndnotes_Fail",
+    "projectId": "Word2019_P07",
+    "taskId": "T07",
+    "assertionType": "FootnotesConvertedToEndnotes",
+    "fixture": "Word2019_P07/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "HeaderDifferentFirstPage_Pass",
+    "projectId": "Word2019_P15",
+    "taskId": "T01",
+    "assertionType": "HeaderDifferentFirstPage",
+    "fixture": "Word2019_P15/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "HeaderDifferentFirstPage_Fail",
+    "projectId": "Word2019_P15",
+    "taskId": "T01",
+    "assertionType": "HeaderDifferentFirstPage",
+    "fixture": "Word2019_P15/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "HeaderTextEffectEquals_Pass",
+    "projectId": "Word2019_P07",
+    "taskId": "T02",
+    "assertionType": "HeaderTextEffectEquals",
+    "fixture": "Word2019_P07/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "HeaderTextEffectEquals_Fail",
+    "projectId": "Word2019_P07",
+    "taskId": "T02",
+    "assertionType": "HeaderTextEffectEquals",
+    "fixture": "Word2019_P07/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "HeadersFootersWatermarksRemovedByState_Pass",
+    "projectId": "Word2019_P24",
+    "taskId": "T06",
+    "assertionType": "HeadersFootersWatermarksRemovedByState",
+    "fixture": "Word2019_P24/T06/pass.docx",
+    "expected": "Pass",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T06/pass.toc.json"
+  },
+  {
+    "id": "HeadersFootersWatermarksRemovedByState_Fail",
+    "projectId": "Word2019_P24",
+    "taskId": "T06",
+    "assertionType": "HeadersFootersWatermarksRemovedByState",
+    "fixture": "Word2019_P24/T06/fail.docx",
+    "expected": "Fail",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T06/fail.toc.json"
+  },
+  {
+    "id": "InlineModel3D_Pass",
+    "projectId": "Word2019_P04",
+    "taskId": "T03",
+    "assertionType": "InlineModel3D",
+    "fixture": "Word2019_P04/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "InlineModel3D_Fail",
+    "projectId": "Word2019_P04",
+    "taskId": "T03",
+    "assertionType": "InlineModel3D",
+    "fixture": "Word2019_P04/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "InsertedTableAutoFitContents_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T02",
+    "assertionType": "InsertedTableAutoFitContents",
+    "fixture": "Word2019_P09/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "InsertedTableAutoFitContents_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T02",
+    "assertionType": "InsertedTableAutoFitContents",
+    "fixture": "Word2019_P09/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "InsertedTableAutoFitWindow_Pass",
+    "projectId": "Word2019_P10",
+    "taskId": "T08",
+    "assertionType": "InsertedTableAutoFitWindow",
+    "fixture": "Word2019_P10/T08/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "InsertedTableAutoFitWindow_Fail",
+    "projectId": "Word2019_P10",
+    "taskId": "T08",
+    "assertionType": "InsertedTableAutoFitWindow",
+    "fixture": "Word2019_P10/T08/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ListLevelEquals_Pass",
+    "projectId": "Word2019_P21",
+    "taskId": "T12",
+    "assertionType": "ListLevelEquals",
+    "fixture": "Word2019_P21/T12/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ListLevelEquals_Fail",
+    "projectId": "Word2019_P21",
+    "taskId": "T12",
+    "assertionType": "ListLevelEquals",
+    "fixture": "Word2019_P21/T12/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ModernWordDocumentFormat_Pass",
+    "projectId": "Word2019_P07",
+    "taskId": "T01",
+    "assertionType": "ModernWordDocumentFormat",
+    "fixture": "Word2019_P07/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ModernWordDocumentFormat_Fail",
+    "projectId": "Word2019_P07",
+    "taskId": "T01",
+    "assertionType": "ModernWordDocumentFormat",
+    "fixture": "Word2019_P07/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "NumberedListSequence_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T03",
+    "assertionType": "NumberedListSequence",
+    "fixture": "Word2019_P09/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "NumberedListSequence_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T03",
+    "assertionType": "NumberedListSequence",
+    "fixture": "Word2019_P09/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ParagraphBlockColumns_Pass",
+    "projectId": "Word2019_P05",
+    "taskId": "T03",
+    "assertionType": "ParagraphBlockColumns",
+    "fixture": "Word2019_P05/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ParagraphBlockColumns_Fail",
+    "projectId": "Word2019_P05",
+    "taskId": "T03",
+    "assertionType": "ParagraphBlockColumns",
+    "fixture": "Word2019_P05/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ParagraphBlockKeepWithNext_Pass",
+    "projectId": "Word2019_P05",
+    "taskId": "T04",
+    "assertionType": "ParagraphBlockKeepWithNext",
+    "fixture": "Word2019_P05/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ParagraphBlockKeepWithNext_Fail",
+    "projectId": "Word2019_P05",
+    "taskId": "T04",
+    "assertionType": "ParagraphBlockKeepWithNext",
+    "fixture": "Word2019_P05/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ParagraphFormattingMatches_Pass",
+    "projectId": "Word2019_P03",
+    "taskId": "T08",
+    "assertionType": "ParagraphFormattingMatches",
+    "fixture": "Word2019_P03/T08/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ParagraphFormattingMatches_Fail",
+    "projectId": "Word2019_P03",
+    "taskId": "T08",
+    "assertionType": "ParagraphFormattingMatches",
+    "fixture": "Word2019_P03/T08/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ParagraphLineSpacingExact_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T07",
+    "assertionType": "ParagraphLineSpacingExact",
+    "fixture": "Word2019_P02/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ParagraphLineSpacingExact_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T07",
+    "assertionType": "ParagraphLineSpacingExact",
+    "fixture": "Word2019_P02/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "PictureArtisticEffect_Pass",
+    "projectId": "Word2019_P01",
+    "taskId": "T06",
+    "assertionType": "PictureArtisticEffect",
+    "fixture": "Word2019_P01/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "PictureArtisticEffect_Fail",
+    "projectId": "Word2019_P01",
+    "taskId": "T06",
+    "assertionType": "PictureArtisticEffect",
+    "fixture": "Word2019_P01/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "PictureBorderColorEquals_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T07",
+    "assertionType": "PictureBorderColorEquals",
+    "fixture": "Word2019_P08/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "PictureBorderColorEquals_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T07",
+    "assertionType": "PictureBorderColorEquals",
+    "fixture": "Word2019_P08/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "PictureHyperlink_Pass",
+    "projectId": "Word2019_P06",
+    "taskId": "T06",
+    "assertionType": "PictureHyperlink",
+    "fixture": "Word2019_P06/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "PictureHyperlink_Fail",
+    "projectId": "Word2019_P06",
+    "taskId": "T06",
+    "assertionType": "PictureHyperlink",
+    "fixture": "Word2019_P06/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "PictureInsertedAtAnchor_Pass",
+    "projectId": "Word2019_P12",
+    "taskId": "T08",
+    "assertionType": "PictureInsertedAtAnchor",
+    "fixture": "Word2019_P12/T08/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "PictureInsertedAtAnchor_Fail",
+    "projectId": "Word2019_P12",
+    "taskId": "T08",
+    "assertionType": "PictureInsertedAtAnchor",
+    "fixture": "Word2019_P12/T08/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "PictureWrapType_Pass",
+    "projectId": "Word2019_P10",
+    "taskId": "T07",
+    "assertionType": "PictureWrapType",
+    "fixture": "Word2019_P10/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "PictureWrapType_Fail",
+    "projectId": "Word2019_P10",
+    "taskId": "T07",
+    "assertionType": "PictureWrapType",
+    "fixture": "Word2019_P10/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SavedWordTemplate_Pass",
+    "projectId": "Word2019_P20",
+    "taskId": "T01",
+    "assertionType": "SavedWordTemplate",
+    "fixture": "Word2019_P20/T01/pass.docx",
+    "expected": "Pass",
+    "contextKind": "SavedTemplate"
+  },
+  {
+    "id": "SavedWordTemplate_Fail",
+    "projectId": "Word2019_P20",
+    "taskId": "T01",
+    "assertionType": "SavedWordTemplate",
+    "fixture": "Word2019_P20/T01/fail.docx",
+    "expected": "Fail",
+    "contextKind": "SavedTemplate"
+  },
+  {
+    "id": "SectionBreakBeforeHeading_Pass",
+    "projectId": "Word2019_P25",
+    "taskId": "T05",
+    "assertionType": "SectionBreakBeforeHeading",
+    "fixture": "Word2019_P25/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SectionBreakBeforeHeading_Fail",
+    "projectId": "Word2019_P25",
+    "taskId": "T05",
+    "assertionType": "SectionBreakBeforeHeading",
+    "fixture": "Word2019_P25/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SectionOrientationByAnchor_Pass",
+    "projectId": "Word2019_P28",
+    "taskId": "T06",
+    "assertionType": "SectionOrientationByAnchor",
+    "fixture": "Word2019_P28/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SectionOrientationByAnchor_Fail",
+    "projectId": "Word2019_P28",
+    "taskId": "T06",
+    "assertionType": "SectionOrientationByAnchor",
+    "fixture": "Word2019_P28/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "ShapeWithTextWrapAndPosition_Pass",
+    "projectId": "Word2019_P05",
+    "taskId": "T07",
+    "assertionType": "ShapeWithTextWrapAndPosition",
+    "fixture": "Word2019_P05/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "ShapeWithTextWrapAndPosition_Fail",
+    "projectId": "Word2019_P05",
+    "taskId": "T07",
+    "assertionType": "ShapeWithTextWrapAndPosition",
+    "fixture": "Word2019_P05/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SmartArtAllNodesBevelEquals_Pass",
+    "projectId": "Word2019_P04",
+    "taskId": "T07",
+    "assertionType": "SmartArtAllNodesBevelEquals",
+    "fixture": "Word2019_P04/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SmartArtAllNodesBevelEquals_Fail",
+    "projectId": "Word2019_P04",
+    "taskId": "T07",
+    "assertionType": "SmartArtAllNodesBevelEquals",
+    "fixture": "Word2019_P04/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SmartArtAltTextDescriptionEquals_Pass",
+    "projectId": "Word2019_P03",
+    "taskId": "T06",
+    "assertionType": "SmartArtAltTextDescriptionEquals",
+    "fixture": "Word2019_P03/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SmartArtAltTextDescriptionEquals_Fail",
+    "projectId": "Word2019_P03",
+    "taskId": "T06",
+    "assertionType": "SmartArtAltTextDescriptionEquals",
+    "fixture": "Word2019_P03/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SmartArtDirectionEquals_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T04",
+    "assertionType": "SmartArtDirectionEquals",
+    "fixture": "Word2019_P09/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SmartArtDirectionEquals_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T04",
+    "assertionType": "SmartArtDirectionEquals",
+    "fixture": "Word2019_P09/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SmartArtInserted_Pass",
+    "projectId": "Word2019_P22",
+    "taskId": "T05",
+    "assertionType": "SmartArtInserted",
+    "fixture": "Word2019_P22/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SmartArtInserted_Fail",
+    "projectId": "Word2019_P22",
+    "taskId": "T05",
+    "assertionType": "SmartArtInserted",
+    "fixture": "Word2019_P22/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SmartArtLogicalOrder_Pass",
+    "projectId": "Word2019_P26",
+    "taskId": "T02",
+    "assertionType": "SmartArtLogicalOrder",
+    "fixture": "Word2019_P26/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SmartArtLogicalOrder_Fail",
+    "projectId": "Word2019_P26",
+    "taskId": "T02",
+    "assertionType": "SmartArtLogicalOrder",
+    "fixture": "Word2019_P26/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "SymbolInserted_Pass",
+    "projectId": "Word2019_P01",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "fixture": "Word2019_P01/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "SymbolInserted_Fail",
+    "projectId": "Word2019_P01",
+    "taskId": "T05",
+    "assertionType": "SymbolInserted",
+    "fixture": "Word2019_P01/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableAccessibilityFirstRow_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T03",
+    "assertionType": "TableAccessibilityFirstRow",
+    "fixture": "Word2019_P08/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableAccessibilityFirstRow_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T03",
+    "assertionType": "TableAccessibilityFirstRow",
+    "fixture": "Word2019_P08/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableAltTextEquals_Pass",
+    "projectId": "Word2019_P23",
+    "taskId": "T06",
+    "assertionType": "TableAltTextEquals",
+    "fixture": "Word2019_P23/T06/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableAltTextEquals_Fail",
+    "projectId": "Word2019_P23",
+    "taskId": "T06",
+    "assertionType": "TableAltTextEquals",
+    "fixture": "Word2019_P23/T06/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableCaptionWithSequence_Pass",
+    "projectId": "Word2019_P28",
+    "taskId": "T04",
+    "assertionType": "TableCaptionWithSequence",
+    "fixture": "Word2019_P28/T04/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableCaptionWithSequence_Fail",
+    "projectId": "Word2019_P28",
+    "taskId": "T04",
+    "assertionType": "TableCaptionWithSequence",
+    "fixture": "Word2019_P28/T04/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableCellSpacingEquals_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T05",
+    "assertionType": "TableCellSpacingEquals",
+    "fixture": "Word2019_P08/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableCellSpacingEquals_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T05",
+    "assertionType": "TableCellSpacingEquals",
+    "fixture": "Word2019_P08/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableCellsMerged_Pass",
+    "projectId": "Word2019_P01",
+    "taskId": "T07",
+    "assertionType": "TableCellsMerged",
+    "fixture": "Word2019_P01/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableCellsMerged_Fail",
+    "projectId": "Word2019_P01",
+    "taskId": "T07",
+    "assertionType": "TableCellsMerged",
+    "fixture": "Word2019_P01/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableColumnWidthsEqual_Pass",
+    "projectId": "Word2019_P03",
+    "taskId": "T03",
+    "assertionType": "TableColumnWidthsEqual",
+    "fixture": "Word2019_P03/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableColumnWidthsEqual_Fail",
+    "projectId": "Word2019_P03",
+    "taskId": "T03",
+    "assertionType": "TableColumnWidthsEqual",
+    "fixture": "Word2019_P03/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableFirstRowIsHeader_Pass",
+    "projectId": "Word2019_P22",
+    "taskId": "T02",
+    "assertionType": "TableFirstRowIsHeader",
+    "fixture": "Word2019_P22/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableFirstRowIsHeader_Fail",
+    "projectId": "Word2019_P22",
+    "taskId": "T02",
+    "assertionType": "TableFirstRowIsHeader",
+    "fixture": "Word2019_P22/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableOfContentsLevels_Pass",
+    "projectId": "Word2019_P24",
+    "taskId": "T03",
+    "assertionType": "TableOfContentsLevels",
+    "fixture": "Word2019_P24/T03/pass.docx",
+    "expected": "Pass",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T03/pass.toc.json"
+  },
+  {
+    "id": "TableOfContentsLevels_Fail",
+    "projectId": "Word2019_P24",
+    "taskId": "T03",
+    "assertionType": "TableOfContentsLevels",
+    "fixture": "Word2019_P24/T03/fail.docx",
+    "expected": "Fail",
+    "contextKind": "Toc",
+    "tocLayout": "Word2019_P24/T03/fail.toc.json"
+  },
+  {
+    "id": "TableRowCharacterStyle_Pass",
+    "projectId": "Word2019_P18",
+    "taskId": "T07",
+    "assertionType": "TableRowCharacterStyle",
+    "fixture": "Word2019_P18/T07/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableRowCharacterStyle_Fail",
+    "projectId": "Word2019_P18",
+    "taskId": "T07",
+    "assertionType": "TableRowCharacterStyle",
+    "fixture": "Word2019_P18/T07/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableRowTextFormatting_Pass",
+    "projectId": "Word2019_P27",
+    "taskId": "T03",
+    "assertionType": "TableRowTextFormatting",
+    "fixture": "Word2019_P27/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableRowTextFormatting_Fail",
+    "projectId": "Word2019_P27",
+    "taskId": "T03",
+    "assertionType": "TableRowTextFormatting",
+    "fixture": "Word2019_P27/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableRowsEqual_Pass",
+    "projectId": "Word2019_P22",
+    "taskId": "T01",
+    "assertionType": "TableRowsEqual",
+    "fixture": "Word2019_P22/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableRowsEqual_Fail",
+    "projectId": "Word2019_P22",
+    "taskId": "T01",
+    "assertionType": "TableRowsEqual",
+    "fixture": "Word2019_P22/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TableStyleApplied_Pass",
+    "projectId": "Word2019_P28",
+    "taskId": "T01",
+    "assertionType": "TableStyleApplied",
+    "fixture": "Word2019_P28/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TableStyleApplied_Fail",
+    "projectId": "Word2019_P28",
+    "taskId": "T01",
+    "assertionType": "TableStyleApplied",
+    "fixture": "Word2019_P28/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextBoxAssemblyWithPosition_Pass",
+    "projectId": "Word2019_P24",
+    "taskId": "T02",
+    "assertionType": "TextBoxAssemblyWithPosition",
+    "fixture": "Word2019_P24/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextBoxAssemblyWithPosition_Fail",
+    "projectId": "Word2019_P24",
+    "taskId": "T02",
+    "assertionType": "TextBoxAssemblyWithPosition",
+    "fixture": "Word2019_P24/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextBoxPictureBevel_Pass",
+    "projectId": "Word2019_P26",
+    "taskId": "T03",
+    "assertionType": "TextBoxPictureBevel",
+    "fixture": "Word2019_P26/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextBoxPictureBevel_Fail",
+    "projectId": "Word2019_P26",
+    "taskId": "T03",
+    "assertionType": "TextBoxPictureBevel",
+    "fixture": "Word2019_P26/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextBoxTextEquals_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T05",
+    "assertionType": "TextBoxTextEquals",
+    "fixture": "Word2019_P02/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextBoxTextEquals_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T05",
+    "assertionType": "TextBoxTextEquals",
+    "fixture": "Word2019_P02/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextConvertedToTable_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T03",
+    "assertionType": "TextConvertedToTable",
+    "fixture": "Word2019_P02/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextConvertedToTable_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T03",
+    "assertionType": "TextConvertedToTable",
+    "fixture": "Word2019_P02/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextRangeFormattingEquals_Pass",
+    "projectId": "Word2019_P23",
+    "taskId": "T03",
+    "assertionType": "TextRangeFormattingEquals",
+    "fixture": "Word2019_P23/T03/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextRangeFormattingEquals_Fail",
+    "projectId": "Word2019_P23",
+    "taskId": "T03",
+    "assertionType": "TextRangeFormattingEquals",
+    "fixture": "Word2019_P23/T03/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextRemovedFromParagraph_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T01",
+    "assertionType": "TextRemovedFromParagraph",
+    "fixture": "Word2019_P02/T01/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextRemovedFromParagraph_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T01",
+    "assertionType": "TextRemovedFromParagraph",
+    "fixture": "Word2019_P02/T01/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextReplaceAll_Pass",
+    "projectId": "Word2019_P02",
+    "taskId": "T02",
+    "assertionType": "TextReplaceAll",
+    "fixture": "Word2019_P02/T02/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextReplaceAll_Fail",
+    "projectId": "Word2019_P02",
+    "taskId": "T02",
+    "assertionType": "TextReplaceAll",
+    "fixture": "Word2019_P02/T02/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TextWatermark_Pass",
+    "projectId": "Word2019_P26",
+    "taskId": "T05",
+    "assertionType": "TextWatermark",
+    "fixture": "Word2019_P26/T05/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TextWatermark_Fail",
+    "projectId": "Word2019_P26",
+    "taskId": "T05",
+    "assertionType": "TextWatermark",
+    "fixture": "Word2019_P26/T05/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "TrackedChangesDisposition_Pass",
+    "projectId": "Word2019_P08",
+    "taskId": "T08",
+    "assertionType": "TrackedChangesDisposition",
+    "fixture": "Word2019_P08/T08/pass.docx",
+    "expected": "Pass"
+  },
+  {
+    "id": "TrackedChangesDisposition_Fail",
+    "projectId": "Word2019_P08",
+    "taskId": "T08",
+    "assertionType": "TrackedChangesDisposition",
+    "fixture": "Word2019_P08/T08/fail.docx",
+    "expected": "Fail"
+  },
+  {
+    "id": "FormattingMarksVisible_Pass",
+    "projectId": "Word2019_P22",
+    "taskId": "T07",
+    "assertionType": "FormattingMarksVisible",
+    "fixture": "Word2019_P22/T07/pass-context.docx",
+    "expected": "Pass",
+    "contextKind": "FormattingMarks",
+    "formattingMarks": {
+      "tabs": true,
+      "spaces": false,
+      "paragraphs": false,
+      "hiddenText": false,
+      "optionalHyphens": false,
+      "objectAnchors": false,
+      "showAll": false
+    }
+  },
+  {
+    "id": "FormattingMarksVisible_Fail",
+    "projectId": "Word2019_P22",
+    "taskId": "T07",
+    "assertionType": "FormattingMarksVisible",
+    "fixture": "Word2019_P22/T07/fail-context.docx",
+    "expected": "Fail",
+    "contextKind": "FormattingMarks",
+    "formattingMarks": {
+      "tabs": false,
+      "spaces": false,
+      "paragraphs": false,
+      "hiddenText": false,
+      "optionalHyphens": false,
+      "objectAnchors": false,
+      "showAll": false
+    }
+  },
+  {
+    "id": "FormattingMarksVisible_NearMiss",
+    "projectId": "Word2019_P22",
+    "taskId": "T07",
+    "assertionType": "FormattingMarksVisible",
+    "fixture": "Word2019_P22/T07/nearmiss-context.docx",
+    "expected": "Fail",
+    "contextKind": "FormattingMarks",
+    "formattingMarks": {
+      "tabs": true,
+      "spaces": false,
+      "paragraphs": false,
+      "hiddenText": false,
+      "optionalHyphens": false,
+      "objectAnchors": false,
+      "showAll": true
+    }
+  },
+  {
+    "id": "PlainTextAtOwnedSavedLocation_Pass",
+    "projectId": "Word2019_P16",
+    "taskId": "T02",
+    "assertionType": "PlainTextAtOwnedSavedLocation",
+    "fixture": "Word2019_P16/T02/pass-context.docx",
+    "expected": "Pass",
+    "contextKind": "OwnedPlainText",
+    "outputFileName": "Outline for Proposal.txt",
+    "ownedDocumentSaveFormat": 2,
+    "outputSource": "Word2019_P16/T02/Outline for Proposal.txt"
+  },
+  {
+    "id": "PlainTextAtOwnedSavedLocation_Fail",
+    "projectId": "Word2019_P16",
+    "taskId": "T02",
+    "assertionType": "PlainTextAtOwnedSavedLocation",
+    "fixture": "Word2019_P16/T02/fail-context.docx",
+    "expected": "Fail",
+    "contextKind": "OwnedPlainText",
+    "outputFileName": "Outline for Proposal.txt",
+    "ownedDocumentSaveFormat": 12,
+    "outputSource": "Word2019_P16/T02/Outline for Proposal.txt"
+  },
+  {
+    "id": "PlainTextAtOwnedSavedLocation_NearMiss",
+    "projectId": "Word2019_P16",
+    "taskId": "T02",
+    "assertionType": "PlainTextAtOwnedSavedLocation",
+    "fixture": "Word2019_P16/T02/nearmiss-context.docx",
+    "expected": "Fail",
+    "contextKind": "OwnedPlainText",
+    "outputFileName": "Outline for Proposal.txt",
+    "ownedDocumentSaveFormat": 2
+  },
+  {
+    "id": "FileExistsInDocuments_Pass",
+    "projectId": "Word2019_P09",
+    "taskId": "T08",
+    "assertionType": "FileExistsInDocuments",
+    "fixture": "Word2019_P09/T08/pass-context.docx",
+    "expected": "Pass",
+    "contextKind": "DocumentsExistence",
+    "outputExists": true,
+    "outputFileName": "Memo.txt"
+  },
+  {
+    "id": "FileExistsInDocuments_Fail",
+    "projectId": "Word2019_P09",
+    "taskId": "T08",
+    "assertionType": "FileExistsInDocuments",
+    "fixture": "Word2019_P09/T08/fail-context.docx",
+    "expected": "Fail",
+    "contextKind": "DocumentsExistence",
+    "outputExists": false,
+    "outputFileName": "Memo.txt"
+  },
+  {
+    "id": "FileExistsInDocuments_NearMiss",
+    "projectId": "Word2019_P09",
+    "taskId": "T08",
+    "assertionType": "FileExistsInDocuments",
+    "fixture": "Word2019_P09/T08/nearmiss-context.docx",
+    "expected": "Fail",
+    "contextKind": "DocumentsExistence",
+    "outputExists": true,
+    "outputFileName": "Wrong-Memo.txt"
+  },
+  {
+    "id": "FileExistsInCustomOfficeTemplates_Pass",
+    "projectId": "Word2019_P06",
+    "taskId": "T08",
+    "assertionType": "FileExistsInCustomOfficeTemplates",
+    "fixture": "Word2019_P06/T08/pass-context.docx",
+    "expected": "Pass",
+    "contextKind": "TemplatesExistence",
+    "outputExists": true,
+    "outputFileName": "Cert.dotx"
+  },
+  {
+    "id": "FileExistsInCustomOfficeTemplates_Fail",
+    "projectId": "Word2019_P06",
+    "taskId": "T08",
+    "assertionType": "FileExistsInCustomOfficeTemplates",
+    "fixture": "Word2019_P06/T08/fail-context.docx",
+    "expected": "Fail",
+    "contextKind": "TemplatesExistence",
+    "outputExists": false,
+    "outputFileName": "Cert.dotx"
+  },
+  {
+    "id": "FileExistsInCustomOfficeTemplates_NearMiss",
+    "projectId": "Word2019_P06",
+    "taskId": "T08",
+    "assertionType": "FileExistsInCustomOfficeTemplates",
+    "fixture": "Word2019_P06/T08/nearmiss-context.docx",
+    "expected": "Fail",
+    "contextKind": "TemplatesExistence",
+    "outputExists": true,
+    "outputFileName": "Wrong-Cert.dotx"
+  }
+]

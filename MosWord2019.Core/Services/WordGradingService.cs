@@ -14,6 +14,19 @@ namespace MosWord2019.Core.Services
 {
     public sealed partial class WordGradingService
     {
+        private readonly Func<string> documentsRoot;
+
+        public WordGradingService()
+            : this(() => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))
+        {
+        }
+
+        // Per-instance test seam; production continues to use the current user's Documents folder.
+        internal WordGradingService(Func<string> documentsRoot)
+        {
+            this.documentsRoot = documentsRoot ?? throw new ArgumentNullException(nameof(documentsRoot));
+        }
+
         private static readonly XNamespace W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private static readonly XNamespace R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         private static readonly XNamespace Rel = "http://schemas.openxmlformats.org/package/2006/relationships";
@@ -100,7 +113,7 @@ namespace MosWord2019.Core.Services
                 }
                 if (task.AssertionType == ExternalOutputLocation.DocumentsAssertionType)
                 {
-                    bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName")));
+                    bool exists = File.Exists(ExternalOutputLocation.ResolveDocuments(RequiredString(task, "expectedFileName"), documentsRoot()));
                     return new TaskGradeResult(exists ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
                         "The exact task-declared file must exist in Documents.", task.AssertionType, task.TaskId);
                 }
@@ -112,7 +125,7 @@ namespace MosWord2019.Core.Services
                 }
                 if (task.AssertionType == TemplateOutputLocation.AssertionType)
                 {
-                    string output = TemplateOutputLocation.Resolve(RequiredString(task, "expectedFileName"));
+                    string output = TemplateOutputLocation.Resolve(RequiredString(task, "expectedFileName"), documentsRoot());
                     return new TaskGradeResult(File.Exists(output) ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail,
                         "The exact declared template file must exist in Documents/Custom Office Templates.", task.AssertionType, task.TaskId);
                 }

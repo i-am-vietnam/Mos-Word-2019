@@ -1,5 +1,13 @@
 # Technical Context
 
+## A1 headless test foundation — 2026-10-29
+
+`MosWord2019.Tests` is a classic net472/C#7.3 MSTest project in the solution, using pinned packages.config MSTest framework/adapter3.1.1 and existing Newtonsoft.Json13.0.4. It references Core/Projects only. VSTest discovers each saved-fixture row separately; original task metadata always comes from `ProjectLoader`, never a test replacement. Fixtures and provenance are tracked under `Fixtures/<ProjectId>/<TaskId>`; runtime does not depend on ignored artifacts. Coverage includes Pass/Fail for all77 used assertion types (78 supported), plus context/output near misses, EN/VI package validation and package-copy hashes. See `MosWord2019.Tests/README.md` for commands.
+
+An explicitly approved internal `WordGradingService(Func<string> documentsRoot)` constructor supplies a per-instance Documents root for isolated existence tests. `InternalsVisibleTo` grants the test assembly access. Public construction and public output path resolvers keep the existing Windows Documents defaults and validators; no output provenance, registry resolution, cleanup or grading-semantic change is introduced. Existing snapshots and native saved files are retained inputs, not fresh Word observations.
+
+WinForms now copies all package files through one `Content Include="Projects\**\*"` item with PreserveNewest, replacing149 explicit file entries. Source package bytes and the output file set remain protected. `.gitattributes` declares CRLF text and binary formats; the separate normalization marker has no content change because tracked text was already normalized.
+
 ## Project 28 generic contracts — 2026-10-29
 
 P01–P28 contain212 tasks and78 supported identifiers. Three new read-only OOXML routes are metadata driven, without project/task-ID branches:

@@ -2,6 +2,11 @@
 
 Reviewed: 2026-10-29.
 
+## A1 test scope and remaining external-output limits
+
+- Tracked headless fixtures now cover every used assertion type; coverage is not exhaustive for every task/metadata branch. Formatting marks and TOC use explicit recorded snapshots, and output tests create isolated files. These checks do not establish a fresh Word GUI, pagination or shutdown run.
+- The A1 Documents-root seam changes test injection only. Existing P06/P07 template-existence and P09 Memo.txt semantics still accept a matching pre-existing file. Existing template cleanup/path resolution and lack of crash recovery remain unchanged; the authorized A3 fixes have not been started. Do not infer ownership from the new existence-positive fixtures.
+
 ## Project 28 verification limits
 
 - Native GUI observed Grid Table5Dark/Accent2, Banded cover, Insert Caption and File Info Status on Word16.0.14026. Address control deletion, Unicode symbol, orientation and complete/combined workflows use owned native API. The first GUI caption had two separator spaces; it remains negative evidence, with a separately labeled API-corrected positive. Full manual Ribbon/F5/all-native VI and other Office builds are not claimed.

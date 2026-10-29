@@ -1,5 +1,13 @@
 # Project Status
 
+## A1 — Repository hygiene and headless test foundation, 2026-10-29
+
+Completed A1 only. P28 implementation already existed in clean HEAD208cf73; prerequisite commit `P28 completion` records fresh verification. Added explicit CRLF/binary attributes and separate `Normalize line endings` marker (renormalization was a no-op; whitespace-insensitive diff is empty). Replaced149 explicit package-copy entries with one PreserveNewest wildcard; all149 filenames/hashes in both outputs exactly match the before-change snapshots. All56 dictionaries,28 starters and8 assets retain their initial bytes.
+
+Added classic net472/C#7.3 MSTest/packages.config project:158 saved-fixture/context cases cover Pass/Fail for all77 used assertion types, with12 context/output positive/negative/near-miss cases. The approved internal per-instance Documents-root seam isolates external-file tests; public paths and accepted production grading/lifecycle behavior remain unchanged. No A2–A4 implementation, UI/Word adapter changes or older package edits.
+
+Fresh Debug/Release full-solution VS MSBuild Rebuilds each report0 warnings/0 errors; headless VSTest171/171 in each configuration,0 skipped. Deliberately wrong expectation/missing fixture each produce a real runner failure; restoration passes. Source/Debug/Release EN/VI validation:28 packages/212 tasks,78 supported routes,0 errors/warnings. Retained shared/P24–P27 expectations1022/1022 and P28 matrix129/129 were freshly replayed through the public grader; these are historical inputs, not new native Word/UI runs. Every fixture is at most1,975,683 bytes. Reproduction: `MosWord2019.Tests/README.md`; local logs/TRX/hash snapshots: `artifacts/a1/` (ignored). Local commits only; stop before A2.
+
 ## A1 prerequisite — P28 completion verified, 2026-10-29
 
 P28 source was already committed in208cf73 when this step began; the worktree was clean. Fresh Debug/Release VS MSBuild Rebuilds each report0 warnings/0 errors; P28 saved-package expectations129/129 and source/outputs EN/VI validation28 packages/212 tasks/78 supported identifiers pass. All149 package files match both outputs and immutable hashes remain unchanged. This prerequisite records verification without rewriting the existing P28 commit. A1 repository/test-foundation work follows separately; A2–A4 are not started. Evidence: `artifacts/a1/p28-*.txt`.
