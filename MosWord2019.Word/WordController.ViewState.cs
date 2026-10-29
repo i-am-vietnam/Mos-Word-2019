@@ -6,7 +6,9 @@ namespace MosWord2019.Word
 {
     public sealed partial class WordController
     {
-        public WordFormattingMarksSnapshot ReadFormattingMarks()
+        public WordFormattingMarksSnapshot ReadFormattingMarks() { return RunCom(ReadFormattingMarksCore); }
+
+        private WordFormattingMarksSnapshot ReadFormattingMarksCore()
         {
             EnsureUsable();
             if (!IsOpened) throw new InvalidOperationException("No owned Word document is open for view inspection.");

@@ -19,31 +19,33 @@ namespace MosWord2019.Word
 
         public void ConfigureExportCheckpoint(string checkpointPath)
         {
-            EnsureUsable();
-            if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
-            string path = Path.GetFullPath(checkpointPath);
-            if (!string.Equals(Path.GetFileName(path), "export-checkpoint.docx", StringComparison.OrdinalIgnoreCase) ||
-                !string.Equals(Path.GetDirectoryName(path), Path.GetDirectoryName(session.Document.FullName), StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("An export checkpoint must be the exact Training checkpoint beside the owned working document.");
-            exportCheckpointPath = path;
-            SaveFormattedCheckpoint(); // Establish a valid checkpoint before native learner operations.
+            RunCom(() =>
+            {
+                EnsureUsable();
+                if (!IsOpened) throw new InvalidOperationException("No owned document is open.");
+                string path = Path.GetFullPath(checkpointPath);
+                if (!string.Equals(Path.GetFileName(path), "export-checkpoint.docx", StringComparison.OrdinalIgnoreCase) ||
+                    !string.Equals(Path.GetDirectoryName(path), Path.GetDirectoryName(session.Document.FullName), StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException("An export checkpoint must be the exact Training checkpoint beside the owned working document.");
+                exportCheckpointPath = path;
+                SaveFormattedCheckpoint(); // Establish a valid checkpoint before native learner operations.
+            });
         }
 
         private void BeforeDocumentSave(Wd.Document document, ref bool saveAsUi, ref bool cancel)
         {
-            if (writingCheckpoint || session?.Document == null) return;
             IntPtr incoming = IntPtr.Zero, owned = IntPtr.Zero;
             try
             {
+                if (writingCheckpoint || session?.Document == null) return;
                 incoming = Marshal.GetIUnknownForObject(document);
                 owned = Marshal.GetIUnknownForObject(session.Document);
                 if (incoming != owned) return; // Never inspect an unrelated document, even in the owned application.
                 OwnedDocumentSaving?.Invoke(document.FullName); // Plain owned facts only; the UI queues the post-save check.
                 if (exportCheckpointPath == null) return;
-                // Office supplies this document to its connection-point callback on an RPC thread.
-                // Read only that event argument (confirmed owned by COM identity), then write its
-                // immutable serialization. Never call the held-session lifecycle from this callback
-                // or synchronously invoke the UI which may itself be waiting in Word.Save().
+                // COM delivers this connection-point callback through its apartment marshaling.
+                // Inspect only the verified event argument. Queue UI work rather than synchronously
+                // invoking the UI or calling the held controller's lifecycle during a native save.
                 WriteFormattedCheckpoint(document.WordOpenXML);
             }
             catch (Exception ex)
@@ -57,14 +59,21 @@ namespace MosWord2019.Word
             {
                 if (incoming != IntPtr.Zero) Marshal.Release(incoming);
                 if (owned != IntPtr.Zero) Marshal.Release(owned);
+                // Release only this callback's RCW reference, never FinalReleaseComObject on the held document.
+                if (document != null && Marshal.IsComObject(document))
+                    try { Marshal.ReleaseComObject(document); }
+                    catch (Exception ex) { AppLogger.Write("Unable to release save event document reference", ex); }
             }
         }
 
         public string SaveFormattedCheckpoint()
         {
-            EnsureUsable();
-            if (!IsOpened || exportCheckpointPath == null) throw new InvalidOperationException("No formatted export checkpoint is configured.");
-            return WriteFormattedCheckpoint(session.Document.WordOpenXML);
+            return RunCom(() =>
+            {
+                EnsureUsable();
+                if (!IsOpened || exportCheckpointPath == null) throw new InvalidOperationException("No formatted export checkpoint is configured.");
+                return WriteFormattedCheckpoint(session.Document.WordOpenXML);
+            });
         }
 
         private string WriteFormattedCheckpoint(string serializedDocument)

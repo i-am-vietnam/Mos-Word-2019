@@ -15,6 +15,9 @@ namespace MosWord2019
         private static Control dispatcher;
         private static int uiThread;
         private static int handlingFatal;
+        private static int recoveryDeferred;
+        internal static bool RecoveryDeferred => Volatile.Read(ref recoveryDeferred) != 0;
+        internal static void DeferRecoveryToNextStart() { Interlocked.Exchange(ref recoveryDeferred, 1); }
 
         [STAThread]
         private static void Main()
@@ -43,7 +46,11 @@ namespace MosWord2019
                     dispatcher.CreateControl();
                     try { Application.Run(new LoginForm()); }
                     catch (Exception ex) { HandleFatal(ex); }
-                    finally { Journal.Recover(); Workspace.CleanupWorkingFiles(); }
+                    finally
+                    {
+                        if (!RecoveryDeferred) { Journal.Recover(); Workspace.CleanupWorkingFiles(); }
+                        else AppLogger.Write("Shutdown left journal intact for recovery at next startup.");
+                    }
                 }
             }
         }
@@ -52,8 +59,12 @@ namespace MosWord2019
         {
             AppLogger.Write("Fatal trainer error", error);
             if (Interlocked.Exchange(ref handlingFatal, 1) != 0) return;
-            Action cleanup = () => FatalRecovery.Run(CloseOwnedForms, () => Workspace?.CleanupWorkingFiles(), () => Journal?.Recover(),
-                ex => AppLogger.Write("Fatal cleanup failed; retained journal for recovery", ex));
+            if (RecoveryDeferred) { Environment.Exit(1); return; }
+            Action cleanup = () =>
+            {
+                if (!RecoveryDeferred) RunRecoveryCleanup(CloseOwnedForms, () => Workspace?.CleanupWorkingFiles(), () => Journal?.Recover(),
+                    ex => AppLogger.Write("Fatal cleanup failed; retained journal for recovery", ex));
+            };
             if (Thread.CurrentThread.ManagedThreadId == uiThread) cleanup();
             else
             {
@@ -67,7 +78,7 @@ namespace MosWord2019
                 catch (Exception ex)
                 {
                     AppLogger.Write("Owned Word cleanup could not run on its STA", ex);
-                    try { Journal?.Recover(); } catch (Exception recoveryError) { AppLogger.Write("Fatal journal recovery failed", recoveryError); }
+                    try { if (!RecoveryDeferred) Journal?.Recover(); } catch (Exception recoveryError) { AppLogger.Write("Fatal journal recovery failed", recoveryError); }
                 }
             }
             // The log and durable claims remain when a locked Word file cannot yet be recovered.
@@ -81,6 +92,13 @@ namespace MosWord2019
                 try { form.CloseOwnedForRecovery(); }
                 catch (Exception ex) { AppLogger.Write("Owned trainer cleanup failed", ex); failure = ex; }
             if (failure != null) throw new InvalidOperationException("Some owned resources remain for the next startup.", failure);
+        }
+
+        internal static void RunRecoveryCleanup(Action closeOwned, Action cleanupWorking, Action recover, Action<Exception> log)
+        {
+            FatalRecovery.Run(closeOwned,
+                () => { if (!RecoveryDeferred) cleanupWorking(); },
+                () => { if (!RecoveryDeferred) recover(); }, log);
         }
     }
 }

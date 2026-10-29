@@ -1,24 +1,31 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-29.
+Reviewed: 2026-10-30.
 
 ## Headless test scope and current external-output limits
 
 - Tracked headless fixtures now cover every used assertion type; coverage is not exhaustive for every task/metadata branch. Formatting marks and TOC use explicit recorded snapshots, and output tests create isolated files. These checks do not establish a fresh Word GUI, pagination or shutdown run.
 - Declared-output freshness requires the current baseline plus new content, identity or later write-time; untouched stale files fail. Cleanup requires baseline absence, a persisted claim and unchanged identity/hash after Word closes. Pre-existing and changed/replaced files are protected; locked claims remain for later recovery.
 
+## A4 verification and shutdown limits
+
+- Fresh headless tests exercise fake rejection policy/registration, actual native STA filter registration without Word, fake-controller close/defer/shutdown/Dispose, EN/VI messages and journal quarantine. The fresh owned Word activation attempt still failed0x80070520 before opening a document. Font-dialog Grade, actual Task Manager/Windows logoff, native event-RCW lifetime and full real UI workflows are not newly verified. Follow artifacts/a4/MANUAL_TEST.md and record actual results; historical Word checks are not A4 PASS evidence.
+- Retry windows bound COM rejections and post-save attempts; they cannot interrupt an already accepted COM call that hangs indefinitely. On Close Anyway or Windows shutdown, trainer-owned Word can remain open if it could not be safely closed. The journal remains; locked files wait for a later recovery. No unrelated Word process is terminated.
+- Quarantine leaves its listed files intact and does not re-import claims. This intentionally sacrifices automatic cleanup for that corrupt journal. If quarantine/fresh-write is denied or the path is redirected, operations still fail safely rather than overwriting evidence. Local-mutex cross-Windows-session limitations remain unchanged.
+- The user's2026-10-29 input-synchronous close and observation-storm diagnostics informed A4. Fake-controller tests reproduce the error paths; they are not a claim of repeating that real Word session.
+
 ## A3b remaining verification and recovery limits
 
 - Headless tests exercise real isolated Windows file identities, exclusive deletion, journal reload/atomic-write failure, junction refusal, mutex contention/abandonment and fatal cleanup ordering. A new native owned Word save-event attempt failed COM activation0x80070520 before opening a document. Native Save As/post-save/EN/VI UI, second-instance message and actual fatal-process shutdown remain unverified; no production ownership/security bypass was added.
 - Cleanup's fallback claim of an absent-baseline exact declared destination with creation time at/after baseline is explicitly user-authorized. That destination is reserved for the session; no arbitrary-folder discovery is performed. A backwards clock can conservatively leave such an unobserved file unclaimed, while monotonic sequences keep grading observations valid.
-- Locked/read-only/reparse files remain with logged durable claims; modified/replaced files are retained and terminal claims dropped. Malformed journal data is preserved, recovery skips it and new claims fail closed. A crash before a creation/first observation is persisted, or during transfer of a proven replacement claim, can leave a conservatively unclaimed file; name/hash alone never trigger crash cleanup.
+- Locked/read-only/reparse files remain with logged durable claims; modified/replaced files are retained and terminal claims dropped. A4 quarantines malformed journal bytes without recovering their claims, then creates a fresh empty journal. Locked/reparse quarantine or write failure still fails closed; the original/quarantined bytes are preserved. A crash before a creation/first observation is persisted, or during transfer of a proven replacement claim, can leave a conservatively unclaimed file; name/hash alone never trigger crash cleanup.
 - The requested Local\\MosWord2019.Trainer mutex is scoped to one Windows logon session, while LocalAppData is per user. Concurrent RDP/Windows sessions for the same user are not supported or verified against the shared journal.
-- P16-T02 PlainTextAtOwnedSavedLocation remains outside cleanup because its path is learner-selected. A4 COM retry, closing-anyway UX and RCW cleanup are not implemented in A3b.
+- P16-T02 PlainTextAtOwnedSavedLocation remains outside cleanup because its path is learner-selected. A4 implements COM retry, closing choices and event-argument RCW release; native confirmation remains below.
 
 ## A2 verification limits
 
 - Nonfatal grading exceptions and malformed TXT metadata now produce Error; unsupported packages are rejected with logged issue codes and an exposed count. Tests capture the logger delegate in memory and exercise EN/VI loader inputs without Word. MainForm count strings are implemented in code; no new native UI/Word or disk-log manual run is claimed.
-- Near-miss pairs cover every current task in the five requested assertion families, not every possible metadata branch. Error fixtures intentionally modify test-only metadata/context while retaining valid saved OOXML. Fatal OOM/StackOverflow escape tests manually throw exception objects; they do not simulate actual resource exhaustion. A3b adds durable recovery; A4 COM behavior remains pending.
+- Near-miss pairs cover every current task in the five requested assertion families, not every possible metadata branch. Error fixtures intentionally modify test-only metadata/context while retaining valid saved OOXML. Fatal OOM/StackOverflow escape tests manually throw exception objects; they do not simulate actual resource exhaustion. A3b adds durable recovery; A4 native/GUI verification remains limited as described below.
 
 ## Project 28 verification limits
 

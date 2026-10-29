@@ -5,4 +5,5 @@
   <Project Path="MosWord2019.Projects/MosWord2019.Projects.csproj" Id="db2edd39-5ee4-43ec-b4c9-8f960e99136f" />
   <Project Path="MosWord2019.WinForms/MosWord2019.WinForms.csproj" Id="6d3746a1-7adc-44ec-b683-b7264098e21d" />
   <Project Path="MosWord2019.Tests/MosWord2019.Tests.csproj" Id="f0195af5-3682-4c41-9dd1-1b92f50f189e" />
+  <Project Path="MosWord2019.Desktop.Tests/MosWord2019.Desktop.Tests.csproj" Id="0d980d15-534c-4682-9074-9766a4c68f31" />
 </Solution>

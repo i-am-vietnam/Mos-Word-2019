@@ -2,6 +2,8 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MosWord2019.Core.Diagnostics;
 using MosWord2019.Core.Interfaces;
@@ -20,6 +22,7 @@ namespace MosWord2019
         private readonly TrainingWorkspaceService workspace;
         private readonly Func<string, bool> confirmRestart;
         private readonly Action<string> notify;
+        private readonly Func<string, bool> retryCleanup;
         private readonly ComboBox projects = new ComboBox { Name = "Projects", DropDownStyle = ComboBoxStyle.DropDownList, Width = 240, DisplayMember = "DisplayName" };
         private readonly Button go = new Button { Name = "Go", AutoSize = true, Enabled = false };
         private readonly Button previous = new Button { Name = "Previous", AutoSize = true };
@@ -36,7 +39,13 @@ namespace MosWord2019
         private bool controllerDisposed;
         private bool displayEventsSubscribed;
         private bool arranging;
-        private readonly Timer savedOutputMonitor = new Timer { Interval = 1000 };
+        private readonly Timer savedOutputMonitor = new Timer { Interval = 250 };
+        private readonly Stopwatch saveObservationWindow = new Stopwatch();
+        private Exception lastSaveObservationFailure;
+        private bool skipCleanup;
+        private bool cleanupCompleted;
+        private bool deferredCloseQueued;
+        private bool deferredCloseAttempted;
 
         public MainForm(AppSession session) : this(session,
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects"),
@@ -45,7 +54,7 @@ namespace MosWord2019
         // The form owns the controller. Injection keeps verification packages out of production.
         public MainForm(AppSession session, string projectRoot, TrainingWorkspaceService workspace,
             IWordController word, Func<string, bool> confirmRestart = null, Action<string> notify = null,
-            TemplateOutputCleanupService outputCleanup = null)
+            TemplateOutputCleanupService outputCleanup = null, Func<string, bool> retryCleanup = null)
         {
             this.session = session ?? throw new ArgumentNullException(nameof(session));
             if (session.Mode != AppMode.Training) throw new NotSupportedException("Testing is not implemented.");
@@ -58,6 +67,7 @@ namespace MosWord2019
                 saveEvents.WorkingFileWritten += workspace.RecordOwnedWorkingFile;
             }
             savedOutputMonitor.Tick += (sender, args) => ObserveAfterSave();
+            this.retryCleanup = retryCleanup ?? ShowCleanupChoice;
             this.confirmRestart = confirmRestart ?? (message => MessageBox.Show(this, message, Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes);
             this.notify = notify ?? (message => MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
@@ -154,13 +164,18 @@ namespace MosWord2019
                 currentProject = selected;
                 currentWorkPath = path;
             }
-            catch
+            catch (Exception openError)
             {
-                if (!word.IsOpened)
+                try
                 {
-                    templateOutputs.Cleanup(true);
-                    workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                    if (!word.IsOpened)
+                    {
+                        templateOutputs.Cleanup(true);
+                        workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                    }
                 }
+                catch (Exception observationError) { AppLogger.Write("Open failed; uncertain document state preserves ownership journal", observationError); }
+                AppLogger.Write("Training project open failed", openError);
                 throw;
             }
             ConfigureExportCheckpoint();
@@ -177,7 +192,7 @@ namespace MosWord2019
                 string text;
                 if (!package.Lang.TryGetValue(task.TitleKey, out text) || string.IsNullOrWhiteSpace(text) ||
                     !package.Lang.TryGetValue(task.InstructionKey, out text) || string.IsNullOrWhiteSpace(text))
-                    throw new InvalidDataException("Required task translation is missing: " + task.TaskId);
+                    throw new MissingTranslationException("Required task translation is missing: " + task.TaskId);
             }
         }
 
@@ -264,7 +279,7 @@ namespace MosWord2019
 
         private void ArrangeWorkspace()
         {
-            if (arranging || IsDisposed || WindowState == FormWindowState.Minimized) return;
+            if (skipCleanup || arranging || IsDisposed || WindowState == FormWindowState.Minimized) return;
             arranging = true;
             try
             {
@@ -285,8 +300,15 @@ namespace MosWord2019
 
         private bool CheckDocument()
         {
-            if (currentProject == null) return false;
-            if (word.IsOpened) return true;
+            if (skipCleanup || currentProject == null) return false;
+            try { if (word.IsOpened) return true; }
+            catch (Exception ex)
+            {
+                AppLogger.Write("Training document availability failed", ex);
+                if (!WordBusyException.IsBusy(ex)) throw;
+                ShowWordBusy();
+                return false;
+            }
             AppLogger.Write("Training manual Word closure " + currentWorkPath);
             EndTrainingSession();
             word.Close();
@@ -299,37 +321,61 @@ namespace MosWord2019
 
         private void ObserveOwnedOutput()
         {
-            if (templateOutputs.CurrentLedger == null) return;
-            try
-            {
-                if (word.IsOpened) templateOutputs.ObserveOwnedDocument((word as IWordDocumentState)?.CurrentDocumentPath);
-            }
-            catch (Exception ex) { AppLogger.Write("Training output ownership could not be observed; preserve unclaimed outputs", ex); }
+            if (skipCleanup || templateOutputs.CurrentLedger == null) return;
+            if (word.IsOpened) templateOutputs.ObserveOwnedDocument((word as IWordDocumentState)?.CurrentDocumentPath);
         }
 
         private void OwnedDocumentSaving(string ownedPath)
         {
             // The callback already verified COM identity. Do not query the controller from that callback.
-            templateOutputs.ObserveOwnedDocument(ownedPath);
-            workspace.ObserveWorkingFiles(ownedPath);
-            if (IsDisposed || Disposing || !IsHandleCreated) return;
-            BeginInvoke((Action)(() =>
+            if (skipCleanup || controllerDisposed) return;
+            try
             {
-                if (IsDisposed || Disposing || controllerDisposed) return;
-                ObserveAfterSave(); // Next owning-STA UI tick, after the save callback has returned.
-                savedOutputMonitor.Start(); // Also observe saves completed after a modeless/dialog message pump.
-            }));
+                templateOutputs.ObserveOwnedDocument(ownedPath);
+                workspace.ObserveWorkingFiles(ownedPath);
+            }
+            catch (Exception ex) { AppLogger.Write("Owned save notification observation failed; preserve journal", ex); }
+            if (skipCleanup || IsDisposed || Disposing || !IsHandleCreated) return;
+            try { BeginInvoke((Action)(() =>
+            {
+                if (skipCleanup || IsDisposed || Disposing || controllerDisposed) return;
+                lastSaveObservationFailure = null;
+                saveObservationWindow.Restart();
+                savedOutputMonitor.Interval = 250;
+                savedOutputMonitor.Start();
+                ObserveAfterSave();
+            })); }
+            catch (InvalidOperationException) { /* Closing raced the save notification. */ }
         }
 
         private void ObserveAfterSave()
         {
-            if (controllerDisposed || IsDisposed || Disposing) return;
-            ObserveOwnedOutput();
+            if (skipCleanup || controllerDisposed || IsDisposed || Disposing) { savedOutputMonitor.Stop(); return; }
+            if (saveObservationWindow.ElapsedMilliseconds >= 5000) { StopSaveObservation(); return; }
             try
             {
-                if (word.IsOpened) workspace.ObserveWorkingFiles((word as IWordDocumentState)?.CurrentDocumentPath);
+                using ((word as WordController)?.BeginShortCallBudget((int)Math.Max(1, Math.Min(250, 5000 - saveObservationWindow.ElapsedMilliseconds))))
+                {
+                    ObserveOwnedOutput();
+                    if (word.IsOpened) workspace.ObserveWorkingFiles((word as IWordDocumentState)?.CurrentDocumentPath);
+                }
+                lastSaveObservationFailure = null;
             }
-            catch (Exception ex) { AppLogger.Write("Owned working save could not be observed", ex); }
+            catch (Exception ex) { lastSaveObservationFailure = ex; }
+            int remaining = (int)(5000 - saveObservationWindow.ElapsedMilliseconds);
+            if (remaining <= 0) StopSaveObservation();
+            else savedOutputMonitor.Interval = Math.Min(remaining, Math.Min(1000, savedOutputMonitor.Interval * 2));
+        }
+
+        private void StopSaveObservation()
+        {
+            savedOutputMonitor.Stop();
+            saveObservationWindow.Stop();
+            if (lastSaveObservationFailure != null)
+            {
+                AppLogger.Write("Post-save observation deferred; ownership journal retained. " + lastSaveObservationFailure.GetType().Name + ": " + lastSaveObservationFailure.Message);
+                lastSaveObservationFailure = null;
+            }
         }
 
         private void CloseOwnedOutputDocument()
@@ -413,6 +459,7 @@ namespace MosWord2019
             catch (Exception ex)
             {
                 AppLogger.Write("Training grade save failed " + currentWorkPath + " task " + task.TaskId, ex);
+                if (WordBusyException.IsBusy(ex)) { ShowWordBusy(); return; }
                 status.ForeColor = Color.Crimson;
                 status.Text = T("Grade error: unable to save the working document.", "Lỗi kiểm tra: không thể lưu tài liệu đang làm.");
                 notify(T("A technical error prevented grading because the document could not be saved. Keep Word open and recover your work there.",
@@ -485,6 +532,7 @@ namespace MosWord2019
 
         private void Run(Action action)
         {
+            if (skipCleanup) return;
             try { action(); }
             catch (Exception ex)
             {
@@ -497,7 +545,12 @@ namespace MosWord2019
                         "Đã có tệp khác tên {0} tại {1}. Hãy di chuyển hoặc đổi tên tệp đó rồi thử lại."),
                         assetConflict.AssetFileName, assetConflict.Location);
                 }
-                else if (ex is InvalidDataException)
+                else if (WordBusyException.IsBusy(ex))
+                {
+                    ShowWordBusy();
+                    return;
+                }
+                else if (ex is MissingTranslationException)
                 {
                     status.Text = T("Required task translations are missing. Correct the project language file before continuing.",
                         "Thiếu bản dịch tác vụ bắt buộc. Hãy sửa tệp ngôn ngữ của dự án trước khi tiếp tục.");
@@ -511,61 +564,158 @@ namespace MosWord2019
             }
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        private void ShowWordBusy()
         {
-            bool completed = false;
-            Run(() =>
+            status.ForeColor = Color.Crimson;
+            status.Text = T("Please close any open dialog in Word and try again.",
+                "Hãy đóng hộp thoại đang mở trong Word rồi thử lại.");
+            notify(status.Text);
+        }
+
+        private void CleanupOwnedSession()
+        {
+            if (skipCleanup || cleanupCompleted) return;
+            savedOutputMonitor.Stop();
+            if (!controllerDisposed)
             {
                 EndTrainingSession();
                 ObserveOwnedOutput();
                 word.Dispose();
                 controllerDisposed = true;
-                templateOutputs.Cleanup(true); // Successful disposal proves closure; never inspect a disposed controller.
-                workspace.CleanupWorkingFiles();
-                AppLogger.Write("Training session closed");
-                completed = true;
-            });
-            e.Cancel = !completed;
+            }
+            templateOutputs.Cleanup(true);
+            workspace.CleanupWorkingFiles();
+            cleanupCompleted = true;
+            AppLogger.Write("Training session closed");
+        }
+
+        private void DeferRecovery(string reason, Exception error = null)
+        {
+            skipCleanup = true;
+            try { savedOutputMonitor.Stop(); }
+            catch (Exception ex) { AppLogger.Write("Unable to stop save monitor during deferred recovery", ex); }
+            Program.DeferRecoveryToNextStart();
+            AppLogger.Write(reason + "; retained journal for next-start recovery", error);
+        }
+
+        private static bool IsCalloutFailure(Exception error)
+        {
+            if (error == null) return false;
+            var com = error as COMException;
+            if (com != null && com.ErrorCode == unchecked((int)0x8001010D)) return true;
+            var aggregate = error as AggregateException;
+            if (aggregate != null && aggregate.InnerExceptions.Any(IsCalloutFailure)) return true;
+            return IsCalloutFailure(error.InnerException);
+        }
+
+        private bool TryCleanupWithChoice()
+        {
+            while (!skipCleanup && !cleanupCompleted)
+            {
+                try { CleanupOwnedSession(); }
+                catch (Exception ex)
+                {
+                    AppLogger.Write("Training close cleanup failed", ex);
+                    if (IsCalloutFailure(ex) && !deferredCloseAttempted)
+                    {
+                        QueueDeferredClose();
+                        return skipCleanup;
+                    }
+                    string message = T("Word cleanup could not finish: ", "Không thể hoàn tất dọn dẹp Word: ") + ex.GetBaseException().Message +
+                        T("\nRetry cleanup, or Close Anyway and recover owned files when the trainer next starts.",
+                          "\nThử lại, hoặc Đóng ngay và khôi phục các tệp thuộc phiên khi mở ứng dụng lần sau.");
+                    if (!retryCleanup(message)) DeferRecovery("User chose Close Anyway", ex);
+                }
+            }
+            return true;
+        }
+
+        private bool ShowCleanupChoice(string message)
+        {
+            using (var dialog = new Form { Text = T("Unable to finish cleanup", "Không thể dọn dẹp"),
+                StartPosition = FormStartPosition.CenterParent, ClientSize = new Size(520, 190),
+                FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false })
+            {
+                var reason = new Label { Text = message, Bounds = new Rectangle(14, 14, 490, 116) };
+                var retry = new Button { Text = T("Retry", "Thử lại"), DialogResult = DialogResult.Retry, Bounds = new Rectangle(224, 143, 130, 32) };
+                var close = new Button { Text = T("Close Anyway", "Đóng ngay"), DialogResult = DialogResult.Cancel, Bounds = new Rectangle(364, 143, 140, 32) };
+                dialog.Controls.AddRange(new Control[] { reason, retry, close });
+                dialog.AcceptButton = retry;
+                dialog.CancelButton = close;
+                return dialog.ShowDialog(this) == DialogResult.Retry;
+            }
+        }
+
+        private void QueueDeferredClose()
+        {
+            if (deferredCloseQueued || skipCleanup || cleanupCompleted) return;
+            deferredCloseQueued = true;
+            try
+            {
+                BeginInvoke((Action)(() =>
+                {
+                    deferredCloseQueued = false;
+                    deferredCloseAttempted = true;
+                    if (IsDisposed || Disposing || skipCleanup) return;
+                    try { if (TryCleanupWithChoice()) Close(); }
+                    catch (Exception ex) { DeferRecovery("Deferred close failed", ex); Close(); }
+                }));
+            }
+            catch (Exception ex) { DeferRecovery("Deferred close could not be queued", ex); }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.WindowsShutDown)
+            {
+                DeferRecovery("Windows shutdown");
+            }
+            else if (!skipCleanup && !cleanupCompleted)
+            {
+                if (e.CloseReason == CloseReason.TaskManagerClosing && !deferredCloseAttempted)
+                {
+                    e.Cancel = true;
+                    QueueDeferredClose(); // No COM while Task Manager's synchronous close notification is active.
+                    if (skipCleanup) e.Cancel = false;
+                }
+                else e.Cancel = !TryCleanupWithChoice();
+            }
             base.OnFormClosing(e);
+        }
+
+        private void DisposeSafely(Action action, string operation)
+        {
+            try { action(); }
+            catch (Exception ex) { DeferRecovery(operation, ex); }
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && displayEventsSubscribed)
-            {
-                SystemEvents.DisplaySettingsChanged -= DisplayChanged;
-                SystemEvents.UserPreferenceChanged -= PreferencesChanged;
-                displayEventsSubscribed = false;
-            }
-            if (disposing && !controllerDisposed)
-            {
-                EndTrainingSession();
-                ObserveOwnedOutput();
-                word.Dispose();
-                controllerDisposed = true;
-                templateOutputs.Cleanup(true);
-                workspace.CleanupWorkingFiles();
-            }
             if (disposing)
             {
-                savedOutputMonitor.Dispose();
-                if (word is IWordSaveEvents saveEvents)
+                if (displayEventsSubscribed)
                 {
-                    saveEvents.OwnedDocumentSaving -= OwnedDocumentSaving;
-                    saveEvents.WorkingFileWritten -= workspace.RecordOwnedWorkingFile;
+                    DisposeSafely(() => SystemEvents.DisplaySettingsChanged -= DisplayChanged, "Unsubscribe display events failed");
+                    DisposeSafely(() => SystemEvents.UserPreferenceChanged -= PreferencesChanged, "Unsubscribe preference events failed");
+                    displayEventsSubscribed = false;
+                }
+                if (!skipCleanup) DisposeSafely(CleanupOwnedSession, "Dispose cleanup failed");
+                DisposeSafely(savedOutputMonitor.Dispose, "Dispose save monitor failed");
+                if (!skipCleanup && word is IWordSaveEvents saveEvents)
+                {
+                    DisposeSafely(() => saveEvents.OwnedDocumentSaving -= OwnedDocumentSaving, "Unsubscribe owned save failed");
+                    if (!skipCleanup) DisposeSafely(() => saveEvents.WorkingFileWritten -= workspace.RecordOwnedWorkingFile, "Unsubscribe working save failed");
                 }
             }
-            base.Dispose(disposing);
+            try { base.Dispose(disposing); }
+            catch (Exception ex) { DeferRecovery("Base form disposal failed", ex); }
         }
 
         internal void CloseOwnedForRecovery()
         {
-            savedOutputMonitor.Stop();
-            ObserveOwnedOutput();
-            if (!controllerDisposed) { word.Dispose(); controllerDisposed = true; }
-            templateOutputs.Cleanup(true);
-            if (currentProject != null) workspace.CleanupProjectAssets(currentProject);
-            workspace.CleanupWorkingFiles();
+            if (skipCleanup) return;
+            try { CleanupOwnedSession(); }
+            catch (Exception ex) { DeferRecovery("Fatal cleanup failed", ex); throw; }
         }
     }
 }

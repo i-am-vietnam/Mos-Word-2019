@@ -7,7 +7,9 @@ namespace MosWord2019.Word
 {
     public sealed partial class WordController
     {
-        public WordTocLayoutSnapshot ReadTocLayout()
+        public WordTocLayoutSnapshot ReadTocLayout() { return RunCom(ReadTocLayoutCore); }
+
+        private WordTocLayoutSnapshot ReadTocLayoutCore()
         {
             EnsureUsable();
             if (!IsOpened) throw new InvalidOperationException("No owned document is open for TOC layout inspection.");

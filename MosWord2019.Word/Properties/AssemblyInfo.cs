@@ -3,3 +3,5 @@ using System.Reflection;
 [assembly: AssemblyProduct("MOS Word 2019")]
 [assembly: AssemblyVersion("0.1.0.0")]
 [assembly: AssemblyFileVersion("0.1.0.0")]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("MosWord2019.Desktop.Tests")]

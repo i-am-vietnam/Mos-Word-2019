@@ -22,3 +22,11 @@ A2 adds exception-injection/metadata-error cases, TXT metadata/content controls,
 A3a adds freshness/content controls, malformed snapshot errors, redirected PersonalTemplates, restart baselines, P20/P07 overlap and exclusive cleanup protection for pre-existing/modified/replaced/locked/live/unclaimed outputs. P16 arbitrary-folder export is explicitly excluded. No Word/COM/UI or A3b crash-recovery result is implied.
 
 A3b adds journal reload/malformed/atomic-failure/lock tests, exact reserved workspace cleanup, default/P12/P26 asset recovery, monotonic-clock and identical-overwrite controls, kernel mutex contention/abandonment and fatal cleanup sequencing. All paths are injected under TestWorkspace. These headless tests neither activate Word nor verify its native save events or actual fatal-process UI; retained native/API results must be labeled separately.
+
+A4 adds a separate `MosWord2019.Desktop.Tests` classic net472 MSTest project. The original assembly still has no Office/UI references and its dependency guard is unchanged. Desktop tests reference the existing application and use fake controllers/registrars on isolated STAs; they never activate Word. One test registers/restores the actual native OLE filter without Office. Both test assemblies use the existing pinned packages.config versions. Run all checks together:
+
+```powershell
+& $vstest MosWord2019.Tests\bin\Debug\MosWord2019.Tests.dll MosWord2019.Desktop.Tests\bin\Debug\MosWord2019.Desktop.Tests.dll /Framework:net472 /TestAdapterPath:MosWord2019.Tests\bin\Debug '/Logger:trx;LogFileName=A4-Debug.trx' /ResultsDirectory:artifacts\a4\TestResults
+```
+
+Repeat for Release. The Vietnamese real-Word checklist is `artifacts/a4/MANUAL_TEST.md`; it is deliberately outside tracked fixtures and is not a completed native test report.

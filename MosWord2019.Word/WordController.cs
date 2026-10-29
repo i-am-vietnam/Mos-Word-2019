@@ -1,8 +1,10 @@
 using MosWord2019.Core.Interfaces;
+using MosWord2019.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using Office = Microsoft.Office.Core;
 using Wd = Microsoft.Office.Interop.Word;
@@ -15,11 +17,35 @@ namespace MosWord2019.Word
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
         private bool disposed;
+        private OleMessageFilter messageFilter;
+        private readonly Func<OleMessageFilter> createMessageFilter;
+
+        public WordController() : this(() => new OleMessageFilter()) { }
+
+        internal WordController(Func<OleMessageFilter> createMessageFilter)
+        {
+            this.createMessageFilter = createMessageFilter ?? throw new ArgumentNullException(nameof(createMessageFilter));
+        }
 
         // Diagnostics only; callers never receive a COM object or a process handle.
         public int? OwnedProcessId { get { return session?.Process?.Id; } }
 
-        public int CurrentSaveFormat
+        /// <summary>Limits OLE rejection retries inside a short owner-STA observation.</summary>
+        public IDisposable BeginShortCallBudget(int milliseconds)
+        {
+            EnsureUsable();
+            if (milliseconds <= 0) throw new ArgumentOutOfRangeException(nameof(milliseconds));
+            return messageFilter != null ? messageFilter.BeginShortCallBudget(milliseconds) : new EmptyCallBudget();
+        }
+
+        private sealed class EmptyCallBudget : IDisposable
+        {
+            public void Dispose() { }
+        }
+
+        public int CurrentSaveFormat { get { return RunCom(() => CurrentSaveFormatCore); } }
+
+        private int CurrentSaveFormatCore
         {
             get
             {
@@ -29,7 +55,9 @@ namespace MosWord2019.Word
             }
         }
 
-        public string CurrentDocumentPath
+        public string CurrentDocumentPath { get { return RunCom(() => CurrentDocumentPathCore); } }
+
+        private string CurrentDocumentPathCore
         {
             get
             {
@@ -39,7 +67,9 @@ namespace MosWord2019.Word
             }
         }
 
-        public string DefaultTemplateFolder
+        public string DefaultTemplateFolder { get { return RunCom(() => DefaultTemplateFolderCore); } }
+
+        private string DefaultTemplateFolderCore
         {
             get
             {
@@ -49,7 +79,9 @@ namespace MosWord2019.Word
             }
         }
 
-        public bool IsOpened
+        public bool IsOpened { get { return RunCom(() => IsOpenedCore); } }
+
+        private bool IsOpenedCore
         {
             get
             {
@@ -61,9 +93,12 @@ namespace MosWord2019.Word
             }
         }
 
-        public void StartWord()
+        public void StartWord() { RunCom(() => StartWordCore()); }
+
+        private void StartWordCore()
         {
             EnsureUsable();
+            if (messageFilter == null) messageFilter = createMessageFilter();
             if (session != null)
             {
                 if (session.Application != null)
@@ -110,7 +145,9 @@ namespace MosWord2019.Word
             }
         }
 
-        public void OpenDocument(string filePath)
+        public void OpenDocument(string filePath) { RunCom(() => OpenDocumentCore(filePath)); }
+
+        private void OpenDocumentCore(string filePath)
         {
             EnsureUsable();
             if (IsOpened) throw new InvalidOperationException("Close the current Word document before opening another.");
@@ -144,7 +181,9 @@ namespace MosWord2019.Word
             finally { ReleaseCom(documents); }
         }
 
-        public void SetWindowBounds(int left, int top, int width, int height)
+        public void SetWindowBounds(int left, int top, int width, int height) { RunCom(() => SetWindowBoundsCore(left, top, width, height)); }
+
+        private void SetWindowBoundsCore(int left, int top, int width, int height)
         {
             EnsureUsable();
             if (!IsOpened || session.Process == null)
@@ -158,7 +197,9 @@ namespace MosWord2019.Word
             finally { ReleaseCom(window); }
         }
 
-        public void Save()
+        public void Save() { RunCom(() => SaveCore()); }
+
+        private void SaveCore()
         {
             EnsureUsable();
             if (!IsOpened) throw new InvalidOperationException("No Word document is open. It may have been closed manually.");
@@ -174,7 +215,9 @@ namespace MosWord2019.Word
             }
         }
 
-        public void CloseDocument()
+        public void CloseDocument() { RunCom(() => CloseDocumentCore()); }
+
+        private void CloseDocumentCore()
         {
             EnsureThread();
             // Switching/reset must never proceed while this application contains a
@@ -208,7 +251,9 @@ namespace MosWord2019.Word
             exportCheckpointPath = null;
         }
 
-        public void Close()
+        public void Close() { RunCom(() => CloseCore()); }
+
+        private void CloseCore()
         {
             EnsureThread();
             if (session == null) return;
@@ -225,6 +270,7 @@ namespace MosWord2019.Word
                 }
             }
             catch (COMException ex) when (IsDisconnected(ex)) { }
+            catch (Exception ex) when (IsDeferredCleanup(ex)) { throw; }
             catch (Exception ex)
             {
                 // If we cannot establish that remaining documents belong to us, do not discard them.
@@ -234,13 +280,11 @@ namespace MosWord2019.Word
             finally { TryRelease(documents, errors); }
 
             try { CloseOwnedDocument(); }
+            catch (Exception ex) when (IsDeferredCleanup(ex)) { throw; }
             catch (Exception ex) { errors.Add(ex); }
-            finally
-            {
-                TryRelease(session.Document, errors);
-                session.Document = null;
-                session.DocumentPath = null;
-            }
+            TryRelease(session.Document, errors);
+            session.Document = null;
+            session.DocumentPath = null;
             if (session.Application != null)
             {
                 try { session.Application.DocumentBeforeSave -= BeforeDocumentSave; }
@@ -249,6 +293,8 @@ namespace MosWord2019.Word
                 {
                     try { session.Application.Quit(Wd.WdSaveOptions.wdDoNotSaveChanges); }
                     catch (COMException ex) when (IsDisconnected(ex)) { }
+                    // A modal dialog is recoverable; never fall through to process termination.
+                    catch (Exception ex) when (IsDeferredCleanup(ex)) { throw; }
                     catch (Exception ex) { errors.Add(ex); }
                 }
                 TryRelease(session.Application, errors);
@@ -276,8 +322,76 @@ namespace MosWord2019.Word
 
         public void Dispose()
         {
-            Close();
+            DisposeOwnedState(Close);
+        }
+
+        // A cleanup callback permits lifecycle failure tests without activating Word.
+        internal void DisposeOwnedState(Action close)
+        {
+            EnsureThread();
+            if (disposed) return;
+            Exception cleanupError = null;
+            try
+            {
+                // A failed previous Dispose restored the STA filter, but kept the live session for Retry.
+                if (session != null && messageFilter == null) messageFilter = createMessageFilter();
+                close();
+            }
+            catch (Exception ex) { cleanupError = ex; }
+            finally
+            {
+                // Registration belongs to the STA, even when document/process cleanup fails.
+                try
+                {
+                    if (messageFilter != null)
+                    {
+                        messageFilter.Dispose();
+                        messageFilter = null;
+                    }
+                }
+                catch (Exception restoreError)
+                {
+                    if (cleanupError != null)
+                        throw new AggregateException("Word cleanup and STA filter restoration failed.", cleanupError, restoreError);
+                    throw;
+                }
+            }
+            if (cleanupError != null) ExceptionDispatchInfo.Capture(cleanupError).Throw();
             disposed = true;
+        }
+
+        private static T RunCom<T>(Func<T> action)
+        {
+            try { return action(); }
+            catch (Exception ex) when (!(ex is WordBusyException) && WordBusyException.IsBusy(ex))
+            { throw new WordBusyException(ex); }
+        }
+
+        private static void RunCom(Action action)
+        {
+            RunCom(() => { action(); return true; });
+        }
+
+        private static bool IsDeferredCleanup(Exception exception)
+        {
+            if (WordBusyException.IsBusy(exception)) return true;
+            // Word may send a synchronous input callback. Calling out again here is forbidden;
+            // preserve the references and let the owner STA retry after that callback returns.
+            var pending = new Stack<Exception>();
+            var seen = new HashSet<Exception>();
+            pending.Push(exception);
+            while (pending.Count != 0)
+            {
+                Exception current = pending.Pop();
+                if (current == null || !seen.Add(current)) continue;
+                var com = current as COMException;
+                if (com != null && com.ErrorCode == unchecked((int)0x8001010D)) return true;
+                var aggregate = current as AggregateException;
+                if (aggregate != null)
+                    foreach (Exception inner in aggregate.InnerExceptions) pending.Push(inner);
+                if (current.InnerException != null) pending.Push(current.InnerException);
+            }
+            return false;
         }
 
         private bool DocumentStillOpen()

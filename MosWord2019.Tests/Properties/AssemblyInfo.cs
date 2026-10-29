@@ -7,3 +7,5 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: ComVisible(false)]
 [assembly: TestDataSourceDiscovery(TestDataSourceDiscoveryOption.DuringDiscovery)]
 [assembly: DoNotParallelize]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("MosWord2019.Desktop.Tests")]

@@ -42,8 +42,14 @@ namespace MosWord2019
             {
                 Hide();
                 try { main.ShowDialog(); }
-                finally { Show(); }
+                finally { if (Program.RecoveryDeferred) Close(); else Show(); }
             }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.WindowsShutDown) Program.DeferRecoveryToNextStart();
+            base.OnFormClosing(e);
         }
     }
 }

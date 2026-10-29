@@ -3,6 +3,8 @@ using MosWord2019.Projects;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -165,7 +167,7 @@ namespace MosWord2019.Tests
         [DataRow("invalidHash")]
         [DataRow("emptySession")]
         [DataRow("extraProperty")]
-        public void MalformedOrAmbiguousJournalNeverDeletesOrOverwrites(string defect)
+        public void MalformedOrAmbiguousJournalIsQuarantinedAndNeverRecoversItsClaims(string defect)
         {
             using (var workspace = new TestWorkspace())
             {
@@ -192,9 +194,102 @@ namespace MosWord2019.Tests
                 var journal = New(journalPath);
                 journal.Recover();
                 Assert.IsTrue(File.Exists(path));
-                Assert.AreEqual(malformed, File.ReadAllText(journalPath));
-                Assert.ThrowsException<InvalidDataException>(() => journal.Track(path, "asset"));
-                Assert.AreEqual(malformed, File.ReadAllText(journalPath));
+                string quarantine = Directory.GetFiles(workspace.Folder, "session-journal.invalid-*.json").Single();
+                Assert.AreEqual(malformed, File.ReadAllText(quarantine));
+                Assert.AreEqual(0, journal.Count);
+                Assert.AreEqual(0, ((JArray)JObject.Parse(File.ReadAllText(journalPath))["entries"]).Count);
+                string fresh = Write(workspace, "fresh.dat", "new owned file");
+                journal.Track(fresh, "asset");
+                Assert.AreEqual(1, New(journalPath).Count);
+                New(journalPath).Recover();
+                Assert.IsFalse(File.Exists(fresh));
+                Assert.AreEqual("session", File.ReadAllText(path));
+                New(journalPath).Recover();
+                Assert.IsTrue(File.Exists(path));
+                Assert.AreEqual(malformed, File.ReadAllText(quarantine));
+            }
+        }
+
+        [TestMethod]
+        public void QuarantinePreservesExistingTimestampCollisionsAndLogsReason()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string journalPath = JournalPath(workspace);
+                File.WriteAllText(journalPath, "{ broken");
+                // Cover the current timestamp and scheduling across a second boundary.
+                DateTime now = DateTime.UtcNow;
+                var existing = Enumerable.Range(-2, 63).Select(offset => Path.Combine(workspace.Folder,
+                    "session-journal.invalid-" + now.AddSeconds(offset).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + ".json")).ToArray();
+                foreach (string path in existing) File.WriteAllText(path, "earlier quarantine");
+                var messages = new List<string>();
+                var journal = new SessionRecoveryJournal(journalPath, messages.Add);
+                Assert.AreEqual(0, journal.Count);
+                foreach (string path in existing) Assert.AreEqual("earlier quarantine", File.ReadAllText(path));
+                string created = Directory.GetFiles(workspace.Folder, "session-journal.invalid-*.json").Except(existing).Single();
+                Assert.IsTrue(created.EndsWith("-1.json", StringComparison.Ordinal), "The occupied timestamp must use a safe suffix.");
+                Assert.AreEqual("{ broken", File.ReadAllText(created));
+                Assert.IsTrue(messages.Any(message => message.Contains("quarantined") && message.Contains(created)));
+                Assert.IsTrue(messages.Any(message => message.Contains("Reason:")));
+                Assert.AreEqual(0, New(journalPath).Count);
+            }
+        }
+
+        [TestMethod]
+        public void LockedMalformedJournalRemainsBlockedUntilNextLoadCanQuarantineIt()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string journalPath = JournalPath(workspace);
+                string path = Write(workspace, "personal.dat", "preserve");
+                File.WriteAllText(journalPath, "{ broken");
+                var messages = new List<string>();
+                using (var held = new FileStream(journalPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    var journal = new SessionRecoveryJournal(journalPath, messages.Add);
+                    journal.Recover();
+                    Assert.ThrowsException<InvalidDataException>(() => journal.Track(path, "asset"));
+                    Assert.AreEqual("{ broken", File.ReadAllText(journalPath));
+                    Assert.AreEqual(0, Directory.GetFiles(workspace.Folder, "session-journal.invalid-*.json").Length);
+                    Assert.IsTrue(messages.Any(message => message.Contains("quarantine failed") && message.Contains("cannot be overwritten")));
+                }
+                var reloaded = New(journalPath);
+                reloaded.Track(path, "asset");
+                Assert.AreEqual(1, New(journalPath).Count);
+                Assert.AreEqual("preserve", File.ReadAllText(path));
+            }
+        }
+
+        [TestMethod]
+        public void RedirectedJournalDirectoryCannotBeQuarantinedOrOverwritten()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                string target = Path.Combine(workspace.Folder, "personal");
+                Directory.CreateDirectory(target);
+                string original = Path.Combine(target, "journal.json");
+                File.WriteAllText(original, "{ broken");
+                string link = Path.Combine(workspace.Folder, "redirected");
+                var start = new ProcessStartInfo("cmd.exe", "/d /c mklink /J \"" + link + "\" \"" + target + "\"")
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+                using (var process = Process.Start(start))
+                {
+                    string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+                    Assert.AreEqual(0, process.ExitCode, output);
+                }
+                try
+                {
+                    var messages = new List<string>();
+                    var journal = new SessionRecoveryJournal(Path.Combine(link, "journal.json"), messages.Add);
+                    journal.Recover();
+                    string path = Write(workspace, "personal.dat", "preserve");
+                    Assert.ThrowsException<InvalidDataException>(() => journal.Track(path, "asset"));
+                    Assert.AreEqual("{ broken", File.ReadAllText(original));
+                    Assert.AreEqual(0, Directory.GetFiles(target, "session-journal.invalid-*.json").Length);
+                    Assert.IsTrue(messages.Any(message => message.Contains("quarantine failed") && message.Contains("Reparse")));
+                }
+                finally { Directory.Delete(link); }
             }
         }
 

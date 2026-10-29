@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -195,7 +196,46 @@ namespace MosWord2019.Projects
                 }
             }
             catch (Exception ex) when (Recoverable(ex) || ex is InvalidDataException || ex is JsonException || ex is OverflowException)
-            { invalid = true; entries.Clear(); log("Invalid recovery journal preserved: " + ex.Message); }
+            {
+                invalid = true;
+                entries.Clear();
+                Quarantine(ex);
+            }
+        }
+
+        private void Quarantine(Exception reason)
+        {
+            try
+            {
+                RejectReparse(journalPath);
+                string prefix = Path.Combine(Path.GetDirectoryName(journalPath), "session-journal.invalid-" +
+                    DateTime.UtcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+                for (int suffix = 0; ; suffix++)
+                {
+                    string target = prefix + (suffix == 0 ? "" : "-" + suffix.ToString(CultureInfo.InvariantCulture)) + ".json";
+                    RejectReparse(target);
+                    if (File.Exists(target) || Directory.Exists(target)) continue;
+                    RejectReparse(journalPath);
+                    try { File.Move(journalPath, target); }
+                    catch (IOException ex)
+                    {
+                        int error = ex.HResult & 0xffff;
+                        // Another creator may reserve this name between the check and move.
+                        if (error == 80 || error == 183) continue;
+                        throw;
+                    }
+                    log("Invalid recovery journal quarantined: " + journalPath + " -> " + target + ". Reason: " + reason.Message);
+                    // Quarantined claims never enter the fresh journal or automatic recovery.
+                    Persist();
+                    invalid = false;
+                    return;
+                }
+            }
+            catch (Exception ex) when (Recoverable(ex))
+            {
+                log("Recovery journal quarantine failed; unsafe journal cannot be overwritten: " + journalPath +
+                    ". Reason: " + reason.Message + ". Quarantine/fresh journal error: " + ex.Message);
+            }
         }
 
         private void Persist()
