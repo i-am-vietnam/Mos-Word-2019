@@ -1,6 +1,12 @@
 # Known Issues and Verification Items
 
-Reviewed: 2026-10-28.
+Reviewed: 2026-10-29.
+
+## Project 27 verification limits
+
+- Native GUI evidence covers Select Table/Sentence case, Scroll: Horizontal/Bottom Center and the Gold Accent4 Soft Bevel WordArt gallery, saved/reopened on Word16.0.14026. Turquoise, normal-default Replace All, combined answers and EN/VI lifecycle use the owned Word API. Both case/replacement orders produce the same verified cell text. This is not a full manual Ribbon/F5/VI workflow or coverage of other Office builds.
+- The modeless Ctrl+H GUI could not retain focus through the available automation: one isolated attempt typed into its document title instead. That fixture is excluded from positive evidence; no production Find settings/security/ownership workaround was added. The native API replacement evidence is separate. The specified Desktop P27 guide was absent; original DOCX, immutable package and the user's detailed contracts were available.
+- WordArt recognition covers the observed readable DrawingML form (including duplicate VML fallback), not unobserved legacy-only scene equivalents. The source note already has cyan highlighting; this is preserved, not attributed to T03. Earlier P20 retained-fixture context reconstruction remains labeled separately from new native answers. Evidence: `artifacts/p27/REPORT.md`.
 
 ## Project 26 verification limits
 

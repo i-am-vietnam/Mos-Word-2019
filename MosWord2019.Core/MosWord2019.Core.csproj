@@ -63,6 +63,8 @@
     <Compile Include="Services\WordGradingService.SmartArtOrder.cs" />
     <Compile Include="Services\WordGradingService.StoryGraphics.cs" />
     <Compile Include="Services\WordGradingService.TextWatermark.cs" />
+    <Compile Include="Services\WordGradingService.TableVariants.cs" />
+    <Compile Include="Services\WordGradingService.BodyWordArt.cs" />
   </ItemGroup>
   <ItemGroup><None Include="packages.config" /></ItemGroup>
 

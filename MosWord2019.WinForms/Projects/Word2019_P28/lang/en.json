@@ -1,0 +1,14 @@
+{
+  "P28_T01_TITLE": "Task 1",
+  "P28_T01_INST": "Apply the Grid Table 5 Dark - Accent 2 table style to the table.",
+  "P28_T02_TITLE": "Task 2",
+  "P28_T02_INST": "Locate the sentence beginning with \"This award is donated…\" and insert a Registered Sign (®) immediately after \"Michael’s Art Shop\".",
+  "P28_T03_TITLE": "Task 3",
+  "P28_T03_INST": "Set the document’s Status property to \"New update!\".",
+  "P28_T04_TITLE": "Task 4",
+  "P28_T04_INST": "Insert a caption below the table using the Table label and the caption text \"- Details of books\".",
+  "P28_T05_TITLE": "Task 5",
+  "P28_T05_INST": "Insert a Banded cover page and delete the \"Company address\" placeholder.",
+  "P28_T06_TITLE": "Task 6",
+  "P28_T06_INST": "Change the page orientation of the section after the existing section break to Landscape."
+}

@@ -1,6 +1,6 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
-Cập nhật: **28/10/2026** (Asia/Bangkok). Tài liệu dành cho lập trình viên và trợ lý đọc trước khi tiếp tục công việc, tổng hợp từ mã nguồn hiện tại và các quyết định đã được người dùng chấp thuận.
+Cập nhật: **29/10/2026** (Asia/Bangkok). Tài liệu dành cho lập trình viên và trợ lý đọc trước khi tiếp tục công việc, tổng hợp từ mã nguồn hiện tại và các quyết định đã được người dùng chấp thuận.
 
 Thứ tự đọc đầu phiên: `AGENTS.md` → `PROJECT_STATUS.md` → `KNOWN_ISSUES.md` → `CODEX_CONTEXT.md` → tài liệu này → các file nguồn liên quan trực tiếp. Yêu cầu hiện tại của người dùng quyết định phạm vi; khi tài liệu mô tả khác mã nguồn, kiểm tra mã nguồn và sửa tài liệu có liên quan. Không tự coi mô tả lịch sử là yêu cầu mới.
 
@@ -16,7 +16,7 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 - `LoginForm` hiện chỉ chọn chế độ/ngôn ngữ, không phải đăng nhập tài khoản hay xác thực.
 - `AppMode` có giá trị `Testing`, nhưng giao diện chỉ cho chọn Training; `MainForm` từ chối Testing vì chưa triển khai.
 - Chưa có thi có tính giờ, tổng điểm, nộp bài, lưu lịch sử vào database hoặc installer/release workflow hoàn chỉnh.
-- Có **26 package P01–P26, tổng201 task**, không áp đặt mọi project phải có cùng số task.
+- Có **27 package P01–P27, tổng206 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.
 
@@ -83,7 +83,7 @@ Lỗi COM/session desktop là lỗi hạ tầng, không phải đáp án sai. CO
 
 ### 2.3. Chấm bài và context chỉ đọc
 
-`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **73 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới.
+`MainForm.GradeCurrentTask()` gọi `WordGradingService.CheckTask(savedPath, task, context)`. Dispatch theo **`AssertionType` + `TaskDefinition.Extra`**, không theo ProjectId/TaskId. Hiện có **75 assertion identifiers**; tái sử dụng assertions/opt-in hiện có trước khi thêm route mới. P27 thêm hai route OOXML `TableRowTextFormatting`, `BodyWordArtTextEffect`; tái sử dụng TableRowsEqual/TextReplaceAll với các trạng thái bảng hữu hạn đã xác minh native và mở rộng vị trí shape bằng opt-in. Năm task là Sentence case toàn bảng, Scroll ngang Bottom Center, highlight Turquoise hàng Prince, WordArt Gold Accent4 Soft Bevel cho title và thay bốn Football thành Soccer. Title có thể chuyển khỏi paragraph thường; các task vẫn độc lập và giữ nguyên bảng/note. Hợp đồng chi tiết ở CODEX_CONTEXT.md; evidence mới ở `artifacts/p27/REPORT.md`.
 
 - Phần saved-content chấm bằng ZIP/OOXML, relationships, styles/theme/effective formatting, logical text. Không mở/attach Word bên trong Core, không chấm theo click history hoặc IDs/XML/runs cố định khi Word có thể tái sinh chúng.
 - Grade thông thường gọi owned `Save()` và `PreserveSaveAsWork()` trước khi đọc đáp án. Save lỗi thì báo Error và giữ Word để phục hồi bài.

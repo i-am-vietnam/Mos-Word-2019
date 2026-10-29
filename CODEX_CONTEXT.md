@@ -1,8 +1,19 @@
 # Technical Context
 
+## Project 27 generic contracts — 2026-10-29
+
+P01–P27 contain206 tasks and75 supported identifiers. `TableRowsEqual` and `TextReplaceAll` optionally accept `expectedTableVariants`: finite complete rectangular cell matrices, compared with exact logical text/whitespace, grid/row/cell/paragraph preservation and visible runs. No plain heading anchor is required in this branch, so a legitimate title-to-WordArt conversion remains valid. Replacement metadata still declares old/new text and original count; optional `ignoreReplacementCase` affects occurrence counting only, never widens matrix equality. Old routes/defaults are unchanged.
+
+- `TableRowTextFormatting`: `expectedTableVariants`, `targetRowVariants`, `expectedFormatting`, optional `allowAdditionalFormatting` (false by default). Exactly one semantic row must match; every character-bearing run resolves effective formatting. P27 uses `highlight: val=cyan`, preserving unrelated formatting and the already-highlighted source note.
+- `BodyWordArtTextEffect`: unique exact `expectedText` in a visible native beginning body text shape, with no duplicate plain title. Effective run/theme fill, text outline, bevel/material/extrusion and scene/camera/light metadata must match the observed preset. The native P27 style is accent4/FFC000, circle bevel25400×38100, extrusion57150, softEdge, orthographicFront, soft/top light rotated15600000. These are text effects; shape fill or picture bevel is insufficient. Readable DrawingML Choice is authoritative over its VML fallback. No volatile IDs, gallery index, font/size or fromWordArt=1 requirement is imposed (native saves0).
+
+`ShapeWithTextWrapAndPosition` adds optional validated `positionReferencePairs` (coherent axis pairs), `allowAnyBodyAnchor` and `requireVisibleShape`; defaults retain prior anchor/reference behavior. P27 declares horizontalScroll, exact text, square wrap and center/bottom Margin/Margin from the saved native preset. Visible native drawing, positive extent and main-body anchor outside tables are required, without prescribing one incidental paragraph.
+
+Optional `preservedTableVariants` plus `preservedTitleText`, `preservedNoteText`, `allowedShapeText` protects the complete original table, beginning title role and following note across independent tasks. Only the finite source/Sentence-case/replacement states and the two requested text objects are admitted. It permits title movement into WordArt without requiring T04 for another task. No COM or task/project-ID dispatch was added. Evidence: `artifacts/p27/REPORT.md`.
+
 ## Project 26 generic contracts — 2026-10-28
 
-P01–P26 contain201 tasks and73 supported identifiers. Four new routes remain pure read-only OOXML, dispatched by assertion/metadata without project/task-ID branches:
+At the P26 checkpoint, P01–P26 contained201 tasks and73 supported identifiers. Four new routes remain pure read-only OOXML, dispatched by assertion/metadata without project/task-ID branches:
 
 - `BodyContentBeforeSmartArt`: unique exact visible `expectedParagraphs` after `precedingParagraph` and before `followingSmartArtLayoutId`; harmless blank boundaries allowed, linked fields/objects/partial/wrong-location imports rejected. Metadata comes from immutable Information, never staged content at Grade time.
 - `SmartArtLogicalOrder`: `expectedLayoutId`, `expectedReverse`, `expectedLogicalNodes`, and `expectedNodePictures` (`text`, allowed `imageSha256s`). Resolve logical parOf/srcOrd and content/presentation/group photo relationships, not ptLst/cache order or volatile IDs. Optional `preservedSmartArt.allowedLogicalOrders` permits original/reordered states for independent tasks. Deleted/hidden/zero-size diagrams fail.

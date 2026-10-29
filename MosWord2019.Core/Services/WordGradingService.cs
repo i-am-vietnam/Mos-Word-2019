@@ -51,7 +51,8 @@ namespace MosWord2019.Core.Services
             "InsertedTableAutoFitContents", "NumberedListSequence", "PlainTextDocumentExport", "FileExistsInDocuments", "PictureInsertedAtAnchor", "PlainTextAtOwnedSavedLocation",
             WordFormattingMarksSnapshot.AssertionType, "SmartArtInserted", "TableAltTextEquals", "DocumentPersonalInformationRemoved",
             "TextBoxAssemblyWithPosition", "BodyContentBeforeHeading", "DocumentBackgroundColor", "SectionBreakBeforeHeading",
-            "BodyContentBeforeSmartArt", "SmartArtLogicalOrder", "TextBoxPictureBevel", "TextWatermark"
+            "BodyContentBeforeSmartArt", "SmartArtLogicalOrder", "TextBoxPictureBevel", "TextWatermark",
+            "TableRowTextFormatting", "BodyWordArtTextEffect"
         };
 
         public bool IsAssertionTypeSupported(string assertionType)
@@ -167,6 +168,8 @@ namespace MosWord2019.Core.Services
                         case "ParagraphFormattingMatches": passed = CheckParagraphFormatting(package, task, out detail); break;
                         case "TableAccessibilityFirstRow": passed = CheckTableAccessibilityFirstRow(package, task, out detail); break;
                         case "TableRowsEqual": passed = CheckTableRows(package, task, out detail); break;
+                        case "TableRowTextFormatting": passed = CheckTableRowTextFormatting(package, task, out detail); break;
+                        case "BodyWordArtTextEffect": passed = CheckBodyWordArtTextEffect(package, task, out detail); break;
                         case "ListLevelEquals": passed = CheckListLevels(package, task, out detail); break;
                         case "InlineModel3D": passed = CheckInlineModel3D(package, task, out detail); break;
                         case "ContinuousSectionBreakBeforeHeading": passed = CheckContinuousSectionBreak(package, task, out detail); break;
@@ -615,6 +618,18 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTextReplaceAll(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("expectedTableVariants"))
+            {
+                int originalCount = RequiredInt(task, "expectedOriginalCount");
+                bool tableMatch = CheckTableVariants(package, task, out detail);
+                string oldValue = RequiredString(task, "oldText"), newValue = RequiredString(task, "newText");
+                var comparison = OptionalBool(task, "ignoreReplacementCase", false) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                var variantBody = package.Xml("word/document.xml").Root.Element(W + "body");
+                string text = string.Join("\n", variantBody.Descendants(W + "p").Where(p => !p.Ancestors(Mc + "Fallback").Any()).Select(LogicalParagraphText));
+                int count = 0, offset = 0;
+                while ((offset = text.IndexOf(newValue, offset, comparison)) >= 0) { count++; offset += newValue.Length; }
+                return tableMatch && text.IndexOf(oldValue, comparison) < 0 && count == originalCount;
+            }
             string anchor = RequiredString(task, "tableAnchor");
             string oldText = RequiredString(task, "oldText");
             string newText = RequiredString(task, "newText");
@@ -885,6 +900,7 @@ namespace MosWord2019.Core.Services
 
         private static bool CheckTableRows(PackageSnapshot package, TaskDefinition task, out string detail)
         {
+            if (task.Extra.ContainsKey("expectedTableVariants")) return CheckTableVariants(package, task, out detail);
             string[] header = RequiredStrings(task, "targetHeaderRow");
             string[][] expectedRows = RequiredStringMatrix(task, "expectedTableRows");
             List<XElement> tables = FindTablesByHeader(package.Xml("word/document.xml"), header);
@@ -1188,25 +1204,81 @@ namespace MosWord2019.Core.Services
             string expectedText = RequiredString(task, "expectedText");
             string horizontal = RequiredString(task, "horizontalAlignment");
             string vertical = RequiredString(task, "verticalAlignment");
-            string relativeFrom = RequiredString(task, "relativeFrom");
-            string afterParagraph = OptionalBool(task, "requireLastBodyParagraph", false) ? string.Empty : RequiredString(task, "afterParagraph");
+            JArray referencePairs = null;
+            if (task.Extra.ContainsKey("positionReferencePairs"))
+            {
+                referencePairs = task.Extra["positionReferencePairs"] as JArray;
+                if (referencePairs == null || referencePairs.Count == 0 || referencePairs.Any(value =>
+                    !(value is JObject) || value["horizontal"]?.Type != JTokenType.String || value["vertical"]?.Type != JTokenType.String ||
+                    !new[] { "page", "margin", "column", "character", "leftMargin", "rightMargin", "insideMargin", "outsideMargin" }.Contains((string)value["horizontal"]) ||
+                    !new[] { "page", "margin", "paragraph", "line", "topMargin", "bottomMargin", "insideMargin", "outsideMargin" }.Contains((string)value["vertical"])))
+                    throw new InvalidDataException("Invalid shape position reference pairs.");
+            }
+            string relativeFrom = referencePairs == null ? RequiredString(task, "relativeFrom") : null;
+            bool anyBodyAnchor = OptionalBool(task, "allowAnyBodyAnchor", false);
+            bool requireVisible = OptionalBool(task, "requireVisibleShape", false);
+            bool requireLast = OptionalBool(task, "requireLastBodyParagraph", false);
+            string afterParagraph = requireLast || anyBodyAnchor ? string.Empty : RequiredString(task, "afterParagraph");
             XDocument document = package.Xml("word/document.xml");
+            Func<XElement, bool> bodyAnchor = anchor => anchor.Ancestors(W + "p").Any() &&
+                anchor.Ancestors(W + "body").Contains(document.Root.Element(W + "body")) &&
+                !anchor.Ancestors().Any(e => e.Name == W + "tbl" || e.Name == W + "txbxContent" || e.Name == W + "hdr" || e.Name == W + "ftr");
             List<XElement> matches = document.Descendants(Wp + "anchor").Where(anchor =>
                 string.Equals((string)anchor.Descendants(Wps + "spPr").Elements(A + "prstGeom").FirstOrDefault()?.Attribute("prst"), geometry, StringComparison.Ordinal) &&
                 string.Equals(VisibleText(anchor.Descendants(Wps + "txbx").FirstOrDefault()).TrimEnd(), expectedText, StringComparison.Ordinal)).ToList();
+            if (requireVisible)
+            {
+                Func<XElement, bool> positiveExtent = extent =>
+                {
+                    long width, height;
+                    return extent != null && long.TryParse((string)extent.Attribute("cx"), NumberStyles.Integer, CultureInfo.InvariantCulture, out width) && width > 0 &&
+                        long.TryParse((string)extent.Attribute("cy"), NumberStyles.Integer, CultureInfo.InvariantCulture, out height) && height > 0;
+                };
+                Func<XElement, bool> visibleRun = run =>
+                {
+                    var formatting = EffectiveRunFormatting(package, run.Ancestors(W + "p").First(), run);
+                    return !new[] { "vanish", "webHidden", "specVanish" }.Any(formatting.ContainsKey);
+                };
+                matches = matches.Where(anchor =>
+                {
+                    if (!bodyAnchor(anchor) || anchor.Parent?.Name != W + "drawing" ||
+                        anchor.Ancestors().Any(e => e.Name == W + "del" || e.Name == W + "moveFrom") ||
+                        new[] { "1", "true", "on" }.Contains((string)anchor.Attribute("simplePos")) || !positiveExtent(anchor.Element(Wp + "extent"))) return false;
+                    XElement graphicData = anchor.Element(A + "graphic")?.Element(A + "graphicData");
+                    var objects = graphicData?.Elements().ToList();
+                    XElement shape = objects?.Count == 1 ? objects[0] : null;
+                    if ((string)graphicData?.Attribute("uri") != Wps.NamespaceName || shape?.Name != Wps + "wsp" ||
+                        (string)shape.Element(Wps + "spPr")?.Element(A + "prstGeom")?.Attribute("prst") != geometry ||
+                        anchor.Descendants().Any(e => (e.Name.LocalName == "docPr" || e.Name.LocalName == "cNvPr" || e.Name.LocalName == "cNvSpPr") &&
+                            new[] { "1", "true", "on" }.Contains((string)e.Attribute("hidden")))) return false;
+                    XElement innerExtent = shape.Element(Wps + "spPr")?.Element(A + "xfrm")?.Element(A + "ext");
+                    if (innerExtent != null && !positiveExtent(innerExtent)) return false;
+                    XElement textBox = shape.Element(Wps + "txbx")?.Element(W + "txbxContent");
+                    var paragraphs = textBox?.Elements(W + "p").ToList();
+                    XElement ownerRun = anchor.Ancestors(W + "r").FirstOrDefault();
+                    return ownerRun != null && visibleRun(ownerRun) && paragraphs != null && paragraphs.Count > 0 &&
+                        !textBox.Descendants().Any(e => e.Name == W + "tbl" || e.Name == W + "del" || e.Name == W + "moveFrom") &&
+                        string.Join("\n", paragraphs.Select(LogicalParagraphText)) == expectedText &&
+                        textBox.Descendants(W + "r").Where(r => r.Descendants(W + "t").Any(t => t.Value.Length > 0)).All(visibleRun);
+                }).ToList();
+            }
             if (matches.Count != 1) { detail = "The exact requested Word shape and text were not found uniquely."; return false; }
             XElement match = matches[0];
             string wrap = task.Extra.ContainsKey("expectedWrap") ? RequiredString(task, "expectedWrap") : "square";
             if (wrap != "square" && wrap != "tight") throw new InvalidDataException("Invalid shape wrapping metadata.");
             bool placement = match.Element(Wp + (wrap == "tight" ? "wrapTight" : "wrapSquare")) != null &&
-                string.Equals((string)match.Element(Wp + "positionH")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
                 string.Equals((string)match.Element(Wp + "positionH")?.Element(Wp + "align"), horizontal, StringComparison.Ordinal) &&
-                string.Equals((string)match.Element(Wp + "positionV")?.Attribute("relativeFrom"), relativeFrom, StringComparison.Ordinal) &&
                 string.Equals((string)match.Element(Wp + "positionV")?.Element(Wp + "align"), vertical, StringComparison.Ordinal);
+            string horizontalReference = (string)match.Element(Wp + "positionH")?.Attribute("relativeFrom");
+            string verticalReference = (string)match.Element(Wp + "positionV")?.Attribute("relativeFrom");
+            placement &= referencePairs == null
+                ? horizontalReference == relativeFrom && verticalReference == relativeFrom
+                : referencePairs.Any(pair => horizontalReference == (string)pair["horizontal"] && verticalReference == (string)pair["vertical"]);
             XElement outerParagraph = match.Ancestors(W + "p").FirstOrDefault();
             string anchorText = outerParagraph == null ? null : ParagraphTextOutsideTextBoxes(outerParagraph);
-            bool matchAll = placement && string.Equals(anchorText, afterParagraph, StringComparison.Ordinal);
-            if (OptionalBool(task, "requireLastBodyParagraph", false))
+            bool matchAll = placement && (anyBodyAnchor && !requireLast || string.Equals(anchorText, afterParagraph, StringComparison.Ordinal)) &&
+                (!(anyBodyAnchor || requireVisible) || bodyAnchor(match));
+            if (requireLast)
             {
                 var body = document.Root.Element(W + "body");
                 matchAll &= outerParagraph == body.Elements(W + "p").LastOrDefault() &&

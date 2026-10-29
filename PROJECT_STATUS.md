@@ -1,6 +1,16 @@
 # Project Status
 
-## Current checkpoint — Project 26, 2026-10-28
+## Current checkpoint — Project 27, 2026-10-29
+
+Implemented exactly P27 T01–T05 from clean `main` HEAD `b70f63202a8f2c5e852f3e9810b922ef4cde3932`: native Sentence case on all25×4 cells; genuine horizontal Scroll with exact `Begin in October!`, square wrapping and Bottom Center Margin/Margin; effective Turquoise text highlight throughout the Prince row; original title converted to Gold Accent4 Soft Bevel WordArt; and all four native Football→Soccer replacements. Finite native table variants keep each task independent, including either case/replacement order and title movement. Two generic OOXML routes bring support to75 identifiers; narrow table/shape/preservation opt-ins retain old defaults. No UI/Interop/staging changes or P01–P26 package edits.
+
+Fresh final checks: P27 saved-package matrix134/134 (20 Pass,101 Fail,13 Error), native combined and reverse order5/5 after save/reopen, EN/VI actual MainForm/owned Word lifecycle91/91, isolated table52/52, shape44/44 and WordArt40/40. Newly replayed older expectations pass888/888 (693 shared/current P24 cases,123 P25,72 P26). The original693-path run returned11 Errors from a missing historical P20 template context; isolated reconstruction passes11/11 and the corrected full693 pass. These are fresh executions on retained fixtures, not fresh manual older-project answers.
+
+Debug/Release VS MSBuild Any CPU Rebuild each reports0 errors/0 warnings. Source and both outputs validate EN/VI:27 packages/206 tasks,75 routes,0 errors/0 warnings; all144 files match both outputs. All54 dictionaries,27 starters,8 assets and138 P01–P26 package files retain initial bytes; only P27 tasks metadata changes, and its five existing copy entries are reused once. Original/package starter SHA-256 remains527E5D4C21166605AC6FA4376520C271E3CA683256545529B1F864E43557DFC1.
+
+Native GUI case/Scroll/WordArt gallery evidence is distinct from API Turquoise/replacement/combined evidence. The modeless Ctrl+H GUI focus attempt failed on an isolated copy and is excluded from positives; full manual Ribbon/F5/VI and other Office builds remain unverified. The named Desktop guide was absent. Evidence, runnable checks and precise limits: `artifacts/p27/REPORT.md`. Isolated form roots are removed; final test Word/Trainer processes and lock files are empty. No commit/push/pull/reset or Excel work. Older checkpoints below remain historical.
+
+## Earlier checkpoint — Project 26, 2026-10-28
 
 Implemented exactly P26 T01–T05 from clean `main` HEAD `a7e9673f03d1c3bd8e31fbe9b76486db48b84448`: complete Information import between the paid-break connector and original SmartArt; logical Accessibility/Speed/Accuracy/Artists order with original photographs/layout; supplied coffee picture below Sidebar text with native Soft Round picture bevel; real bullets on exactly three shifts; and inherited header-story text watermark `MOS Word`, Arial. Four generic OOXML routes bring support to73 identifiers; narrow preservation/effective-neighbor opt-ins retain old defaults. No UI/Word ownership/lifecycle changes or P01–P25 package changes.
 
