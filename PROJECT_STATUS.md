@@ -1,5 +1,12 @@
 # Project Status
 
+## B1 — Deterministic exam composition and scoring, 2026-10-30
+
+Implemented Core-only ExamComposer, immutable definition/result snapshots, SplitMix64 PRNG, ScoreAllocator and ExamScorer. Project identities are sampled before task subsets; uniform seven-identity proposals are conditioned on conflict/legacy/total feasibility, never weighted by task-combination counts. Required/grouped/excluded tasks preserve original task order and instruction keys. Prepared composer copies its inputs; static Compose(catalog, packages, seed) is also available. A finite reservoir fallback covers restrictive feasible catalogs after bounded proposals. Score allocation uses a separate seeded stream, sums exactly1000, awards25–30/task, and treats Fail/Error/missing results as incorrect. Error diagnostics go only to an injected internal logger, never ExamResult. No Training, package/catalog, Word/lifecycle or B2/UI changes.
+
+Fresh VS MSBuild full-solution Debug/Release rebuilds each0 warnings/0 errors. Both suites pass622/622 per configuration (571 headless +51 desktop), retaining all589 B0 cases including528 Phase A cases. Each configuration checks100,000 seeds against every catalog rule, all N34–40 and25–30 point/sum1000 limits. All28 projects appear within±20%of25,000: range20,477–25,655; P10=25,253, P20=20,477, P21=25,434. P07/P20 marginal reduction follows their mutual conflict, not project task count. Golden seed/PRNG/allocation, restrictive-pool fallback, invalid metadata/outcomes, immutable input/output, missing-result behavior, private Error logging and exact699/700/1000 thresholds pass. Final source/output150-file lists/hashes match; all149 original package files and catalog are unchanged. No native Word check in this pure-logic scope. Evidence: artifacts/b1 (ignored). Stop after B1; B2 remains unauthorized.
+
+
 ## B0 — Testing catalog and housekeeping, 2026-10-30
 
 Added separate strict TestingCatalogLoader/Validator and Core metadata model, without changing Training loading/grading/UI. All28 projects remain eligible; required P07-T01, all-or-none P14-T03/T04 and P18-T05/T07, sole conflict P07/P20 Notes.dotx. Exclude starter-satisfied P04-T05/P13-T03/P16-T01 and defer live-snapshot P22-T07/P24-T03 until B2. Fresh headless starter review212:3 Pass/201 Fail/8 Error (six legacy conversion, two missing live snapshots). Vietnamese per-project evidence: docs/TESTING_CATALOG_REVIEW.md; A4 checklist moved unchanged to tracked docs/MANUAL_TEST.md.

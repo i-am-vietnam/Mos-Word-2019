@@ -2,7 +2,7 @@
 
 ## B0 Testing readiness boundary — 2026-10-30
 
-Testing remains unimplemented beyond catalog validation. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 must preserve last OOXML plus owned Save As/output provenance (especially TXT P09/P16), isolate SessionId/project copies, and stage/cleanup via Phase A services. Catalog validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
+B1 composition/scoring is implemented as pure Core logic; the Testing session engine, UI and persistence remain unimplemented. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 must preserve last OOXML plus owned Save As/output provenance (especially TXT P09/P16), isolate SessionId/project copies, and stage/cleanup via Phase A services. Catalog/composer headless validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
 
 
 Reviewed: 2026-10-30.

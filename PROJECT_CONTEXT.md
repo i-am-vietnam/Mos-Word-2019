@@ -1,5 +1,22 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B1 — Sinh đề và tính điểm thuần Core
+
+Đã thêm ExamComposer/ExamDefinition, PRNG SplitMix64 cố định, ScoreAllocator và ExamScorer/ExamResult; chưa nối UI hoặc session. Composer chọn project trước task, tôn trọng catalog B0, tối đa một legacy.doc/conflictGroup, bảy project và34–40task. Bộ chuẩn bị sao chép metadata; đầu ra giữ thứ tự task và instruction key để B3 tra đúng ngôn ngữ phiên. Điều kiện xung đột ảnh hưởng tần suất biên, nhưng không dùng số tổ hợp task để tăng/giảm trọng số project. Golden test giữ hợp đồng tái lập seed; không tự đổi catalog đang được duyệt.
+
+Điểm theo thứ tự project/task của definition, stream riêng theo seed. Fail/Error/thiếu kết quả nhận0; chỉ Error gửi callback log nội bộ, không có chẩn đoán trong ExamResult. Tổng project cộng thành tổng bài; từ700 là Passed. B3 mới hiển thị Đạt/Pass hoặc Cần Luyện Tập thêm/Needs more practice và instruction đầy đủ từ khóa đã lưu.
+
+| N | Điểm cơ bản | Số task được thêm1 |
+|---|---|---|
+|34|29|14|
+|35|28|20|
+|36|27|28|
+|37|27|1|
+|38|26|12|
+|39|25|25|
+|40|25|0|
+
+
 ## B0 — Catalog Testing
 
 Catalog riêng `MosWord2019.WinForms/Projects/testing-catalog.json` chứa28 entry; Core có TestingCatalogEntry, Projects có TestingCatalogLoader/Validator. Loader kiểm schema và constraints trước khi trả dữ liệu; không nối vào ProjectLoader Training. Validator dùng tập con theo nhóm và DP kiểm tính khả thi7project/34–40task/conflict/legacy; không sinh đề hoặc chấm điểm. Rationale và các điều kiện B2: docs/TESTING_CATALOG_REVIEW.md. Checklist A4 hiện được tracked ở docs/MANUAL_TEST.md. Training và149 file package gốc giữ nguyên; wildcard copy thêm đúng catalog.
