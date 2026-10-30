@@ -65,6 +65,8 @@ namespace MosWord2019.Tests
     {
         private readonly string root = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestWorkspaces"));
         public string Folder { get; }
+        internal MosWord2019.Core.Services.WordGradingService CreateGrader(string documents)
+            => new MosWord2019.Core.Services.WordGradingService(() => documents);
 
         public TestWorkspace()
         {

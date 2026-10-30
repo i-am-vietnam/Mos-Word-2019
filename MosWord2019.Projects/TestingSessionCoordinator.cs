@@ -44,7 +44,7 @@ namespace MosWord2019.Projects
         public void Resume()
         {
             EnsureUsable(); attached = true; Session.Tick();
-            if (Session.Status == TestingSessionStatus.Submitting) { FinalizeSaved(); return; }
+            if (Session.Status == TestingSessionStatus.Submitting) { SubmitSaved(); return; }
             resumeEntryPending = true; StartHeartbeat(); EnterCurrent(); ApplyLock(); Save(); StateChanged?.Invoke();
         }
         private void EnterCurrent()
@@ -75,6 +75,7 @@ namespace MosWord2019.Projects
                 busyWarning = false; StateChanged?.Invoke();
             }
             catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); throw; }
+            catch (WordReopenPendingException) { throw; }
             catch { faulted = true; throw; }
         }
         public void Restart()
@@ -97,9 +98,10 @@ namespace MosWord2019.Projects
                 entered = false; Finish();
             }
             catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); throw; }
+            catch (WordReopenPendingException) { throw; }
             catch { faulted = true; throw; }
         }
-        private void FinalizeSaved() { entered = false; Submit(); }
+        public void SubmitSaved() { EnsureUsable(); savedOnlyFinalization = true; entered = false; Submit(); }
         private void Finish()
         {
             heartbeat?.Dispose(); heartbeat = null;

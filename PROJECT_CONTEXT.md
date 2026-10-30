@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B4-FIX — Đóng/mở lại Word và khôi phục phiên
+
+Bản sửa theo lỗi Word thật ngày30/10/2026: khi học viên đóng Word bằng X, Testing nhả COM của Application cũ, chỉ chờ process sở hữu tối đa10giây mỗi lượt rồi mở instance mới từ checkpoint; ba lần thử có backoff, hết lượt vẫn retry ở tick sau. Application đã retire không còn quyền terminate tự động, bảo vệ tài liệu khác nếu process chưa thoát. Timer và provenance Save As/legacy conversion được giữ.
+
+Warning dùng mã sự kiện; chỉ coordinator.NeedsRecovery mới chuyển UI sang recovery. PID đã thoát/không đọc được identity không làm startup chết và không được terminate. Startup và mở Testing cùng có Retry/Nộp từ dữ liệu đã lưu/Later khi Inspect lỗi; nộp saved dùng checkpoint/autosave, không mở Word, lưu kết quả trước giải phóng phiên. Later không cố Prepare lên active state. Không đổi grader, task/catalog/package; B5/Phase C chưa triển khai. Checklist Word thật bước5/7 ở `docs/MANUAL_TEST.md` còn chờ chạy lại bằng bản sửa.
+
 ## B4 — Lưu kết quả và retry ghi atomic
 
 Mỗi bài hoàn tất lưu Results/<SessionId>.json trước cleanup cuối, có seed/definition/hash nội dung, outcome/điểm từng task, tổng điểm, mốc UTC, lịch sử offline theo đồng hồ đơn điệu và pendingUpload=true. Không ghi chẩn đoán grader hay thông tin ownership/COM vào kết quả. Ghi lại cùng dữ liệu là idempotent; dữ liệu xung đột hoặc lỗi ghi giữ nguyên state để khôi phục. Chỉ xóa state sau khi kết quả đã bền vững; archive cũ không tự migrate, thiếu lịch sử được đánh dấu rõ.

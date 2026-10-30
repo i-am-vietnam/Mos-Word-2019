@@ -40,12 +40,28 @@ namespace MosWord2019.Projects
                 journal.DeferRecovery(false); journal.Recover(); // Its own SessionId remains protected.
                 return record;
             }
+            Complete(record, finalize);
+            return null;
+        }
+        /// <summary>Explicit fallback: no process inspection, termination or Word activation.</summary>
+        public void FinalizeSaved(string catalog, IEnumerable<ProjectPackage> packages, Action<TestingRecoveryRecord> finalize)
+        {
+            store.ProtectPendingRecovery(journal); journal.DeferRecovery(true);
+            var envelope = store.ReadEnvelope();
+            if ((string)envelope["status"] == "Completed")
+            { store.ArchiveCompleted(); Release((string)envelope["sessionId"]); return; }
+            var record = store.Load(catalog, packages);
+            store.RecordRecoveryDecision(record.Decide(DateTime.UtcNow));
+            Complete(record, finalize);
+        }
+        private void Complete(TestingRecoveryRecord record, Action<TestingRecoveryRecord> finalize)
+        {
             finalize(record); // Must store and archive before any recovery claims are released.
             if (File.Exists(store.StatePath)) store.ArchiveCompleted(); // Refuse recovery if finalization did not actually store a completed result.
             string resultPath = Path.Combine(Path.GetDirectoryName(store.StatePath), "Results", record.Prepared.SessionId + ".json");
             PreparedTestingSession.CheckPath(resultPath);
             if (!File.Exists(resultPath)) throw new InvalidDataException("Testing finalization did not archive its result.");
-            Release(record.Prepared.SessionId); return null;
+            Release(record.Prepared.SessionId);
         }
         public void Release(string id) { journal.ReleaseSession(id); journal.DeferRecovery(false); journal.Recover(); }
     }

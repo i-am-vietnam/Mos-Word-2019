@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "sessionId": "8123ccd108534a2496b95b7b2cf831f3",
+  "seed": -2538600346381127957,
+  "machine": "DESKTOP-4968L2S",
+  "language": "vi",
+  "definition": {
+    "Seed": -2538600346381127957,
+    "Projects": [
+      {
+        "ProjectId": "Word2019_P04",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T03",
+          "T07",
+          "T08"
+        ],
+        "InstructionKeys": {
+          "T01": "P04_T01_INST",
+          "T02": "P04_T02_INST",
+          "T03": "P04_T03_INST",
+          "T07": "P04_T07_INST",
+          "T08": "P04_T08_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P28",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T03",
+          "T04",
+          "T05"
+        ],
+        "InstructionKeys": {
+          "T01": "P28_T01_INST",
+          "T02": "P28_T02_INST",
+          "T03": "P28_T03_INST",
+          "T04": "P28_T04_INST",
+          "T05": "P28_T05_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P02",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T03",
+          "T04",
+          "T06",
+          "T08"
+        ],
+        "InstructionKeys": {
+          "T01": "P02_T01_INST",
+          "T02": "P02_T02_INST",
+          "T03": "P02_T03_INST",
+          "T04": "P02_T04_INST",
+          "T06": "P02_T06_INST",
+          "T08": "P02_T08_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P16",
+        "TaskIds": [
+          "T03",
+          "T04",
+          "T05",
+          "T06",
+          "T07"
+        ],
+        "InstructionKeys": {
+          "T03": "P16_T03_INST",
+          "T04": "P16_T04_INST",
+          "T05": "P16_T05_INST",
+          "T06": "P16_T06_INST",
+          "T07": "P16_T07_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P18",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T04",
+          "T06"
+        ],
+        "InstructionKeys": {
+          "T01": "P18_T01_INST",
+          "T02": "P18_T02_INST",
+          "T04": "P18_T04_INST",
+          "T06": "P18_T06_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P09",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T07",
+          "T08"
+        ],
+        "InstructionKeys": {
+          "T01": "P09_T01_INST",
+          "T02": "P09_T02_INST",
+          "T07": "P09_T07_INST",
+          "T08": "P09_T08_INST"
+        }
+      },
+      {
+        "ProjectId": "Word2019_P22",
+        "TaskIds": [
+          "T01",
+          "T02",
+          "T03",
+          "T04",
+          "T05"
+        ],
+        "InstructionKeys": {
+          "T01": "P22_T01_INST",
+          "T02": "P22_T02_INST",
+          "T03": "P22_T03_INST",
+          "T04": "P22_T04_INST",
+          "T05": "P22_T05_INST"
+        }
+      }
+    ],
+    "N": 34
+  },
+  "contentHashes": {
+    "testing-catalog.json": "7D37DCA1279847D137409C1BE43574938CD9B9ED8C390062B4145F05237D332E",
+    "Word2019_P04/tasks.json": "C1830B8F346C3BECF5C3DA603933D912E260B4FD6C8EBBABAF999E464A93DB8F",
+    "Word2019_P04/starter.docx": "696015203B45BAD814B60F45047A7F51B0B4B25580246E8E26F2AB32BC5BE95E",
+    "Word2019_P28/tasks.json": "2D79F9F59D74558371B7C76C53833837DF1F96790477E4BFCE5C7751EE46CC26",
+    "Word2019_P28/starter.docx": "D5F08CF903DDFD26E3FA042CF6C38ABC3EE562AD7F6007CF124B332DD8FBB7A8",
+    "Word2019_P02/tasks.json": "9A76CBB2A780544936BF80D4A8FE1041432BDE4F153289742E4A1421EFBA6E4F",
+    "Word2019_P02/starter.docx": "63A40EAD1EAB7BD4AAF5ECA672B36C784D07A7E3A912C0F4D2C8BB862308F23C",
+    "Word2019_P16/tasks.json": "7B8F10CA9B8C874CDF27E9252B92E7E75AEBC4EC1EFEDBF5E8FA9D69D70A6040",
+    "Word2019_P16/starter.docx": "706B0800B9103EAEA3FE117FA80B88CFC1108C7331D3916242EB31C004C8FEF6",
+    "Word2019_P18/tasks.json": "EB0640F73A6A4945F6FDC806901C60ECFDE1E4ADAABB31010529EB72EA90F7BA",
+    "Word2019_P18/starter.docx": "2F76845848857FD606A9ED6AC596FA02CC0EFF789F028EF5275211810E1277BD",
+    "Word2019_P09/tasks.json": "F5D3FEBBB79C1E1B778E0A355DE440E539E0F59315A25591C2D58F4B4CB70196",
+    "Word2019_P09/starter.docx": "1DE4B3B6E846CCF3884F49F8E27C72492E235DE22A07EE7A22A94C6742688C5C",
+    "Word2019_P22/tasks.json": "076AB31D5175FBAFBA5C6674677315BDE87C6A64545827E798341879F02DC418",
+    "Word2019_P22/starter.docx": "D4665D836727A46D013C352E72927AADC12DC8512389789E16F56CFC57E143BC"
+  },
+  "startedUtc": "2026-10-30T14:51:53.921589Z",
+  "completedUtc": null,
+  "offlinePeriods": [],
+  "historyIncomplete": false,
+  "lastHeartbeatUtc": "2026-10-30T14:53:54.1691005Z",
+  "lastSaveUtc": "2026-10-30T14:53:58.4556911Z",
+  "finalizeReason": "None",
+  "clockRollbackDetected": false,
+  "ownedWord": {
+    "ProcessId": 17120,
+    "CreationFileTimeUtc": 134378455104497480,
+    "ImagePath": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+    "IsWord": true
+  },
+  "projectContexts": {
+    "Word2019_P04": {
+      "sourcePath": "C:\\Users\\HUYNH HAU\\Documents\\MosWord2019\\Working\\Testing\\8123ccd108534a2496b95b7b2cf831f3\\Word2019_P04\\work.docx",
+      "context": {
+        "DefaultTemplateFolder": "C:\\Users\\HUYNH HAU\\Documents\\Custom Office Templates",
+        "SavedFromCurrentWorkingDocument": false,
+        "OwnedDocumentPath": "C:\\Users\\HUYNH HAU\\Documents\\MosWord2019\\Working\\Testing\\8123ccd108534a2496b95b7b2cf831f3\\Word2019_P04\\work.docx",
+        "OwnedDocumentSaveFormat": 12,
+        "FormattingMarks": null,
+        "TocLayout": null,
+        "OutputOwnership": {
+          "SessionId": "8123ccd108534a2496b95b7b2cf831f3",
+          "SessionStartedUtc": "2026-10-30T14:53:21.8370059Z",
+          "DocumentsFolder": "C:\\Users\\HUYNH HAU\\Documents",
+          "TemplateFolder": null,
+          "Outputs": []
+        }
+      },
+      "savedUtc": "2026-10-30T14:53:58.4556911Z"
+    }
+  },
+  "offlineElapsedTicks": 0,
+  "elapsedTicks": 1202438611,
+  "currentIndex": 0,
+  "status": "Running",
+  "projectStates": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "lockedResults": [],
+  "result": null
+}

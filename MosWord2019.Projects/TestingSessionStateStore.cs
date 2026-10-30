@@ -55,6 +55,18 @@ namespace MosWord2019.Projects
     {
         private readonly object gate = new object();
         public string StatePath { get; }
+        public bool RequiresRecovery
+        {
+            get
+            {
+                lock (gate)
+                {
+                    if (!File.Exists(StatePath)) return false;
+                    string status = (string)ReadEnvelope()["status"];
+                    return status != "Preparing" && status != "Prepared";
+                }
+            }
+        }
         public TestingSessionStateStore(string statePath = null)
         {
             StatePath = Path.GetFullPath(statePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

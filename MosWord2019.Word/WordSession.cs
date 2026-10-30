@@ -8,6 +8,7 @@ namespace MosWord2019.Word
         internal Wd.Application Application;
         internal Wd.Document Document;
         internal WinApiProcessHelper.OwnedProcess Process;
+        internal bool Retired;
         internal string DocumentPath;
     }
 }

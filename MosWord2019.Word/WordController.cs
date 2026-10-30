@@ -32,7 +32,7 @@ namespace MosWord2019.Word
         // Diagnostics only; callers never receive a COM object or a process handle.
         public event Action<MosWord2019.Core.Models.OwnedWordProcessIdentity> OwnedProcessStarted;
         public MosWord2019.Core.Models.OwnedWordProcessIdentity OwnedProcessIdentity
-        { get { EnsureUsable(); return session?.Process?.ReadIdentity(); } }
+        { get { EnsureUsable(); return session?.Retired == true ? null : session?.Process?.ReadIdentity(); } }
         public int? OwnedProcessId { get { return session?.Process?.Id; } }
 
         /// <summary>Limits OLE rejection retries inside a short owner-STA observation.</summary>
@@ -100,10 +100,43 @@ namespace MosWord2019.Word
 
         public void StartWord() { RunCom(() => StartWordCore()); }
 
+        public void ReleaseClosedApplication()
+        {
+            RunCom(() =>
+            {
+                EnsureUsable();
+                if (IsOpened) throw new InvalidOperationException("The owned document is still open.");
+                if (session == null) return;
+                session.Retired = true; // From here on, waiting is allowed; automatic termination is not.
+                // Version/FullName can still answer while the last Word window is shutting down.
+                // Retire these RCWs without Quit, Close or termination (other documents may exist).
+                var errors = new List<Exception>();
+                if (session.Application != null)
+                {
+                    try
+                    {
+                        session.Application.DocumentBeforeSave -= BeforeDocumentSave;
+                        if (closeEventsSubscribed) session.Application.DocumentBeforeClose -= BeforeDocumentClose;
+                    }
+                    catch (Exception ex) { errors.Add(ex); }
+                }
+                closeEventsSubscribed = false;
+                TryRelease(session.Document, errors); session.Document = null; session.DocumentPath = null;
+                TryRelease(session.Application, errors); session.Application = null;
+                exportCheckpointPath = null; testingWindow = IntPtr.Zero;
+                if (errors.Count > 0) MosWord2019.Core.Diagnostics.AppLogger.Write("Closed Word COM release: " + errors[0].Message);
+                // Keep the original handle after a timeout so a later observation can wait again.
+                if (session.Process != null && !session.Process.WaitForExit(10000))
+                    throw new TimeoutException("The previous owned Word application is still exiting; reopen will retry.");
+                session.Process?.Dispose(); session = null;
+            });
+        }
+
         private void StartWordCore()
         {
             EnsureUsable();
             if (messageFilter == null) messageFilter = createMessageFilter();
+            if (session?.Retired == true) ReleaseClosedApplication();
             if (session != null)
             {
                 if (session.Application != null)
@@ -281,6 +314,13 @@ namespace MosWord2019.Word
         {
             EnsureThread();
             if (session == null) return;
+            if (session.Retired)
+            {
+                // A personal document may have kept the retired application alive past the wait.
+                // Never turn its retained wait handle back into cleanup/force-close authority.
+                session.Process?.Dispose(); session = null;
+                return;
+            }
             var errors = new List<Exception>();
             bool preserveApplication = false;
             Wd.Documents documents = null;

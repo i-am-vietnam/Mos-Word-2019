@@ -31,6 +31,8 @@ namespace MosWord2019.Word
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint WaitForSingleObject(SafeProcessHandle process, uint milliseconds);
         [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetExitCodeProcess(SafeProcessHandle process, out uint exitCode);
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool TerminateProcess(SafeProcessHandle process, uint exitCode);
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr window, int command);
@@ -122,6 +124,7 @@ namespace MosWord2019.Word
 
             internal OwnedWordProcessIdentity ReadIdentity()
             {
+                if (HasExited) return null;
                 long created, exited, kernel, user;
                 var path = new StringBuilder(32768); int length = path.Capacity;
                 if (!GetProcessTimes(handle, out created, out exited, out kernel, out user) ||
@@ -130,6 +133,16 @@ namespace MosWord2019.Word
             }
             OwnedWordProcessIdentity IRecoveredWordProcess.ReadIdentity() => ReadIdentity();
             void IRecoveredWordProcess.Terminate() => EnsureExited();
+            public bool HasExited
+            {
+                get
+                {
+                    if (WaitForExit(0)) return true;
+                    uint code;
+                    if (!GetExitCodeProcess(handle, out code)) throw new Win32Exception(Marshal.GetLastWin32Error());
+                    return code != 259; // STILL_ACTIVE
+                }
+            }
 
             internal bool SetInputEnabled(IntPtr window, bool enabled)
             {

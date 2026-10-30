@@ -18,11 +18,23 @@ namespace MosWord2019
                 do
                 {
                     var store = new TestingSessionStateStore();
-                    if (Program.PendingTestingRecovery == null && File.Exists(store.StatePath)) Program.InspectTestingRecovery();
+                    if (Program.PendingTestingRecovery == null && File.Exists(store.StatePath))
+                    {
+                        if (!Program.InspectTestingRecovery(owner)) return;
+                        // Later/refused orphan close is a decision to keep pending, never permission to Prepare.
+                        if (Program.PendingTestingRecovery == null && store.RequiresRecovery) return;
+                    }
                     var record = Program.TakeTestingRecovery();
                     string root = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects");
                     var available = new ProjectLoader().LoadAll(root, language);
-                    var prepared = record?.Prepared ?? store.Prepare(Path.Combine(root, "testing-catalog.json"), available, language);
+                    PreparedTestingSession prepared;
+                    try { prepared = record?.Prepared ?? store.Prepare(Path.Combine(root, "testing-catalog.json"), available, language); }
+                    catch (IOException ex) when (File.Exists(store.StatePath))
+                    {
+                        if (!Program.InspectTestingRecovery(owner, ex)) return;
+                        if (Program.PendingTestingRecovery == null && store.RequiresRecovery) return;
+                        continue;
+                    }
                     var packages = LoadForExam(root, prepared); // The persisted language wins on resume/retry.
                     var host = TestingStaHost.Create(prepared, store, Program.Journal, packages, record);
                     TestingForm form;
@@ -33,8 +45,9 @@ namespace MosWord2019
                         form.ShowDialog(owner);
                         if (!form.RecoveryRequired || Program.RecoveryDeferred) return;
                     }
-                    Program.InspectTestingRecovery();
-                } while (Program.PendingTestingRecovery != null);
+                    if (!Program.InspectTestingRecovery(owner)) return;
+                    if (Program.PendingTestingRecovery == null) return;
+                } while (true);
             }
             catch (Exception ex)
             {

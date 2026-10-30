@@ -229,6 +229,22 @@ namespace MosWord2019.Tests
                 Assert.AreEqual(TestingSessionStatus.Completed, lab.Session.Status); Assert.AreEqual(1, lab.Runtime.Forced);
             }
         }
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void ReopenPendingCanRetryNextOrSubmitWithoutFaultingSession(bool submit)
+        {
+            using (var lab = new Lab())
+            {
+                lab.Engine.Start(); lab.Runtime.ReopenFailures = 1;
+                Action command = () => { if (submit) lab.Engine.Submit(); else lab.Engine.Next(); };
+                Assert.ThrowsException<MosWord2019.Core.Services.WordReopenPendingException>(command);
+                Assert.IsFalse(lab.Engine.NeedsRecovery); Assert.AreEqual(0, lab.Session.CurrentIndex);
+                lab.Clock.Advance(10); command();
+                Assert.AreEqual(submit ? TestingSessionStatus.Completed : TestingSessionStatus.Running, lab.Session.Status);
+                if (!submit) { Assert.AreEqual(1, lab.Session.CurrentIndex); Assert.AreEqual(TimeSpan.FromSeconds(10), lab.Session.Elapsed); }
+            }
+        }
         private sealed class Clock : ITestingClock
         {
             public TimeSpan Monotonic { get; private set; }
@@ -243,7 +259,7 @@ namespace MosWord2019.Tests
         }
         private sealed class Runtime : ITestingProjectRuntime, ITestingForceRecovery
         {
-            internal int Saves, FromDisk, Restarts, Entries, BusyRemaining, Forced, EntryBusyRemaining; internal bool LastResume; internal bool Enabled, ForceFails; internal int BusyCode;
+            internal int Saves, FromDisk, Restarts, Entries, BusyRemaining, Forced, EntryBusyRemaining, ReopenFailures; internal bool LastResume; internal bool Enabled, ForceFails; internal int BusyCode;
             private readonly ExamDefinition definition; private string current;
             internal Runtime(ExamDefinition definition) { this.definition = definition; }
             public void Enter(string id, bool resume) { LastResume = resume; if (EntryBusyRemaining-- > 0) throw new MosWord2019.Core.Services.WordBusyException(new Exception("entry dialog")); current = id; Entries++; }
@@ -252,7 +268,8 @@ namespace MosWord2019.Tests
             public void SetInputEnabled(bool enabled) { if (ForceFails && Forced > 0) throw new IOException("Word unavailable"); Enabled = enabled; }
             private IReadOnlyList<ExamTaskGrade> Grades(string id) => definition.Projects.Single(p => p.ProjectId == id).TaskIds
                 .Select(t => new ExamTaskGrade(id, t, new TaskGradeResult(TaskGradeOutcome.Pass, "", "", t))).ToList();
-            public void LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist) { if (BusyRemaining-- > 0) { if (BusyCode != 0) throw new System.Runtime.InteropServices.COMException("busy", BusyCode); throw new MosWord2019.Core.Services.WordBusyException(new Exception("fake dialog")); } persist(Grades(current)); }
+            public void LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist) { if (ReopenFailures-- > 0) throw new MosWord2019.Core.Services.WordReopenPendingException(new IOException("instance exiting"));
+                if (BusyRemaining-- > 0) { if (BusyCode != 0) throw new System.Runtime.InteropServices.COMException("busy", BusyCode); throw new MosWord2019.Core.Services.WordBusyException(new Exception("fake dialog")); } persist(Grades(current)); }
             public void ForceCloseOwnedWord() { Forced++; if (ForceFails) throw new IOException("termination denied"); BusyRemaining = 0; }
             public IReadOnlyList<ExamTaskGrade> GradeSaved(string id) { FromDisk++; return Grades(id); }
             public void Restart(string id) { Restarts++; }

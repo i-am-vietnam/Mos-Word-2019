@@ -334,6 +334,7 @@ namespace MosWord2019.Tests
 
         private sealed class FakeController : IWordController
         {
+            public void ReleaseClosedApplication() { }
             internal int DisposeFailures;
             internal int DisposeCalls;
             internal int TotalCalls;

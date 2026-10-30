@@ -67,44 +67,50 @@ namespace MosWord2019
         internal static TestingRecoveryRecord TakeTestingRecovery()
         { var record = PendingTestingRecovery; PendingTestingRecovery = null; return record; }
 
-        internal static void InspectTestingRecovery()
+        internal static bool InspectTestingRecovery(IWin32Window owner = null, Exception initialFailure = null)
         {
             var store = new TestingSessionStateStore();
-            if (!File.Exists(store.StatePath)) return;
-            try
+            PendingTestingRecovery = null;
+            if (!File.Exists(store.StatePath) && initialFailure == null) return true;
+            string projects = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects");
+            return TestingRecoveryDialog.Run(
+                () => InspectTestingRecoveryCore(owner, store, projects),
+                () =>
+                {
+                    var packages = new ProjectLoader().LoadAll(projects, "en");
+                    new TestingStartupRecovery(store, Journal).FinalizeSaved(Path.Combine(projects, "testing-catalog.json"), packages,
+                        record => FinalizeSavedRecord(owner, store, projects, record));
+                },
+                error => RecoveryDeferred ? TestingRecoveryFailureChoice.Later : TestingRecoveryDialog.Show(owner),
+                error => { Journal.DeferRecovery(true); AppLogger.Write("Testing startup recovery retained pending session", error); }, initialFailure);
+        }
+
+        private static void InspectTestingRecoveryCore(IWin32Window owner, TestingSessionStateStore store, string projects)
+        {
+            var packages = new ProjectLoader().LoadAll(projects, "en");
+            var process = new OwnedWordProcessRecovery();
+            PendingTestingRecovery = new TestingStartupRecovery(store, Journal).Inspect(Path.Combine(projects, "testing-catalog.json"), packages,
+                DateTime.UtcNow, process.IsRunning,
+                id => MessageBox.Show(owner, "Word của bài thi trước vẫn đang mở và sẽ được đóng. Nếu bạn đang mở tài liệu cá nhân trong cửa sổ Word đó, hãy lưu lại rồi bấm Tiếp tục.\n\nWord from the previous exam is still open and will be closed. If you have personal documents open in that Word window, save them, then click Continue.",
+                    "Tiếp tục / Continue", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK,
+                process.Stop,
+                record =>
+                {
+                    var choice = MessageBox.Show(owner, "Tiếp tục bài thi trước? Thời gian ứng dụng đóng vẫn được tính. Yes: tiếp tục; No: nộp bài; Cancel: để lần sau.\n\nResume the previous exam? Downtime counts. Yes: resume; No: submit; Cancel: keep pending.",
+                        "MOS Word 2019", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    return choice == DialogResult.Yes ? TestingResumeChoice.Resume : choice == DialogResult.No ? TestingResumeChoice.Submit : TestingResumeChoice.Later;
+                }, record => FinalizeSavedRecord(owner, store, projects, record));
+        }
+
+        private static void FinalizeSavedRecord(IWin32Window owner, TestingSessionStateStore store, string projects, TestingRecoveryRecord record)
+        {
+            var localized = TestingFlow.LoadForExam(projects, record.Prepared);
+            using (var host = TestingStaHost.Create(record.Prepared, store, Journal, localized, record))
             {
-                string projects = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects");
-                var packages = new ProjectLoader().LoadAll(projects, "en");
-                var process = new OwnedWordProcessRecovery();
-                PendingTestingRecovery = new TestingStartupRecovery(store, Journal).Inspect(Path.Combine(projects, "testing-catalog.json"), packages,
-                    DateTime.UtcNow, process.IsRunning,
-                    id => MessageBox.Show("Word của bài thi trước vẫn đang mở và sẽ được đóng. Nếu bạn đang mở tài liệu cá nhân trong cửa sổ Word đó, hãy lưu lại rồi bấm Tiếp tục.\n\nWord from the previous exam is still open and will be closed. If you have personal documents open in that Word window, save them, then click Continue.",
-                        "Tiếp tục / Continue", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK,
-                    process.Stop,
-                    record =>
-                    {
-                        var choice = MessageBox.Show("Tiếp tục bài thi trước? Thời gian ứng dụng đóng vẫn được tính. Yes: tiếp tục; No: nộp bài; Cancel: để lần sau.\n\nResume the previous exam? Downtime counts. Yes: resume; No: submit; Cancel: keep pending.",
-                            "MOS Word 2019", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                        return choice == DialogResult.Yes ? TestingResumeChoice.Resume : choice == DialogResult.No ? TestingResumeChoice.Submit : TestingResumeChoice.Later;
-                    },
-                    record =>
-                    {
-                        var localized = TestingFlow.LoadForExam(projects, record.Prepared);
-                        using (var host = TestingStaHost.Create(record.Prepared, store, Journal, localized, record))
-                        {
-                            var result = GradingProgress.Run(record.Prepared.Language, async () =>
-                            { await host.SubmitAsync(); return await host.InvokeAsync(c => c.Session.Result); });
-                            using (var window = new ResultForm(result, localized, record.Prepared.Language)) window.ShowDialog();
-                        }
-                    });
-                // Main opens the accepted resume before Login; the host recomputes downtime when it is created.
-            }
-            catch (Exception ex)
-            {
-                Journal.DeferRecovery(true); AppLogger.Write("Testing startup recovery retained pending session", ex);
-                if (RecoveryDeferred) return;
-                MessageBox.Show("Không thể khôi phục bài thi. Dữ liệu được giữ để thử lại. / Exam recovery failed; its data has been retained.",
-                    "MOS Word 2019", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Do not Resume/Start: saved-only submission never activates Word or reopens a document.
+                var result = GradingProgress.Run(record.Prepared.Language, async () =>
+                { await host.SubmitSavedAsync(); return await host.InvokeAsync(c => c.Session.Result); });
+                using (var window = new ResultForm(result, localized, record.Prepared.Language)) window.ShowDialog(owner);
             }
         }
 

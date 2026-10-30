@@ -65,11 +65,14 @@ namespace MosWord2019.Tests
         [DllImport("user32.dll")] private static extern bool IsWindowEnabled(IntPtr window);
         private sealed class EmptyRuntime : ITestingProjectRuntime
         {
+            internal int ObserveFailures;
+            internal bool GradeFails;
+            internal readonly TaskCompletionSource<bool> Observed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             public void Enter(string id, bool resume) { }
             public void AutosaveCurrent() { }
-            public void Observe() { }
+            public void Observe() { if (Interlocked.Decrement(ref ObserveFailures) >= 0) throw new IOException("transient tick failure"); Observed.TrySetResult(true); }
             public void SetInputEnabled(bool enabled) { }
-            public void LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist) { }
+            public void LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist) { if (GradeFails) throw new IOException("genuine submission failure"); }
             public IReadOnlyList<ExamTaskGrade> GradeSaved(string id) => new ExamTaskGrade[0];
             public void Restart(string id) { }
             public void Close() { }
@@ -80,6 +83,62 @@ namespace MosWord2019.Tests
         {
             using (var host = new MosWord2019.TestingStaHost(() => { throw new IOException("injected startup failure"); }, new AlwaysOnlineMonitor(), _ => { }))
                 await Assert.ThrowsExceptionAsync<IOException>(() => host.InvokeAsync(e => true));
+        }
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public async Task HostWarningCodeComesFromCoordinatorFaultAndTransientTicksKeepRetrying(bool fault)
+        {
+            using (var folder = new TestWorkspace())
+            {
+                var store = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json"));
+                var prepared = store.Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, "en"), "en");
+                var network = new AlwaysOnlineMonitor();
+                var runtime = new EmptyRuntime { ObserveFailures = fault ? 0 : 1, GradeFails = fault };
+                var warning = new TaskCompletionSource<MosWord2019.TestingWarningCode>(TaskCreationOptions.RunContinuationsAsynchronously);
+                using (var host = new MosWord2019.TestingStaHost(() =>
+                {
+                    var clock = new StopwatchTestingClock();
+                    return new TestingSessionCoordinator(prepared, new TestingSession(prepared.SessionId, prepared.Definition, clock, network), store, clock, runtime, () => { }, _ => { });
+                }, network, _ => { }))
+                {
+                    host.Warning += value => warning.TrySetResult(value);
+                    await host.StartAsync();
+                    if (fault) await Assert.ThrowsExceptionAsync<IOException>(() => host.InvokeAsync(c => { c.Next(); return true; }));
+                    Assert.AreEqual(warning.Task, await Task.WhenAny(warning.Task, Task.Delay(8000)), "No typed host warning.");
+                    Assert.AreEqual(fault ? MosWord2019.TestingWarningCode.RecoveryRequired : MosWord2019.TestingWarningCode.ObservationDelayed, await warning.Task);
+                    Assert.AreEqual(fault, await host.InvokeAsync(c => c.NeedsRecovery));
+                    if (!fault)
+                    {
+                        Assert.AreEqual(runtime.Observed.Task, await Task.WhenAny(runtime.Observed.Task, Task.Delay(8000)), "Transient observation did not retry.");
+                        Assert.AreEqual(TestingSessionStatus.Running, await host.InvokeAsync(c => c.Session.Status));
+                        Assert.IsTrue(await host.InvokeAsync(c => c.Session.Elapsed > TimeSpan.Zero));
+                    }
+                }
+            }
+        }
+        [TestMethod]
+        public async Task RecoveryWarningIsNotSuppressedByEarlierTransientObservationWarning()
+        {
+            using (var folder = new TestWorkspace())
+            {
+                var store = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json"));
+                var prepared = store.Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, "en"), "en");
+                var network = new AlwaysOnlineMonitor(); var clock = new TestingSessionTests.FakeClock();
+                var runtime = new EmptyRuntime { ObserveFailures = 1 };
+                var transient = new TaskCompletionSource<bool>(); var recovery = new TaskCompletionSource<bool>();
+                using (var host = new MosWord2019.TestingStaHost(() => new TestingSessionCoordinator(prepared,
+                    new TestingSession(prepared.SessionId, prepared.Definition, clock, network), store, clock, runtime, () => { }, _ => { }), network, _ => { }))
+                {
+                    host.Warning += code => { if (code == MosWord2019.TestingWarningCode.ObservationDelayed) transient.TrySetResult(true);
+                        if (code == MosWord2019.TestingWarningCode.RecoveryRequired) recovery.TrySetResult(true); };
+                    await host.StartAsync();
+                    Assert.AreEqual(transient.Task, await Task.WhenAny(transient.Task, Task.Delay(8000)));
+                    await host.InvokeAsync(c => { runtime.GradeFails = true; clock.Advance(3000); return true; });
+                    Assert.AreEqual(recovery.Task, await Task.WhenAny(recovery.Task, Task.Delay(8000)), "A genuine fault must escape transient log suppression.");
+                    Assert.IsTrue(await host.InvokeAsync(c => c.NeedsRecovery));
+                }
+            }
         }
     }
 }

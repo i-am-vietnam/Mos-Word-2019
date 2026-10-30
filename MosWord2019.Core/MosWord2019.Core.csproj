@@ -66,6 +66,7 @@
     <Compile Include="Services\TestingRecoveryDecision.cs" />
     <Compile Include="Services\WordGradingService.cs" />
     <Compile Include="Services\WordBusyException.cs" />
+    <Compile Include="Services\WordReopenPendingException.cs" />
     <Compile Include="Services\WordGradingService.OutputOwnership.cs" />
     <Compile Include="Services\WordGradingService.PackageAssertions.cs" />
     <Compile Include="Services\TemplateOutputLocation.cs" />

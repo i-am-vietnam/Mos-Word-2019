@@ -1,5 +1,27 @@
 # Kiểm thử thủ công A3a / A3b / A4
 
+## Testing — kiểm thử lại B4-FIX, 2026-10-30
+
+Lượt Word thật của người dùng lúc21:51–21:56 trong `training-20261030.log`: bước1–4 đạt, bước5 thất bại rồi làm recovery bị kẹt. Bản sửa B4-FIX có test tự động/fake/process-handle riêng; **bước5 và7 dưới đây CHƯA KIỂM THỬ LẠI trên Word thật**. Đây là checklist hồi quy B4-FIX, không phải tuyên bố hoàn tất B5.
+
+1. Dùng tài khoản/VM thử nghiệm và bản build B4-FIX mới. Giữ bản sao state/log lỗi trước khi chạy; không chạy Trainer trên file gốc đang dùng làm chứng cứ. Mở một Word cá nhân riêng làm sentinel, ghi PID/creation time và nội dung chưa lưu. Ghi build, Word version, ngôn ngữ và giờ bắt đầu.
+   **Mong đợi:** không sửa starter, question, assets hoặc tài liệu cá nhân. Sentinel không bị đóng/lưu/terminate bởi Trainer.
+2. Chọn Testing EN rồi VI ở hai lượt riêng, Start và ghi SessionId, seed, project/task đã chọn, PID Word sở hữu và timer.
+   **Mong đợi:** đúng bảy project, subset task cố định, timer bắt đầu khi Word mở thành công; không có Grade trong bài thi.
+3. Sửa một nội dung dễ nhận biết trong project hiện tại; chuyển task, mở/đóng hộp thoại Font rồi thử thao tác khi Word bận và thử lại sau khi đóng Font.
+   **Mong đợi:** edits không mất; Word bận không biến thành yêu cầu khôi phục; timer vẫn chạy, nút thao tác dùng lại được.
+4. Thử Restart No/Yes và Next project có xác nhận bằng dữ liệu thử nghiệm.
+   **Mong đợi:** No giữ bài; Yes chỉ reset project hiện tại; Next một chiều, không đổi seed/phiên/deadline. Sau đó thêm edits mới, gồm cả edits chưa Save, để dùng bước5.
+5. **Đóng cửa sổ Word sở hữu bằng X**, không đóng Trainer. Lặp trên project thường và ngay sau Save As sang TXT/template; thử cả trước chu kỳ autosave60giây.
+   **Mong đợi:** callback ghi checkpoint trước đóng. Trainer nhả Application cũ, chờ handle process cũ thoát tối đa10giây mỗi lần thử, rồi mở **instance mới/PID mới** và đúng project/checkpoint; edits và provenance Save As giữ nguyên, không tự hoàn thành legacy conversion. Reopen thử tối đa ba lần với backoff trước status warning; nếu chưa được thì tiếp tục retry ở tick sau. Warning tạm thời không ẩn task/khóa vĩnh viễn Next/Restart/Submit; timer tiếp tục. Ghi PID cũ/mới và đoạn log, không suy PASS từ việc chỉ thấy cửa sổ Word xuất hiện.
+   **Biến thể bảo vệ:** mở thêm một tài liệu thử nghiệm trong chính Word sở hữu rồi đóng tài liệu project. Nếu tài liệu kia giữ process sống quá10giây, Trainer chỉ chờ/cảnh báo; Submit/timeout/đóng Trainer không được terminate Application đã retire. Lưu/đóng tài liệu thử nghiệm thủ công, kiểm tra reopen retry hoặc nộp từ checkpoint.
+6. Nộp bài sau reopen, và thử riêng timeout trong lúc reopen đang retry. Nếu có lỗi hạ tầng thật, thử đường khôi phục.
+   **Mong đợi:** warning tạm thời trước đó không che mất sự kiện NeedsRecovery thật; UI có Recover, không mắc kẹt ở progress. Khi Inspect lỗi, cả startup và mở Testing đều có ba lựa chọn song ngữ **Thử lại / Retry**, **Nộp bài từ dữ liệu đã lưu / Submit from saved work**, **Để sau / Later**. Retry kiểm tra lại; Later giữ phiên và không gọi Prepare lên active state; Submit saved không mở Word, chấm checkpoint/autosave đã lưu, lưu `Results/<SessionId>.json` trước release phiên. Lỗi I/O/audit thật vẫn giữ recovery và cho chọn lại, không tạo điểm giả.
+7. **Task Manager kill rồi mở lại**, xác định đúng process thử nghiệm; tuyệt đối không kill theo tên WINWORD hoặc process tree. Lượt(a): kill Word sở hữu rồi để Trainer còn chạy; lượt(b): kill Trainer và mở lại trong15phút; lượt(c): mở lại sau15phút hoặc hết thời gian thi. Giữ checkpoints/log trước từng lượt.
+   **Mong đợi:** (a) reopen instance mới từ checkpoint/autosave gần nhất, không cam kết giữ edits chưa tới checkpoint khi kill cưỡng bức; (b) offer Resume/Submit/Later, giữ seed/subset và cộng downtime; (c) finalize saved work, lưu result rồi release phiên. PID đã thoát hoặc identity đọc lỗi31/access denied/reused không chặn recovery, không bị terminate, chỉ log một dòng cho lượt kiểm tra lỗi. Orphan còn sống và chứng minh được sở hữu vẫn cần xác nhận song ngữ trước khi dừng. Sau finalize phải mở được Testing mới; không lặp “An active Testing session requires resume/finalization”.
+
+Với bước5/7 và từng biến thể, ghi **PASS/FAIL/CHƯA THỬ**, giờ EN/VI, SessionId, PID cũ/mới, ảnh, log, checkpoint/result hashes và sentinel còn nguyên. Chỉ đánh dấu PASS khi đã chạy đúng trên Word thật bằng bản sửa mới.
+
 Ngày soạn: 2026-10-30. Đây là checklist chưa được xác minh trên Word thật trong lượt A4: môi trường Codex bị COM `0x80070520` trước khi mở tài liệu. Không đánh dấu PASS nếu chưa thực hiện và ghi bằng chứng.
 
 ## Chuẩn bị

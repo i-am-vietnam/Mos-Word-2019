@@ -66,6 +66,77 @@ namespace MosWord2019.Tests
             });
         }
         [DataTestMethod]
+        [DataRow("en")]
+        [DataRow("vi")]
+        public void TransientTickWarningKeepsTheExamUsable(string language)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var prepared = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json")).Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    using (var form = new MosWord2019.TestingForm(prepared, packages))
+                    using (var session = new TestingSession(prepared.SessionId, prepared.Definition, new StopwatchTestingClock(), new AlwaysOnlineMonitor()))
+                    {
+                        form.Show(); session.Start(); form.ApplyState(session.CaptureState());
+                        form.HostWarning(MosWord2019.TestingWarningCode.ObservationDelayed);
+                        Assert.IsFalse(form.RecoveryRequired);
+                        Assert.IsTrue(Find<Button>(form, "NextProject").Enabled);
+                        Assert.IsTrue(Find<Button>(form, "Submit").Enabled);
+                        Assert.IsTrue(Find<TabControl>(form, "ExamTasks").Visible);
+                        form.Hide();
+                    }
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow("en")]
+        [DataRow("vi")]
+        public void RecoveryWarningDisablesExamOnlyAfterCoordinatorFault(string language)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var prepared = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json")).Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    using (var form = new MosWord2019.TestingForm(prepared, packages))
+                    using (var session = new TestingSession(prepared.SessionId, prepared.Definition, new StopwatchTestingClock(), new AlwaysOnlineMonitor()))
+                    {
+                        form.Show(); session.Start(); form.ApplyState(session.CaptureState());
+                        form.HostWarning(MosWord2019.TestingWarningCode.RecoveryRequired);
+                        Assert.IsTrue(form.RecoveryRequired); Assert.IsTrue(Find<Button>(form, "Recover").Visible);
+                        Assert.IsFalse(Find<Button>(form, "NextProject").Enabled); Assert.IsFalse(Find<Button>(form, "Submit").Enabled);
+                        Assert.IsFalse(Find<TabControl>(form, "ExamTasks").Visible);
+                        form.Hide();
+                    }
+                }
+            });
+        }
+        [TestMethod]
+        public void RecoveryDialogOffersThreeExplicitBilingualChoices()
+        {
+            Sta(() =>
+            {
+                foreach (string name in new[] { "Retry", "SubmitSaved", "Later" })
+                {
+                    MosWord2019.TestingRecoveryFailureChoice? selected = null;
+                    using (var form = MosWord2019.TestingRecoveryDialog.Create(value => selected = value))
+                    {
+                        form.Show(); Application.DoEvents();
+                        Assert.IsTrue(Find<Button>(form, "Retry").Text.Contains("Thử lại"));
+                        Assert.IsTrue(Find<Button>(form, "SubmitSaved").Text.Contains("Submit from saved work"));
+                        Assert.IsTrue(Find<Button>(form, "Later").Text.Contains("Để sau"));
+                        Find<Button>(form, name).PerformClick(); Assert.IsNotNull(selected);
+                        Assert.AreEqual(name, selected.Value.ToString());
+                    }
+                }
+            });
+        }
+
+        [DataTestMethod]
         [DataRow("en", true)]
         [DataRow("en", false)]
         [DataRow("vi", true)]
@@ -230,6 +301,41 @@ namespace MosWord2019.Tests
                 finally { flag.SetValue(null, original); }
             });
         }
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public void FailedInspectOffersRetrySavedSubmitOrLater(int selected)
+        {
+            var choice = (MosWord2019.TestingRecoveryFailureChoice)selected;
+            int attempts = 0, prompts = 0, finalizes = 0, logs = 0;
+            bool done = MosWord2019.TestingRecoveryDialog.Run(
+                () => { if (++attempts == 1) throw new IOException("inspection failure"); },
+                () => finalizes++, error => { prompts++; return choice; }, error => logs++);
+            Assert.AreEqual(choice != MosWord2019.TestingRecoveryFailureChoice.Later, done);
+            Assert.AreEqual(choice == MosWord2019.TestingRecoveryFailureChoice.Retry ? 2 : 1, attempts);
+            Assert.AreEqual(choice == MosWord2019.TestingRecoveryFailureChoice.SubmitSaved ? 1 : 0, finalizes);
+            Assert.AreEqual(1, prompts); Assert.AreEqual(1, logs);
+        }
+        [TestMethod]
+        public void FailedSavedFinalizationReturnsToTheSameRecoveryChoices()
+        {
+            int prompts = 0, finalized = 0;
+            bool done = MosWord2019.TestingRecoveryDialog.Run(() => { throw new IOException("inspect"); },
+                () => { finalized++; throw new IOException("saved file is locked"); },
+                error => ++prompts == 1 ? MosWord2019.TestingRecoveryFailureChoice.SubmitSaved : MosWord2019.TestingRecoveryFailureChoice.Later,
+                error => { });
+            Assert.IsFalse(done); Assert.AreEqual(2, prompts); Assert.AreEqual(1, finalized);
+        }
+        [TestMethod]
+        public void PrepareFailureUsesTheSameChoiceBeforeInspectingAgain()
+        {
+            bool inspected = false, finalized = false;
+            bool done = MosWord2019.TestingRecoveryDialog.Run(() => inspected = true, () => finalized = true,
+                error => MosWord2019.TestingRecoveryFailureChoice.SubmitSaved, error => { }, new IOException("An active Testing session requires resume/finalization."));
+            Assert.IsTrue(done); Assert.IsTrue(finalized); Assert.IsFalse(inspected);
+        }
+
         private static void Pump(Func<bool> done)
         {
             var deadline = Stopwatch.StartNew();

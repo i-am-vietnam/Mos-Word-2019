@@ -1,5 +1,13 @@
 # Technical Context
 
+## B4-FIX closed Word and recovery contract — 2026-10-30
+
+TestingProjectRunner retires learner-closed applications through IWordController.ReleaseClosedApplication before promoting/reopening checkpoints. WordController releases RCWs, waits up to10seconds on the retained process handle without termination, then creates a new instance. A retired session can only wait: it exposes no live force-close identity and Close/Dispose only releases its handle. Reopen has three attempts with250/500ms backoff; WordReopenPendingException keeps later ticks/Next/Submit retryable. Partial opens finish checkpoint configuration before announcing success.
+
+TestingStaHost emits TestingWarningCode; only coordinator.NeedsRecovery emits RecoveryRequired, independently of transient log suppression. TestingForm never classifies warning text. Observation/reopen failures retain task controls/timer and retry; genuine faults reveal recovery without re-opening progress.
+
+OwnedWordProcessRecovery checks retained-handle exit (WaitForSingleObject/GetExitCodeProcess) before each identity verification. Open/identity failures log one line and return false, never authorize termination. Program and TestingFlow share TestingRecoveryDialog Retry/SubmitSaved/Later; Later/refused orphan close never falls through into Prepare for an active state. TestingStartupRecovery.FinalizeSaved and coordinator.SubmitSaved use audited saved inputs without Start/Resume/Word activation; durable result precedes state/journal release. Failed finalization re-offers the same choices and keeps inputs. State/result schemas, scoring, catalog and package content are unchanged.
+
 ## B4 persistence and atomic commit contract — 2026-10-30
 
 TestingSession records StartedUtc/CompletedUtc and immutable TestingOfflinePeriod {StartedUtc, EndedUtc, DurationTicks}; snapshots/recovery carry closed and active periods. DurationTicks uses the monotonic clock; UTC remains descriptive and ending UTC is clamped on rollback. Existing exam elapsed/offline/deadline rules are unchanged. Old snapshots lacking this audit are explicitly historyIncomplete.

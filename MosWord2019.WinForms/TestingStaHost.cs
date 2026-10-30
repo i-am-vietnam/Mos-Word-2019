@@ -12,6 +12,7 @@ using MosWord2019.Projects;
 using MosWord2019.Word;
 namespace MosWord2019
 {
+    public enum TestingWarningCode { DocumentReopened, ObservationDelayed, RecoveryRequired }
     /// <summary>Single background STA with a message pump; all Testing Word calls and grading stay here.</summary>
     public sealed class TestingStaHost : IDisposable
     {
@@ -25,7 +26,7 @@ namespace MosWord2019
         private bool executing, disposed;
         private readonly Action<string> log;
         public event Action<TestingSessionSnapshot> StateChanged;
-        public event Action<string> Warning;
+        public event Action<TestingWarningCode> Warning;
         public event Action WordDialogRequired;
         public TestingStaHost(Func<TestingSessionCoordinator> create, IConnectivityMonitor network, Action<string> log = null)
         {
@@ -55,6 +56,7 @@ namespace MosWord2019
         private readonly Stopwatch pacing = Stopwatch.StartNew();
         private TimeSpan retryAfter;
         private bool failureLogged;
+        private bool recoveryReported;
         private readonly Stopwatch rejection = new Stopwatch();
         private bool rejectionLogged;
         private void Tick()
@@ -70,8 +72,15 @@ namespace MosWord2019
                 { log("Testing observation delayed: " + ex.Message); rejectionLogged = true; }
             }
             catch (Exception ex) { retryAfter = pacing.Elapsed + TimeSpan.FromSeconds(5);
-                if (!failureLogged) { log("Testing tick deferred: " + ex.Message); Warning?.Invoke("Testing needs attention; your saved work is retained. / Bài thi cần kiểm tra; bài đã lưu được giữ lại."); failureLogged = true; } }
+                if (!failureLogged) { log("Testing tick deferred: " + ex.Message);
+                    if (!engine.NeedsRecovery) Warning?.Invoke(TestingWarningCode.ObservationDelayed); failureLogged = true; }
+                ReportRecovery(); }
             finally { executing = false; Drain(); }
+        }
+        private void ReportRecovery()
+        {
+            if (engine.NeedsRecovery && !recoveryReported)
+            { recoveryReported = true; Warning?.Invoke(TestingWarningCode.RecoveryRequired); }
         }
         private void Post(Action action)
         {
@@ -91,13 +100,16 @@ namespace MosWord2019
             await ready.Task.ConfigureAwait(false);
             if (disposed) throw new ObjectDisposedException(nameof(TestingStaHost));
             var done = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Post(() => { try { done.SetResult(command(engine)); } catch (Exception ex) { done.SetException(ex); } });
+            Post(() => { try { done.SetResult(command(engine)); } catch (Exception ex) {
+                ReportRecovery();
+                done.SetException(ex); } });
             if (await Task.WhenAny(done.Task, stopped.Task, disposing.Task).ConfigureAwait(false) != done.Task) throw new InvalidOperationException("Testing STA has stopped.");
             return await done.Task.ConfigureAwait(false);
         }
         public Task<bool> StartAsync() => InvokeAsync(e => { e.Start(); return true; });
         public Task<bool> ResumeAsync() => InvokeAsync(e => { e.Resume(); return true; });
         public Task<bool> SubmitAsync() => InvokeAsync(e => { e.Submit(); return true; });
+        public Task<bool> SubmitSavedAsync() => InvokeAsync(e => { e.SubmitSaved(); return true; });
         public static TestingStaHost Create(PreparedTestingSession prepared, TestingSessionStateStore store, SessionRecoveryJournal journal,
             IEnumerable<ProjectPackage> packages, TestingRecoveryRecord recovery = null, IConnectivityMonitor network = null)
         {
@@ -115,7 +127,7 @@ namespace MosWord2019
                         var identity = word.OwnedProcessIdentity;
                         if (identity != null) new OwnedWordProcessRecovery().Stop(identity, Environment.MachineName);
                     });
-                runner.DocumentReopened += () => host?.Warning?.Invoke("Word was closed. The latest checkpoint has been reopened; the timer keeps running. / Word đã đóng. Đã mở lại checkpoint gần nhất; thời gian vẫn chạy.");
+                runner.DocumentReopened += () => host?.Warning?.Invoke(TestingWarningCode.DocumentReopened);
                 var coordinator = new TestingSessionCoordinator(prepared, session, store, clock, runner,
                     () => workspace.Preflight(prepared, packages), s => AppLogger.Write(s));
                 coordinator.Completed += () => { if (coordinator.CleanupPending) journal.DeferRecovery(true);

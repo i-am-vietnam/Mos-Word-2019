@@ -7,6 +7,8 @@ namespace MosWord2019.Core.Interfaces
     {
         bool IsOpened { get; }
         void StartWord();
+        /// <summary>After learner closure, release the old application and wait up to 10 seconds for its retained owned process. Never terminate it.</summary>
+        void ReleaseClosedApplication();
         /// <summary>Open an existing writable .docx working copy, never starter.docx.</summary>
         void OpenDocument(string filePath);
         void Save();

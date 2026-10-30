@@ -56,7 +56,7 @@ namespace MosWord2019
             next.Click += async (s, e) => { if (snapshot?.CurrentIndex == 6) await Submit(); else if (Confirm(T("You will not be able to return to this project.", "Bạn sẽ không thể quay lại project này"))) await Command(() => host.InvokeAsync(c => { c.Next(); return true; }), true); };
             restart.Click += async (s, e) => { if (Confirm(T("Restart the current project? Time keeps running.", "Làm lại project hiện tại? Thời gian vẫn chạy."))) await Command(() => host.InvokeAsync(c => { c.Restart(); return true; }), false); };
             submit.Click += async (s, e) => await Submit(); offlineSubmit.Click += async (s, e) => await Submit();
-            recover.Click += (s, e) => { RecoveryRequired = true; allowClose = true; Close(); };
+            recover.Click += (s, e) => { allowClose = true; Close(); };
             if (host != null) { host.StateChanged += HostState; host.Warning += HostWarning; host.WordDialogRequired += BusyWarning; }
             Shown += async (s, e) => { Arrange(); if (resume && host != null) await Command(() => host.ResumeAsync(), true); };
             Resize += (s, e) => Arrange();
@@ -66,10 +66,11 @@ namespace MosWord2019
         private void Dispatch(Action action)
         { if (IsDisposed || Disposing || !IsHandleCreated) return; if (InvokeRequired) { try { BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing && IsHandleCreated) action(); })); } catch (InvalidOperationException) { } } else action(); }
         private void HostState(TestingSessionSnapshot value) => Dispatch(() => ApplyState(value));
-        private void HostWarning(string text) => Dispatch(() =>
+        internal void HostWarning(TestingWarningCode code) => Dispatch(() =>
         {
-            if (text.StartsWith("Word was closed", StringComparison.Ordinal)) { status.Text = T("Word was reopened; the timer keeps running.", "Đã mở lại Word; thời gian vẫn chạy."); Arrange(); }
-            else { RecoveryRequired = true; recover.Visible = true; HideProgress(); status.Text = T("Exam recovery is required; saved work is retained.", "Bài thi cần khôi phục; dữ liệu đã được giữ"); ApplyState(snapshot); }
+            if (code == TestingWarningCode.DocumentReopened) { status.Text = T("Word was reopened; the timer keeps running.", "Đã mở lại Word; thời gian vẫn chạy."); Arrange(); }
+            else if (code == TestingWarningCode.RecoveryRequired) { RecoveryRequired = true; recover.Visible = true; HideProgress(); status.Text = T("Exam recovery is required; saved work is retained.", "Bài thi cần khôi phục; dữ liệu đã được giữ"); ApplyState(snapshot); }
+            else status.Text = T("Word is reconnecting; saved work is retained and retry continues.", "Đang kết nối lại Word; bài đã lưu được giữ và sẽ tiếp tục thử lại.");
         });
         private void BusyWarning() => Dispatch(() => status.Text = T("Close the open Word dialog, then try again.", "Hãy đóng hộp thoại đang mở trong Word rồi bấm lại."));
         internal void ApplyState(TestingSessionSnapshot value)
@@ -90,7 +91,7 @@ namespace MosWord2019
                 string id = prepared.Definition.Projects[value.CurrentIndex].ProjectId;
                 if (shownProject != id) { BuildTabs(id); shownProject = id; Arrange(); }
             }
-            if (value.Status == TestingSessionStatus.Submitting) ShowProgress();
+            if (value.Status == TestingSessionStatus.Submitting && !RecoveryRequired) ShowProgress();
             if (value.Status == TestingSessionStatus.Completed && !resultShown && host != null) { resultShown = true; ShowResult(); }
         }
         private void BuildTabs(string id)
@@ -118,10 +119,9 @@ namespace MosWord2019
                 {
                     if (WordBusyException.IsBusy(ex)) BusyWarning();
                     else if (snapshot.Status == TestingSessionStatus.Ready) status.Text = ex.Message;
-                    else
+                    else if (!RecoveryRequired)
                     {
-                        RecoveryRequired = true; recover.Visible = true;
-                        status.Text = T("Exam recovery is required; saved work is retained.", "Bài thi cần khôi phục; dữ liệu đã được giữ");
+                        status.Text = T("Please try again; saved work is retained.", "Hãy thử lại; bài đã lưu được giữ.");
                     }
                 });
             }
@@ -143,7 +143,7 @@ namespace MosWord2019
                     allowClose = true; Close();
                 });
             }
-            catch (Exception ex) { AppLogger.Write("Testing result display failed", ex); Dispatch(() => { RecoveryRequired = true; recover.Visible = true; HideProgress(); }); }
+            catch (Exception ex) { AppLogger.Write("Testing result display failed", ex); Dispatch(() => { HideProgress(); resultShown = false; status.Text = T("Result display will retry; the saved result is retained.", "Sẽ thử hiển thị lại kết quả; kết quả đã lưu được giữ."); }); }
         }
 
         private async void Arrange()

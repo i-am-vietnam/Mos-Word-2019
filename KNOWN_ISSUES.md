@@ -1,5 +1,12 @@
 # Known Issues and Verification Items
 
+## B4-FIX native retest boundary — 2026-10-30
+
+- The user's real Word run21:51–21:56 reproduced a dying-Application reopen race, string-based warning escalation and Win32 error31 while inspecting PID17120, followed by a Prepare/recovery dead end. B4-FIX repairs these paths with retained-handle retirement/wait, three reopen attempts, typed coordinator-driven recovery warnings, exit-first fail-closed identity checks and shared Retry/Submit saved/Later choices. Automated tests use isolated fakes, a short-lived test-owned process and a byte-exact copied state; they are not a fresh real Word acceptance run.
+- Close-X/checkpoint/Save As/native shutdown timing and Task Manager kill/restart must be re-tested on Word with the new build: `docs/MANUAL_TEST.md`, Testing steps5/7. Original step5 was FAIL; neither step is newly native PASS. If personal documents keep a retired Application alive, wait/retry may remain pending; automatic cleanup/force-close never regains termination authority for that retired process.
+- Failed identity reads mean ownership is unproven, not permission to terminate. Genuine corrupt/audit/I/O failures still retain recovery inputs and re-offer the three choices; saved submission does not bypass validation or fabricate results. Already accepted hung COM/filesystem calls remain outside retry budgets.
+- Source reproduction fixture: `MosWord2019.Tests/Fixtures/B4Fix/testing-session-8123cc.json`, SHA-256 `FA09E3BBCE37CAEDD5C5C6456771CDD1B24A6E73738BB931FC0439FE71FC3EA2`. Tests adapt only disposable copies to isolated paths; the user's original LocalAppData state/journal/log are not test workspaces. Evidence: ignored `artifacts/b4fix` and initial RED/GREEN runs in `artifacts/b4-fix`.
+
 ## B4 persistence/UI verification boundary and local trust — 2026-10-30
 
 - Testing UI is enabled in EN/VI and reuses B2/Phase A services. Busy Next/Submit can be retried; automatic expiry has a30-second retry window before verified owned-process recovery and saved-only grading. Failed cleanup keeps the durable Completed result/journal. A genuinely unrecoverable error routes to startup recovery. The remaining live-Word boundary is below; fake UI/controller tests do not prove it.

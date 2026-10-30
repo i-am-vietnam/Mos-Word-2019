@@ -318,6 +318,69 @@ namespace MosWord2019.Tests
             });
         }
 
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        public void DyingApplicationIsRetiredBeforeReopenAndKeepsUnsavedEdits(int delayedTicks)
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P25");
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath("Word2019_P25/T04/pass-a2.docx"));
+                    lab.Word.LearnerClose(); lab.Word.Dying = true; lab.Word.DelayedTicks = delayedTicks;
+                    int reopened = 0; lab.Runner.DocumentReopened += () => reopened++;
+                    lab.Runner.ReopenIfClosed();
+                    Assert.AreEqual(1, reopened);
+                    Assert.AreEqual(delayedTicks + 1, lab.Word.Releases);
+                    Assert.AreEqual(2, lab.Word.ApplicationsStarted, "Reopen must start a new application.");
+                    Assert.AreEqual(TaskGradeOutcome.Pass, lab.Runner.LeaveAndGrade().Single(g => g.TaskId == "T04").Result.Outcome);
+                    lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
+        [TestMethod]
+        public void ExhaustedReopenKeepsCheckpointAndCanSucceedOnLaterObservation()
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P25");
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath("Word2019_P25/T04/pass-a2.docx"));
+                    lab.Word.LearnerClose(); lab.Word.Dying = true; lab.Word.DelayedTicks = 3;
+                    string saved = lab.Work.Files.GetExportCheckpointPath(lab.Work.CurrentAttempt.Package);
+                    byte[] before = File.ReadAllBytes(saved);
+                    Assert.ThrowsException<WordReopenPendingException>(() => lab.Runner.ReopenIfClosed());
+                    Assert.AreEqual(3, lab.Word.Releases);
+                    CollectionAssert.AreEqual(before, File.ReadAllBytes(saved));
+                    lab.Runner.ReopenIfClosed();
+                    Assert.AreEqual(TaskGradeOutcome.Pass, lab.Runner.LeaveAndGrade().Single(g => g.TaskId == "T04").Result.Outcome);
+                    lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void PartiallyReopenedDocumentFinishesConfigurationOnRetry()
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P25");
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath("Word2019_P25/T04/pass-a2.docx"));
+                    lab.Word.LearnerClose(); lab.Word.ConfigureFailures = 1;
+                    int reopened = 0; lab.Runner.DocumentReopened += () => reopened++;
+                    lab.Runner.ReopenIfClosed(); Assert.AreEqual(1, reopened);
+                    Assert.AreEqual(1, lab.Word.Releases);
+                    Assert.AreEqual(TaskGradeOutcome.Pass, lab.Runner.LeaveAndGrade().Single(g => g.TaskId == "T04").Result.Outcome);
+                    lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
         private static void OnSta(Action action)
         {
             Exception failure = null;
@@ -387,13 +450,22 @@ namespace MosWord2019.Tests
             public WordFormattingMarksSnapshot ReadFormattingMarks() => Marks;
             public WordTocLayoutSnapshot ReadTocLayout() => Layout;
             internal byte[] Live; internal int Saves, CheckpointWrites; private string checkpoint;
-            public void StartWord() { OwnedProcessStarted?.Invoke(OwnedProcessIdentity); }
+            internal bool Dying, ApplicationAlive;
+            internal int DelayedTicks, Releases, ApplicationsStarted, ConfigureFailures;
+            public void ReleaseClosedApplication()
+            {
+                Releases++;
+                if (Dying && DelayedTicks-- > 0) throw new InvalidOperationException("Owned application is still exiting.");
+                ApplicationAlive = false; Dying = false;
+            }
+            public void StartWord() { if (!ApplicationAlive) { ApplicationAlive = true; ApplicationsStarted++; OwnedProcessStarted?.Invoke(OwnedProcessIdentity); } }
             public void OpenDocument(string path) { CurrentDocumentPath = path; Live = File.ReadAllBytes(path); IsOpened = true; }
             public void Save() { OwnedDocumentSaving?.Invoke(CurrentDocumentPath); File.WriteAllBytes(CurrentDocumentPath, Live); Saves++; }
             public void CloseDocument() { IsOpened = false; }
             public void Close() { CloseDocument(); }
             public void Dispose() { }
-            public void ConfigureExportCheckpoint(string path) { checkpoint = path; SaveFormattedCheckpoint(); }
+            public void ConfigureExportCheckpoint(string path) { if (Dying) { IsOpened = false; throw new InvalidOperationException("No owned document is open."); }
+                if (ConfigureFailures-- > 0) throw new IOException("Checkpoint write is temporarily blocked."); checkpoint = path; SaveFormattedCheckpoint(); }
             public string SaveFormattedCheckpoint() { File.WriteAllBytes(checkpoint, Live); CheckpointWrites++; WorkingFileWritten?.Invoke(checkpoint); return checkpoint; }
         }
     }

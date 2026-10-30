@@ -25,7 +25,7 @@ namespace MosWord2019.Projects
         private readonly Action<string> log;
         private readonly Func<IDisposable> observationBudget;
         private readonly Action forceClose;
-        private bool savedAs, disposed, reopenedWorking, deliberateClose;
+        private bool savedAs, disposed, reopenedWorking, deliberateClose, reopenPending;
         private bool inputEnabled = true, closeCheckpointPending, engineSaving, nativeSavePending;
         private readonly IWordCloseEvents closeEvents;
         private string observedExport;
@@ -82,20 +82,43 @@ namespace MosWord2019.Projects
         {
             string path = GradePath();
             word.StartWord(); word.OpenDocument(path);
+            ConfigureOpenedDocument();
+        }
+        private void ConfigureOpenedDocument()
+        {
             checkpoint.ConfigureExportCheckpoint(workspace.Files.GetExportCheckpointPath(workspace.CurrentAttempt.Package));
             (word as IWordInputLock)?.SetInputEnabled(inputEnabled);
         }
         public void ReopenIfClosed()
         {
             EnsureOwner();
-            if (word.IsOpened) return;
+            if (word.IsOpened && !reopenPending) return;
+            reopenPending = true;
+            for (int attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    if (!word.IsOpened) { word.ReleaseClosedApplication(); ReopenWorking(); }
+                    else { ConfigureOpenedDocument(); CompleteReopen(); }
+                    return;
+                }
+                catch (Exception ex) when (!(ex is OutOfMemoryException) && !(ex is StackOverflowException))
+                {
+                    if (attempt == 2) throw new WordReopenPendingException(ex);
+                    Thread.Sleep(250 * (attempt + 1));
+                }
+            }
+        }
+        private void ReopenWorking()
+        {
             var attempt = workspace.CurrentAttempt ?? throw new InvalidOperationException("No active Testing attempt.");
             string saved = workspace.Files.GetExportCheckpointPath(attempt.Package);
             // Keep untouched binary starters binary; opening them must never answer a conversion task.
             if (File.Exists(saved) && (closeCheckpointPending || Path.GetExtension(attempt.WorkingPath) != ".doc" || Path.GetExtension(GradePath()) == ".docx" || string.Equals(Path.GetExtension(observedExport), ".docx", StringComparison.OrdinalIgnoreCase)))
                 workspace.Files.PreserveSavedWorkingCopy(attempt.Package, saved);
-            OpenWorking(); closeCheckpointPending = false; reopenedWorking = true; DocumentReopened?.Invoke();
+            OpenWorking(); CompleteReopen();
         }
+        private void CompleteReopen() { closeCheckpointPending = false; reopenedWorking = true; reopenPending = false; DocumentReopened?.Invoke(); }
         public void ObserveAfterSave()
         {
             EnsureOwner();
