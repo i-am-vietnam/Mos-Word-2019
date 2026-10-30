@@ -32,6 +32,7 @@
     <Compile Include="MainFormResilienceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwnedWordRecoveryTests.cs" />
+    <Compile Include="TestingStaHostTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

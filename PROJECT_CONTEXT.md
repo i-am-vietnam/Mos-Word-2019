@@ -1,12 +1,12 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
-## B2 — Phần 2: pipeline từng project và dịch vụ khôi phục, chưa hoàn thành B2
+## B2 — Engine toàn phiên và startup recovery
 
-Đã có runner chạy trên STA sở hữu controller: baseline trước mở Word; lưu working copy hoặc checkpoint WordOpenXML sau Save As; capture context, đóng document, chấm task rồi cleanup. Không Save lại TXT/DOTX hay đường dẫn tùy ý của học viên. Reopen ưu tiên checkpoint đã lưu, không tự chuyển starter `.doc`. Preflight cho phép output có sẵn và chỉ chặn asset khác nội dung; quyền sở hữu/cleanup vẫn dùng Phase A.
+Đã nối host STA nền có message pump, autosave60giây, heartbeat5giây, Next một chiều, Restart project hiện tại, Submit/timeout/offline và chấm project chưa mở từ starter. Kết quả được lưu trước cleanup; chấm recovery từ checkpoint/context đã lưu. Đồng hồ đơn điệu vẫn chạy khi đóng/mở lại Word; chỉ mất mạng mới pause. Không Save lại output sau Save As.
 
-Crash downtime được cộng vào50phút; resume cùng máy trong15phút và còn thời gian. Có heartbeat5giây, đọc/kiểm tra state, giữ seed/definition khi retry Preparing/Prepared, archive Completed và nhận diện Word bằng PID+creation time+image path. Startup giữ journal claim theo SessionId trước recovery. Đây là dịch vụ/pipeline đã test riêng, chưa có điều phối offer resume, expired finalize và giải phóng journal sau đó.
+Trước khi học viên đóng Word, sự kiện owned DocumentBeforeClose ghi checkpoint WordOpenXML/context bền vững; chỉ thay working copy sau khi document đóng để tránh khóa file. Native path/format và baseline được giữ qua reopen/resume. Khi startup, phải xác nhận trước khi dừng Word còn sót đã xác minh PID/creation/image; từ chối giữ phiên pending. Phiên hết hạn được chấm/lưu/archive trước journal recovery. Clock rollback trên2phút được log và lưu cờ audit; thời gian server/chữ ký vẫn thuộc Phase C.
 
-Còn thiếu host STA nền, lịch autosave60giây, điều phối Next/Restart/Submit/unvisited grading, khôi phục workspace/baseline và khóa HWND thực. Testing vẫn tắt. P22-T07/P24-T03 đã thử lại bằng fake snapshot/fixture lưu sẵn, chưa bật catalog hoặc khẳng định Word thật. State cục bộ có thể bị sửa; Phase C cần thời gian từ server và chữ ký kết quả. Chia tiếp tại ranh giới dưới khoảng1500dòng theo yêu cầu người dùng.
+Testing chưa bật trong Login vì UI là B3. Resume được chấp nhận qua startup sẽ nằm ở PendingTestingRecovery để B3 gắn host/form; không chạy bài thi ẩn sau Training. Thời gian chờ này vẫn tính từ heartbeat cũ. P22-T07/P24-T03 giữ nguyên loại trừ, không thay catalog/package. Kiểm chứng Word thật (close/save-as/dialog/crash/orphan/full50phút) sẽ làm sau B3; test fake/OOXML/HWND độc lập không thay thế kiểm chứng đó.
 
 
 ## B1 — Sinh đề và tính điểm thuần Core

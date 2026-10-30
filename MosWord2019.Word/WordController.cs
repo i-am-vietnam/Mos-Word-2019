@@ -12,10 +12,12 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents, IWordProcessIdentity
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents, IWordProcessIdentity, IWordCloseEvents, IWordInputLock
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
+        private IntPtr testingWindow;
+        private bool closeEventsSubscribed;
         private bool disposed;
         private OleMessageFilter messageFilter;
         private readonly Func<OleMessageFilter> createMessageFilter;
@@ -129,6 +131,7 @@ namespace MosWord2019.Word
                 session.Application.DisplayAlerts = Wd.WdAlertLevel.wdAlertsNone;
                 session.Application.AutomationSecurity = Office.MsoAutomationSecurity.msoAutomationSecurityForceDisable;
                 session.Application.DocumentBeforeSave += BeforeDocumentSave;
+                if (OwnedDocumentClosing != null) { session.Application.DocumentBeforeClose += BeforeDocumentClose; closeEventsSubscribed = true; }
             }
             catch (WinApiProcessHelper.OwnershipRejectedException)
             {
@@ -169,7 +172,7 @@ namespace MosWord2019.Word
                 session.Document = documents.Open(path, ConfirmConversions: false, ReadOnly: false,
                     AddToRecentFiles: false, PasswordDocument: password, WritePasswordDocument: password,
                     Visible: true, OpenAndRepair: false, NoEncodingDialog: true);
-                session.DocumentPath = path;
+                session.DocumentPath = path; testingWindow = IntPtr.Zero;
                 if (session.Document.ReadOnly)
                     throw new IOException("Word opened the working copy read-only. Close other users of this file before retrying.");
             }
@@ -183,6 +186,23 @@ namespace MosWord2019.Word
                 throw new InvalidOperationException("Could not open the Word working copy: " + path, ex);
             }
             finally { ReleaseCom(documents); }
+        }
+
+        public void SetInputEnabled(bool enabled)
+        {
+            EnsureUsable();
+            if (session?.Document == null) return;
+            if (testingWindow == IntPtr.Zero)
+            {
+                RunCom(() =>
+                {
+                    if (!IsOpened) return;
+                    Wd.Window window = null;
+                    try { window = session.Document.ActiveWindow; testingWindow = new IntPtr(window.Hwnd); }
+                    finally { ReleaseCom(window); }
+                });
+            }
+            if (testingWindow != IntPtr.Zero && !session.Process.SetInputEnabled(testingWindow, enabled)) testingWindow = IntPtr.Zero; // Closed HWND: reopen on the next observation.
         }
 
         public void SetWindowBounds(int left, int top, int width, int height) { RunCom(() => SetWindowBoundsCore(left, top, width, height)); }
@@ -291,7 +311,8 @@ namespace MosWord2019.Word
             session.DocumentPath = null;
             if (session.Application != null)
             {
-                try { session.Application.DocumentBeforeSave -= BeforeDocumentSave; }
+                try { session.Application.DocumentBeforeSave -= BeforeDocumentSave;
+                    if (closeEventsSubscribed) { session.Application.DocumentBeforeClose -= BeforeDocumentClose; closeEventsSubscribed = false; } }
                 catch (COMException ex) when (IsDisconnected(ex)) { }
                 if (!preserveApplication)
                 {

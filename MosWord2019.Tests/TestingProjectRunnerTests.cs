@@ -212,6 +212,90 @@ namespace MosWord2019.Tests
             });
         }
 
+        [TestMethod]
+        public void LearnerClosePreservesUnsavedFormattingBeforeReopen()
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P25");
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath("Word2019_P25/T04/pass-a2.docx"));
+                    using (var locked = new FileStream(lab.Work.CurrentAttempt.WorkingPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) lab.Word.LearnerClose();
+                    Assert.AreEqual(TaskGradeOutcome.Pass, lab.Grader.CheckTask(lab.Work.Files.GetExportCheckpointPath(lab.Work.CurrentAttempt.Package),
+                        lab.Work.CurrentAttempt.Package.Tasks.Single(t => t.TaskId == "T04")).Outcome);
+                    lab.Runner.ReopenIfClosed();
+                    Assert.AreEqual(TaskGradeOutcome.Pass, lab.Runner.LeaveAndGrade().Single(g => g.TaskId == "T04").Result.Outcome);
+                    lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void ResumeRetainsOriginalOutputBaselineAndProtectsChangedClaim(bool changed)
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P20");
+                    var fixture = TestCaseData.LoadAll().First(c => c.AssertionType == "SavedWordTemplate" && c.Expected == "Pass");
+                    lab.Foreign("Notes.dotx", File.ReadAllBytes(TestCaseData.FixturePath(fixture.Fixture)));
+                    string output = lab.Word.CurrentDocumentPath; lab.Runner.Autosave(); lab.Word.CloseDocument(); lab.Runner.Dispose();
+                    var journal = new SessionRecoveryJournal(Path.Combine(Path.GetDirectoryName(lab.Store.StatePath), "journal.json"), _ => { });
+                    var work = new TestingWorkspaceService(lab.Prepared.SessionId, journal, Path.Combine(Path.GetDirectoryName(lab.Store.StatePath), "Documents"),
+                        Path.Combine(Path.GetDirectoryName(lab.Store.StatePath), "Pictures"), Path.GetDirectoryName(output), _ => { }, true);
+                    work.Preflight(lab.Prepared, lab.Packages, false);
+                    var word = new FakeWord { DefaultTemplateFolder = Path.GetDirectoryName(output) };
+                    using (var runner = new TestingProjectRunner(work, word, lab.Prepared, lab.Store, lab.Grader, _ => { }))
+                    {
+                        runner.Enter("Word2019_P20", true);
+                        if (changed) File.AppendAllText(output, "changed after claim");
+                        var grades = runner.LeaveAndGrade();
+                        Assert.AreEqual(TaskGradeOutcome.Pass, grades.Single(g => g.TaskId == "T01").Result.Outcome); // ZIP permits trailing bytes; cleanup must still preserve the changed file.
+                        Assert.AreEqual(changed, File.Exists(output));
+                        work.CleanupCompleted(true);
+                    }
+                }
+            });
+        }
+        [TestMethod]
+        public void SavedGradingUsesUntouchedStarterForUnvisitedProject()
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    var grades = lab.Runner.GradeSaved("Word2019_P25");
+                    Assert.IsTrue(grades.Count >= 4); Assert.IsTrue(grades.All(g => g.Result.Outcome == TaskGradeOutcome.Fail));
+                    Assert.IsFalse(lab.Word.IsOpened); Assert.AreEqual(0, lab.Word.Saves);
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void LegacyCloseCheckpointDoesNotAnswerConversionWithoutANativeModernSave(bool learnerSaves)
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab("Word2019_P07", "T01"))
+                {
+                    lab.Runner.Enter("Word2019_P07");
+                    var fixture = TestCaseData.LoadAll().Single(c => c.ProjectId == "Word2019_P07" && c.TaskId == "T01" && c.Expected == "Pass");
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath(fixture.Fixture));
+                    lab.Word.LearnerClose(); lab.Runner.ReopenIfClosed();
+                    if (learnerSaves) { lab.Word.Save(); lab.Runner.ObserveAfterSave(); }
+                    var result = lab.Runner.LeaveAndGrade().Single(g => g.TaskId == "T01").Result;
+                    Assert.AreEqual(learnerSaves ? TaskGradeOutcome.Pass : TaskGradeOutcome.Fail, result.Outcome, result.Message);
+                    lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
+
         private static void OnSta(Action action)
         {
             Exception failure = null;
@@ -227,6 +311,9 @@ namespace MosWord2019.Tests
             internal readonly TestingProjectRunner Runner;
             internal readonly WordGradingService Grader;
             private readonly string documents, templates;
+            internal TestingSessionStateStore Store;
+            internal PreparedTestingSession Prepared;
+            internal System.Collections.Generic.IReadOnlyList<ProjectPackage> Packages;
             internal Lab(string extraProject = null, string extraTask = null)
             {
                 documents = Path.Combine(folder.Folder, "Documents"); templates = Path.Combine(folder.Folder, "Templates");
@@ -247,7 +334,7 @@ namespace MosWord2019.Tests
                 }
                 string path = Path.Combine(folder.Folder, "testing-catalog.json"); File.WriteAllText(path, catalog.ToString());
                 var store = new TestingSessionStateStore(Path.Combine(folder.Folder, "testing-session.json"));
-                var prepared = store.Prepare(path, packages, "en");
+                var prepared = store.Prepare(path, packages, "en"); Store = store; Prepared = prepared; Packages = packages.ToList();
                 Work = new TestingWorkspaceService(prepared.SessionId, new SessionRecoveryJournal(Path.Combine(folder.Folder, "journal.json"), _ => { }),
                     documents, Path.Combine(folder.Folder, "Pictures"), templates, _ => { });
                 Work.Preflight(prepared, packages); Grader = new WordGradingService(() => documents);
@@ -260,7 +347,7 @@ namespace MosWord2019.Tests
             }
             public void Dispose() { Runner.Dispose(); folder.Dispose(); }
         }
-        private sealed class FakeWord : IWordController, IWordDocumentState, IWordSaveFormat, IWordSaveEvents, IWordExportCheckpoint, IWordProcessIdentity, IWordViewState, IWordTocLayout
+        private sealed class FakeWord : IWordController, IWordDocumentState, IWordSaveFormat, IWordSaveEvents, IWordExportCheckpoint, IWordProcessIdentity, IWordCloseEvents, IWordViewState, IWordTocLayout
         {
             public bool IsOpened { get; private set; }
             public string CurrentDocumentPath { get; set; }
@@ -269,6 +356,8 @@ namespace MosWord2019.Tests
             public OwnedWordProcessIdentity OwnedProcessIdentity { get; } = new OwnedWordProcessIdentity(123, 100000, @"C:\Office\WINWORD.EXE");
             public event Action<OwnedWordProcessIdentity> OwnedProcessStarted;
             public event Action<string> OwnedDocumentSaving;
+            public event Action<string, int, string> OwnedDocumentClosing;
+            internal void LearnerClose() { var saved = SaveFormattedCheckpoint(); OwnedDocumentClosing?.Invoke(CurrentDocumentPath, CurrentSaveFormat, saved); IsOpened = false; }
             public event Action<string> WorkingFileWritten;
             public event Action<string> ExportCheckpointFailed { add { } remove { } }
             internal WordFormattingMarksSnapshot Marks;

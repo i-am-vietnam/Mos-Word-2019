@@ -126,6 +126,15 @@ namespace MosWord2019.Projects
             catch { entries.Add(path, old); throw; }
         }
 
+        internal Tuple<string, string> OutputClaim(string path, string sessionId)
+        {
+            lock (gate)
+            {
+                Claim claim;
+                return entries.TryGetValue(Normalize(path), out claim) && claim.SessionId == sessionId && claim.Kind == "output"
+                    ? Tuple.Create(claim.Identity, claim.Hash) : null;
+            }
+        }
         public void PreserveSession(string sessionId)
         {
             Guid id;

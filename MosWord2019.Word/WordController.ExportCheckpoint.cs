@@ -66,6 +66,31 @@ namespace MosWord2019.Word
             }
         }
 
+        public event Action<string, int, string> OwnedDocumentClosing;
+        private void BeforeDocumentClose(Wd.Document document, ref bool cancel)
+        {
+            IntPtr incoming = IntPtr.Zero, owned = IntPtr.Zero;
+            try
+            {
+                if (OwnedDocumentClosing == null || session?.Document == null || exportCheckpointPath == null) return;
+                incoming = Marshal.GetIUnknownForObject(document); owned = Marshal.GetIUnknownForObject(session.Document);
+                if (incoming != owned) return;
+                testingWindow = IntPtr.Zero; // A closed window handle must never be reused to lock a different document.
+                string path = document.FullName; int format = (int)document.SaveFormat;
+                string saved = WriteFormattedCheckpoint(document.WordOpenXML);
+                OwnedDocumentClosing?.Invoke(path, format, saved); // Plain facts; no held controller call inside this callback.
+            }
+            catch (Exception ex)
+            { cancel = true; AppLogger.Write("Testing close checkpoint failed; close cancelled", ex); }
+            finally
+            {
+                if (incoming != IntPtr.Zero) Marshal.Release(incoming);
+                if (owned != IntPtr.Zero) Marshal.Release(owned);
+                if (document != null && Marshal.IsComObject(document))
+                    try { Marshal.ReleaseComObject(document); } catch (Exception ex) { AppLogger.Write("Unable to release close event argument", ex); }
+            }
+        }
+
         public string SaveFormattedCheckpoint()
         {
             return RunCom(() =>

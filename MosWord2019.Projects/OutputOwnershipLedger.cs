@@ -47,10 +47,27 @@ namespace MosWord2019.Projects
         }
 
         public string SessionId { get; }
-        public DateTime SessionStartedUtc { get; }
+        public DateTime SessionStartedUtc { get; private set; }
         public string DocumentsFolder { get; }
         public string TemplateFolder { get; }
 
+        internal static OutputOwnershipLedger Restore(ProjectPackage package, OutputOwnershipSnapshot snapshot, string documents,
+            string templates, string sessionId, SessionRecoveryJournal journal, Action<string> log)
+        {
+            if (snapshot == null || snapshot.SessionId != sessionId || !string.Equals(Path.GetFullPath(documents), snapshot.DocumentsFolder, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("Invalid recovered output baseline.");
+            var ledger = new OutputOwnershipLedger(package, documents, templates, log, sessionId, journal);
+            if (snapshot.Outputs.Count != ledger.entries.Count) throw new InvalidDataException("Recovered output declarations differ.");
+            foreach (var output in snapshot.Outputs)
+            {
+                Entry entry;
+                if (output.Baseline == null || !ledger.entries.TryGetValue(output.Baseline.Path, out entry)) throw new InvalidDataException("Unexpected recovered output path.");
+                entry.Baseline = output.Baseline;
+                var claim = journal.OutputClaim(entry.Path, sessionId);
+                if (claim != null) entry.Claim = new OutputFileState(entry.Path, true, 0, claim.Item2, DateTime.MinValue, claim.Item1, DateTime.UtcNow);
+            }
+            ledger.SessionStartedUtc = snapshot.SessionStartedUtc; return ledger;
+        }
         public OutputOwnershipSnapshot Capture(string ownedDocumentPath = null)
         {
             if (!string.IsNullOrWhiteSpace(ownedDocumentPath)) ObserveOwnedDocument(ownedDocumentPath);

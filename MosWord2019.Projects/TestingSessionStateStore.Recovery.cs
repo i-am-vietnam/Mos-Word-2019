@@ -133,6 +133,19 @@ namespace MosWord2019.Projects
             }
         }
 
+        public TrainingGradeContext ReadProjectContext(string projectId)
+        {
+            lock (gate)
+            {
+                var value = ReadEnvelope()["projectContexts"]?[projectId]?["context"];
+                return value == null ? null : value.ToObject<TrainingGradeContext>();
+            }
+        }
+        public void RecordRecoveryDecision(TestingRecoveryDecision decision)
+        {
+            if (!decision.SuspiciousClockRollback) return;
+            lock (gate) { var data = ReadEnvelope(); data["clockRollbackDetected"] = true; Write(data, true); }
+        }
         internal void SaveHeartbeat(PreparedTestingSession prepared, TestingSession session)
         {
             lock (gate)
@@ -177,7 +190,7 @@ namespace MosWord2019.Projects
                 try
                 {
                     var data = ReadEnvelope();
-                    if ((string)data["status"] == "Completed") { ArchiveCompleted(); return; }
+                    if ((string)data["status"] == "Completed" && data["ownedWord"]?.Type == JTokenType.Null) { ArchiveCompleted(); return; }
                     journal.PreserveSession((string)data["sessionId"]);
                     if ((string)data["status"] != "Prepared" && (string)data["status"] != "Preparing") journal.DeferRecovery(true);
                 }

@@ -14,13 +14,14 @@ namespace MosWord2019.Projects
         private readonly Action<string> log;
         private readonly Dictionary<string, ProjectPackage> projects = new Dictionary<string, ProjectPackage>(StringComparer.Ordinal);
         private PreparedTestingSession preparation;
+        internal SessionRecoveryJournal Journal => journal;
         public string SessionId { get; }
         public string RootPath { get; }
         public TrainingWorkspaceService Files { get; }
         public TestingProjectAttempt CurrentAttempt { get; private set; }
 
         public TestingWorkspaceService(string sessionId, SessionRecoveryJournal journal, string documents = null,
-            string pictures = null, string templates = null, Action<string> log = null)
+            string pictures = null, string templates = null, Action<string> log = null, bool resumeExisting = false)
         {
             Guid id;
             if (!Guid.TryParseExact(sessionId, "N", out id)) throw new ArgumentException("A session GUID is required.");
@@ -32,11 +33,11 @@ namespace MosWord2019.Projects
             this.log = log ?? (s => MosWord2019.Core.Diagnostics.AppLogger.Write(s));
             RootPath = Path.Combine(this.documents, "MosWord2019", "Working", "Testing", sessionId);
             RejectReparse(RootPath);
-            if (Directory.Exists(RootPath) || File.Exists(RootPath)) throw new IOException("A fresh Testing workspace must not already exist.");
+            if (File.Exists(RootPath) || (!resumeExisting && Directory.Exists(RootPath))) throw new IOException("A fresh Testing workspace must not already exist.");
             Files = new TrainingWorkspaceService(RootPath, this.documents, this.pictures, journal, SessionId);
         }
 
-        public void Preflight(PreparedTestingSession prepared, IEnumerable<ProjectPackage> packages)
+        public void Preflight(PreparedTestingSession prepared, IEnumerable<ProjectPackage> packages, bool checkForeignFiles = true)
         {
             if (CurrentAttempt != null) throw new InvalidOperationException("Preflight must precede project entry.");
             preparation = null; projects.Clear(); // Failed preflight cannot leave an earlier authorization active.
@@ -54,7 +55,7 @@ namespace MosWord2019.Projects
                 if (selected.ProjectId != package.Meta.ProjectId || !package.Tasks.Where(t => selected.TaskIds.Contains(t.TaskId)).Select(t => t.TaskId).SequenceEqual(selected.TaskIds) ||
                     selected.TaskIds.Any(id => package.Tasks.Single(t => t.TaskId == id).InstructionKey != selected.InstructionKeys[id]))
                     throw new InvalidDataException("Selected tasks no longer match the audited package.");
-                CheckForeignFiles(package);
+                if (checkForeignFiles) CheckForeignFiles(package);
                 checkedProjects.Add(selected.ProjectId, package);
             }
             projects.Clear(); foreach (var pair in checkedProjects) projects.Add(pair.Key, pair.Value);
@@ -96,6 +97,21 @@ namespace MosWord2019.Projects
             return CurrentAttempt = new TestingProjectAttempt(package, path, outputs);
         }
 
+        internal ProjectPackage Package(string id) => projects[id];
+        internal string SavedPath(string id)
+        {
+            string directory = Path.Combine(RootPath, id);
+            string path = Path.Combine(directory, "work.docx");
+            if (!File.Exists(path)) path = Path.Combine(directory, "work" + Path.GetExtension(projects[id].Meta.Starter));
+            RejectReparse(path); return path;
+        }
+        internal TestingProjectAttempt ResumeAttempt(string id, TrainingGradeContext context)
+        {
+            if (CurrentAttempt != null || preparation == null) throw new InvalidOperationException("Resume requires a prepared workspace.");
+            var package = projects[id]; preparation.VerifyPackage(package);
+            var outputs = OutputOwnershipLedger.Restore(package, context.OutputOwnership, documents, templates, SessionId, journal, log);
+            return CurrentAttempt = new TestingProjectAttempt(package, SavedPath(id), outputs);
+        }
         public void Leave(bool ownedDocumentClosed)
         {
             if (!ownedDocumentClosed) throw new InvalidOperationException("Close owned Word before Testing cleanup.");

@@ -9,6 +9,7 @@ namespace MosWord2019.Core.Services
         public TestingRecoveryAction Action { get; }
         public TimeSpan Elapsed { get; }
         public TimeSpan Downtime { get; }
+        public bool SuspiciousClockRollback { get; private set; }
         public TimeSpan Remaining => TestingSession.Duration - Elapsed;
         private TestingRecoveryDecision(TestingRecoveryAction action, TimeSpan elapsed, TimeSpan downtime)
         { Action = action; Elapsed = elapsed; Downtime = downtime; }
@@ -24,7 +25,10 @@ namespace MosWord2019.Core.Services
             long ticks = Math.Min(TestingSession.Duration.Ticks, storedElapsed.Ticks + Math.Min(downtime.Ticks, TestingSession.Duration.Ticks));
             bool resume = sameMachine && downtime <= TimeSpan.FromMinutes(15) && ticks < TestingSession.Duration.Ticks &&
                 (status == TestingSessionStatus.Running || status == TestingSessionStatus.Offline);
-            return new TestingRecoveryDecision(resume ? TestingRecoveryAction.Resume : TestingRecoveryAction.Finalize, TimeSpan.FromTicks(ticks), downtime);
+            bool rollback = heartbeatUtc - nowUtc > TimeSpan.FromMinutes(2);
+            if (rollback) MosWord2019.Core.Diagnostics.AppLogger.Write("Suspicious Testing clock rollback: " + (heartbeatUtc - nowUtc));
+            return new TestingRecoveryDecision(resume ? TestingRecoveryAction.Resume : TestingRecoveryAction.Finalize, TimeSpan.FromTicks(ticks), downtime)
+            { SuspiciousClockRollback = rollback };
         }
     }
 }

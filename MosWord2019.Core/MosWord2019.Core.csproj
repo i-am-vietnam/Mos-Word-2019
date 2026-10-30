@@ -52,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\OwnedWordProcessIdentity.cs" />
     <Compile Include="Interfaces\IWordProcessIdentity.cs" />
+    <Compile Include="Interfaces\IWordCloseEvents.cs" />
     <Compile Include="Models\TestingCatalogEntry.cs" />
     <Compile Include="Models\ExamDefinition.cs" />
     <Compile Include="Models\TestingSession.cs" />

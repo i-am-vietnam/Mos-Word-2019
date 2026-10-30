@@ -17,6 +17,12 @@ namespace MosWord2019.Core.Models
         {
             Path = path; Exists = exists; Length = length; Sha256 = sha256;
             LastWriteUtc = lastWriteUtc; Identity = identity; ObservedUtc = observedUtc;
+            if (observationSequence.HasValue)
+            {
+                long seen;
+                do { seen = Interlocked.Read(ref nextObservationSequence); if (seen >= observationSequence.Value) break; }
+                while (Interlocked.CompareExchange(ref nextObservationSequence, observationSequence.Value, seen) != seen);
+            }
             ObservationSequence = observationSequence ?? Interlocked.Increment(ref nextObservationSequence);
             CreatedUtc = creationUtc;
         }

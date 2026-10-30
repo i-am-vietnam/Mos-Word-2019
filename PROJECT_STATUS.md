@@ -1,5 +1,14 @@
 # Project Status
 
+## B2 — Session engine/STA/startup integration, 2026-10-30
+
+Completed remaining B2 services: pumped owner-STA host,60-second autosave, full-session Next/Restart/Submit/timeout/offline/unvisited grading, persisted original baselines and startup resume/finalize arbitration. Owned native close checkpoints before closure and reopens afterward without replacing a locked live work file or auto-answering legacy conversion. Orphan Word requires bilingual confirmation and same-handle identity verification; refusal/recheck failure retains pending state. Clock rollback greater than2minutes is logged/archived; retry timing is monotonic and never suppresses timeout locking.
+
+B3 UI is still unavailable: accepted startup resume is handed to PendingTestingRecovery for B3 form/host attachment; no hidden exam starts behind Training. Saved-source expired finalization is wired now. P22-T07/P24-T03 remain excluded without approval. No packages, dictionaries, assets, catalog or assertion implementations changed. Fresh Word end-to-end checks are explicitly deferred until B3; standalone HWND tests and fake Word/real OOXML evidence are distinguished.
+
+Fresh full-solution VS MSBuild Debug/Release rebuilds each0 warnings/0 errors. Both suites718/718 per configuration,0 skipped (657 headless +61 desktop), retaining every691 previous case including528 Phase A;27 new cases. Coverage includes one-way transitions, current restart, autosave/offline/timeout/backoff, saved/unvisited finalization, original baseline/claim preservation, closed-document deny-delete checkpoint/reopen, legacy non-auto-conversion, confirmation refusal/failed stop, durable finalization ordering, rollback audit and hydrated observation sequences. Background STA/message pump and standalone native HWND checks pass without Word. Source/Debug/Release150-file lists/hashes match;149 original package files/catalog/fixtures unchanged. Independent read-only review found no remaining concrete P1/P2 blocker after fixes. No native Word activation/termination or full exam UI run was performed. Evidence artifacts/b2c (ignored).
+
+
 ## B2 part 2 — Per-project pipeline and recovery services (B2 incomplete), 2026-10-30
 
 Added owner-STA TestingProjectRunner reusing Phase A Save As WordOpenXML checkpoints, source-context capture, close-before-grade/cleanup and reopen from the last checkpoint. Preflight allows pre-existing declared outputs and protects them through fresh baselines. Added crash-downtime policy, validated state hydration,5-second heartbeat service, same-seed Prepared retry, Completed archive and persisted Word PID/creation/image identity with same-handle recovery verification. Testing journal claims now use the exam SessionId; Program protects pending state before generic recovery.

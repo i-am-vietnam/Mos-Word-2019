@@ -41,6 +41,9 @@
     <Compile Include="TestingSessionStateStore.Recovery.cs" />
     <Compile Include="TestingHeartbeat.cs" />
     <Compile Include="TestingProjectRunner.cs" />
+    <Compile Include="ITestingProjectRuntime.cs" />
+    <Compile Include="TestingSessionCoordinator.cs" />
+    <Compile Include="TestingStartupRecovery.cs" />
     <Compile Include="TestingWordProcessRegistration.cs" />
     <Compile Include="TestingCatalogValidator.cs" />
     <Compile Include="TestingCatalogLoader.cs" />

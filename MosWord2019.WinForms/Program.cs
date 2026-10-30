@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.IO;
+using MosWord2019.Word;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,6 +14,7 @@ namespace MosWord2019
     {
         internal static SessionRecoveryJournal Journal { get; private set; }
         internal static TrainingWorkspaceService Workspace { get; private set; }
+        internal static TestingRecoveryRecord PendingTestingRecovery { get; private set; }
         private static Control dispatcher;
         private static int uiThread;
         private static int handlingFatal;
@@ -45,7 +48,7 @@ namespace MosWord2019
                 using (dispatcher = new Control())
                 {
                     dispatcher.CreateControl();
-                    try { Application.Run(new LoginForm()); }
+                    try { InspectTestingRecovery(); Application.Run(new LoginForm()); }
                     catch (Exception ex) { HandleFatal(ex); }
                     finally
                     {
@@ -53,6 +56,41 @@ namespace MosWord2019
                         else AppLogger.Write("Shutdown left journal intact for recovery at next startup.");
                     }
                 }
+            }
+        }
+
+        private static void InspectTestingRecovery()
+        {
+            var store = new TestingSessionStateStore();
+            if (!File.Exists(store.StatePath)) return;
+            try
+            {
+                string projects = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects");
+                var packages = new ProjectLoader().LoadAll(projects, "en");
+                var process = new OwnedWordProcessRecovery();
+                PendingTestingRecovery = new TestingStartupRecovery(store, Journal).Inspect(Path.Combine(projects, "testing-catalog.json"), packages,
+                    DateTime.UtcNow, process.IsRunning,
+                    id => MessageBox.Show("Word của bài thi trước vẫn đang mở và sẽ được đóng. Nếu bạn đang mở tài liệu cá nhân trong cửa sổ Word đó, hãy lưu lại rồi bấm Tiếp tục.\n\nWord from the previous exam is still open and will be closed. If you have personal documents open in that Word window, save them, then click Continue.",
+                        "Tiếp tục / Continue", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK,
+                    process.Stop,
+                    record =>
+                    {
+                        var choice = MessageBox.Show("Tiếp tục bài thi trước? Thời gian ứng dụng đóng vẫn được tính. Yes: tiếp tục; No: nộp bài; Cancel: để lần sau.\n\nResume the previous exam? Downtime counts. Yes: resume; No: submit; Cancel: keep pending.",
+                            "MOS Word 2019", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                        return choice == DialogResult.Yes ? TestingResumeChoice.Resume : choice == DialogResult.No ? TestingResumeChoice.Submit : TestingResumeChoice.Later;
+                    },
+                    record =>
+                    {
+                        using (var host = TestingStaHost.Create(record.Prepared, store, Journal, packages, record))
+                            host.SubmitAsync().GetAwaiter().GetResult();
+                    });
+                // B3 consumes PendingTestingRecovery when constructing its Testing form. No hidden exam is started behind Login.
+            }
+            catch (Exception ex)
+            {
+                Journal.DeferRecovery(true); AppLogger.Write("Testing startup recovery retained pending session", ex);
+                MessageBox.Show("Không thể khôi phục bài thi. Dữ liệu được giữ để thử lại. / Exam recovery failed; its data has been retained.",
+                    "MOS Word 2019", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

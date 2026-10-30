@@ -116,6 +116,7 @@ namespace MosWord2019.Projects
                 ["definition"] = JObject.FromObject(prepared.Definition), ["contentHashes"] = JObject.FromObject(prepared.ContentHashes),
                 ["lastHeartbeatUtc"] = DateTime.UtcNow, ["lastSaveUtc"] = lastSaveUtc.HasValue ? new JValue(lastSaveUtc.Value) : JValue.CreateNull(),
                 ["finalizeReason"] = snapshot?.FinalizeReason.ToString() ?? "None",
+                ["clockRollbackDetected"] = (bool?)prior["clockRollbackDetected"] ?? false,
                 ["ownedWord"] = prior["ownedWord"]?.DeepClone() ?? JValue.CreateNull(),
                 ["projectContexts"] = prior["projectContexts"]?.DeepClone() ?? new JObject(),
                 ["offlineElapsedTicks"] = snapshot?.OfflineElapsed.Ticks ?? 0,

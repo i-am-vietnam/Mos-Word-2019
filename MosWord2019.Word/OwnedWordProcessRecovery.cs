@@ -13,6 +13,11 @@ namespace MosWord2019.Word
         private readonly Func<int, IRecoveredWordProcess> open;
         public OwnedWordProcessRecovery() : this(WinApiProcessHelper.OpenRecoveryHandle) { }
         internal OwnedWordProcessRecovery(Func<int, IRecoveredWordProcess> open) { this.open = open; }
+        public bool IsRunning(OwnedWordProcessIdentity expected, string recordedMachine)
+        {
+            if (expected == null || !expected.IsWord || !string.Equals(recordedMachine, Environment.MachineName, StringComparison.OrdinalIgnoreCase)) return false;
+            using (var process = open(expected.ProcessId)) return process != null && expected.Matches(process.ReadIdentity());
+        }
         public bool Stop(OwnedWordProcessIdentity expected, string recordedMachine)
         {
             if (expected == null || !expected.IsWord || !string.Equals(recordedMachine, Environment.MachineName, StringComparison.OrdinalIgnoreCase)) return false;

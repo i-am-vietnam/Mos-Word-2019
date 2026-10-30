@@ -183,6 +183,121 @@ namespace MosWord2019.Tests
             }
         }
 
+        [DataTestMethod]
+        [DataRow(119, false)]
+        [DataRow(120, false)]
+        [DataRow(121, true)]
+        public void ClockRollbackIsFlaggedWithoutGrantingNegativeDowntime(int seconds, bool suspicious)
+        {
+            var now = DateTime.UtcNow;
+            var decision = TestingRecoveryDecision.Evaluate(TestingSessionStatus.Running, TimeSpan.FromMinutes(10), now, now.AddSeconds(-seconds), true);
+            Assert.AreEqual(TimeSpan.Zero, decision.Downtime);
+            var flag = typeof(TestingRecoveryDecision).GetProperty("SuspiciousClockRollback");
+            Assert.IsNotNull(flag, "Recovery must expose the suspicious rollback for persistence.");
+            Assert.AreEqual(suspicious, flag.GetValue(decision));
+        }
+
+        [TestMethod]
+        public void DeclinedOrphanConfirmationKeepsSessionAndJournalPendingForNextStart()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                session.Start(); lab.Store.Save(lab.Prepared, session, null);
+                lab.Store.RecordOwnedWord(lab.Prepared, new OwnedWordProcessIdentity(123, 100000, @"C:\Office\WINWORD.EXE"));
+                var journal = new SessionRecoveryJournal(Path.Combine(lab.Folder, "journal.json"), _ => { });
+                string owned = Path.Combine(lab.Folder, "owned.docx"); File.WriteAllText(owned, "preserve"); journal.Track(owned, "working", lab.Prepared.SessionId);
+                var startup = new TestingStartupRecovery(lab.Store, journal); int prompts = 0, stops = 0, finalized = 0;
+                Func<bool, TestingRecoveryRecord> inspect = accept => startup.Inspect(lab.Catalog, lab.Packages, DateTime.UtcNow,
+                    (id, machine) => true, id => { prompts++; return accept; }, (id, machine) => { stops++; return true; },
+                    record => TestingResumeChoice.Resume, record => finalized++);
+                Assert.IsNull(inspect(false)); journal.Recover(); Assert.IsTrue(File.Exists(owned));
+                Assert.AreEqual(0, stops); Assert.AreEqual(0, finalized);
+                Assert.IsNotNull(inspect(true)); Assert.AreEqual(2, prompts); Assert.AreEqual(1, stops); journal.Recover(); Assert.IsTrue(File.Exists(owned));
+            }
+        }
+        [TestMethod]
+        public void ExpiredStartupFinalizesBeforeRecoveringAnyAutosave()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                session.Start(); lab.Store.Save(lab.Prepared, session, null);
+                var state = JObject.Parse(File.ReadAllText(lab.Store.StatePath)); state["lastHeartbeatUtc"] = DateTime.UtcNow.AddMinutes(-16); File.WriteAllText(lab.Store.StatePath, state.ToString());
+                var journal = new SessionRecoveryJournal(Path.Combine(lab.Folder, "journal.json"), _ => { });
+                string owned = Path.Combine(lab.Folder, "work.docx"); File.WriteAllText(owned, "last autosave"); journal.Track(owned, "working", lab.Prepared.SessionId);
+                bool finalized = false;
+                new TestingStartupRecovery(lab.Store, journal).Inspect(lab.Catalog, lab.Packages, DateTime.UtcNow,
+                    (id, machine) => false, id => false, (id, machine) => false, record => { Assert.Fail("Expired sessions cannot resume."); return TestingResumeChoice.Resume; },
+                    record =>
+                    {
+                        Assert.IsTrue(File.Exists(owned));
+                        using (var restored = record.Restore(new StopwatchTestingClock(), new AlwaysOnlineMonitor()))
+                        {
+                            restored.BeginSubmit(new ExamTaskGrade[0]);
+                            for (int i = 1; i < 7; i++) restored.RecordUnvisitedResults(i, new ExamTaskGrade[0]);
+                            restored.Complete(_ => { }); lab.Store.Save(record.Prepared, restored, null); lab.Store.ArchiveCompleted();
+                        }
+                        finalized = true;
+                    });
+                Assert.IsTrue(finalized); Assert.IsFalse(File.Exists(owned));
+            }
+        }
+        [TestMethod]
+        public void RollbackAuditSurvivesSubsequentStateWrites()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                var now = DateTime.UtcNow; session.Start(); lab.Store.Save(lab.Prepared, session, null);
+                lab.Store.RecordRecoveryDecision(TestingRecoveryDecision.Evaluate(TestingSessionStatus.Running, TimeSpan.Zero, now, now.AddMinutes(-3), true));
+                lab.Store.Save(lab.Prepared, session, null);
+                Assert.IsTrue((bool)JObject.Parse(File.ReadAllText(lab.Store.StatePath))["clockRollbackDetected"]);
+            }
+        }
+
+        [TestMethod]
+        public void FailedVerifiedStopDoesNotFinalizeOrRecover()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                session.Start(); lab.Store.Save(lab.Prepared, session, null);
+                lab.Store.RecordOwnedWord(lab.Prepared, new OwnedWordProcessIdentity(123, 100000, @"C:\Office\WINWORD.EXE"));
+                var journal = new SessionRecoveryJournal(Path.Combine(lab.Folder, "journal.json"), _ => { });
+                string file = Path.Combine(lab.Folder, "work.docx"); File.WriteAllText(file, "preserve"); journal.Track(file, "working", lab.Prepared.SessionId);
+                new TestingStartupRecovery(lab.Store, journal).Inspect(lab.Catalog, lab.Packages, DateTime.UtcNow,
+                    (id, machine) => true, id => true, (id, machine) => false,
+                    record => { Assert.Fail("Stop was not verified."); return TestingResumeChoice.Submit; }, record => Assert.Fail("Must remain pending."));
+                journal.Recover(); Assert.IsTrue(File.Exists(file)); Assert.IsTrue(File.Exists(lab.Store.StatePath));
+            }
+        }
+        [TestMethod]
+        public void FailedFinalizationCannotReleaseRecoveryClaims()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                session.Start(); lab.Store.Save(lab.Prepared, session, null);
+                var journal = new SessionRecoveryJournal(Path.Combine(lab.Folder, "journal.json"), _ => { });
+                string file = Path.Combine(lab.Folder, "work.docx"); File.WriteAllText(file, "preserve"); journal.Track(file, "working", lab.Prepared.SessionId);
+                Assert.ThrowsException<InvalidOperationException>(() => new TestingStartupRecovery(lab.Store, journal).Inspect(lab.Catalog, lab.Packages, DateTime.UtcNow,
+                    (id, machine) => false, id => true, (id, machine) => true, record => TestingResumeChoice.Submit, record => { }));
+                journal.Recover(); Assert.IsTrue(File.Exists(file));
+            }
+        }
+
+        [TestMethod]
+        public void HydratedOutputSequenceCannotMakeFreshObservationsOlderThanTheBaseline()
+        {
+            var baseline = new OutputFileState(@"C:\isolated\Memo.txt", false, 0, null, DateTime.MinValue, null, DateTime.UtcNow, 1000000000);
+            var current = new OutputFileState(baseline.Path, false, 0, null, DateTime.MinValue, null, DateTime.UtcNow);
+            Assert.IsTrue(current.ObservationSequence > baseline.ObservationSequence);
+            var older = new OutputFileState(baseline.Path, false, 0, null, DateTime.MinValue, null, DateTime.UtcNow, 1);
+            var later = new OutputFileState(baseline.Path, false, 0, null, DateTime.MinValue, null, DateTime.UtcNow);
+            Assert.IsTrue(later.ObservationSequence > current.ObservationSequence); Assert.AreEqual(1L, older.ObservationSequence);
+        }
+
         private sealed class FakeIdentitySource : IWordProcessIdentity
         {
             public OwnedWordProcessIdentity OwnedProcessIdentity { get; private set; }

@@ -112,6 +112,8 @@ namespace MosWord2019.Word
             return new OwnedProcess(pid, handle);
         }
 
+        [DllImport("user32.dll")] private static extern bool EnableWindow(IntPtr window, bool enabled);
+
         internal sealed class OwnedProcess : IDisposable, IRecoveredWordProcess
         {
             private readonly SafeProcessHandle handle;
@@ -129,6 +131,13 @@ namespace MosWord2019.Word
             OwnedWordProcessIdentity IRecoveredWordProcess.ReadIdentity() => ReadIdentity();
             void IRecoveredWordProcess.Terminate() => EnsureExited();
 
+            internal bool SetInputEnabled(IntPtr window, bool enabled)
+            {
+                uint pid; GetWindowThreadProcessId(window, out pid);
+                if (window == IntPtr.Zero || pid == 0 || WaitForExit(0)) return false;
+                if (pid != Id) throw new InvalidOperationException("Word window is not session-owned.");
+                EnableWindow(window, enabled); return true;
+            }
             internal void PositionWindow(IntPtr window, int left, int top, int width, int height)
             {
                 if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
