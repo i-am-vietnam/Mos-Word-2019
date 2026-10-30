@@ -1,10 +1,19 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B2 — Phần 1 nền tảng, chưa hoàn thành bước B2
+
+Đã có TestingSession thuần Core (đồng hồ đơn điệu50phút, trạng thái offline30phút, chuyển tiến, restart project hiện tại, snapshot nhất quán), clock/connectivity abstraction và AlwaysOnlineMonitor. Đây là state model: chỉ yêu cầu lock/finalize, chưa tự khóa Word/tự nộp hoặc thực hiện Save/Grade. ExamScorer ghi log nội bộ cho từng `missing grade`, gồm cả project thiếu hoàn toàn; UI result vẫn không có chẩn đoán.
+
+Workspace Testing dùng SessionId riêng và gọi lại dịch vụ Phase A để tạo work/staging/ledger/journal/cleanup. Preflight chỉ đọc; Enter/Restart có baseline mới trước khi controller mở Word. Session-state store ghi seed mật mã8byte ngay, rồi definition cùng15 hash nguồn, và hỗ trợ ghi snapshot nguyên tử; chưa có đọc/khôi phục. Working files được giữ khi rời project; chỉ cleanup hoàn tất mới bỏ reserved files. Tài nguyên gốc, catalog và Training không đổi.
+
+Phần B2 tiếp theo cần điều phối owned Word trên STA, autosave60giây, checkpoint live sau Save As TXT/DOTX (không Save output), capture/close/grade/cleanup, reopen Word, resume15phút/expired finalize và phân xử trước journal recovery hiện tại. Chưa được bật Testing hoặc đưa lại P22-T07/P24-T03. Chia bước vì bổ sung phần tích hợp này và test sẽ vượt phạm vi khoảng1500dòng mà người dùng đặt cho một lượt.
+
+
 ## B1 — Sinh đề và tính điểm thuần Core
 
 Đã thêm ExamComposer/ExamDefinition, PRNG SplitMix64 cố định, ScoreAllocator và ExamScorer/ExamResult; chưa nối UI hoặc session. Composer chọn project trước task, tôn trọng catalog B0, tối đa một legacy.doc/conflictGroup, bảy project và34–40task. Bộ chuẩn bị sao chép metadata; đầu ra giữ thứ tự task và instruction key để B3 tra đúng ngôn ngữ phiên. Điều kiện xung đột ảnh hưởng tần suất biên, nhưng không dùng số tổ hợp task để tăng/giảm trọng số project. Golden test giữ hợp đồng tái lập seed; không tự đổi catalog đang được duyệt.
 
-Điểm theo thứ tự project/task của definition, stream riêng theo seed. Fail/Error/thiếu kết quả nhận0; chỉ Error gửi callback log nội bộ, không có chẩn đoán trong ExamResult. Tổng project cộng thành tổng bài; từ700 là Passed. B3 mới hiển thị Đạt/Pass hoặc Cần Luyện Tập thêm/Needs more practice và instruction đầy đủ từ khóa đã lưu.
+Điểm theo thứ tự project/task của definition, stream riêng theo seed. Fail/Error/thiếu kết quả nhận0; Error và task thiếu kết quả gửi callback log nội bộ, không có chẩn đoán trong ExamResult. Tổng project cộng thành tổng bài; từ700 là Passed. B3 mới hiển thị Đạt/Pass hoặc Cần Luyện Tập thêm/Needs more practice và instruction đầy đủ từ khóa đã lưu.
 
 | N | Điểm cơ bản | Số task được thêm1 |
 |---|---|---|

@@ -49,7 +49,8 @@ namespace MosWord2019.Core.Services
                     else
                     {
                         wrong.Add(new ExamWrongTask(project.ProjectId, id, project.InstructionKeys[id]));
-                        if (grade != null && grade.Outcome == TaskGradeOutcome.Error)
+                        if (grade == null) logError(project.ProjectId + "/" + id + ": missing grade");
+                        else if (grade.Outcome == TaskGradeOutcome.Error)
                             logError(project.ProjectId + "/" + id + ": " + grade.Message);
                     }
                 }

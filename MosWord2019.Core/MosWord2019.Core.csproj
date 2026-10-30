@@ -52,6 +52,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\TestingCatalogEntry.cs" />
     <Compile Include="Models\ExamDefinition.cs" />
+    <Compile Include="Models\TestingSession.cs" />
+    <Compile Include="Interfaces\ITestingClock.cs" />
     <Compile Include="Models\ExamResult.cs" />
     <Compile Include="Services\ExamRandom.cs" />
     <Compile Include="Services\ExamComposer.cs" />

@@ -1,8 +1,15 @@
 # Known Issues and Verification Items
 
+## B2 part 1 — Integration/resume not implemented, 2026-10-30
+
+- Session state, isolated workspace/preflight and durable audited write snapshots are implemented; the owned-STA runner/60-second autosave/live checkpoint/close-grade orchestration and15-minute resume/expired finalization are not. InputLocked/OverlayRequested/timeout are model requests only. No new real Word check; keep Testing disabled.
+- Program.Main still calls generic Journal.Recover before UI. Remaining B2 must arbitrate retained Testing state/working claims before that cleanup; otherwise those journalled files can be deleted before resume. This existing Training startup has deliberately not been changed in the partial step.
+- Existing testing-session.json (including Preparing from failed preparation) is preserved and blocks Prepare until the pending resume/archive policy handles it. There is no state hydration or fresh-root reuse API yet. Caller must call state Save for heartbeat; no autonomous heartbeat schedule exists yet.
+
+
 ## B0 Testing readiness boundary — 2026-10-30
 
-B1 composition/scoring is implemented as pure Core logic; the Testing session engine, UI and persistence remain unimplemented. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 must preserve last OOXML plus owned Save As/output provenance (especially TXT P09/P16), isolate SessionId/project copies, and stage/cleanup via Phase A services. Catalog/composer headless validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
+B1 composition/scoring and B2 part1 foundations are implemented; Testing Word orchestration, resume and UI remain unimplemented. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 part1 isolates SessionId/project copies and stages/cleans via Phase A services. The remaining coordinator must preserve last OOXML plus live Save As/output provenance (especially TXT P09/P16). Catalog/composer headless validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
 
 
 Reviewed: 2026-10-30.

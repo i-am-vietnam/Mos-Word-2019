@@ -31,6 +31,8 @@
     <Compile Include="TestingCatalogValidatorTests.cs" />
     <Compile Include="TestingCatalogTests.cs" />
     <Compile Include="ExamTests.cs" />
+    <Compile Include="TestingSessionTests.cs" />
+    <Compile Include="TestingWorkspaceTests.cs" />
     <Compile Include="PackageLoadingTests.cs" />
     <Compile Include="PlainTextMetadataTests.cs" />
     <Compile Include="GradingErrorTests.cs" />

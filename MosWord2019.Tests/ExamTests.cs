@@ -151,10 +151,13 @@ namespace MosWord2019.Tests
         {
             var packages = Packages();
             var exam = new ExamComposer(Catalog(packages), packages).Compose(42);
-            var scorer = new ExamScorer(_ => Assert.Fail("Fail or missing results have no Error diagnostics."));
+            var missing = new List<string>();
+            var scorer = new ExamScorer(missing.Add);
             var first = exam.Projects[0];
             var fail = new ExamTaskGrade(first.ProjectId, first.TaskIds[0], new TaskGradeResult(TaskGradeOutcome.Fail, "hidden", "test", first.TaskIds[0]));
             Assert.AreEqual(exam.N, scorer.Score(exam, new[] { fail }).WrongTasks.Count);
+            Assert.AreEqual(exam.N - 1, missing.Count);
+            Assert.IsTrue(missing.All(s => s.Contains("missing grade")));
             Assert.ThrowsException<InvalidDataException>(() => scorer.Score(exam, new[] { fail, fail }));
             Assert.ThrowsException<InvalidDataException>(() => scorer.Score(exam, new[] {
                 new ExamTaskGrade("Word2019_P99", "T01", fail.Result) }));
