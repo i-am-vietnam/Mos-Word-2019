@@ -48,7 +48,12 @@ namespace MosWord2019
                 using (dispatcher = new Control())
                 {
                     dispatcher.CreateControl();
-                    try { InspectTestingRecovery(); Application.Run(new LoginForm()); }
+                    try
+                    {
+                        InspectTestingRecovery();
+                        if (PendingTestingRecovery != null) TestingFlow.Open(null, PendingTestingRecovery.Prepared.Language);
+                        if (!RecoveryDeferred) Application.Run(new LoginForm());
+                    }
                     catch (Exception ex) { HandleFatal(ex); }
                     finally
                     {
@@ -59,7 +64,10 @@ namespace MosWord2019
             }
         }
 
-        private static void InspectTestingRecovery()
+        internal static TestingRecoveryRecord TakeTestingRecovery()
+        { var record = PendingTestingRecovery; PendingTestingRecovery = null; return record; }
+
+        internal static void InspectTestingRecovery()
         {
             var store = new TestingSessionStateStore();
             if (!File.Exists(store.StatePath)) return;
@@ -81,14 +89,20 @@ namespace MosWord2019
                     },
                     record =>
                     {
-                        using (var host = TestingStaHost.Create(record.Prepared, store, Journal, packages, record))
-                            host.SubmitAsync().GetAwaiter().GetResult();
+                        var localized = TestingFlow.LoadForExam(projects, record.Prepared);
+                        using (var host = TestingStaHost.Create(record.Prepared, store, Journal, localized, record))
+                        {
+                            var result = GradingProgress.Run(record.Prepared.Language, async () =>
+                            { await host.SubmitAsync(); return await host.InvokeAsync(c => c.Session.Result); });
+                            using (var window = new ResultForm(result, localized, record.Prepared.Language)) window.ShowDialog();
+                        }
                     });
-                // B3 consumes PendingTestingRecovery when constructing its Testing form. No hidden exam is started behind Login.
+                // Main opens the accepted resume before Login; the host recomputes downtime when it is created.
             }
             catch (Exception ex)
             {
                 Journal.DeferRecovery(true); AppLogger.Write("Testing startup recovery retained pending session", ex);
+                if (RecoveryDeferred) return;
                 MessageBox.Show("Không thể khôi phục bài thi. Dữ liệu được giữ để thử lại. / Exam recovery failed; its data has been retained.",
                     "MOS Word 2019", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

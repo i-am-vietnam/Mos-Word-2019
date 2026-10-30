@@ -1,12 +1,19 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B3 — Giao diện Testing EN/VI
+
+Đã bật Testing ở Login, màn hình luật/Start giữ seed khi retry preflight, panel task ở dưới Word, đồng hồ đỏ từ05:00, đánh dấu xem lại, Restart hiện tại, Next một chiều và Submit có xác nhận. Khi offline, ẩn task và hiện overlay/nút nộp; timeout khóa input rồi tự chấm. Result hiển thị tổng/1000, kết luận, điểm từng project và instruction đầy đủ của task sai; không lộ chẩn đoán grader.
+
+Resume mở trực tiếp theo ngôn ngữ đã lưu và tính lại downtime lúc gắn STA. Hộp tiến trình chấm không chặn message pump. Word bận không làm hỏng phiên; deadline retry30giây rồi dùng xác minh PID/creation/image có sẵn và chấm checkpoint chỉ đọc. Lỗi cleanup giữ kết quả bền vững/journal; lỗi không khôi phục được trong phiên có đường quay về startup recovery. Đóng lúc Start/Resume còn chạy cũng áp dụng thoát có giữ dữ liệu. Không đổi Training, grader, catalog hay package. B4/B5 chưa làm; cần kiểm chứng Word thật sau B3, không suy PASS từ UI fake.
+
+
 ## B2 — Engine toàn phiên và startup recovery
 
 Đã nối host STA nền có message pump, autosave60giây, heartbeat5giây, Next một chiều, Restart project hiện tại, Submit/timeout/offline và chấm project chưa mở từ starter. Kết quả được lưu trước cleanup; chấm recovery từ checkpoint/context đã lưu. Đồng hồ đơn điệu vẫn chạy khi đóng/mở lại Word; chỉ mất mạng mới pause. Không Save lại output sau Save As.
 
 Trước khi học viên đóng Word, sự kiện owned DocumentBeforeClose ghi checkpoint WordOpenXML/context bền vững; chỉ thay working copy sau khi document đóng để tránh khóa file. Native path/format và baseline được giữ qua reopen/resume. Khi startup, phải xác nhận trước khi dừng Word còn sót đã xác minh PID/creation/image; từ chối giữ phiên pending. Phiên hết hạn được chấm/lưu/archive trước journal recovery. Clock rollback trên2phút được log và lưu cờ audit; thời gian server/chữ ký vẫn thuộc Phase C.
 
-Testing chưa bật trong Login vì UI là B3. Resume được chấp nhận qua startup sẽ nằm ở PendingTestingRecovery để B3 gắn host/form; không chạy bài thi ẩn sau Training. Thời gian chờ này vẫn tính từ heartbeat cũ. P22-T07/P24-T03 giữ nguyên loại trừ, không thay catalog/package. Kiểm chứng Word thật (close/save-as/dialog/crash/orphan/full50phút) sẽ làm sau B3; test fake/OOXML/HWND độc lập không thay thế kiểm chứng đó.
+B3 đã bật Testing và gắn trực tiếp host/form khi chấp nhận resume; không chạy bài thi ẩn sau Training. Thời gian chờ này vẫn tính từ heartbeat cũ. P22-T07/P24-T03 giữ nguyên loại trừ, không thay catalog/package. Kiểm chứng Word thật (close/save-as/dialog/crash/orphan/full50phút) sẽ làm sau B3; test fake/OOXML/HWND độc lập không thay thế kiểm chứng đó.
 
 
 ## B1 — Sinh đề và tính điểm thuần Core

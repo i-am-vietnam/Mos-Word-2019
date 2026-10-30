@@ -10,7 +10,7 @@ using MosWord2019.Core.Services;
 namespace MosWord2019.Projects
 {
     /// <summary>Per-project pipeline, called by the Testing host on the controller's owning STA.</summary>
-    public sealed class TestingProjectRunner : ITestingProjectRuntime
+    public sealed class TestingProjectRunner : ITestingProjectRuntime, ITestingForceRecovery, IWordWindowLayout
     {
         private readonly int owner = Thread.CurrentThread.ManagedThreadId;
         private readonly TestingWorkspaceService workspace;
@@ -24,6 +24,7 @@ namespace MosWord2019.Projects
         private readonly WordGradingService grading;
         private readonly Action<string> log;
         private readonly Func<IDisposable> observationBudget;
+        private readonly Action forceClose;
         private bool savedAs, disposed, reopenedWorking, deliberateClose;
         private bool inputEnabled = true, closeCheckpointPending, engineSaving, nativeSavePending;
         private readonly IWordCloseEvents closeEvents;
@@ -32,7 +33,7 @@ namespace MosWord2019.Projects
         public event Action DocumentReopened;
 
         public TestingProjectRunner(TestingWorkspaceService workspace, IWordController word, PreparedTestingSession prepared,
-            TestingSessionStateStore store, WordGradingService grading, Action<string> log, Func<IDisposable> observationBudget = null)
+            TestingSessionStateStore store, WordGradingService grading, Action<string> log, Func<IDisposable> observationBudget = null, Action forceClose = null)
         {
             if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA) throw new InvalidOperationException("Testing Word operations require an owning STA.");
             this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -40,7 +41,7 @@ namespace MosWord2019.Projects
             this.prepared = prepared ?? throw new ArgumentNullException(nameof(prepared));
             this.store = store ?? throw new ArgumentNullException(nameof(store));
             this.grading = grading ?? throw new ArgumentNullException(nameof(grading));
-            this.log = log ?? throw new ArgumentNullException(nameof(log)); this.observationBudget = observationBudget;
+            this.log = log ?? throw new ArgumentNullException(nameof(log)); this.observationBudget = observationBudget; this.forceClose = forceClose;
             state = word as IWordDocumentState ?? throw new NotSupportedException("Owned document state is required.");
             checkpoint = word as IWordExportCheckpoint ?? throw new NotSupportedException("WordOpenXML checkpoints are required.");
             events = word as IWordSaveEvents ?? throw new NotSupportedException("Owned save events are required.");
@@ -155,6 +156,10 @@ namespace MosWord2019.Projects
         };
         public IReadOnlyList<ExamTaskGrade> LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist = null)
         {
+            using (observationBudget?.Invoke()) return LeaveAndGradeCore(persist);
+        }
+        private IReadOnlyList<ExamTaskGrade> LeaveAndGradeCore(Action<IReadOnlyList<ExamTaskGrade>> persist)
+        {
             EnsureOwner(); string source = Autosave(); var attempt = workspace.CurrentAttempt;
             var selected = prepared.Definition.Projects.Single(p => p.ProjectId == attempt.Package.Meta.ProjectId);
             var tasks = selected.TaskIds.Select(id => attempt.Package.Tasks.Single(t => t.TaskId == id)).ToArray();
@@ -202,7 +207,7 @@ namespace MosWord2019.Projects
             else
             {
                 string checkpointPath = workspace.Files.GetExportCheckpointPath(package);
-                if (File.Exists(checkpointPath)) { workspace.Files.PreserveSavedWorkingCopy(package, checkpointPath); source = workspace.SavedPath(projectId); }
+                if (File.Exists(checkpointPath)) source = checkpointPath; // Read recovery input directly; Word may still hold the working file.
                 var ledger = OutputOwnershipLedger.Restore(package, context.OutputOwnership, context.OutputOwnership.DocumentsFolder,
                     context.DefaultTemplateFolder, prepared.SessionId, workspace.Journal, log);
                 context.OutputOwnership = ledger.Capture();
@@ -222,6 +227,14 @@ namespace MosWord2019.Projects
             }
             return results.AsReadOnly();
         }
+        public void ForceCloseOwnedWord()
+        {
+            EnsureOwner(); if (forceClose == null) throw new InvalidOperationException("Verified Word termination is unavailable.");
+            forceClose();
+            deliberateClose = true; try { word.Close(); } finally { deliberateClose = false; }
+        }
+        public void SetWindowBounds(int left, int top, int width, int height)
+        { EnsureOwner(); (word as IWordWindowLayout)?.SetWindowBounds(left, top, width, height); }
         public void Close()
         { EnsureOwner(); if (word.IsOpened) CloseDocument(); word.Close(); workspace.CleanupCompleted(true); }
         private string GradePath()

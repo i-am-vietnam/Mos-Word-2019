@@ -20,14 +20,14 @@ namespace MosWord2019
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(24), ColumnCount = 1, RowCount = 7 };
             layout.Controls.Add(new Label { Text = "MOS Word 2019", AutoSize = true, Font = new Font(Font.FontFamily, 18, FontStyle.Bold) });
             layout.Controls.Add(new Label { Text = "Training / Luyện tập", AutoSize = true });
-            mode.Items.Add(AppMode.Training);
+            mode.Items.Add(AppMode.Training); mode.Items.Add(AppMode.Testing);
             mode.SelectedIndex = 0;
             layout.Controls.Add(mode);
             layout.Controls.Add(new Label { Text = "Language / Ngôn ngữ", AutoSize = true });
             language.Items.AddRange(new object[] { "English", "Tiếng Việt" });
             language.SelectedIndex = 0;
             layout.Controls.Add(language);
-            layout.Controls.Add(new Label { Text = "Testing is not available. / Chưa có chế độ kiểm tra.", AutoSize = true, MaximumSize = new Size(400, 0) });
+            layout.Controls.Add(new Label { Text = "Training / Luyện tập • Testing / Kiểm tra", AutoSize = true, MaximumSize = new Size(400, 0) });
             var enter = new Button { Name = "Continue", Text = "Continue / Tiếp tục", AutoSize = true };
             enter.Click += OpenShell;
             layout.Controls.Add(enter);
@@ -37,6 +37,11 @@ namespace MosWord2019
 
         private void OpenShell(object sender, EventArgs e)
         {
+            if ((AppMode)mode.SelectedItem == AppMode.Testing)
+            {
+                Hide(); try { TestingFlow.Open(this, language.SelectedIndex == 1 ? "vi" : "en"); }
+                finally { if (Program.RecoveryDeferred) Close(); else Show(); } return;
+            }
             var session = new AppSession(AppMode.Training, language.SelectedIndex == 1 ? "vi" : "en");
             using (var main = new MainForm(session))
             {

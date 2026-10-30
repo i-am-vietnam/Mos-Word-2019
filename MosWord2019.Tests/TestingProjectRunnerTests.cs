@@ -296,6 +296,28 @@ namespace MosWord2019.Tests
             });
         }
 
+        [TestMethod]
+        public void SavedFallbackReadsCheckpointWithoutReplacingLockedWorkingFile()
+        {
+            OnSta(() =>
+            {
+                using (var lab = new Lab())
+                {
+                    lab.Runner.Enter("Word2019_P25");
+                    string work = lab.Word.CurrentDocumentPath;
+                    lab.Word.Live = File.ReadAllBytes(TestCaseData.FixturePath("Word2019_P25/T04/pass-a2.docx"));
+                    lab.Word.SaveFormattedCheckpoint();
+                    using (var held = new FileStream(work, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        var result = lab.Runner.GradeSaved("Word2019_P25").Single(g => g.TaskId == "T04").Result;
+                        Assert.AreEqual(TaskGradeOutcome.Pass, result.Outcome, result.Message);
+                        Assert.AreEqual(0, lab.Word.Saves);
+                    }
+                    lab.Word.CloseDocument(); lab.Work.CleanupCompleted(true);
+                }
+            });
+        }
+
         private static void OnSta(Action action)
         {
             Exception failure = null;

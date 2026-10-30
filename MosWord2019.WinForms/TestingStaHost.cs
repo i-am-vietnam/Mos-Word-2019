@@ -26,6 +26,7 @@ namespace MosWord2019
         private readonly Action<string> log;
         public event Action<TestingSessionSnapshot> StateChanged;
         public event Action<string> Warning;
+        public event Action WordDialogRequired;
         public TestingStaHost(Func<TestingSessionCoordinator> create, IConnectivityMonitor network, Action<string> log = null)
         {
             this.log = log ?? (s => AppLogger.Write(s));
@@ -38,6 +39,7 @@ namespace MosWord2019
                     {
                         dispatcher = control; control.CreateControl(); engine = create();
                         engine.StateChanged += () => StateChanged?.Invoke(engine.Session.CaptureState());
+                        engine.WordDialogRequired += () => WordDialogRequired?.Invoke();
                         Action<bool> connectivity = _ => Post(Tick);
                         network.ConnectivityChanged += connectivity;
                         timer.Tick += (s, e) => { if (!executing) Tick(); }; timer.Start(); ready.TrySetResult(true);
@@ -61,7 +63,7 @@ namespace MosWord2019
             bool observe = pacing.Elapsed >= retryAfter;
             executing = true;
             try { engine.Tick(observe); if (observe) { rejection.Reset(); rejectionLogged = false; failureLogged = false; } }
-            catch (WordBusyException ex)
+            catch (Exception ex) when (WordBusyException.IsBusy(ex))
             {
                 if (!rejection.IsRunning) rejection.Start(); retryAfter = pacing.Elapsed + TimeSpan.FromMilliseconds(250);
                 if (!rejectionLogged && rejection.ElapsedMilliseconds >= 5000)
@@ -108,11 +110,16 @@ namespace MosWord2019
                 if (recovery != null) workspace.Preflight(prepared, packages, false);
                 var word = new WordController();
                 var runner = new TestingProjectRunner(workspace, word, prepared, store, new MosWord2019.Core.Services.WordGradingService(), s => AppLogger.Write(s),
-                    () => word.BeginShortCallBudget(250));
+                    () => word.BeginShortCallBudget(250), () =>
+                    {
+                        var identity = word.OwnedProcessIdentity;
+                        if (identity != null) new OwnedWordProcessRecovery().Stop(identity, Environment.MachineName);
+                    });
                 runner.DocumentReopened += () => host?.Warning?.Invoke("Word was closed. The latest checkpoint has been reopened; the timer keeps running. / Word đã đóng. Đã mở lại checkpoint gần nhất; thời gian vẫn chạy.");
                 var coordinator = new TestingSessionCoordinator(prepared, session, store, clock, runner,
                     () => workspace.Preflight(prepared, packages), s => AppLogger.Write(s));
-                coordinator.Completed += () => { journal.ReleaseSession(prepared.SessionId); journal.DeferRecovery(false); journal.Recover(); };
+                coordinator.Completed += () => { if (coordinator.CleanupPending) journal.DeferRecovery(true);
+                    else { journal.ReleaseSession(prepared.SessionId); journal.DeferRecovery(false); journal.Recover(); } };
                 return coordinator;
             }, network);
             return host;

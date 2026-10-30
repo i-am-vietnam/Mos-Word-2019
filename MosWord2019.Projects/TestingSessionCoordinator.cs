@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MosWord2019.Core.Interfaces;
 using MosWord2019.Core.Models;
+using MosWord2019.Core.Services;
 namespace MosWord2019.Projects
 {
     /// <summary>Serial owner-thread orchestration. UI receives state/results, never live grader diagnostics.</summary>
@@ -15,7 +16,11 @@ namespace MosWord2019.Projects
         private readonly Action<string> log;
         private TimeSpan lastSave;
         private TestingHeartbeat heartbeat;
-        private bool disposed, faulted, entered;
+        private bool disposed, faulted, entered, busyWarning, resumeEntryPending, attached, savedOnlyFinalization;
+        private TimeSpan? automaticBusySince;
+        public bool NeedsRecovery => faulted;
+        public bool CleanupPending { get; private set; }
+        public event Action WordDialogRequired;
         public TestingSession Session { get; }
         public event Action StateChanged;
         public event Action Completed;
@@ -34,14 +39,16 @@ namespace MosWord2019.Projects
             EnsureUsable();
             if (Session.Status != TestingSessionStatus.Ready) throw new InvalidOperationException("Exam already started.");
             preflight(); runtime.Enter(Current, false); entered = true; // No timer until preflight and Word entry succeed.
-            Session.Start(); Save(); StartHeartbeat(); ApplyLock(); StateChanged?.Invoke();
+            attached = true; Session.Start(); Save(); StartHeartbeat(); ApplyLock(); StateChanged?.Invoke();
         }
         public void Resume()
         {
-            EnsureUsable();
+            EnsureUsable(); attached = true; Session.Tick();
             if (Session.Status == TestingSessionStatus.Submitting) { FinalizeSaved(); return; }
-            runtime.Enter(Current, true); entered = true; StartHeartbeat(); ApplyLock(); Save(); StateChanged?.Invoke();
+            resumeEntryPending = true; StartHeartbeat(); EnterCurrent(); ApplyLock(); Save(); StateChanged?.Invoke();
         }
+        private void EnterCurrent()
+        { runtime.Enter(Current, resumeEntryPending); entered = true; resumeEntryPending = false; }
         private void StartHeartbeat()
         { lastSave = clock.Monotonic; heartbeat = new TestingHeartbeat(prepared, Session, store, clock); }
         private void EnsureUsable()
@@ -53,6 +60,7 @@ namespace MosWord2019.Projects
             RequireRunning(); if (Session.CurrentIndex == 6) throw new InvalidOperationException("Use Submit on the last project.");
             try
             {
+                if (!entered) { EnterCurrent(); ApplyLock(); StateChanged?.Invoke(); return; }
                 runtime.SetInputEnabled(false);
                 runtime.LeaveAndGrade(grades =>
                 {
@@ -63,14 +71,15 @@ namespace MosWord2019.Projects
                 });
                 entered = false;
                 if (Session.Status == TestingSessionStatus.Submitting) Finish();
-                else { runtime.Enter(Current, false); entered = true; lastSave = clock.Monotonic; ApplyLock(); }
-                StateChanged?.Invoke();
+                else { EnterCurrent(); lastSave = clock.Monotonic; ApplyLock(); }
+                busyWarning = false; StateChanged?.Invoke();
             }
+            catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); throw; }
             catch { faulted = true; throw; }
         }
         public void Restart()
         {
-            RequireRunning(); runtime.SetInputEnabled(false); runtime.Restart(Current);
+            RequireRunning(); runtime.SetInputEnabled(false); if (entered) runtime.Restart(Current); else EnterCurrent();
             Session.RestartCurrent(); Save(); lastSave = clock.Monotonic; ApplyLock(); StateChanged?.Invoke();
         }
         public void Submit()
@@ -79,7 +88,7 @@ namespace MosWord2019.Projects
             if (Session.Status == TestingSessionStatus.Ready || Session.Status == TestingSessionStatus.Completed) throw new InvalidOperationException("No active exam.");
             try
             {
-                runtime.SetInputEnabled(false);
+                if (!savedOnlyFinalization) runtime.SetInputEnabled(false);
                 if (Session.ProjectStates[Session.CurrentIndex] != TestingProjectState.Locked)
                 {
                     if (entered) runtime.LeaveAndGrade(grades => { Session.BeginSubmit(grades); Save(); });
@@ -87,6 +96,7 @@ namespace MosWord2019.Projects
                 }
                 entered = false; Finish();
             }
+            catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); throw; }
             catch { faulted = true; throw; }
         }
         private void FinalizeSaved() { entered = false; Submit(); }
@@ -97,14 +107,44 @@ namespace MosWord2019.Projects
                 if (Session.ProjectStates[i] != TestingProjectState.Locked)
                 { Session.RecordUnvisitedResults(i, runtime.GradeSaved(prepared.Definition.Projects[i].ProjectId)); Save(); }
             Session.Complete(log); Save(); // Never clean recovery inputs before the result is durable.
-            runtime.Close(); store.ArchiveCompleted(); Completed?.Invoke(); StateChanged?.Invoke();
+            try { runtime.Close(); if (!CleanupPending) store.ArchiveCompleted(); }
+            catch (Exception ex) { CleanupPending = true; log("Completed Testing cleanup pending: " + ex.Message); }
+            Completed?.Invoke(); StateChanged?.Invoke();
         }
+        private void Busy()
+        {
+            if (!busyWarning) { WordDialogRequired?.Invoke(); busyWarning = true; }
+            if (Session.Status == TestingSessionStatus.Running)
+                try { ApplyLock(); } catch (Exception ex) when (WordBusyException.IsBusy(ex)) { }
+        }
+        public void SetWindowBounds(int left, int top, int width, int height)
+        { (runtime as IWordWindowLayout)?.SetWindowBounds(left, top, width, height); }
         private void ApplyLock() => runtime.SetInputEnabled(!Session.InputLocked);
         public void Tick(bool observe = true)
         {
-            EnsureUsable(); if (Session.Status == TestingSessionStatus.Ready || Session.Status == TestingSessionStatus.Completed) return;
-            Session.Tick(); ApplyLock(); StateChanged?.Invoke();
-            if (Session.Status == TestingSessionStatus.Submitting) { Submit(); return; }
+            EnsureUsable(); if (!attached || Session.Status == TestingSessionStatus.Ready || Session.Status == TestingSessionStatus.Completed) return;
+            Session.Tick();
+            if (!savedOnlyFinalization) try { ApplyLock(); } catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); }
+            StateChanged?.Invoke();
+            if (Session.Status == TestingSessionStatus.Submitting)
+            {
+                if (!automaticBusySince.HasValue) automaticBusySince = clock.Monotonic;
+                if (clock.Monotonic - automaticBusySince.Value >= TimeSpan.FromSeconds(30))
+                {
+                    savedOnlyFinalization = true;
+                    var recovery = runtime as ITestingForceRecovery ?? throw new InvalidOperationException("Verified Word force recovery is unavailable.");
+                    try { recovery.ForceCloseOwnedWord(); }
+                    catch (Exception ex) { CleanupPending = true; log("Verified force cleanup pending; grading saved work: " + ex.Message); }
+                    entered = false; Submit(); return;
+                }
+                try { Submit(); } catch (Exception ex) when (WordBusyException.IsBusy(ex)) { }
+                return;
+            }
+            if (!entered && Session.Status == TestingSessionStatus.Running)
+            {
+                try { EnterCurrent(); ApplyLock(); Save(); }
+                catch (Exception ex) when (WordBusyException.IsBusy(ex)) { Busy(); return; }
+            }
             if (!observe) return; // Deadlines and lock above always run, even during observation backoff.
             runtime.Observe();
             if (Session.Status == TestingSessionStatus.Running)

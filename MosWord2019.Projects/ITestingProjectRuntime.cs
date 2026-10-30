@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MosWord2019.Core.Models;
 namespace MosWord2019.Projects
 {
+    public interface ITestingForceRecovery { void ForceCloseOwnedWord(); }
     public interface ITestingProjectRuntime : IDisposable
     {
         void Enter(string projectId, bool resume);

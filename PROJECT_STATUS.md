@@ -1,5 +1,13 @@
 # Project Status
 
+## B3 — Testing UI and retryable finalization, 2026-10-30
+
+Enabled Testing in Login (EN/VI), same-seed rules/preflight Start, bottom task panel with chosen tabs/local review marks, countdown red from05:00, current Restart, confirmed one-way Next/Submit and offline overlay. Result shows total/verdict, seven project scores and full wrong-task instructions without grader diagnostics. Startup resumes directly in the stored language, recomputing downtime when the STA attaches; startup/interactive grading use a responsive progress window.
+
+WordBusy/RPC rejections no longer fault Next/Submit. Automatic expiry retries for30seconds, then uses verified owned-process recovery and grades saved checkpoints directly, including when the working file is locked. Cleanup failure retains the durable Completed result and journal. Unrecoverable UI errors offer startup recovery; in-flight Start/Resume closing uses deferred-recovery exit. Training/grader/packages/catalog are unchanged. P22-T07/P24-T03 stay excluded. B4/B5 are not implemented.
+
+Fresh VS MSBuild Debug/Release solution rebuilds:0 warnings/0 errors each. Both suites749/749 per configuration (673 headless +76 desktop),0 skipped; every718 B2 test remains, including528 Phase A. New coverage includes transient/continued busy, forced fallback failure, locked-file checkpoint grading, pre-attachment tick safety, resume downtime/language, EN/VI UI states/buttons/confirmation/retry, in-flight close, result privacy, responsive progress and nonblocking system-close policy. Source/Debug/Release150-file lists/hashes match;149 original resources/catalog/fixtures unchanged. Form renders and test evidence: artifacts/b3 (ignored). No native Word activation/termination or full50-minute exam was executed; Word-native acceptance remains explicitly pending.
+
 ## B2 — Session engine/STA/startup integration, 2026-10-30
 
 Completed remaining B2 services: pumped owner-STA host,60-second autosave, full-session Next/Restart/Submit/timeout/offline/unvisited grading, persisted original baselines and startup resume/finalize arbitration. Owned native close checkpoints before closure and reopens afterward without replacing a locked live work file or auto-answering legacy conversion. Orphan Word requires bilingual confirmation and same-handle identity verification; refusal/recheck failure retains pending state. Clock rollback greater than2minutes is logged/archived; retry timing is monotonic and never suppresses timeout locking.

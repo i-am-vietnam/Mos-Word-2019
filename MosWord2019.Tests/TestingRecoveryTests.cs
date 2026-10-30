@@ -298,6 +298,21 @@ namespace MosWord2019.Tests
             Assert.IsTrue(later.ObservationSequence > current.ObservationSequence); Assert.AreEqual(1L, older.ObservationSequence);
         }
 
+        [TestMethod]
+        public void ResumeRecomputesDowntimeAtAttachmentInsteadOfReusingInspectTime()
+        {
+            using (var lab = new Lab())
+            using (var session = lab.Session())
+            {
+                session.Start(); lab.Clock.Advance(60); lab.Store.Save(lab.Prepared, session, null);
+                var data = JObject.Parse(File.ReadAllText(lab.Store.StatePath)); data["lastHeartbeatUtc"] = lab.Clock.UtcNow; File.WriteAllText(lab.Store.StatePath, data.ToString());
+                var record = lab.Store.Load(lab.Catalog, lab.Packages);
+                Assert.AreEqual(TimeSpan.FromSeconds(60), record.Decide(lab.Clock.UtcNow).Elapsed);
+                lab.Clock.Advance(300);
+                using (var restored = record.Restore(lab.Clock, new AlwaysOnlineMonitor())) Assert.AreEqual(TimeSpan.FromSeconds(360), restored.Elapsed);
+            }
+        }
+
         private sealed class FakeIdentitySource : IWordProcessIdentity
         {
             public OwnedWordProcessIdentity OwnedProcessIdentity { get; private set; }

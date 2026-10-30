@@ -1,8 +1,11 @@
 # Known Issues and Verification Items
 
-## B2 engine verification boundary and local trust — 2026-10-30
+## B3 UI verification boundary and local trust — 2026-10-30
 
-- B2 now supplies the pumped background STA host,60-second autosave, per-project save/checkpoint/capture/close/grade/cleanup, Next/Restart/Submit/timeout/offline coordination, saved-source finalization and startup arbitration. Testing remains unavailable in Login until B3. An accepted startup resume is handed to B3 as Program.PendingTestingRecovery; no invisible exam starts behind Training. The original heartbeat remains authoritative for counting that waiting/downtime when the host is attached.
+- Testing UI is enabled in EN/VI and reuses B2/Phase A services. Busy Next/Submit can be retried; automatic expiry has a30-second retry window before verified owned-process recovery and saved-only grading. Failed cleanup keeps the durable Completed result/journal. A genuinely unrecoverable error routes to startup recovery. The remaining live-Word boundary is below; fake UI/controller tests do not prove it.
+- A repeated full-suite run observed one transient Windows atomic-replace IOException1175 during a new resume test setup; isolated recheck passed. The state writer fails safely and retains prior state, but unlike the journal it does not retry transient replacement failures. This pre-existing persistence limit was not changed in B3.
+- One supplemental render-only VSTest run stalled without a TRX result; only its identified trainer-test runner was stopped. The diagnostic rerun completed12/12, and both full suites passed. The isolated stall was not reproduced; its cause is unconfirmed. Optional B3_UI_EVIDENCE writes per-case markers/renders for investigation.
+- AlwaysOnlineMonitor is still the production connectivity source. Offline UI/state is tested with explicit snapshots/fakes; the real heartbeat is Phase C. Result archives remain preliminary B2 records; B4 pendingUpload schema and B5 acceptance checklist are not part of B3.
 - No fresh real Word run was executed in this step. Native DocumentBeforeClose timing/RCW lifetime, Save As followed immediately by close, modal dialogs, cached HWND behavior with Word itself, actual orphan-process termination, crash/power-loss recovery, full50-minute UI/offline workflow and personal documents in the owned Word window remain for manual acceptance after B3. Fake-controller/real OOXML and standalone native HWND tests do not establish those results. Historical activation0x80070520 is not a fresh test.
 - A close callback durably writes the reserved WordOpenXML checkpoint/context before native closure; promotion into work.docx occurs only after closure because the live file can deny delete sharing. A failed checkpoint cancels closure rather than discarding edits. Legacy conversion provenance prevents internal XML recovery from completing the conversion task automatically.
 - testing-session.json is user-writable: elapsed time, locked results and recovery metadata can be tampered with locally. Server-authoritative time and result signing remain Phase C work. A UTC rollback greater than2minutes is logged and archived as clockRollbackDetected; downtime stays0. This flag detects a suspicious clock, it does not enforce trustworthy time.
@@ -12,7 +15,7 @@
 
 ## B0 Testing readiness boundary — 2026-10-30
 
-B1 and B2 engine/startup services are implemented; the Testing UI remains B3 work. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 part1 isolates SessionId/project copies and stages/cleans via Phase A services. The engine preserves last OOXML plus live Save As/output provenance (especially TXT P09/P16); B3 UI/native acceptance remains. Catalog/composer headless validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
+B1–B3 composition, engine/startup and Testing UI are implemented. P22-T07 FormattingMarksVisible and P24-T03 TOC layout are excluded pending B2 live snapshots; source-satisfied P04-T05/P13-T03/P16-T01 remain excluded. B2 part1 isolates SessionId/project copies and stages/cleans via Phase A services. The engine preserves last OOXML plus live Save As/output provenance (especially TXT P09/P16); Native Word acceptance remains. Catalog/composer headless validation does not prove Word-native workflow or exam engine correctness. Review: docs/TESTING_CATALOG_REVIEW.md.
 
 
 Reviewed: 2026-10-30.
