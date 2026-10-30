@@ -18,6 +18,18 @@ namespace MosWord2019.Tests
     public sealed class TestingStaHostTests
     {
         [TestMethod]
+        public void SyntheticConnectivityTypesAndCommandsAreAbsentFromRelease()
+        {
+            var assembly = typeof(MosWord2019.TestingStaHost).Assembly;
+            var type = assembly.GetType("MosWord2019.DebugConnectivityMonitor");
+            var command = typeof(MosWord2019.TestingStaHost).GetMethod("SetDebugOfflineAsync", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+#if DEBUG
+            Assert.IsNotNull(type); Assert.IsNotNull(command);
+#else
+            Assert.IsNull(type); Assert.IsNull(command);
+#endif
+        }
+        [TestMethod]
         public async Task HostOwnsPumpedBackgroundStaAndSerializesCommands()
         {
             using (var folder = new TestWorkspace())

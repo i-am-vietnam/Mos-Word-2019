@@ -336,6 +336,67 @@ namespace MosWord2019.Tests
             Assert.IsTrue(done); Assert.IsTrue(finalized); Assert.IsFalse(inspected);
         }
 
+        [DataTestMethod]
+        [DataRow("en", false)]
+        [DataRow("en", true)]
+        [DataRow("vi", false)]
+        [DataRow("vi", true)]
+        public void OfflineSimulationUsesExistingSessionOverlayAndSubmissionOnlyInDebug(string language, bool waitForLimit)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var store = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json"));
+                    var prepared = store.Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    var network = MosWord2019.TestingStaHost.CreateConnectivityMonitor();
+                    var clock = new TestingSessionTests.FakeClock();
+                    var runtime = new UiRuntime(prepared.Definition);
+                    using (var host = new MosWord2019.TestingStaHost(() => new TestingSessionCoordinator(prepared,
+                        new TestingSession(prepared.SessionId, prepared.Definition, clock, network), store, clock, runtime, () => { }, _ => { }), network, _ => { }))
+                    using (var form = new MosWord2019.TestingForm(prepared, packages, host))
+                    {
+                        ExamResult result = null; form.ConfirmChoice = _ => true; form.DisplayResult = value => result = value;
+                        form.Show(); Find<Button>(form, "Start").PerformClick(); Pump(() => Find<Button>(form, "Submit").Enabled);
+#if DEBUG
+                        var toggle = Find<CheckBox>(form, "DebugSimulateOffline");
+                        Assert.IsTrue(toggle.Text.Contains(language == "vi" ? "Giả lập mất mạng" : "Simulate offline"));
+                        Assert.IsTrue(toggle.Enabled);
+                        host.InvokeAsync(c => { clock.Advance(10); c.Tick(false); return true; }).GetAwaiter().GetResult();
+                        toggle.Checked = true;
+                        Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        Assert.IsFalse(runtime.InputEnabled); Assert.IsFalse(Find<TabControl>(form, "ExamTasks").Visible);
+                        Assert.IsFalse(Find<Button>(form, "NextProject").Enabled); Assert.IsFalse(Find<Button>(form, "RestartProject").Enabled);
+                        Assert.IsTrue(Find<Button>(form, "OfflineSubmit").Enabled);
+                        Assert.IsTrue(MosWord2019.TestingStaHost.CreateConnectivityMonitor().IsOnline, "A separate exam must not inherit this simulation.");
+                        var paused = host.InvokeAsync(c => { clock.Advance(120); c.Tick(false); return c.Session.Elapsed; }).GetAwaiter().GetResult();
+                        Assert.AreEqual(TimeSpan.FromSeconds(10), paused);
+                        toggle.Checked = false; Pump(() => !Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        Assert.IsTrue(runtime.InputEnabled); Assert.IsTrue(Find<TabControl>(form, "ExamTasks").Visible);
+                        var resumed = host.InvokeAsync(c => { clock.Advance(5); c.Tick(false); return c.Session.Elapsed; }).GetAwaiter().GetResult();
+                        Assert.AreEqual(TimeSpan.FromSeconds(15), resumed);
+                        toggle.Checked = true; Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        if (waitForLimit) host.InvokeAsync(c => { clock.Advance(1800); c.Tick(false); return true; }).GetAwaiter().GetResult();
+                        else Find<Button>(form, "OfflineSubmit").PerformClick();
+#else
+                        Assert.AreEqual(0, form.Controls.Find("DebugSimulateOffline", true).Length);
+                        Assert.IsTrue(network is AlwaysOnlineMonitor); Assert.IsTrue(network.IsOnline);
+                        Find<Button>(form, "Submit").PerformClick();
+#endif
+                        Pump(() => result != null && form.IsDisposed);
+                        Assert.IsFalse(File.Exists(store.StatePath));
+                        var saved = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(Path.Combine(folder.Folder, "Results", prepared.SessionId + ".json")));
+                        Assert.AreEqual(prepared.SessionId, (string)saved["sessionId"]);
+#if DEBUG
+                        Assert.AreEqual(TimeSpan.FromSeconds(120).Ticks, (long)saved["offlinePeriods"][0]["DurationTicks"]);
+                        Assert.AreEqual(waitForLimit ? "OfflineLimit" : "Submitted", (string)saved["finalizeReason"]);
+#endif
+                    }
+                }
+            });
+        }
+
         private static void Pump(Func<bool> done)
         {
             var deadline = Stopwatch.StartNew();
@@ -345,12 +406,12 @@ namespace MosWord2019.Tests
         private sealed class UiRuntime : ITestingProjectRuntime
         {
             private readonly ExamDefinition definition; private string current;
-            internal volatile bool Busy, Entering; internal int Restarts; internal ManualResetEventSlim EntryGate;
+            internal volatile bool Busy, Entering, InputEnabled; internal int Restarts; internal ManualResetEventSlim EntryGate;
             internal UiRuntime(ExamDefinition definition) { this.definition = definition; }
             public void Enter(string id, bool resume) { Entering = true; EntryGate?.Wait(); current = id; }
             public void AutosaveCurrent() { }
             public void Observe() { }
-            public void SetInputEnabled(bool enabled) { }
+            public void SetInputEnabled(bool enabled) { InputEnabled = enabled; }
             public void Restart(string id) { Restarts++; }
             public void Close() { }
             public void Dispose() { }

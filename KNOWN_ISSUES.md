@@ -1,9 +1,15 @@
 # Known Issues and Verification Items
 
+## B5 acceptance evidence and remaining native checks — 2026-10-30
+
+- User-confirmed real Word acceptance: original ten-step checklist1–4 PASS on the first run; step5 originally FAIL with the dying-Word/recovery chain; after B4-FIX, steps5–10 PASS on Word16Click-to-Run/DESKTOP-4968L2S/Debug/VI, with English startup at step10. docs/TESTING_MANUAL_TEST.md preserves the original table; historical21:51–21:56 failure evidence remains failure evidence. Conditional Save As coverage does not establish every variant/project.
+- Full50-minute expiry, Font held open at expiry, Debug offline simulation on Word itself and resume/finalize after15minutes are NOT YET RUN natively. Automated clock/fake/desktop checks do not fill these gaps. The seven-step targeted B4-FIX checklist retains its wider personal-document, kill-Word and infrastructure variants as separate verification questions.
+- The B5 offline checkbox/monitor/actuator compile only in Debug and use the existing engine; they do not detect real network loss. Release remains AlwaysOnlineMonitor until Phase C. No global simulation flag or clock-shortening control exists. Accepted hung COM/native calls remain outside retry budgets.
+
 ## B4-FIX native retest boundary — 2026-10-30
 
 - The user's real Word run21:51–21:56 reproduced a dying-Application reopen race, string-based warning escalation and Win32 error31 while inspecting PID17120, followed by a Prepare/recovery dead end. B4-FIX repairs these paths with retained-handle retirement/wait, three reopen attempts, typed coordinator-driven recovery warnings, exit-first fail-closed identity checks and shared Retry/Submit saved/Later choices. Automated tests use isolated fakes, a short-lived test-owned process and a byte-exact copied state; they are not a fresh real Word acceptance run.
-- Close-X/checkpoint/Save As/native shutdown timing and Task Manager kill/restart must be re-tested on Word with the new build: `docs/MANUAL_TEST.md`, Testing steps5/7. Original step5 was FAIL; neither step is newly native PASS. If personal documents keep a retired Application alive, wait/retry may remain pending; automatic cleanup/force-close never regains termination authority for that retired process.
+- At the B4-FIX implementation checkpoint, close-X/Save As and Task Manager retests were pending. Subsequent user-confirmed PASS for original steps5–10 is recorded in B5 above; it does not certify every wider targeted variant. If personal documents keep a retired Application alive, wait/retry may remain pending; automatic cleanup/force-close never regains termination authority for that retired process.
 - Failed identity reads mean ownership is unproven, not permission to terminate. Genuine corrupt/audit/I/O failures still retain recovery inputs and re-offer the three choices; saved submission does not bypass validation or fabricate results. Already accepted hung COM/filesystem calls remain outside retry budgets.
 - Source reproduction fixture: `MosWord2019.Tests/Fixtures/B4Fix/testing-session-8123cc.json`, SHA-256 `FA09E3BBCE37CAEDD5C5C6456771CDD1B24A6E73738BB931FC0439FE71FC3EA2`. Tests adapt only disposable copies to isolated paths; the user's original LocalAppData state/journal/log are not test workspaces. Evidence: ignored `artifacts/b4fix` and initial RED/GREEN runs in `artifacts/b4-fix`.
 

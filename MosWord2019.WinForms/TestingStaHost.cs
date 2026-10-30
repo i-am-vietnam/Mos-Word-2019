@@ -28,9 +28,24 @@ namespace MosWord2019
         public event Action<TestingSessionSnapshot> StateChanged;
         public event Action<TestingWarningCode> Warning;
         public event Action WordDialogRequired;
+#if DEBUG
+        private readonly DebugConnectivityMonitor debugNetwork;
+        internal bool CanSimulateOffline => debugNetwork != null;
+        internal bool IsDebugOffline => debugNetwork != null && !debugNetwork.IsOnline;
+        internal Task<bool> SetDebugOfflineAsync(bool offline) => InvokeAsync(c =>
+        {
+            if (debugNetwork == null) throw new InvalidOperationException("This host has no Debug connectivity simulator.");
+            debugNetwork.SetOnline(!offline);
+            c.Tick(false); // Apply the existing lock/overlay/deadline path on the owning STA immediately.
+            return true;
+        });
+#endif
         public TestingStaHost(Func<TestingSessionCoordinator> create, IConnectivityMonitor network, Action<string> log = null)
         {
             this.log = log ?? (s => AppLogger.Write(s));
+#if DEBUG
+            debugNetwork = network as DebugConnectivityMonitor;
+#endif
             thread = new Thread(() =>
             {
                 using (var control = new Control())
@@ -110,10 +125,18 @@ namespace MosWord2019
         public Task<bool> ResumeAsync() => InvokeAsync(e => { e.Resume(); return true; });
         public Task<bool> SubmitAsync() => InvokeAsync(e => { e.Submit(); return true; });
         public Task<bool> SubmitSavedAsync() => InvokeAsync(e => { e.SubmitSaved(); return true; });
+        internal static IConnectivityMonitor CreateConnectivityMonitor()
+        {
+#if DEBUG
+            return new DebugConnectivityMonitor();
+#else
+            return new AlwaysOnlineMonitor();
+#endif
+        }
         public static TestingStaHost Create(PreparedTestingSession prepared, TestingSessionStateStore store, SessionRecoveryJournal journal,
             IEnumerable<ProjectPackage> packages, TestingRecoveryRecord recovery = null, IConnectivityMonitor network = null)
         {
-            network = network ?? new AlwaysOnlineMonitor(); TestingStaHost host = null;
+            network = network ?? CreateConnectivityMonitor(); TestingStaHost host = null;
             host = new TestingStaHost(() =>
             {
                 var clock = new StopwatchTestingClock();

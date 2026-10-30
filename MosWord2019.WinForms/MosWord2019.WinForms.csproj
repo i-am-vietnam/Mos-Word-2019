@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="TestingStaHost.cs" />
+    <Compile Include="DebugConnectivityMonitor.cs" />
     <Compile Include="TestingForm.cs" />
     <Compile Include="ResultForm.cs" />
     <Compile Include="GradingProgress.cs" />

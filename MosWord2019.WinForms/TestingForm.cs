@@ -22,6 +22,9 @@ namespace MosWord2019
         private readonly Button submit = new Button { Name = "Submit", AutoSize = true };
         private readonly Button recover = new Button { Name = "Recover", AutoSize = true, Visible = false };
         private readonly Button offlineSubmit = new Button { Name = "OfflineSubmit", AutoSize = true };
+#if DEBUG
+        private readonly CheckBox debugOffline = new CheckBox { Name = "DebugSimulateOffline", AutoSize = true };
+#endif
         private readonly Label countdown = new Label { Name = "Countdown", AutoSize = true, Font = new Font("Segoe UI", 15, FontStyle.Bold) };
         private readonly Label project = new Label { Name = "ProjectIndex", AutoSize = true };
         private readonly Label status = new Label { Name = "ExamStatus", AutoSize = true };
@@ -46,6 +49,14 @@ namespace MosWord2019
             var top = new FlowLayoutPanel { Dock = DockStyle.Fill }; top.Controls.AddRange(new Control[] { countdown, project, status }); layout.Controls.Add(top);
             var body = new Panel { Dock = DockStyle.Fill }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body);
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill }; actions.Controls.AddRange(new Control[] { start, restart, next, submit, recover }); layout.Controls.Add(actions); Controls.Add(layout);
+#if DEBUG
+            if (host?.CanSimulateOffline == true)
+            {
+                debugOffline.Text = T("DEBUG: Simulate offline", "DEBUG: Giả lập mất mạng");
+                debugOffline.CheckedChanged += async (s, e) => await ChangeDebugConnectivity();
+                actions.Controls.Add(debugOffline);
+            }
+#endif
             start.Text = T("Start", "Bắt đầu bài thi"); restart.Text = T("Restart Project", "Làm lại project"); submit.Text = offlineSubmit.Text = T("Submit", "Nộp bài"); recover.Text = T("Recover exam", "Khôi phục bài thi");
             rules.Text = T("50 minutes. 7 projects, ", "50 phút. 7 project, ") + prepared.Definition.N + T(" tasks.\n", " task.\n") +
                 T("A random subset of tasks is selected. Total score: 1000; pass: 700. No grading feedback during the exam.\nNext Project is one-way. Restart affects the current project only; time keeps running. Submit is available at any time.\nNetwork loss pauses the timer for up to 30 minutes. Crash downtime counts; resume is offered within 15 minutes.",
@@ -73,6 +84,27 @@ namespace MosWord2019
             else status.Text = T("Word is reconnecting; saved work is retained and retry continues.", "Đang kết nối lại Word; bài đã lưu được giữ và sẽ tiếp tục thử lại.");
         });
         private void BusyWarning() => Dispatch(() => status.Text = T("Close the open Word dialog, then try again.", "Hãy đóng hộp thoại đang mở trong Word rồi bấm lại."));
+#if DEBUG
+        private async Task ChangeDebugConnectivity()
+        {
+            if (operation || host == null) return;
+            operation = true; ApplyState(snapshot);
+            try { await host.SetDebugOfflineAsync(debugOffline.Checked).ConfigureAwait(false); }
+            catch (Exception ex)
+            {
+                AppLogger.Write("Debug connectivity simulation failed", ex);
+                Dispatch(() => status.Text = T("Offline simulation failed; try again.", "Giả lập mất mạng thất bại; hãy thử lại."));
+            }
+            finally
+            {
+                Dispatch(() =>
+                {
+                    debugOffline.Checked = host.IsDebugOffline;
+                    operation = false; ApplyState(snapshot);
+                });
+            }
+        }
+#endif
         internal void ApplyState(TestingSessionSnapshot value)
         {
             snapshot = value;
@@ -81,6 +113,9 @@ namespace MosWord2019
             project.Text = "Project " + (value.CurrentIndex + 1) + "/7";
             bool ready = value.Status == TestingSessionStatus.Ready, running = value.Status == TestingSessionStatus.Running;
             bool lost = value.Status == TestingSessionStatus.Offline;
+#if DEBUG
+            debugOffline.Enabled = (running || lost) && !operation && !RecoveryRequired;
+#endif
             start.Visible = ready; start.Enabled = ready && !operation; rules.Visible = ready;
             next.Text = value.CurrentIndex == 6 ? T("Submit", "Nộp bài") : T("Next Project", "Project tiếp theo");
             next.Enabled = restart.Enabled = running && !operation && !RecoveryRequired;

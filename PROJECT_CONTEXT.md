@@ -1,10 +1,16 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B5 — Checklist chấp nhận và công tắc offline Debug
+
+`docs/TESTING_MANUAL_TEST.md` giữ nguyên biên bản10bước Word thật do người dùng xác nhận: ngày30/10/2026 bước1–4 PASS lượt đầu; bước5 FAIL lượt đầu rồi PASS sau B4-FIX; bước5–10 PASS sau sửa trên Word16Click-to-Run, DESKTOP-4968L2S, Debug/VI (bước10 mở English). Không coi đây là lượt Codex tự chạy lại. Checklist7bước B4-FIX được giữ thành mục riêng và đối chiếu với bước5–10; có regression set tối thiểu. Full50phút, Font tại timeout, offline giả và resume sau15phút vẫn CHƯA CHẠY native.
+
+Testing Debug có checkbox `DEBUG: Giả lập mất mạng`/`DEBUG: Simulate offline` ở hàng nút ngoài overlay. Monitor giả riêng từng bài đi qua host STA và cơ chế pause/lock/submit có sẵn; không đổi Core, grader hay Training. Release không chứa monitor giả/lệnh/công tắc; vẫn AlwaysOnlineMonitor. Không có heartbeat thật/uploader/chữ ký mới; Phase C chưa triển khai.
+
 ## B4-FIX — Đóng/mở lại Word và khôi phục phiên
 
 Bản sửa theo lỗi Word thật ngày30/10/2026: khi học viên đóng Word bằng X, Testing nhả COM của Application cũ, chỉ chờ process sở hữu tối đa10giây mỗi lượt rồi mở instance mới từ checkpoint; ba lần thử có backoff, hết lượt vẫn retry ở tick sau. Application đã retire không còn quyền terminate tự động, bảo vệ tài liệu khác nếu process chưa thoát. Timer và provenance Save As/legacy conversion được giữ.
 
-Warning dùng mã sự kiện; chỉ coordinator.NeedsRecovery mới chuyển UI sang recovery. PID đã thoát/không đọc được identity không làm startup chết và không được terminate. Startup và mở Testing cùng có Retry/Nộp từ dữ liệu đã lưu/Later khi Inspect lỗi; nộp saved dùng checkpoint/autosave, không mở Word, lưu kết quả trước giải phóng phiên. Later không cố Prepare lên active state. Không đổi grader, task/catalog/package; B5/Phase C chưa triển khai. Checklist Word thật bước5/7 ở `docs/MANUAL_TEST.md` còn chờ chạy lại bằng bản sửa.
+Warning dùng mã sự kiện; chỉ coordinator.NeedsRecovery mới chuyển UI sang recovery. PID đã thoát/không đọc được identity không làm startup chết và không được terminate. Startup và mở Testing cùng có Retry/Nộp từ dữ liệu đã lưu/Later khi Inspect lỗi; nộp saved dùng checkpoint/autosave, không mở Word, lưu kết quả trước giải phóng phiên. Later không cố Prepare lên active state. Không đổi grader, task/catalog/package. Đây là mốc triển khai B4-FIX trước khi người dùng báo cáo kiểm chứng native; kết quả tiếp theo và các ca còn thiếu được ghi ở mục B5 phía trên.
 
 ## B4 — Lưu kết quả và retry ghi atomic
 

@@ -1,5 +1,11 @@
 # Technical Context
 
+## B5 Debug connectivity and acceptance evidence — 2026-10-30
+
+TestingStaHost.CreateConnectivityMonitor creates a per-exam DebugConnectivityMonitor only under DEBUG; Release keeps AlwaysOnlineMonitor. The fake type, host actuator/properties and TestingForm checkbox are all preprocessor-excluded from Release. Its checkbox is outside the offline overlay, available only during Running/Offline, and serializes changes through InvokeAsync on the existing owning STA. Existing TestingSession connectivity handling, input lock, timer, offline history, early submission and30-minute limit are reused without Core/Projects/Word/Training changes. Each newly created monitor starts online; no global/network settings or persisted debug flags exist.
+
+Native acceptance evidence is recorded verbatim in docs/TESTING_MANUAL_TEST.md: user-reported first-run steps1–4 PASS, original step5 FAIL, post-B4-FIX steps5–10 PASS (Word16Click-to-Run, DESKTOP-4968L2S, Debug/VI; step10 opens English). This is user-provided evidence, not a new Codex native run. Full50-minute timeout, Font at timeout, Debug offline and restart after15minutes remain explicitly unrun. The separate seven-step B4-FIX targeted retest and minimum regression set are retained there. Real connectivity/upload/signing remain Phase C.
+
 ## B4-FIX closed Word and recovery contract — 2026-10-30
 
 TestingProjectRunner retires learner-closed applications through IWordController.ReleaseClosedApplication before promoting/reopening checkpoints. WordController releases RCWs, waits up to10seconds on the retained process handle without termination, then creates a new instance. A retired session can only wait: it exposes no live force-close identity and Close/Dispose only releases its handle. Reopen has three attempts with250/500ms backoff; WordReopenPendingException keeps later ticks/Next/Submit retryable. Partial opens finish checkpoint configuration before announcing success.
