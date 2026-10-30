@@ -12,7 +12,7 @@ using Wd = Microsoft.Office.Interop.Word;
 namespace MosWord2019.Word
 {
     /// <summary>Owns one Word instance and at most one editable working document.</summary>
-    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents
+    public sealed partial class WordController : IWordController, IWordWindowLayout, IWordDocumentState, IWordSaveFormat, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents, IWordProcessIdentity
     {
         private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
         private WordSession session;
@@ -28,6 +28,9 @@ namespace MosWord2019.Word
         }
 
         // Diagnostics only; callers never receive a COM object or a process handle.
+        public event Action<MosWord2019.Core.Models.OwnedWordProcessIdentity> OwnedProcessStarted;
+        public MosWord2019.Core.Models.OwnedWordProcessIdentity OwnedProcessIdentity
+        { get { EnsureUsable(); return session?.Process?.ReadIdentity(); } }
         public int? OwnedProcessId { get { return session?.Process?.Id; } }
 
         /// <summary>Limits OLE rejection retries inside a short owner-STA observation.</summary>
@@ -121,6 +124,7 @@ namespace MosWord2019.Word
                 session.Application.Caption = token;
                 session.Application.Visible = true;
                 session.Process = WinApiProcessHelper.Capture(token, preexisting, activationUtc);
+                OwnedProcessStarted?.Invoke(session.Process.ReadIdentity());
                 session.Application.Caption = caption;
                 session.Application.DisplayAlerts = Wd.WdAlertLevel.wdAlertsNone;
                 session.Application.AutomationSecurity = Office.MsoAutomationSecurity.msoAutomationSecurityForceDisable;

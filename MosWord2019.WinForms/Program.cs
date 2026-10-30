@@ -32,6 +32,7 @@ namespace MosWord2019
                 }
                 // The instance lock must precede recovery: never recover another live trainer's files.
                 Journal = new SessionRecoveryJournal();
+                new TestingSessionStateStore().ProtectPendingRecovery(Journal);
                 Journal.Recover();
                 Workspace = new TrainingWorkspaceService(Journal);
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);

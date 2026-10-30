@@ -1,5 +1,14 @@
 # Project Status
 
+## B2 part 2 — Per-project pipeline and recovery services (B2 incomplete), 2026-10-30
+
+Added owner-STA TestingProjectRunner reusing Phase A Save As WordOpenXML checkpoints, source-context capture, close-before-grade/cleanup and reopen from the last checkpoint. Preflight allows pre-existing declared outputs and protects them through fresh baselines. Added crash-downtime policy, validated state hydration,5-second heartbeat service, same-seed Prepared retry, Completed archive and persisted Word PID/creation/image identity with same-handle recovery verification. Testing journal claims now use the exam SessionId; Program protects pending state before generic recovery.
+
+This is a coherent split near the user's1500-line boundary, not completed B2: background STA host,60-second autosave scheduler, full navigation/unvisited grading, actual Word locking, resume/expired-finalization orchestration and journal release remain. Testing stays disabled. P22-T07/P24-T03 isolated snapshot reevaluation covers Pass/Fail/Error but uses fake/retained evidence; no catalog change or fresh native Word claim. Local state tampering/Phase C signing limit is documented.
+
+Fresh VS MSBuild full-solution Debug/Release rebuilds each0 warnings/0 errors; both suites691/691 per configuration (633 headless +58 desktop),0 skipped. All648 previous test identities remain, including528 Phase A;43 new cases cover crash/15-minute boundaries, heartbeat, audit restore/retry/archive, SID protection, fake process identity and real OOXML grading through fake Word checkpoint/output/reopen paths. Review fixed observed export context and legacy uppercase.DOCX preservation on reopen. Source/Debug/Release150-file hashes match;149 original package files, catalog and fixtures unchanged. Native Word/termination/resume UI not executed; no new native PASS claimed. Evidence artifacts/b2b (ignored).
+
+
 ## B2 part 1 — Session/workspace foundations (B2 incomplete), 2026-10-30
 
 Coherent first sub-part only, kept below the user's approximately1500-line limit; Word orchestration plus its Save As/STA/resume tests remains a separate continuation. Added pure TestingSession with monotonic50-minute clock, pause/resume through connectivity state,30-minute offline deadline, one-way transitions/current-only restart, per-project locked grades and atomic immutable snapshots. Deadline transitions request finalization/lock state only: no actual Word/window lock or automatic grading is claimed. AlwaysOnlineMonitor ships with a fake in tests. ExamScorer now logs every selected missing grade internally and awards0; an entire omitted project is covered.

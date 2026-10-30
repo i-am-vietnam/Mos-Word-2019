@@ -26,7 +26,7 @@ namespace MosWord2019.Tests
                 Assert.AreEqual(lab.Prepared.SessionId, (string)json["sessionId"]);
                 Assert.AreEqual(0L, (long)json["elapsedTicks"]);
                 Assert.IsFalse(Directory.Exists(lab.Work.RootPath));
-                Assert.ThrowsException<IOException>(() => lab.Store.Prepare(lab.Catalog, lab.Packages, "en"));
+                Assert.AreEqual(lab.Prepared.SessionId, lab.Store.Prepare(lab.Catalog, lab.Packages, "en").SessionId);
                 var clock = new TestingSessionTests.FakeClock();
                 using (var session = new TestingSession(lab.Prepared.SessionId, lab.Prepared.Definition, clock, new AlwaysOnlineMonitor()))
                 {
@@ -59,7 +59,7 @@ namespace MosWord2019.Tests
                 var json = JObject.Parse(File.ReadAllText(store.StatePath));
                 Assert.AreEqual("Preparing", (string)json["status"]);
                 Assert.AreEqual(JTokenType.Integer, json["seed"].Type);
-                Assert.ThrowsException<IOException>(() => store.Prepare(catalog, new ProjectPackage[0], "en"));
+                Assert.ThrowsException<InvalidDataException>(() => store.Prepare(catalog, new ProjectPackage[0], "en"));
             }
         }
 
@@ -119,10 +119,17 @@ namespace MosWord2019.Tests
                     kind == "picture" ? Path.Combine(lab.Pictures, "Map.png") :
                     kind == "memo" ? Path.Combine(lab.Documents, "Memo.txt") : Path.Combine(lab.Templates, kind == "notes" ? "Notes.dotx" : "Cert.dotx");
                 File.WriteAllText(file, "personal content");
-                Assert.ThrowsException<IOException>(() => lab.Preflight());
+                if (kind == "asset" || kind == "picture") Assert.ThrowsException<IOException>(() => lab.Preflight());
+                else
+                {
+                    lab.Preflight();
+                    var attempt = lab.Work.Enter(kind == "memo" ? "Word2019_P09" : kind == "notes" ? "Word2019_P20" : "Word2019_P06");
+                    Assert.IsTrue(attempt.Outputs.Capture().Outputs.Single().Baseline.Exists);
+                    lab.Work.CleanupCompleted(true);
+                }
                 Assert.AreEqual("personal content", File.ReadAllText(file));
                 Assert.AreEqual(0, lab.Journal.Count); Assert.IsFalse(Directory.Exists(lab.Work.RootPath));
-                Assert.ThrowsException<InvalidOperationException>(() => lab.Work.Enter("Word2019_P26"));
+                if (kind == "asset" || kind == "picture") Assert.ThrowsException<InvalidOperationException>(() => lab.Work.Enter("Word2019_P26"));
             }
         }
 
@@ -168,7 +175,9 @@ namespace MosWord2019.Tests
             using (var lab = new Lab())
             {
                 lab.Preflight(); string output = Path.Combine(lab.Templates, "Notes.dotx"); File.WriteAllText(output, "new personal output");
-                Assert.ThrowsException<IOException>(() => lab.Work.Enter("Word2019_P20"));
+                var attempt = lab.Work.Enter("Word2019_P20");
+                Assert.IsTrue(attempt.Outputs.Capture().Outputs.Single().Baseline.Exists);
+                lab.Work.CleanupCompleted(true);
                 Assert.AreEqual("new personal output", File.ReadAllText(output)); Assert.AreEqual(0, lab.Journal.Count);
             }
         }

@@ -106,7 +106,7 @@ namespace MosWord2019.Projects
                                 finally
                                 {
                                     entry.Hash = AssetHash(output);
-                                    journal?.Track(destination, entry.Identity, entry.Hash, "asset");
+                                    journal?.Track(destination, entry.Identity, entry.Hash, "asset", journalSessionId);
                                 }
                                 if (AssetHash(output) != hash) throw new IOException("Asset copy hash mismatch: " + name);
                             }

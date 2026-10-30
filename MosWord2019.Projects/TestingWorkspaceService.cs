@@ -33,7 +33,7 @@ namespace MosWord2019.Projects
             RootPath = Path.Combine(this.documents, "MosWord2019", "Working", "Testing", sessionId);
             RejectReparse(RootPath);
             if (Directory.Exists(RootPath) || File.Exists(RootPath)) throw new IOException("A fresh Testing workspace must not already exist.");
-            Files = new TrainingWorkspaceService(RootPath, this.documents, this.pictures, journal);
+            Files = new TrainingWorkspaceService(RootPath, this.documents, this.pictures, journal, SessionId);
         }
 
         public void Preflight(PreparedTestingSession prepared, IEnumerable<ProjectPackage> packages)
@@ -78,10 +78,8 @@ namespace MosWord2019.Projects
                 if (Directory.Exists(copy.Item2) || (File.Exists(copy.Item2) && PreparedTestingSession.Hash(copy.Item1) != PreparedTestingSession.Hash(copy.Item2)))
                     throw new IOException("Testing asset conflicts with a foreign file: " + copy.Item2);
             }
-            // Reuse exact declared locations and safe filename validation; no output is claimed or created.
-            var probe = new OutputOwnershipLedger(package, documents, templates, log, SessionId).Capture();
-            if (probe.Outputs.Any(o => o.Baseline.Exists || o.Current == null || o.Current.Exists || o.ObservationError != null))
-                throw new IOException("Testing declared output already exists or cannot be checked: " + package.Meta.ProjectId);
+            // Pre-existing declared outputs are allowed: entry-time freshness baselines protect them.
+
         }
 
         public TestingProjectAttempt Enter(string projectId)

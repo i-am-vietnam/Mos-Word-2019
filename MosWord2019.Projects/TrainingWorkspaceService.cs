@@ -37,6 +37,7 @@ namespace MosWord2019.Projects
         private readonly string documentsRootPath;
         private readonly string picturesRootPath;
         private readonly SessionRecoveryJournal journal;
+        private readonly string journalSessionId;
         private readonly object workingGate = new object();
         private readonly Dictionary<string, StagedAsset> workingFiles = new Dictionary<string, StagedAsset>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> workingDirectories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -62,7 +63,7 @@ namespace MosWord2019.Projects
         {
         }
 
-        public TrainingWorkspaceService(string workingRootPath, string documentsRootPath, string picturesRootPath, SessionRecoveryJournal journal = null)
+        public TrainingWorkspaceService(string workingRootPath, string documentsRootPath, string picturesRootPath, SessionRecoveryJournal journal = null, string journalSessionId = null)
         {
             if (string.IsNullOrWhiteSpace(workingRootPath))
                 throw new ArgumentException("A Training working root is required.", nameof(workingRootPath));
@@ -74,6 +75,7 @@ namespace MosWord2019.Projects
                 throw new ArgumentException("A Pictures root is required.", nameof(picturesRootPath));
             this.picturesRootPath = Path.GetFullPath(picturesRootPath);
             this.journal = journal;
+            this.journalSessionId = journalSessionId;
         }
 
         public string WorkingRootPath { get { return workingRootPath; } }
@@ -215,7 +217,7 @@ namespace MosWord2019.Projects
                     before.Written.dwHighDateTime != after.Written.dwHighDateTime || before.Written.dwLowDateTime != after.Written.dwLowDateTime)
                     throw new IOException("Working file changed during observation: " + path);
                 // This observation follows an owned save or a file creation under our handle.
-                journal?.RefreshWorking(path, entry.Identity, entry.Hash);
+                journal?.RefreshWorking(path, entry.Identity, entry.Hash, journalSessionId);
                 workingFiles[path] = entry;
             }
         }
@@ -230,7 +232,7 @@ namespace MosWord2019.Projects
                 // reserved path. A retained older-session claim no longer names its file.
                 // Passive observations must continue to reject older-session claims.
                 journal?.Forget(destination);
-                journal?.RefreshWorking(destination, entry.Identity, entry.Hash);
+                journal?.RefreshWorking(destination, entry.Identity, entry.Hash, journalSessionId);
                 ForgetWorkingFile(source);
                 entry.Destination = destination;
                 workingFiles[destination] = entry;

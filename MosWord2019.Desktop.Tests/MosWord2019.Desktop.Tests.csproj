@@ -31,6 +31,7 @@
     <Compile Include="OleMessageFilterTests.cs" />
     <Compile Include="MainFormResilienceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OwnedWordRecoveryTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -51,8 +51,9 @@ namespace MosWord2019.Projects
     }
 
     /// <summary>Durable preparation/audit and write-only snapshots. Resume hydration is a separate integration step.</summary>
-    public sealed class TestingSessionStateStore
+    public sealed partial class TestingSessionStateStore
     {
+        private readonly object gate = new object();
         public string StatePath { get; }
         public TestingSessionStateStore(string statePath = null)
         {
@@ -60,15 +61,23 @@ namespace MosWord2019.Projects
                 "MosWord2019", "testing-session.json"));
         }
         public PreparedTestingSession Prepare(string catalogPath, IEnumerable<ProjectPackage> packages, string language)
+        { lock (gate) return PrepareCore(catalogPath, packages, language); }
+        private PreparedTestingSession PrepareCore(string catalogPath, IEnumerable<ProjectPackage> packages, string language)
         {
             if (language != "en" && language != "vi") throw new ArgumentException("Testing language must be en or vi.");
-            if (File.Exists(StatePath) || Directory.Exists(StatePath)) throw new IOException("Existing Testing state requires resume/finalization; it will not be overwritten.");
+            JObject prior = File.Exists(StatePath) ? ReadEnvelope() : null;
+            if ((string)prior?["status"] == "Completed") { ArchiveCompleted(); prior = null; }
+            if ((string)prior?["status"] == "Prepared") return ReadPrepared(prior, catalogPath, packages);
+            if (prior != null && (string)prior["status"] != "Preparing") throw new IOException("An active Testing session requires resume/finalization.");
             byte[] bytes = new byte[8];
             using (var random = new RNGCryptoServiceProvider()) random.GetBytes(bytes);
-            long seed = BitConverter.ToInt64(bytes, 0);
-            string id = Guid.NewGuid().ToString("N");
+            long seed = prior == null ? BitConverter.ToInt64(bytes, 0) : (long)prior["seed"];
+            string id = prior == null ? Guid.NewGuid().ToString("N") : (string)prior["sessionId"];
             // Persist the cryptographic seed before composing, hashing, staging, or starting the timer.
-            Write(new JObject { ["version"] = 1, ["sessionId"] = id, ["seed"] = seed, ["status"] = "Preparing" }, false);
+            if (prior == null) Write(new JObject { ["version"] = 1, ["sessionId"] = id, ["seed"] = seed,
+                ["language"] = language, ["machine"] = Environment.MachineName, ["status"] = "Preparing" }, false);
+            else if (prior["language"] != null && (string)prior["language"] != language)
+                throw new InvalidDataException("Prepared exam language cannot change on retry.");
             var available = packages.ToList();
             string catalog = Path.GetFullPath(catalogPath), catalogHash = PreparedTestingSession.Hash(catalog);
             var entries = new TestingCatalogLoader().Load(catalog, available);
@@ -90,6 +99,8 @@ namespace MosWord2019.Projects
             return prepared;
         }
         public void Save(PreparedTestingSession prepared, TestingSession session, DateTime? lastSaveUtc)
+        { lock (gate) SaveCore(prepared, session, lastSaveUtc); }
+        private void SaveCore(PreparedTestingSession prepared, TestingSession session, DateTime? lastSaveUtc)
         {
             if (prepared == null || (session != null && (session.SessionId != prepared.SessionId || session.Definition != prepared.Definition)))
                 throw new InvalidDataException("Testing snapshot does not match its prepared definition.");
@@ -105,6 +116,9 @@ namespace MosWord2019.Projects
                 ["definition"] = JObject.FromObject(prepared.Definition), ["contentHashes"] = JObject.FromObject(prepared.ContentHashes),
                 ["lastHeartbeatUtc"] = DateTime.UtcNow, ["lastSaveUtc"] = lastSaveUtc.HasValue ? new JValue(lastSaveUtc.Value) : JValue.CreateNull(),
                 ["finalizeReason"] = snapshot?.FinalizeReason.ToString() ?? "None",
+                ["ownedWord"] = prior["ownedWord"]?.DeepClone() ?? JValue.CreateNull(),
+                ["projectContexts"] = prior["projectContexts"]?.DeepClone() ?? new JObject(),
+                ["offlineElapsedTicks"] = snapshot?.OfflineElapsed.Ticks ?? 0,
                 ["elapsedTicks"] = snapshot?.Elapsed.Ticks ?? 0, ["currentIndex"] = snapshot?.CurrentIndex ?? 0,
                 ["status"] = snapshot == null ? "Prepared" : snapshot.Status.ToString(),
                 ["projectStates"] = JArray.FromObject(snapshot?.ProjectStates ?? Enumerable.Repeat(TestingProjectState.NotStarted, 7).ToArray()),

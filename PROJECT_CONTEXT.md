@@ -1,12 +1,12 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
-## B2 — Phần 1 nền tảng, chưa hoàn thành bước B2
+## B2 — Phần 2: pipeline từng project và dịch vụ khôi phục, chưa hoàn thành B2
 
-Đã có TestingSession thuần Core (đồng hồ đơn điệu50phút, trạng thái offline30phút, chuyển tiến, restart project hiện tại, snapshot nhất quán), clock/connectivity abstraction và AlwaysOnlineMonitor. Đây là state model: chỉ yêu cầu lock/finalize, chưa tự khóa Word/tự nộp hoặc thực hiện Save/Grade. ExamScorer ghi log nội bộ cho từng `missing grade`, gồm cả project thiếu hoàn toàn; UI result vẫn không có chẩn đoán.
+Đã có runner chạy trên STA sở hữu controller: baseline trước mở Word; lưu working copy hoặc checkpoint WordOpenXML sau Save As; capture context, đóng document, chấm task rồi cleanup. Không Save lại TXT/DOTX hay đường dẫn tùy ý của học viên. Reopen ưu tiên checkpoint đã lưu, không tự chuyển starter `.doc`. Preflight cho phép output có sẵn và chỉ chặn asset khác nội dung; quyền sở hữu/cleanup vẫn dùng Phase A.
 
-Workspace Testing dùng SessionId riêng và gọi lại dịch vụ Phase A để tạo work/staging/ledger/journal/cleanup. Preflight chỉ đọc; Enter/Restart có baseline mới trước khi controller mở Word. Session-state store ghi seed mật mã8byte ngay, rồi definition cùng15 hash nguồn, và hỗ trợ ghi snapshot nguyên tử; chưa có đọc/khôi phục. Working files được giữ khi rời project; chỉ cleanup hoàn tất mới bỏ reserved files. Tài nguyên gốc, catalog và Training không đổi.
+Crash downtime được cộng vào50phút; resume cùng máy trong15phút và còn thời gian. Có heartbeat5giây, đọc/kiểm tra state, giữ seed/definition khi retry Preparing/Prepared, archive Completed và nhận diện Word bằng PID+creation time+image path. Startup giữ journal claim theo SessionId trước recovery. Đây là dịch vụ/pipeline đã test riêng, chưa có điều phối offer resume, expired finalize và giải phóng journal sau đó.
 
-Phần B2 tiếp theo cần điều phối owned Word trên STA, autosave60giây, checkpoint live sau Save As TXT/DOTX (không Save output), capture/close/grade/cleanup, reopen Word, resume15phút/expired finalize và phân xử trước journal recovery hiện tại. Chưa được bật Testing hoặc đưa lại P22-T07/P24-T03. Chia bước vì bổ sung phần tích hợp này và test sẽ vượt phạm vi khoảng1500dòng mà người dùng đặt cho một lượt.
+Còn thiếu host STA nền, lịch autosave60giây, điều phối Next/Restart/Submit/unvisited grading, khôi phục workspace/baseline và khóa HWND thực. Testing vẫn tắt. P22-T07/P24-T03 đã thử lại bằng fake snapshot/fixture lưu sẵn, chưa bật catalog hoặc khẳng định Word thật. State cục bộ có thể bị sửa; Phase C cần thời gian từ server và chữ ký kết quả. Chia tiếp tại ranh giới dưới khoảng1500dòng theo yêu cầu người dùng.
 
 
 ## B1 — Sinh đề và tính điểm thuần Core

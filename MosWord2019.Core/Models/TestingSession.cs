@@ -9,7 +9,7 @@ namespace MosWord2019.Core.Models
 {
     public enum TestingProjectState { NotStarted, Active, Locked }
     public enum TestingSessionStatus { Ready, Running, Offline, Submitting, Completed }
-    public enum TestingFinalizeReason { None, Submitted, Timeout, OfflineLimit }
+    public enum TestingFinalizeReason { None, Submitted, Timeout, OfflineLimit, RecoveryExpired }
 
     /// <summary>Thread-safe pure state. The owner must perform Word/save/grade operations before committing transitions.</summary>
     public sealed class TestingSession : IDisposable
@@ -48,6 +48,49 @@ namespace MosWord2019.Core.Models
             this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
             this.connectivity = connectivity ?? throw new ArgumentNullException(nameof(connectivity));
             connectivity.ConnectivityChanged += ConnectivityChanged;
+        }
+
+        public static TestingSession Restore(string sessionId, ExamDefinition definition, TestingSessionSnapshot snapshot,
+            TestingRecoveryDecision decision, ITestingClock clock, IConnectivityMonitor connectivity)
+        {
+            if (snapshot == null || decision == null || snapshot.ProjectStates == null || snapshot.LockedResults == null ||
+                snapshot.CurrentIndex < 0 || snapshot.CurrentIndex >= 7 || snapshot.ProjectStates.Count != 7 ||
+                snapshot.ProjectStates.Any(p => !Enum.IsDefined(typeof(TestingProjectState), p)) || snapshot.LockedResults.Any(g => g == null) ||
+                !new[] { TestingSessionStatus.Running, TestingSessionStatus.Offline, TestingSessionStatus.Submitting }.Contains(snapshot.Status) ||
+                !Enum.IsDefined(typeof(TestingFinalizeReason), snapshot.FinalizeReason) || snapshot.OfflineElapsed < TimeSpan.Zero ||
+                (decision.Action != TestingRecoveryAction.Resume && decision.Action != TestingRecoveryAction.Finalize))
+                throw new InvalidDataException("Invalid Testing resume state.");
+            var session = new TestingSession(sessionId, definition, clock, connectivity);
+            try
+            {
+                session.current = snapshot.CurrentIndex;
+                for (int i = 0; i < 7; i++)
+                {
+                    var state = snapshot.ProjectStates[i];
+                    if (i < session.current && state != TestingProjectState.Locked || i == session.current && (state == TestingProjectState.NotStarted ||
+                        snapshot.Status != TestingSessionStatus.Submitting && state != TestingProjectState.Active) ||
+                        i > session.current && state == TestingProjectState.Active || snapshot.Status != TestingSessionStatus.Submitting && i > session.current && state != TestingProjectState.NotStarted)
+                        throw new InvalidDataException("Inconsistent Testing project states.");
+                    if (state == TestingProjectState.Locked)
+                        session.Lock(i, snapshot.LockedResults.Where(g => g.ProjectId == definition.Projects[i].ProjectId));
+                    else session.states[i] = state;
+                }
+                if (snapshot.LockedResults.Any(g => g == null || !definition.Projects.Select((p, i) => new { p.ProjectId, State = session.states[i] })
+                    .Any(p => p.ProjectId == g.ProjectId && p.State == TestingProjectState.Locked))) throw new InvalidDataException("Unbound locked grades.");
+                session.elapsed = decision.Elapsed; session.segmentStart = clock.Monotonic;
+                session.offlineStart = clock.Monotonic - snapshot.OfflineElapsed - decision.Downtime;
+                session.reason = snapshot.FinalizeReason;
+                session.status = decision.Action == TestingRecoveryAction.Finalize ? TestingSessionStatus.Submitting :
+                    connectivity.IsOnline ? TestingSessionStatus.Running : TestingSessionStatus.Offline;
+                if (decision.Action == TestingRecoveryAction.Finalize && session.reason == TestingFinalizeReason.None)
+                    session.reason = decision.Remaining <= TimeSpan.Zero ? TestingFinalizeReason.Timeout : TestingFinalizeReason.RecoveryExpired;
+                if (snapshot.Status != TestingSessionStatus.Offline) session.offlineStart = clock.Monotonic;
+                if (snapshot.Status == TestingSessionStatus.Offline && snapshot.OfflineElapsed + decision.Downtime >= OfflineLimit)
+                { session.status = TestingSessionStatus.Submitting; session.reason = TestingFinalizeReason.OfflineLimit; }
+                session.CheckDeadlines();
+                return session;
+            }
+            catch { session.Dispose(); throw; }
         }
 
         public void Start()
@@ -143,7 +186,7 @@ namespace MosWord2019.Core.Models
             lock (gate)
             {
                 EnsureUsable(); CheckDeadlines();
-                return new TestingSessionSnapshot(status, reason, current, ReadElapsed(), states, GetLockedResults(), result);
+                return new TestingSessionSnapshot(status, reason, current, ReadElapsed(), states, GetLockedResults(), result, status == TestingSessionStatus.Offline ? clock.Monotonic - offlineStart : TimeSpan.Zero);
             }
         }
         public ExamResult Complete(Action<string> logError)
@@ -183,10 +226,11 @@ namespace MosWord2019.Core.Models
         public IReadOnlyList<TestingProjectState> ProjectStates { get; }
         public IReadOnlyList<ExamTaskGrade> LockedResults { get; }
         public ExamResult Result { get; }
-        internal TestingSessionSnapshot(TestingSessionStatus status, TestingFinalizeReason reason, int index,
-            TimeSpan elapsed, IEnumerable<TestingProjectState> states, IEnumerable<ExamTaskGrade> grades, ExamResult result)
+        public TimeSpan OfflineElapsed { get; }
+        public TestingSessionSnapshot(TestingSessionStatus status, TestingFinalizeReason reason, int index,
+            TimeSpan elapsed, IEnumerable<TestingProjectState> states, IEnumerable<ExamTaskGrade> grades, ExamResult result, TimeSpan offlineElapsed = default(TimeSpan))
         {
-            Status = status; FinalizeReason = reason; CurrentIndex = index; Elapsed = elapsed; Result = result;
+            Status = status; FinalizeReason = reason; CurrentIndex = index; Elapsed = elapsed; Result = result; OfflineElapsed = offlineElapsed;
             ProjectStates = states.ToList().AsReadOnly(); LockedResults = grades.ToList().AsReadOnly();
         }
     }

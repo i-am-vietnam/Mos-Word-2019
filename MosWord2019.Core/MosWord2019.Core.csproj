@@ -50,6 +50,8 @@
     <Compile Include="Models\ValidationIssue.cs" />
     <Compile Include="Models\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\OwnedWordProcessIdentity.cs" />
+    <Compile Include="Interfaces\IWordProcessIdentity.cs" />
     <Compile Include="Models\TestingCatalogEntry.cs" />
     <Compile Include="Models\ExamDefinition.cs" />
     <Compile Include="Models\TestingSession.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="Services\ExamComposer.cs" />
     <Compile Include="Services\ScoreAllocator.cs" />
     <Compile Include="Services\ExamScorer.cs" />
+    <Compile Include="Services\TestingRecoveryDecision.cs" />
     <Compile Include="Services\WordGradingService.cs" />
     <Compile Include="Services\WordBusyException.cs" />
     <Compile Include="Services\WordGradingService.OutputOwnership.cs" />

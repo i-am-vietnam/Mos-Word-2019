@@ -24,6 +24,8 @@ namespace MosWord2019.Projects
         private readonly object gate = new object();
         private readonly Dictionary<string, Claim> entries = new Dictionary<string, Claim>(StringComparer.OrdinalIgnoreCase);
         private bool invalid;
+        private bool recoveryDeferred;
+        private readonly HashSet<string> preservedSessions = new HashSet<string>(StringComparer.Ordinal);
 
         public SessionRecoveryJournal(string path = null, Action<string> log = null)
         {
@@ -88,18 +90,18 @@ namespace MosWord2019.Projects
         }
 
         // Only the current session may refresh its working copy after a verified owned save.
-        public void RefreshWorking(string path, string identity, string sha256)
+        public void RefreshWorking(string path, string identity, string sha256, string sessionId = null)
         {
             lock (gate)
             {
                 EnsureValid();
                 path = Normalize(path);
-                var claim = new Claim { Path = path, Identity = identity, Hash = sha256, Kind = "working", SessionId = SessionId };
+                var claim = new Claim { Path = path, Identity = identity, Hash = sha256, Kind = "working", SessionId = sessionId ?? SessionId };
                 Validate(claim);
                 RejectReparse(path);
                 Claim old;
                 bool exists = entries.TryGetValue(path, out old);
-                if (exists && (old.Kind != "working" || old.SessionId != SessionId))
+                if (exists && (old.Kind != "working" || old.SessionId != claim.SessionId))
                     throw new InvalidOperationException("Only a current-session working claim may be refreshed: " + path);
                 if (exists && old.Identity == identity && old.Hash == sha256) return;
                 entries[path] = claim;
@@ -124,6 +126,15 @@ namespace MosWord2019.Projects
             catch { entries.Add(path, old); throw; }
         }
 
+        public void PreserveSession(string sessionId)
+        {
+            Guid id;
+            if (!Guid.TryParseExact(sessionId, "N", out id)) throw new ArgumentException("A session GUID is required.");
+            lock (gate) preservedSessions.Add(sessionId);
+        }
+        public void ReleaseSession(string sessionId) { lock (gate) preservedSessions.Remove(sessionId); }
+        public void DeferRecovery(bool defer) { lock (gate) recoveryDeferred = defer; }
+
         public void Recover()
         {
             lock (gate) RecoverCore();
@@ -131,12 +142,13 @@ namespace MosWord2019.Projects
 
         private void RecoverCore()
         {
-            if (invalid) { log("Recovery skipped: journal is invalid or unsafe."); return; }
+            if (invalid || recoveryDeferred) { log("Recovery deferred: journal unsafe or Testing decision pending."); return; }
             // Refuse recovery if the journal path has become redirected since construction.
             try { RejectReparse(journalPath); }
             catch (Exception ex) when (Recoverable(ex)) { log("Recovery deferred: " + ex.Message); return; }
             foreach (var claim in entries.Values.ToArray())
             {
+                if (preservedSessions.Contains(claim.SessionId)) { log("Recovery retained Testing session " + claim.SessionId); continue; }
                 try
                 {
                     Validate(claim);

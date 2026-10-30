@@ -1,4 +1,5 @@
 using Microsoft.Win32.SafeHandles;
+using MosWord2019.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -99,11 +100,34 @@ namespace MosWord2019.Word
             throw new InvalidOperationException("Could not identify the newly created Word window. No process termination is permitted.");
         }
 
-        internal sealed class OwnedProcess : IDisposable
+        internal static IRecoveredWordProcess OpenRecoveryHandle(int pid)
+        {
+            SafeProcessHandle handle = OpenProcess(0x00100000 | 0x1000 | 0x0001, false, pid);
+            if (handle.IsInvalid)
+            {
+                int error = Marshal.GetLastWin32Error(); handle.Dispose();
+                if (error == 87) return null; // PID no longer exists.
+                throw new Win32Exception(error);
+            }
+            return new OwnedProcess(pid, handle);
+        }
+
+        internal sealed class OwnedProcess : IDisposable, IRecoveredWordProcess
         {
             private readonly SafeProcessHandle handle;
             internal int Id { get; }
             internal OwnedProcess(int id, SafeProcessHandle handle) { Id = id; this.handle = handle; }
+
+            internal OwnedWordProcessIdentity ReadIdentity()
+            {
+                long created, exited, kernel, user;
+                var path = new StringBuilder(32768); int length = path.Capacity;
+                if (!GetProcessTimes(handle, out created, out exited, out kernel, out user) ||
+                    !QueryFullProcessImageName(handle, 0, path, ref length)) throw new Win32Exception(Marshal.GetLastWin32Error());
+                return new OwnedWordProcessIdentity(Id, created, path.ToString());
+            }
+            OwnedWordProcessIdentity IRecoveredWordProcess.ReadIdentity() => ReadIdentity();
+            void IRecoveredWordProcess.Terminate() => EnsureExited();
 
             internal void PositionWindow(IntPtr window, int left, int top, int width, int height)
             {
