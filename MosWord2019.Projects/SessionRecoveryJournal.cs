@@ -237,7 +237,7 @@ namespace MosWord2019.Projects
                     RejectReparse(target);
                     if (File.Exists(target) || Directory.Exists(target)) continue;
                     RejectReparse(journalPath);
-                    try { File.Move(journalPath, target); }
+                    try { MosWord2019.Core.IO.AtomicFile.Commit(journalPath, target, false, () => { RejectReparse(journalPath); RejectReparse(target); }, log); }
                     catch (IOException ex)
                     {
                         int error = ex.HResult & 0xffff;
@@ -272,31 +272,10 @@ namespace MosWord2019.Projects
                 using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 { stream.Write(data, 0, data.Length); stream.Flush(true); }
                 RejectReparse(journalPath);
-                if (File.Exists(journalPath)) ReplaceWithRetry(temp);
-                else File.Move(temp, journalPath);
+                MosWord2019.Core.IO.AtomicFile.Commit(temp, journalPath, File.Exists(journalPath),
+                    () => { RejectReparse(temp); RejectReparse(journalPath); }, log);
             }
             finally { if (File.Exists(temp)) File.Delete(temp); }
-        }
-
-        private void ReplaceWithRetry(string temp)
-        {
-            for (int retry = 0; ; retry++)
-            {
-                RejectReparse(temp);
-                RejectReparse(journalPath);
-                try { File.Replace(temp, journalPath, null); return; }
-                catch (IOException ex)
-                {
-                    int error = ex.HResult & 0xffff;
-                    bool transient = error == 32 || error == 33 || error == 1175 || error == 1176 || error == 1177;
-                    // If Windows consumed the source, its partial state is not safe to retry.
-                    if (!transient || retry >= 3 || !File.Exists(temp)) throw;
-                    RejectReparse(temp);
-                    RejectReparse(journalPath);
-                    log("Recovery journal atomic replace retry " + (retry + 1) + " error=" + error);
-                    Thread.Sleep(20);
-                }
-            }
         }
 
         private void Validate(Claim claim)

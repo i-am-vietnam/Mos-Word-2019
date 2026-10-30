@@ -1,10 +1,17 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## B4 — Lưu kết quả và retry ghi atomic
+
+Mỗi bài hoàn tất lưu Results/<SessionId>.json trước cleanup cuối, có seed/definition/hash nội dung, outcome/điểm từng task, tổng điểm, mốc UTC, lịch sử offline theo đồng hồ đơn điệu và pendingUpload=true. Không ghi chẩn đoán grader hay thông tin ownership/COM vào kết quả. Ghi lại cùng dữ liệu là idempotent; dữ liệu xung đột hoặc lỗi ghi giữ nguyên state để khôi phục. Chỉ xóa state sau khi kết quả đã bền vững; archive cũ không tự migrate, thiếu lịch sử được đánh dấu rõ.
+
+State, results, journal và checkpoint/working-copy dùng chung helper atomic: tối đa10 lần, tổng chờ1,98giây cho lỗi32/33/1175/1176/1177; kiểm lại đường dẫn và không ghi đè trái quyền. Hết retry chỉ log một dòng tổng kết. Hộp task sai bật xuống dòng/scroll dọc. Không đổi grader, package, catalog hay hành vi Training ngoài retry I/O đã được yêu cầu. Chưa có uploader/ký kết quả/thời gian server (Phase C); B5 chưa làm và Word thật vẫn cần kiểm chứng riêng.
+
+
 ## B3 — Giao diện Testing EN/VI
 
 Đã bật Testing ở Login, màn hình luật/Start giữ seed khi retry preflight, panel task ở dưới Word, đồng hồ đỏ từ05:00, đánh dấu xem lại, Restart hiện tại, Next một chiều và Submit có xác nhận. Khi offline, ẩn task và hiện overlay/nút nộp; timeout khóa input rồi tự chấm. Result hiển thị tổng/1000, kết luận, điểm từng project và instruction đầy đủ của task sai; không lộ chẩn đoán grader.
 
-Resume mở trực tiếp theo ngôn ngữ đã lưu và tính lại downtime lúc gắn STA. Hộp tiến trình chấm không chặn message pump. Word bận không làm hỏng phiên; deadline retry30giây rồi dùng xác minh PID/creation/image có sẵn và chấm checkpoint chỉ đọc. Lỗi cleanup giữ kết quả bền vững/journal; lỗi không khôi phục được trong phiên có đường quay về startup recovery. Đóng lúc Start/Resume còn chạy cũng áp dụng thoát có giữ dữ liệu. Không đổi Training, grader, catalog hay package. B4/B5 chưa làm; cần kiểm chứng Word thật sau B3, không suy PASS từ UI fake.
+Resume mở trực tiếp theo ngôn ngữ đã lưu và tính lại downtime lúc gắn STA. Hộp tiến trình chấm không chặn message pump. Word bận không làm hỏng phiên; deadline retry30giây rồi dùng xác minh PID/creation/image có sẵn và chấm checkpoint chỉ đọc. Lỗi cleanup giữ kết quả bền vững/journal; lỗi không khôi phục được trong phiên có đường quay về startup recovery. Đóng lúc Start/Resume còn chạy cũng áp dụng thoát có giữ dữ liệu. Không đổi Training, grader, catalog hay package. B4 đã bổ sung lưu kết quả như trên; B5 chưa làm, cần kiểm chứng Word thật, không suy PASS từ UI fake.
 
 
 ## B2 — Engine toàn phiên và startup recovery

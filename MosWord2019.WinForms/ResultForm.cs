@@ -31,7 +31,7 @@ namespace MosWord2019
                 string instruction = package.Lang[w.InstructionKey].Replace("\r", " ").Replace("\n", " ");
                 return w.ProjectCode + "-" + w.TaskId + ": " + instruction;
             });
-            layout.Controls.Add(new TextBox { Name = "WrongTasks", Multiline = true, ReadOnly = true, WordWrap = false, ScrollBars = ScrollBars.Both,
+            layout.Controls.Add(new TextBox { Name = "WrongTasks", Multiline = true, ReadOnly = true, WordWrap = true, ScrollBars = ScrollBars.Vertical,
                 Dock = DockStyle.Fill, Text = string.Join(Environment.NewLine, lines) });
             var close = new Button { Text = t("Close", "Đóng"), AutoSize = true, DialogResult = DialogResult.OK }; layout.Controls.Add(close);
             Controls.Add(layout); AcceptButton = close; CancelButton = close;

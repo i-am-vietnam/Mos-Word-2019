@@ -141,10 +141,8 @@ namespace MosWord2019.Projects
                     finally { RecordWorkingFile(temporaryPath, output); }
                 }
                 MakeWritable(temporaryPath);
-                if (File.Exists(paths.WorkingPath))
-                    File.Replace(temporaryPath, paths.WorkingPath, null, true);
-                else
-                    File.Move(temporaryPath, paths.WorkingPath);
+                MosWord2019.Core.IO.AtomicFile.Commit(temporaryPath, paths.WorkingPath, File.Exists(paths.WorkingPath),
+                    () => RejectReparsePath(paths.WorkingPath), ignoreMetadataErrors: true);
                 MakeWritable(paths.WorkingPath);
                 MoveWorkingRecord(temporaryPath, paths.WorkingPath);
                 foreach (string owned in ownedPaths.Where(p => !string.Equals(p, paths.WorkingPath, StringComparison.OrdinalIgnoreCase)))

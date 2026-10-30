@@ -106,7 +106,7 @@ namespace MosWord2019.Projects
             for (int i = Session.CurrentIndex + 1; i < 7; i++)
                 if (Session.ProjectStates[i] != TestingProjectState.Locked)
                 { Session.RecordUnvisitedResults(i, runtime.GradeSaved(prepared.Definition.Projects[i].ProjectId)); Save(); }
-            Session.Complete(log); Save(); // Never clean recovery inputs before the result is durable.
+            Session.Complete(log); Save(); store.PersistCompletedResult(); // Never clean recovery inputs before the result is durable.
             try { runtime.Close(); if (!CleanupPending) store.ArchiveCompleted(); }
             catch (Exception ex) { CleanupPending = true; log("Completed Testing cleanup pending: " + ex.Message); }
             Completed?.Invoke(); StateChanged?.Invoke();

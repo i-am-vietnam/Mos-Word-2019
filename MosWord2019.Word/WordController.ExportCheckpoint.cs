@@ -147,9 +147,9 @@ namespace MosWord2019.Word
                 if (File.Exists(exportCheckpointPath))
                 {
                     if ((File.GetAttributes(exportCheckpointPath) & FileAttributes.ReparsePoint) != 0) throw new IOException("Checkpoint cannot be a reparse point.");
-                    File.Replace(temporary, exportCheckpointPath, null);
+                    MosWord2019.Core.IO.AtomicFile.Commit(temporary, exportCheckpointPath, true);
                 }
-                else File.Move(temporary, exportCheckpointPath);
+                else MosWord2019.Core.IO.AtomicFile.Commit(temporary, exportCheckpointPath, false);
                 WorkingFileWritten?.Invoke(exportCheckpointPath);
                 return exportCheckpointPath;
             }

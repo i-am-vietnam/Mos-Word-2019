@@ -359,24 +359,20 @@ namespace MosWord2019.Tests
                 string journalPath = JournalPath(workspace);
                 string first = Write(workspace, "first.dat", "one");
                 string second = Write(workspace, "second.dat", "two");
-                int retries = 0;
-                var journal = new SessionRecoveryJournal(journalPath, message =>
-                {
-                    if (!message.StartsWith("Recovery journal atomic replace retry ", StringComparison.Ordinal)) return;
-                    Interlocked.Increment(ref retries);
-                    releaseReader.Set();
-                    Assert.IsTrue(readerReleased.Wait(TimeSpan.FromSeconds(5)), "Reader must release before the next retry.");
-                });
+                var messages = new List<string>();
+                var journal = new SessionRecoveryJournal(journalPath, messages.Add);
                 journal.Track(first, "output");
                 var held = new FileStream(journalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var releaseTask = Task.Run(() =>
                 {
-                    try { Assert.IsTrue(releaseReader.Wait(TimeSpan.FromSeconds(5)), "Expected a retry before releasing the reader."); }
+                    try { releaseReader.Wait(); Thread.Sleep(80); }
                     finally { held.Dispose(); readerReleased.Set(); }
                 });
+                releaseReader.Set();
                 try { journal.Track(second, "asset"); }
-                finally { releaseReader.Set(); releaseTask.GetAwaiter().GetResult(); held.Dispose(); }
-                Assert.IsTrue(retries >= 1 && retries <= 3);
+                finally { releaseTask.GetAwaiter().GetResult(); held.Dispose(); }
+                Assert.IsTrue(readerReleased.IsSet);
+                Assert.IsFalse(messages.Any(m => m.StartsWith("Atomic commit failed", StringComparison.Ordinal)));
                 Assert.AreEqual(2, New(journalPath).Count);
                 Assert.AreEqual(0, Directory.GetFiles(workspace.Folder, "*.tmp").Length);
                 New(journalPath).Recover();

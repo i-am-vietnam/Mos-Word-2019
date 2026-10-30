@@ -1,5 +1,13 @@
 # Project Status
 
+## B4 — Durable pending-upload results and atomic retry, 2026-10-30
+
+Finished exams now commit a separate versioned Results/<SessionId>.json before final Word/workspace cleanup: seed/definition,15 content hashes, language, per-task outcome/allocated/earned points, totals/project scores, start/completion/save/heartbeat timestamps, monotonic offline periods and pendingUpload=true. Grader diagnostics and ownership/COM recovery details are excluded. Idempotent persistence preserves an existing identical result; conflicting results or failed writes retain recovery state. Older states lacking audit history are marked historyIncomplete rather than inventing it.
+
+A shared Core.IO.AtomicFile wraps every production atomic Move/Replace for state/results/journal/checkpoints/working copies, preserving no-overwrite/ownership/reparse checks and native metadata options. Transient32/33/1175/1176/1177 retry at most10 times with1.98seconds total waits; final failure logs one summary. A consumed source is never replayed. Result instructions now wrap with vertical scrolling. Training grading/packages/catalog and B5 remain untouched.
+
+Fresh VS MSBuild Debug/Release full rebuilds each0 warnings/0 errors; both suites770/770 per configuration (694 headless +76 desktop),0 skipped, retaining every749 B3 case including528 Phase A.21 new tests cover injected filesystem success/exhaustion/nontransient/consumed-source paths, no overwrite, persisted audit/points/privacy, blocked/conflicting/incomplete results, idempotent locked-state retry and offline-history resume. Existing journal-reader regression now releases independently of per-attempt logging, matching the new final-summary contract. Source/output150-file hashes and149 original resources/catalog/fixtures remain unchanged. Evidence artifacts/b4 (ignored). No native Word/real antivirus/crash acceptance run was performed; Phase C connectivity/signing/upload and B5 remain separate.
+
 ## B3 — Testing UI and retryable finalization, 2026-10-30
 
 Enabled Testing in Login (EN/VI), same-seed rules/preflight Start, bottom task panel with chosen tabs/local review marks, countdown red from05:00, current Restart, confirmed one-way Next/Submit and offline overlay. Result shows total/verdict, seven project scores and full wrong-task instructions without grader diagnostics. Startup resumes directly in the stored language, recomputing downtime when the STA attaches; startup/interactive grading use a responsive progress window.

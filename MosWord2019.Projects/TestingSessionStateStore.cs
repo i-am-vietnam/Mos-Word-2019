@@ -114,6 +114,10 @@ namespace MosWord2019.Projects
                 ["version"] = 1, ["sessionId"] = prepared.SessionId, ["seed"] = prepared.Definition.Seed,
                 ["machine"] = Environment.MachineName, ["language"] = prepared.Language,
                 ["definition"] = JObject.FromObject(prepared.Definition), ["contentHashes"] = JObject.FromObject(prepared.ContentHashes),
+                ["startedUtc"] = snapshot?.StartedUtc.HasValue == true ? new JValue(snapshot.StartedUtc.Value) : JValue.CreateNull(),
+                ["completedUtc"] = snapshot?.CompletedUtc.HasValue == true ? new JValue(snapshot.CompletedUtc.Value) : JValue.CreateNull(),
+                ["offlinePeriods"] = JArray.FromObject(snapshot?.OfflinePeriods ?? new TestingOfflinePeriod[0]),
+                ["historyIncomplete"] = snapshot?.HistoryIncomplete ?? false,
                 ["lastHeartbeatUtc"] = DateTime.UtcNow, ["lastSaveUtc"] = lastSaveUtc.HasValue ? new JValue(lastSaveUtc.Value) : JValue.CreateNull(),
                 ["finalizeReason"] = snapshot?.FinalizeReason.ToString() ?? "None",
                 ["clockRollbackDetected"] = (bool?)prior["clockRollbackDetected"] ?? false,
@@ -139,8 +143,7 @@ namespace MosWord2019.Projects
                 byte[] bytes = new UTF8Encoding(false).GetBytes(data.ToString());
                 using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 { file.Write(bytes, 0, bytes.Length); file.Flush(true); }
-                if (replace) File.Replace(temporary, StatePath, null);
-                else File.Move(temporary, StatePath);
+                MosWord2019.Core.IO.AtomicFile.Commit(temporary, StatePath, replace, () => PreparedTestingSession.CheckPath(StatePath));
             }
             finally { if (File.Exists(temporary)) File.Delete(temporary); }
         }

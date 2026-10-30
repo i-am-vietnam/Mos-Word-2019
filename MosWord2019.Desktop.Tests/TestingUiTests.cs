@@ -85,7 +85,7 @@ namespace MosWord2019.Tests
                     {
                         Assert.AreEqual((pass ? "1000" : "0") + " / 1000", Find<Label>(form, "TotalScore").Text);
                         Assert.AreEqual(pass ? (language == "vi" ? "Đạt" : "Pass") : (language == "vi" ? "Cần Luyện Tập thêm" : "Needs more practice"), Find<Label>(form, "Verdict").Text);
-                        var wrong = Find<TextBox>(form, "WrongTasks"); Assert.IsFalse(wrong.Text.Contains("PRIVATE_DIAGNOSTIC"));
+                        var wrong = Find<TextBox>(form, "WrongTasks"); Assert.IsTrue(wrong.WordWrap); Assert.AreEqual(ScrollBars.Vertical, wrong.ScrollBars); Assert.IsFalse(wrong.Text.Contains("PRIVATE_DIAGNOSTIC"));
                         Assert.AreEqual(pass ? 0 : prepared.Definition.N, wrong.Lines.Length);
                         if (!pass)
                         {

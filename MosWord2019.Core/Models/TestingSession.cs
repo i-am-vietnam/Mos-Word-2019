@@ -27,6 +27,9 @@ namespace MosWord2019.Core.Models
         private int current;
         private bool disposed;
         private ExamResult result;
+        private DateTime? startedUtc, completedUtc, offlinePeriodStart;
+        private readonly List<TestingOfflinePeriod> offlinePeriods = new List<TestingOfflinePeriod>();
+        private bool historyIncomplete;
         public string SessionId { get; }
         public ExamDefinition Definition { get; }
         public ExamResult Result { get { lock (gate) return result; } }
@@ -64,6 +67,13 @@ namespace MosWord2019.Core.Models
             try
             {
                 session.current = snapshot.CurrentIndex;
+                session.startedUtc = snapshot.StartedUtc;
+                session.historyIncomplete = snapshot.HistoryIncomplete || !snapshot.StartedUtc.HasValue;
+                var open = snapshot.OfflinePeriods.Where(p => !p.EndedUtc.HasValue).ToList();
+                if (open.Count > 1 || open.Count == 1 && (snapshot.Status != TestingSessionStatus.Offline || snapshot.OfflinePeriods.Last() != open[0]))
+                    throw new InvalidDataException("Invalid offline audit history.");
+                session.offlinePeriods.AddRange(snapshot.OfflinePeriods.Where(p => p.EndedUtc.HasValue));
+                session.offlinePeriodStart = open.Count == 1 ? (DateTime?)open[0].StartedUtc : null;
                 for (int i = 0; i < 7; i++)
                 {
                     var state = snapshot.ProjectStates[i];
@@ -87,6 +97,10 @@ namespace MosWord2019.Core.Models
                 if (snapshot.Status != TestingSessionStatus.Offline) session.offlineStart = clock.Monotonic;
                 if (snapshot.Status == TestingSessionStatus.Offline && snapshot.OfflineElapsed + decision.Downtime >= OfflineLimit)
                 { session.status = TestingSessionStatus.Submitting; session.reason = TestingFinalizeReason.OfflineLimit; }
+                if (snapshot.Status == TestingSessionStatus.Offline && session.status != TestingSessionStatus.Offline)
+                    session.CloseOfflinePeriod();
+                if (session.status == TestingSessionStatus.Offline && !session.offlinePeriodStart.HasValue)
+                { session.offlinePeriodStart = clock.UtcNow; session.historyIncomplete |= snapshot.Status == TestingSessionStatus.Offline; }
                 session.CheckDeadlines();
                 return session;
             }
@@ -99,8 +113,10 @@ namespace MosWord2019.Core.Models
             {
                 EnsureUsable();
                 if (status != TestingSessionStatus.Ready) throw new InvalidOperationException("Session already started.");
+                startedUtc = clock.UtcNow;
                 segmentStart = offlineStart = clock.Monotonic;
                 status = connectivity.IsOnline ? TestingSessionStatus.Running : TestingSessionStatus.Offline;
+                if (!connectivity.IsOnline) offlinePeriodStart = clock.UtcNow;
                 states[0] = TestingProjectState.Active;
             }
         }
@@ -110,7 +126,7 @@ namespace MosWord2019.Core.Models
             if (status == TestingSessionStatus.Running && ReadElapsed() >= Duration)
             { elapsed = Duration; status = TestingSessionStatus.Submitting; reason = TestingFinalizeReason.Timeout; }
             if (status == TestingSessionStatus.Offline && clock.Monotonic - offlineStart >= OfflineLimit)
-            { status = TestingSessionStatus.Submitting; reason = TestingFinalizeReason.OfflineLimit; }
+            { CloseOfflinePeriod(); status = TestingSessionStatus.Submitting; reason = TestingFinalizeReason.OfflineLimit; }
         }
         private void ConnectivityChanged(bool online)
         {
@@ -120,12 +136,19 @@ namespace MosWord2019.Core.Models
                 CheckDeadlines();
                 if (!online && status == TestingSessionStatus.Running)
                 {
-                    elapsed = ReadElapsed(); offlineStart = clock.Monotonic;
+                    elapsed = ReadElapsed(); offlineStart = clock.Monotonic; offlinePeriodStart = clock.UtcNow;
                     status = TestingSessionStatus.Offline;
                 }
                 else if (online && status == TestingSessionStatus.Offline)
-                { segmentStart = clock.Monotonic; status = TestingSessionStatus.Running; }
+                { CloseOfflinePeriod(); segmentStart = clock.Monotonic; status = TestingSessionStatus.Running; }
             }
+        }
+        private void CloseOfflinePeriod()
+        {
+            if (!offlinePeriodStart.HasValue) return;
+            DateTime end = clock.UtcNow < offlinePeriodStart.Value ? offlinePeriodStart.Value : clock.UtcNow;
+            offlinePeriods.Add(new TestingOfflinePeriod(offlinePeriodStart.Value, end, (clock.Monotonic - offlineStart).Ticks));
+            offlinePeriodStart = null;
         }
         private TimeSpan ReadElapsed()
         {
@@ -152,6 +175,7 @@ namespace MosWord2019.Core.Models
                 EnsureUsable(); CheckDeadlines();
                 if (status == TestingSessionStatus.Ready || status == TestingSessionStatus.Completed || states[current] == TestingProjectState.Locked)
                     throw new InvalidOperationException("Session cannot begin submission.");
+                if (status == TestingSessionStatus.Offline) CloseOfflinePeriod();
                 Lock(current, currentResults);
                 elapsed = ReadElapsed(); status = TestingSessionStatus.Submitting;
                 if (reason == TestingFinalizeReason.None) reason = TestingFinalizeReason.Submitted;
@@ -186,7 +210,11 @@ namespace MosWord2019.Core.Models
             lock (gate)
             {
                 EnsureUsable(); CheckDeadlines();
-                return new TestingSessionSnapshot(status, reason, current, ReadElapsed(), states, GetLockedResults(), result, status == TestingSessionStatus.Offline ? clock.Monotonic - offlineStart : TimeSpan.Zero);
+                var periods = offlinePeriods.ToList();
+                if (status == TestingSessionStatus.Offline && offlinePeriodStart.HasValue)
+                    periods.Add(new TestingOfflinePeriod(offlinePeriodStart.Value, null, (clock.Monotonic - offlineStart).Ticks));
+                return new TestingSessionSnapshot(status, reason, current, ReadElapsed(), states, GetLockedResults(), result,
+                    status == TestingSessionStatus.Offline ? clock.Monotonic - offlineStart : TimeSpan.Zero, startedUtc, completedUtc, periods, historyIncomplete);
             }
         }
         public ExamResult Complete(Action<string> logError)
@@ -197,6 +225,7 @@ namespace MosWord2019.Core.Models
                 if (status != TestingSessionStatus.Submitting || states.Any(s => s != TestingProjectState.Locked))
                     throw new InvalidOperationException("All projects must be graded before completion.");
                 result = new ExamScorer(logError).Score(Definition, GetLockedResults());
+                completedUtc = clock.UtcNow;
                 status = TestingSessionStatus.Completed;
                 return result;
             }
@@ -217,6 +246,18 @@ namespace MosWord2019.Core.Models
             }
         }
     }
+    public sealed class TestingOfflinePeriod
+    {
+        public DateTime StartedUtc { get; }
+        public DateTime? EndedUtc { get; }
+        public long DurationTicks { get; }
+        public TestingOfflinePeriod(DateTime startedUtc, DateTime? endedUtc, long durationTicks)
+        {
+            if (startedUtc.Kind != DateTimeKind.Utc || endedUtc.HasValue && (endedUtc.Value.Kind != DateTimeKind.Utc || endedUtc < startedUtc) || durationTicks < 0)
+                throw new InvalidDataException("Invalid offline period.");
+            StartedUtc = startedUtc; EndedUtc = endedUtc; DurationTicks = durationTicks;
+        }
+    }
     public sealed class TestingSessionSnapshot
     {
         public TestingSessionStatus Status { get; }
@@ -227,10 +268,17 @@ namespace MosWord2019.Core.Models
         public IReadOnlyList<ExamTaskGrade> LockedResults { get; }
         public ExamResult Result { get; }
         public TimeSpan OfflineElapsed { get; }
+        public DateTime? StartedUtc { get; }
+        public DateTime? CompletedUtc { get; }
+        public IReadOnlyList<TestingOfflinePeriod> OfflinePeriods { get; }
+        public bool HistoryIncomplete { get; }
         public TestingSessionSnapshot(TestingSessionStatus status, TestingFinalizeReason reason, int index,
-            TimeSpan elapsed, IEnumerable<TestingProjectState> states, IEnumerable<ExamTaskGrade> grades, ExamResult result, TimeSpan offlineElapsed = default(TimeSpan))
+            TimeSpan elapsed, IEnumerable<TestingProjectState> states, IEnumerable<ExamTaskGrade> grades, ExamResult result, TimeSpan offlineElapsed = default(TimeSpan), DateTime? startedUtc = null,
+            DateTime? completedUtc = null, IEnumerable<TestingOfflinePeriod> offlinePeriods = null, bool historyIncomplete = false)
         {
             Status = status; FinalizeReason = reason; CurrentIndex = index; Elapsed = elapsed; Result = result; OfflineElapsed = offlineElapsed;
+            StartedUtc = startedUtc; CompletedUtc = completedUtc; HistoryIncomplete = historyIncomplete;
+            OfflinePeriods = (offlinePeriods ?? new TestingOfflinePeriod[0]).ToList().AsReadOnly();
             ProjectStates = states.ToList().AsReadOnly(); LockedResults = grades.ToList().AsReadOnly();
         }
     }

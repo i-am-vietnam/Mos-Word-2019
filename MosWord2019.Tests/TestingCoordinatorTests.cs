@@ -201,6 +201,7 @@ namespace MosWord2019.Tests
                 lab.Clock.Advance(3000); lab.Engine.Tick(); lab.Clock.Advance(30); lab.Engine.Tick();
                 Assert.AreEqual(TestingSessionStatus.Completed, lab.Session.Status);
                 Assert.IsTrue(lab.Engine.CleanupPending); Assert.IsFalse(lab.Engine.NeedsRecovery);
+                Assert.IsTrue(File.Exists(Path.Combine(lab.Folder, "Results", lab.Prepared.SessionId + ".json")));
                 Assert.IsNotNull(Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(lab.Store.StatePath))["result"]);
                 Assert.AreEqual(7, lab.Runtime.FromDisk);
             }

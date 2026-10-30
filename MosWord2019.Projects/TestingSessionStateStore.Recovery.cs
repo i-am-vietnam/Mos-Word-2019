@@ -104,7 +104,8 @@ namespace MosWord2019.Projects
                     data["machine"]?.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)data["machine"])) throw new InvalidDataException("Invalid saved Testing state.");
                 var snapshot = new TestingSessionSnapshot(status, reason, (int)data["currentIndex"], TimeSpan.FromTicks((long)data["elapsedTicks"]),
                     states.Select(t => (TestingProjectState)(int)t), grades.ToObject<List<ExamTaskGrade>>(), null,
-                    TimeSpan.FromTicks((long?)data["offlineElapsedTicks"] ?? 0));
+                    TimeSpan.FromTicks((long?)data["offlineElapsedTicks"] ?? 0), (DateTime?)data["startedUtc"], (DateTime?)data["completedUtc"],
+                    data["offlinePeriods"]?.ToObject<List<TestingOfflinePeriod>>(), (bool?)data["historyIncomplete"] ?? data["offlinePeriods"] == null);
                 var owned = data["ownedWord"] == null || data["ownedWord"].Type == JTokenType.Null ? null : data["ownedWord"].ToObject<OwnedWordProcessIdentity>();
                 var record = new TestingRecoveryRecord(prepared, snapshot, (DateTime)data["lastHeartbeatUtc"], (string)data["machine"], owned);
                 var decision = record.Decide(DateTime.UtcNow);
@@ -168,12 +169,8 @@ namespace MosWord2019.Projects
         {
             lock (gate)
             {
-                var data = ReadEnvelope();
-                if ((string)data["status"] != "Completed" || data["result"]?.Type != JTokenType.Object) throw new InvalidOperationException("Only a stored completed result may be archived.");
-                string directory = Path.Combine(Path.GetDirectoryName(StatePath), "Results");
-                PreparedTestingSession.CheckPath(directory); Directory.CreateDirectory(directory);
-                string target = Path.Combine(directory, (string)data["sessionId"] + ".json");
-                PreparedTestingSession.CheckPath(target); File.Move(StatePath, target); // Atomic, same volume, never overwrite another result.
+                string target = PersistCompletedResult();
+                PreparedTestingSession.CheckPath(StatePath); File.Delete(StatePath); // Remove recovery input only after the result is durable.
                 return target;
             }
         }

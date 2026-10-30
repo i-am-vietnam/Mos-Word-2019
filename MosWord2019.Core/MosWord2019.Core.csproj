@@ -29,6 +29,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\AtomicFile.cs" />
     <Compile Include="Diagnostics\AppLogger.cs" />
     <Compile Include="Interfaces\IWordController.cs" />
     <Compile Include="Interfaces\IWordDocumentState.cs" />

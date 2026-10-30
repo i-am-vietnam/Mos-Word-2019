@@ -76,8 +76,7 @@ namespace MosWord2019.Projects
                             }
                             finally { RecordWorkingFile(temporary, output); }
                         }
-                        if (File.Exists(paths.WorkingPath)) File.Replace(temporary, paths.WorkingPath, null);
-                        else File.Move(temporary, paths.WorkingPath);
+                        MosWord2019.Core.IO.AtomicFile.Commit(temporary, paths.WorkingPath, File.Exists(paths.WorkingPath), () => RejectReparsePath(paths.WorkingPath));
                         MoveWorkingRecord(temporary, paths.WorkingPath);
                     }
                     finally { if (File.Exists(temporary)) { File.Delete(temporary); ForgetWorkingFile(temporary); } }
