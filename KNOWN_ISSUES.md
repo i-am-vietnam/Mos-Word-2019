@@ -1,5 +1,10 @@
 # Known Issues and Verification Items
 
+## U1 — Giới hạn kiểm chứng giao diện, 2026-11-01
+
+- Bốn form đã qua ma trận viewport/scale WinForms mô phỏng và có ảnh EN/VI Debug/Release; chưa chạy lại với Word thật tại DPI Windows100/125/150% hoặc khi chuyển monitor. Cần kiểm lại diện tích Word, cuộn instruction dài, dialog/timeout và bộ regression trong docs/TESTING_MANUAL_TEST.md trước chấp nhận native U1.
+- Login hiện chấp nhận tài khoản/mật khẩu bất kỳ không rỗng qua OfflineAuthenticationService, chưa có server. Ctrl+Shift+F12 chỉ áp dụng khi focus Trainer Debug; nó thay checkbox B5, không phải global hotkey và không phát hiện mạng thật. Release vẫn AlwaysOnlineMonitor tới Phase C.
+
 ## B5 acceptance evidence and remaining native checks — 2026-10-30
 
 - User-confirmed real Word acceptance: original ten-step checklist1–4 PASS on the first run; step5 originally FAIL with the dying-Word/recovery chain; after B4-FIX, steps5–10 PASS on Word16Click-to-Run/DESKTOP-4968L2S/Debug/VI, with English startup at step10. docs/TESTING_MANUAL_TEST.md preserves the original table; historical21:51–21:56 failure evidence remains failure evidence. Conditional Save As coverage does not establish every variant/project.

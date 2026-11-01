@@ -30,8 +30,9 @@ namespace MosWord2019
         private readonly Button restart = new Button { Name = "Restart", AutoSize = true };
         private readonly Button grade = new Button { Name = "Grade", AutoSize = true };
         private readonly WordGradingService grading = new WordGradingService();
-        private readonly TabControl tabTasks = new TabControl { Name = "tabTasks", Dock = DockStyle.Fill, Visible = false, Multiline = true };
+        private readonly TabControl tabTasks = new TabControl { Name = "tabTasks", Dock = DockStyle.Fill, Visible = false, Multiline = false };
         private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
+        private readonly Label taskCounter = new Label { Name = "TaskCounter", AutoSize = true, Anchor = AnchorStyles.Right };
         private ProjectPackage currentProject;
         private string currentWorkPath;
         private readonly TemplateOutputCleanupService templateOutputs;
@@ -91,26 +92,33 @@ namespace MosWord2019
             AutoScaleMode = AutoScaleMode.Font;
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(4), ColumnCount = 1, RowCount = 3 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            var selection = new FlowLayoutPanel { Name = "pnlTopBar", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), WrapContents = false };
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+            var top = new TableLayoutPanel { Name = "pnlTopBar", Margin = Padding.Empty, Dock = DockStyle.Fill, BackColor = Color.White, ColumnCount = 3 };
+            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45));
+            top.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            var selection = new FlowLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(2), WrapContents = false };
+            top.Controls.Add(selection, 0, 0);
+            top.Controls.Add(new Label { Name = "TrainingCountdown", Visible = false, Text = "04:00:00", ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold), Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter }, 1, 0);
+            top.Controls.Add(taskCounter, 2, 0);
             selection.Controls.Add(new Label { Text = T("Project:", "Dự án:"), AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
             selection.Controls.Add(projects);
             go.Text = T("Go", "Bắt đầu");
             selection.Controls.Add(go);
-            layout.Controls.Add(selection, 0, 0);
+            layout.Controls.Add(top, 0, 0);
             layout.Controls.Add(tabTasks, 0, 1);
-            var actions = new TableLayoutPanel { Name = "pnlFooter", AutoSize = true, Dock = DockStyle.Fill, Padding = new Padding(6), RowCount = 1, ColumnCount = 5 };
+            var actions = new TableLayoutPanel { Name = "pnlFooter", Margin = Padding.Empty, Dock = DockStyle.Fill, Padding = new Padding(2), RowCount = 1, ColumnCount = 5 };
+            actions.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             for (int i = 0; i < 4; i++) actions.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            previous.Text = "<<";
-            next.Text = ">>";
+            previous.Text = "← Task";
+            next.Text = "Task →";
             previous.MinimumSize = next.MinimumSize = new Size(50, 28);
             go.MinimumSize = new Size(60, 28);
             restart.Text = T("Restart Project", "Làm lại dự án");
             restart.MinimumSize = new Size(120, 28);
-            grade.Text = T("Grade Project", "Kiểm tra");
+            grade.Text = T("Grade", "Kiểm tra");
             grade.MinimumSize = new Size(110, 28);
             actions.Controls.Add(previous, 0, 0);
             actions.Controls.Add(next, 1, 0);
@@ -209,12 +217,10 @@ namespace MosWord2019
             ClearTabs();
             foreach (var task in currentProject.Tasks)
             {
-                var page = new TabPage(currentProject.Lang[task.TitleKey]) { AutoScroll = true, BackColor = Color.White };
-                var instruction = new Label { AutoSize = true, Location = new Point(0, 0), Padding = new Padding(10),
-                    Font = new Font("Segoe UI", 10F), Text = currentProject.Lang[task.InstructionKey] };
-                page.Controls.Add(instruction);
-                // Wrapping plus scrolling preserves long instructions on small/high-DPI displays.
-                page.Resize += (s, e) => instruction.MaximumSize = new Size(Math.Max(1, page.ClientSize.Width - SystemInformation.VerticalScrollBarWidth), 0);
+                var page = new TabPage("Task " + (tabTasks.TabCount + 1)) { BackColor = Color.White };
+                page.Controls.Add(new RichTextBox { Name = "Instruction", ReadOnly = true, BorderStyle = BorderStyle.None,
+                    Dock = DockStyle.Fill, WordWrap = true, ScrollBars = RichTextBoxScrollBars.Vertical,
+                    BackColor = Color.White, Font = new Font("Segoe UI", 20F), Text = currentProject.Lang[task.InstructionKey] });
                 tabTasks.TabPages.Add(page);
             }
             tabTasks.Visible = true;
@@ -228,7 +234,8 @@ namespace MosWord2019
             bool active = currentProject != null && taskIndex >= 0;
             previous.Enabled = active && taskIndex > 0;
             next.Enabled = active && taskIndex < tabTasks.TabPages.Count - 1;
-            if (active) status.Text = T("Task ", "Nhiệm vụ ") + (taskIndex + 1) + "/" + tabTasks.TabPages.Count;
+            taskCounter.Text = active ? "Task " + (taskIndex + 1) + "/" + tabTasks.TabPages.Count : "";
+            if (active) status.Text = taskCounter.Text;
             if (active) status.ForeColor = SystemColors.ControlText;
         }
 
@@ -285,7 +292,7 @@ namespace MosWord2019
             {
                 Rectangle area = Screen.FromControl(this).WorkingArea;
                 int minimum = (int)Math.Ceiling(Font.Height * 12.5);
-                int height = Math.Min(area.Height, Math.Max(area.Height / 4, minimum));
+                int height = Math.Min((int)(area.Height * .35), Math.Max((int)(area.Height * .32), minimum));
                 Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
                 if (currentProject != null && word is IWordWindowLayout placement && word.IsOpened)
                     placement.SetWindowBounds(area.Left, area.Top, area.Width, area.Height - height);
@@ -502,6 +509,7 @@ namespace MosWord2019
         private void ClearProject()
         {
             currentProject = null;
+            taskCounter.Text = "";
             currentWorkPath = null;
             taskIndex = 0;
             ClearTabs();

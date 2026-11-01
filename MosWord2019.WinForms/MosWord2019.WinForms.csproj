@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppMode.cs" />
+    <Compile Include="Authentication.cs" />
     <Compile Include="AppSession.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>

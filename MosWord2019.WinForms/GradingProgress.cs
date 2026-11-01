@@ -10,8 +10,9 @@ namespace MosWord2019
         {
             Text = language == "vi" ? "Đang chấm bài…" : "Grading…";
             ControlBox = false; ShowInTaskbar = false; StartPosition = FormStartPosition.CenterScreen;
-            FormBorderStyle = FormBorderStyle.FixedDialog; ClientSize = new Size(360, 100);
-            Controls.Add(new Label { Text = Text, Dock = DockStyle.Top, Height = 42, TextAlign = ContentAlignment.MiddleCenter });
+            FormBorderStyle = FormBorderStyle.FixedDialog; ClientSize = new Size(400, 125);
+            Font = new Font("Segoe UI", 14); BackColor = Color.White;
+            Controls.Add(new Label { Text = Text, Dock = DockStyle.Top, Height = 70, TextAlign = ContentAlignment.MiddleCenter });
             Controls.Add(new ProgressBar { Style = ProgressBarStyle.Marquee, Dock = DockStyle.Bottom, Height = 24 });
         }
         internal static T Run<T>(string language, Func<Task<T>> work, IWin32Window owner = null)

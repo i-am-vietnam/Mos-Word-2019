@@ -22,11 +22,14 @@ namespace MosWord2019
         private readonly Button submit = new Button { Name = "Submit", AutoSize = true };
         private readonly Button recover = new Button { Name = "Recover", AutoSize = true, Visible = false };
         private readonly Button offlineSubmit = new Button { Name = "OfflineSubmit", AutoSize = true };
-#if DEBUG
-        private readonly CheckBox debugOffline = new CheckBox { Name = "DebugSimulateOffline", AutoSize = true };
-#endif
-        private readonly Label countdown = new Label { Name = "Countdown", AutoSize = true, Font = new Font("Segoe UI", 15, FontStyle.Bold) };
-        private readonly Label project = new Label { Name = "ProjectIndex", AutoSize = true };
+        private readonly Label countdown = new Label { Name = "Countdown", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) };
+        private readonly Label project = new Label { Name = "ProjectIndex", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleRight };
+        private readonly Label projectId = new Label { Name = "ProjectId", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
+        private readonly Label taskCounter = new Label { Name = "TaskCounter", AutoSize = true };
+        private readonly Button previousTask = new Button { Name = "PreviousTask", Text = "← Task", AutoSize = true };
+        private readonly Button nextTask = new Button { Name = "NextTask", Text = "Task →", AutoSize = true };
+        private readonly CheckBox review = new CheckBox { AutoSize = true, Font = new Font("Segoe UI", 8) };
+        private bool updatingReview;
         private readonly Label status = new Label { Name = "ExamStatus", AutoSize = true };
         private readonly TabControl tabs = new TabControl { Name = "ExamTasks", Dock = DockStyle.Fill, Multiline = true };
         private readonly RichTextBox rules = new RichTextBox { Name = "ExamRules", ReadOnly = true, Dock = DockStyle.Fill, BorderStyle = BorderStyle.None };
@@ -43,25 +46,46 @@ namespace MosWord2019
         public TestingForm(PreparedTestingSession prepared, IReadOnlyList<ProjectPackage> packages, TestingStaHost host = null, bool resume = false)
         {
             this.prepared = prepared; this.packages = packages; this.host = host; this.resume = resume;
-            Text = "MOS Word 2019 — Testing"; StartPosition = FormStartPosition.Manual; MinimumSize = new Size(640, 220);
-            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(8) };
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
-            var top = new FlowLayoutPanel { Dock = DockStyle.Fill }; top.Controls.AddRange(new Control[] { countdown, project, status }); layout.Controls.Add(top);
-            var body = new Panel { Dock = DockStyle.Fill }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body);
-            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill }; actions.Controls.AddRange(new Control[] { start, restart, next, submit, recover }); layout.Controls.Add(actions); Controls.Add(layout);
-#if DEBUG
-            if (host?.CanSimulateOffline == true)
-            {
-                debugOffline.Text = T("DEBUG: Simulate offline", "DEBUG: Giả lập mất mạng");
-                debugOffline.CheckedChanged += async (s, e) => await ChangeDebugConnectivity();
-                actions.Controls.Add(debugOffline);
-            }
-#endif
-            start.Text = T("Start", "Bắt đầu bài thi"); restart.Text = T("Restart Project", "Làm lại project"); submit.Text = offlineSubmit.Text = T("Submit", "Nộp bài"); recover.Text = T("Recover exam", "Khôi phục bài thi");
+            Text = "MOS Word 2019 — Testing"; StartPosition = FormStartPosition.Manual; MinimumSize = new Size(640, 100);
+            Font = new Font("Segoe UI", 9); BackColor = Color.White;
+            AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
+            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(2) };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52));
+            var top = new TableLayoutPanel { Name = "ExamTopBar", Dock = DockStyle.Fill, ColumnCount = 3, Margin = Padding.Empty, BackColor = Color.White };
+            top.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
+            top.Controls.Add(projectId, 0, 0); top.Controls.Add(countdown, 1, 0); top.Controls.Add(project, 2, 0); layout.Controls.Add(top);
+            var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body);
+            var footer = new TableLayoutPanel { Name = "ExamFooter", Dock = DockStyle.Fill, ColumnCount = 2, Margin = Padding.Empty };
+            footer.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68)); footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32));
+            var left = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, ColumnCount = 1 };
+            left.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            left.RowStyles.Add(new RowStyle(SizeType.AutoSize)); left.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false };
+            actions.Controls.AddRange(new Control[] { start, previousTask, nextTask, restart, next, recover });
+            left.Controls.Add(actions); status.Dock = DockStyle.Fill; status.AutoSize = false; status.AutoEllipsis = true; left.Controls.Add(status);
+            var right = new TableLayoutPanel { Dock = DockStyle.Fill, Margin = Padding.Empty, RowCount = 2, ColumnCount = 1 };
+            right.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            right.RowStyles.Add(new RowStyle(SizeType.Absolute, 20)); right.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            var taskInfo = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, Margin = Padding.Empty };
+            taskInfo.Controls.AddRange(new Control[] { taskCounter, review }); right.Controls.Add(taskInfo, 0, 0);
+            submit.Margin = Padding.Empty; submit.AutoSize = false; submit.Dock = DockStyle.Fill; submit.BackColor = Color.FromArgb(30, 125, 65); submit.ForeColor = Color.White;
+            submit.FlatStyle = FlatStyle.Flat; submit.Font = new Font("Segoe UI", 11, FontStyle.Bold); right.Controls.Add(submit, 0, 1);
+            footer.Controls.Add(left, 0, 0); footer.Controls.Add(right, 1, 0); layout.Controls.Add(footer); Controls.Add(layout);
+            rules.Font = new Font("Segoe UI", 18); rules.BackColor = Color.White;
+            start.Font = new Font("Segoe UI", 12, FontStyle.Bold); start.BackColor = Color.FromArgb(32, 100, 190); start.ForeColor = Color.White; start.FlatStyle = FlatStyle.Flat;
+            previousTask.Click += (s, e) => { if (tabs.SelectedIndex > 0) tabs.SelectedIndex--; };
+            nextTask.Click += (s, e) => { if (tabs.SelectedIndex < tabs.TabCount - 1) tabs.SelectedIndex++; };
+            tabs.SelectedIndexChanged += (s, e) => UpdateTaskNavigation();
+            review.Text = T("Mark for review", "Đánh dấu xem lại");
+            review.CheckedChanged += (s, e) => { if (!updatingReview && SelectedTaskKey() != null) marks[SelectedTaskKey()] = review.Checked; };
+            start.Text = T("Start", "Bắt đầu bài thi"); restart.Text = T("Restart Project", "Làm lại project"); submit.Text = T("Submit Test", "Nộp bài"); offlineSubmit.Text = T("Submit", "Nộp bài"); recover.Text = T("Recover exam", "Khôi phục bài thi");
             rules.Text = T("50 minutes. 7 projects, ", "50 phút. 7 project, ") + prepared.Definition.N + T(" tasks.\n", " task.\n") +
                 T("A random subset of tasks is selected. Total score: 1000; pass: 700. No grading feedback during the exam.\nNext Project is one-way. Restart affects the current project only; time keeps running. Submit is available at any time.\nNetwork loss pauses the timer for up to 30 minutes. Crash downtime counts; resume is offered within 15 minutes.",
                   "Các task được chọn ngẫu nhiên. Tổng điểm: 1000; đạt từ 700. Không hiển thị đúng/sai khi đang thi.\nChuyển project chỉ một chiều. Làm lại chỉ áp dụng project hiện tại; thời gian vẫn chạy. Có thể nộp bài bất kỳ lúc nào.\nMất mạng tạm dừng tối đa 30 phút. Thời gian ứng dụng đóng vẫn tính; có thể khôi phục trong 15 phút.");
-            offline.Controls.Add(new Label { Text = T("Connection lost – waiting to reconnect", "Mất kết nối – đang chờ kết nối lại"), Dock = DockStyle.Top, Height = 55, TextAlign = ContentAlignment.MiddleCenter });
+            offline.Controls.Add(new Label { Text = T("Connection lost – waiting to reconnect", "Mất kết nối – đang chờ kết nối lại"), Dock = DockStyle.Fill, Font = new Font("Segoe UI", 18, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter });
             offlineSubmit.Dock = DockStyle.Bottom; offline.Controls.Add(offlineSubmit);
             start.Click += async (s, e) => await Command(() => host.StartAsync(), false);
             next.Click += async (s, e) => { if (snapshot?.CurrentIndex == 6) await Submit(); else if (Confirm(T("You will not be able to return to this project.", "Bạn sẽ không thể quay lại project này"))) await Command(() => host.InvokeAsync(c => { c.Next(); return true; }), true); };
@@ -87,9 +111,10 @@ namespace MosWord2019
 #if DEBUG
         private async Task ChangeDebugConnectivity()
         {
-            if (operation || host == null) return;
+            if (operation || host?.CanSimulateOffline != true || RecoveryRequired ||
+                (snapshot.Status != TestingSessionStatus.Running && snapshot.Status != TestingSessionStatus.Offline)) return;
             operation = true; ApplyState(snapshot);
-            try { await host.SetDebugOfflineAsync(debugOffline.Checked).ConfigureAwait(false); }
+            try { await host.SetDebugOfflineAsync(!host.IsDebugOffline).ConfigureAwait(false); }
             catch (Exception ex)
             {
                 AppLogger.Write("Debug connectivity simulation failed", ex);
@@ -99,7 +124,7 @@ namespace MosWord2019
             {
                 Dispatch(() =>
                 {
-                    debugOffline.Checked = host.IsDebugOffline;
+                    status.Text = host.IsDebugOffline ? T("DEBUG: Simulated offline", "DEBUG: Đang giả lập mất mạng") : T("DEBUG: Online", "DEBUG: Đã kết nối");
                     operation = false; ApplyState(snapshot);
                 });
             }
@@ -109,15 +134,12 @@ namespace MosWord2019
         {
             snapshot = value;
             int seconds = (int)Math.Max(0, Math.Ceiling((TestingSession.Duration - value.Elapsed).TotalSeconds));
-            countdown.Text = (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00"); countdown.ForeColor = seconds <= 300 ? Color.Red : SystemColors.ControlText;
+            countdown.Text = (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00"); countdown.ForeColor = Color.Red;
             project.Text = "Project " + (value.CurrentIndex + 1) + "/7";
             bool ready = value.Status == TestingSessionStatus.Ready, running = value.Status == TestingSessionStatus.Running;
             bool lost = value.Status == TestingSessionStatus.Offline;
-#if DEBUG
-            debugOffline.Enabled = (running || lost) && !operation && !RecoveryRequired;
-#endif
             start.Visible = ready; start.Enabled = ready && !operation; rules.Visible = ready;
-            next.Text = value.CurrentIndex == 6 ? T("Submit", "Nộp bài") : T("Next Project", "Project tiếp theo");
+            next.Text = value.CurrentIndex == 6 ? T("Submit", "Nộp bài") : T("Next Project →", "Project tiếp theo →");
             next.Enabled = restart.Enabled = running && !operation && !RecoveryRequired;
             submit.Enabled = offlineSubmit.Enabled = (running || lost) && !operation && !RecoveryRequired;
             offline.Visible = lost; tabs.Visible = running && !RecoveryRequired; if (lost) offline.BringToFront(); else if (ready) rules.BringToFront(); else tabs.BringToFront();
@@ -126,21 +148,50 @@ namespace MosWord2019
                 string id = prepared.Definition.Projects[value.CurrentIndex].ProjectId;
                 if (shownProject != id) { BuildTabs(id); shownProject = id; Arrange(); }
             }
+            UpdateTaskNavigation();
             if (value.Status == TestingSessionStatus.Submitting && !RecoveryRequired) ShowProgress();
             if (value.Status == TestingSessionStatus.Completed && !resultShown && host != null) { resultShown = true; ShowResult(); }
         }
         private void BuildTabs(string id)
         {
-            tabs.TabPages.Clear(); var selected = prepared.Definition.Projects.Single(p => p.ProjectId == id); var package = packages.Single(p => p.Meta.ProjectId == id);
+            shownProject = id;
+            while (tabs.TabCount > 0) { var page = tabs.TabPages[0]; tabs.TabPages.Remove(page); page.Dispose(); }
+            var selected = prepared.Definition.Projects.Single(p => p.ProjectId == id); var package = packages.Single(p => p.Meta.ProjectId == id);
+            projectId.Text = "Project: " + id;
             foreach (string taskId in selected.TaskIds)
             {
-                var task = package.Tasks.Single(t => t.TaskId == taskId); string key = id + "/" + taskId;
-                var tab = new TabPage(taskId + " — " + package.Lang[task.TitleKey]);
-                var mark = new CheckBox { Name = "Mark_" + taskId, Text = T("Mark for review", "Đánh dấu xem lại"), Dock = DockStyle.Top, Checked = marks.ContainsKey(key) && marks[key], Height = 25 };
-                mark.CheckedChanged += (s, e) => marks[key] = mark.Checked;
-                tab.Controls.Add(new RichTextBox { Text = package.Lang[task.InstructionKey], ReadOnly = true, Dock = DockStyle.Fill, BorderStyle = BorderStyle.None }); tab.Controls.Add(mark); tabs.TabPages.Add(tab);
+                var task = package.Tasks.Single(t => t.TaskId == taskId);
+                var tab = new TabPage("Task " + (tabs.TabCount + 1));
+                tab.Controls.Add(new RichTextBox { Name = "Instruction", Text = package.Lang[task.InstructionKey], ReadOnly = true,
+                    Dock = DockStyle.Fill, BorderStyle = BorderStyle.None, BackColor = Color.White, WordWrap = true,
+                    ScrollBars = RichTextBoxScrollBars.Vertical, Font = new Font("Segoe UI", 18) });
+                tabs.TabPages.Add(tab);
             }
+            UpdateTaskNavigation();
         }
+        private string SelectedTaskKey()
+        {
+            if (shownProject == null || tabs.SelectedIndex < 0) return null;
+            var selected = prepared.Definition.Projects.Single(p => p.ProjectId == shownProject);
+            return tabs.SelectedIndex < selected.TaskIds.Count ? shownProject + "/" + selected.TaskIds[tabs.SelectedIndex] : null;
+        }
+        private void UpdateTaskNavigation()
+        {
+            bool active = snapshot?.Status == TestingSessionStatus.Running && !operation && !RecoveryRequired;
+            previousTask.Enabled = active && tabs.SelectedIndex > 0; nextTask.Enabled = active && tabs.SelectedIndex < tabs.TabCount - 1;
+            review.Enabled = active; review.Visible = taskCounter.Visible = tabs.TabCount > 0 && snapshot?.Status == TestingSessionStatus.Running && !RecoveryRequired;
+            taskCounter.Text = "Task " + (tabs.SelectedIndex + 1) + "/" + tabs.TabCount;
+            string key = SelectedTaskKey(); updatingReview = true;
+            try { review.Name = key == null ? "MarkForReview" : "Mark_" + key.Substring(key.IndexOf('/') + 1); review.Checked = key != null && marks.ContainsKey(key) && marks[key]; }
+            finally { updatingReview = false; }
+        }
+#if DEBUG
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.Shift | Keys.F12)) { _ = ChangeDebugConnectivity(); return true; }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+#endif
         private bool Confirm(string text) => ConfirmChoice != null ? ConfirmChoice(text) : MessageBox.Show(this, text, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
         private async Task Submit() { if (Confirm(T("Submit this exam?", "Nộp bài thi này?"))) await Command(() => host.SubmitAsync(), true); }
         private async Task Command(Func<Task<bool>> work, bool grading)
@@ -187,7 +238,7 @@ namespace MosWord2019
             try
             {
                 Rectangle area = Screen.FromControl(this).WorkingArea; int minimum = (int)Math.Ceiling(Font.Height * 12.5);
-                int height = Math.Min(area.Height, Math.Max(area.Height / 4, minimum)); Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
+                int height = Math.Min((int)(area.Height * .35), Math.Max((int)(area.Height * .32), minimum)); Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
                 if (host != null && snapshot != null && snapshot.Status != TestingSessionStatus.Ready && snapshot.Status != TestingSessionStatus.Completed)
                     await host.InvokeAsync(c => { c.SetWindowBounds(area.Left, area.Top, area.Width, area.Height - height); return true; });
             }

@@ -46,7 +46,11 @@ Chạy lại các bước tương ứng với English khi thay đổi UI hoặc 
 | Chưa đạt | Cần Luyện Tập thêm | Needs more practice | Tổng dưới700/1000. |
 | Danh sách sai | Các task sai: | Incorrect tasks: | Một dòng/task: `P15-T04: <instruction đầy đủ theo ngôn ngữ phiên>`; cuộn/copy được, không có diagnostics. |
 | Offline | Mất kết nối – đang chờ kết nối lại | Connection lost – waiting to reconnect | Ẩn task, khóa Word sở hữu, giữ nút nộp bài. |
-| Công tắc Debug | DEBUG: Giả lập mất mạng | DEBUG: Simulate offline | Chỉ có ở Testing build Debug, không xuất hiện trong Release/Training. |
+| Phím tắt Debug | Ctrl+Shift+F12 | Ctrl+Shift+F12 | Chỉ có handler trong Testing Debug; không có checkbox ở bất kỳ build nào. |
+
+## Thay đổi thao tác sau U1
+
+Biên bản ngày30/10 bên trên giữ nguyên lời bước gốc. Từ U1: điền tài khoản/mật khẩu bất kỳ không rỗng, chọn Testing và ngôn ngữ rồi bấm Login/Đăng nhập thay cho Continue. Ngôn ngữ đổi nhãn ngay; nhớ tên tài khoản/ngôn ngữ, không nhớ mật khẩu. Tab hiển thị Task1..n theo thứ tự chọn; đồng hồ luôn đỏ. Nút ←Task/Task→ chỉ chuyển task trong project, không quay về project trước. Chữ lớn có cuộn dọc; panel tối đa35% working area. Đây là thay đổi UI, không mở rộng bằng chứng PASS native cũ.
 
 ## Các ca bổ sung — CHƯA CHẠY trên Word thật
 
@@ -56,25 +60,25 @@ Các ca sau không được gộp vào PASS của mười bước trên. Điền
 |---|---|---|---|
 | O1 | Làm một bài đủ50phút, không pause offline; ở project bất kỳ khi hết giờ. | `00:00` khóa thao tác và cửa sổ Word sở hữu, tự nộp không hỏi; chấm project chưa mở từ starter, lưu result trước cleanup. | **CHƯA CHẠY** |
 | O2 | Mở Ctrl+D/Font sát thời điểm timeout và giữ hộp thoại mở. | Timer vẫn về0; không hỏi xác nhận nộp. Retry/fallback nộp từ dữ liệu đã lưu trong khoảng30giây khi Word tiếp tục từ chối RPC; không deadlock hay fake score, không terminate process chưa chứng minh sở hữu. Ghi riêng thời gian bắt đầu nộp và thời gian chấm xong. | **CHƯA CHẠY** |
-| O3 | Thực hiện toàn bộ chuỗi mô phỏng offline bằng công tắc Debug bên dưới. | Pause/resume đúng thời gian, task/Word khóa đúng, có nộp sớm khi offline và tự finalize sau30phút mất kết nối liên tục. | **CHƯA CHẠY** |
+| O3 | Thực hiện toàn bộ chuỗi mô phỏng offline bằng phím tắt Debug bên dưới. | Pause/resume đúng thời gian, task/Word khóa đúng, có nộp sớm khi offline và tự finalize sau30phút mất kết nối liên tục. | **CHƯA CHẠY** |
 | O4 | Kill đúng Trainer thử nghiệm, chờ hơn15phút từ heartbeat cuối hoặc để bài hết thời gian, rồi mở lại trên cùng máy. | Không resume bài hết hạn; chấm checkpoint/autosave và project chưa mở, lưu kết quả trước giải phóng phiên; mở được Testing mới. | **CHƯA CHẠY** — bước7 gốc chỉ chờ khoảng1phút. |
 
 Ngân sách retry không ngắt được một lệnh COM/native/filesystem đã được chấp nhận nhưng treo vô hạn. Nếu O2 gặp tình huống này, ghi FAIL/giới hạn kèm log thay vì nhận là đã đạt mốc30giây. Không hạ tiêu chí kiểm thử để che lỗi.
 
 ### Cách dùng mô phỏng offline chỉ trong Debug
 
-1. Build `MosWord2019.slnx` cấu hình **Debug** bằng VS MSBuild. Mở một bài Testing thử nghiệm và Start. Công tắc ở hàng nút dưới task; nó bị disable trước Start, khi đang thao tác/nộp hoặc khi cần recovery.
-   **Mong đợi:** `DEBUG: Giả lập mất mạng`/`DEBUG: Simulate offline` có trong Debug. Release không chứa type monitor giả, lệnh điều khiển giả hoặc checkbox này; vẫn dùng AlwaysOnlineMonitor cho tới Phase C. Ngắt cáp mạng thật hiện chưa kích hoạt luồng offline.
-2. Ghi timer, SessionId và project hiện tại; bật công tắc, giữ ít nhất60giây.
+1. Build `MosWord2019.slnx` cấu hình **Debug** bằng VS MSBuild. Mở một bài Testing thử nghiệm và Start. Đặt focus vào cửa sổ Trainer, nhấn **Ctrl+Shift+F12** để bật/tắt offline; phím tắt không áp dụng khi focus đang ở Word. Phím bị bỏ qua trước Start, khi đang thao tác/nộp hoặc cần recovery.
+   **Mong đợi:** không có checkbox Debug trên mọi build. Debug hiển thị ghi chú nhỏ `DEBUG: Đang giả lập mất mạng`/`DEBUG: Simulated offline` hoặc `DEBUG: Đã kết nối`/`DEBUG: Online`. Release không chứa handler, monitor hay lệnh giả; vẫn AlwaysOnlineMonitor tới Phase C. Ngắt cáp mạng thật hiện chưa kích hoạt luồng offline.
+2. Ghi timer, SessionId và project hiện tại; nhấn phím tắt để offline, giữ ít nhất60giây.
    **Mong đợi:** monitor giả phát Offline trên STA của host; luồng session có sẵn pause timer, overlay che task, Word sở hữu bị disable. Next/Restart tắt; nút Nộp bài ở overlay vẫn dùng được. Timer không mất60giây đang offline; các Word không thuộc phiên không bị khóa.
-3. Bỏ chọn công tắc ở hàng nút bên ngoài overlay, tiếp tục sửa bài.
+3. Đặt focus vào Trainer rồi nhấn Ctrl+Shift+F12 lần nữa để online, tiếp tục sửa bài.
    **Mong đợi:** overlay biến mất, task/Word được bật lại, giữ edits/project/seed và số giây còn lại; timer tiếp tục chạy. Lịch sử offline được lưu khi chốt kết quả.
 4. Trong lượt riêng, bật offline rồi bấm Nộp bài ở overlay và xác nhận.
    **Mong đợi:** nộp sớm qua pipeline hiện có, kết quả có per-project/instruction đúng ngôn ngữ, `pendingUpload=true`; không cần chuyển online trước khi nộp.
 5. Trong lượt riêng, giữ offline liên tục đủ30phút.
    **Mong đợi:** auto-finalize một lần từ dữ liệu hiện có, không hỏi, không kéo dài thời gian chờ bằng các tick lặp lại. Đây là ngưỡng offline, không phải50phút thi. Không sửa JSON hoặc thêm công tắc nhảy thời gian để giả lập PASS native.
 6. Mở bài mới rồi kiểm tra lại bằng Release.
-   **Mong đợi:** bài mới không kế thừa trạng thái offline giả của bài trước; Release không có công tắc. Training không thay đổi. Kết quả các bước này vẫn **CHƯA CHẠY native** cho tới khi người thử xác nhận.
+   **Mong đợi:** bài mới không kế thừa trạng thái offline giả của bài trước; Release không có handler phím tắt hoặc công tắc. Training không thay đổi. Kết quả các bước này vẫn **CHƯA CHẠY native** cho tới khi người thử xác nhận.
 
 ## B4-FIX targeted retest
 

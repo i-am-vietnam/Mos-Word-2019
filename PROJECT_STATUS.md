@@ -1,5 +1,11 @@
 # Project Status
 
+## U1 — Làm mới giao diện, 2026-11-01
+
+Hoàn tất Login với radio EN/VI/Training/Testing, kiểm tra tài khoản/mật khẩu qua IAuthenticationService + OfflineAuthenticationService và tùy chọn chỉ nhớ username/language. Routing Training/Testing và recovery trước Login giữ nguyên. Training/Testing dùng tab Task1..n, chữ câu hỏi20/18pt cuộn dọc, counter/nút chuyển task; đồng hồ Testing24pt luôn đỏ/căn giữa, Submit xanh; panel khoảng32–35% working area. Result tăng cỡ điểm/list; rules/overlay/progress cùng kiểu chữ. Debug bỏ checkbox, dùng Ctrl+Shift+F12 khi focus Trainer; Release loại handler và simulator như trước.
+
+VS MSBuild Rebuild Debug/Release: mỗi cấu hình0warnings/0errors; mỗi cấu hình844/844 PASS (701 headless +143 desktop),0skipped, stderr rỗng. Audit giữ đủ806case B5, thêm38case U1. Ma trận hai độ phân giải1366x768/1920x1080 × scale100/125/150% × EN/VI cho bốn form được kiểm tra bằng scale WinForms trong test; có kiểm panel<=35% sau khi chừa taskbar40px. Review phát hiện và đã sửa MinimumSize gây vượt cap; không còn finding cụ thể. Đây không phải xác minh DPI Windows native/monitor transition hoặc lượt Word thật mới. Ảnh EN/VI Debug/Release, TRX/log/audit ở artifacts/u1 (ignored);149tài nguyên gốc và150file source/output package/catalog không đổi. Không sửa Core/Projects/Word/Data/Program, grader, engine, recovery, journal hay hành vi Training. Giữ thay đổi CONVERSATION_HANDOFF.md có sẵn ngoài commit; commit cục bộ U1, không push; dừng trước Phase C.
+
 ## B5 — Checklist chấp nhận và mô phỏng offline Debug, 2026-10-30
 
 Hoàn tất docs/TESTING_MANUAL_TEST.md: giữ nguyên biên bản10bước do người dùng cung cấp, bảng EN/VI, expected results, checklist7bước B4-FIX riêng và regression set tối thiểu. Bằng chứng native ngày30/10: bước1–4 PASS lượt đầu; bước5 FAIL lượt đầu do dying Word/recovery, rồi bước5–10 PASS sau B4-FIX trên Word16Click-to-Run/DESKTOP-4968L2S/Debug/VI, với English ở bước10. Đây là xác nhận người dùng, không phải lượt Codex chạy native mới. Full50phút, Font tại timeout, offline Debug và resume/finalize sau15phút vẫn CHƯA CHẠY native; không mở rộng PASS sang mọi biến thể Save As/ownership/targeted retest.

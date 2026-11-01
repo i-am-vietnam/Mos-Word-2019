@@ -1,5 +1,13 @@
 # Technical Context
 
+## U1 presentation/authentication boundary — 2026-11-01
+
+LoginForm uses IAuthenticationService; OfflineAuthenticationService accepts non-whitespace username/password. LoginPreferences optionally stores only username/language at LocalAppData/MosWord2019/login-preferences.txt, swallowing preference I/O/format failures; password is masked, never persisted and cleared after navigation. Existing OpenSession routing and Program.InspectTestingRecovery remain unchanged. Phase C can replace the authentication implementation independently of control layout.
+
+TestingForm keeps all coordinator/host command handlers, adding task-tab navigation and a shared review checkbox backed by the existing project/task-keyed local marks. Countdown presentation is always red24pt, instructions18pt (Training20pt), sequential tab labels and panel sizing capped at35% working area. The Debug checkbox introduced in B5 is superseded by DEBUG-only ProcessCmdKey Ctrl+Shift+F12; it calls the existing STA connectivity actuator, with no release handler. Training uses a single tab row with native overflow arrows for long projects (P10 has17tasks); its future countdown is hidden and has no timer. Result fonts change without scoring/content changes.
+
+U1 verification:844cases/configuration, preserving806B5 cases; screenshots and synthetic viewport/scale matrix in artifacts/u1. Native Windows DPI transitions and a new Word acceptance run remain unverified; historic B5 PASS does not cover U1. No engine/Word/grader/package changes.
+
 ## B5 Debug connectivity and acceptance evidence — 2026-10-30
 
 TestingStaHost.CreateConnectivityMonitor creates a per-exam DebugConnectivityMonitor only under DEBUG; Release keeps AlwaysOnlineMonitor. The fake type, host actuator/properties and TestingForm checkbox are all preprocessor-excluded from Release. Its checkbox is outside the offline overlay, available only during Running/Offline, and serializes changes through InvokeAsync on the existing owning STA. Existing TestingSession connectivity handling, input lock, timer, offline history, early submission and30-minute limit are reused without Core/Projects/Word/Training changes. Each newly created monitor starts online; no global/network settings or persisted debug flags exist.

@@ -27,7 +27,7 @@ namespace MosWord2019.Tests
         }
         private static T Find<T>(Control form, string name) where T : Control => (T)form.Controls.Find(name, true).Single();
         [TestMethod]
-        public void LoginOffersBothModes() => Sta(() => { using (var form = new MosWord2019.LoginForm()) Assert.IsTrue(Find<ComboBox>(form, "Mode").Items.Contains(MosWord2019.AppMode.Testing)); });
+        public void LoginOffersBothModes() => Sta(() => { using (var form = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), null, _ => { })) Assert.IsFalse(Find<RadioButton>(form, "Testing").Checked); });
         [DataTestMethod]
         [DataRow("en")]
         [DataRow("vi")]
@@ -360,27 +360,32 @@ namespace MosWord2019.Tests
                         ExamResult result = null; form.ConfirmChoice = _ => true; form.DisplayResult = value => result = value;
                         form.Show(); Find<Button>(form, "Start").PerformClick(); Pump(() => Find<Button>(form, "Submit").Enabled);
 #if DEBUG
-                        var toggle = Find<CheckBox>(form, "DebugSimulateOffline");
-                        Assert.IsTrue(toggle.Text.Contains(language == "vi" ? "Giả lập mất mạng" : "Simulate offline"));
-                        Assert.IsTrue(toggle.Enabled);
+                        Assert.AreEqual(0, form.Controls.Find("DebugSimulateOffline", true).Length);
+                        Action toggle = () =>
+                        {
+                            var method = typeof(MosWord2019.TestingForm).GetMethod("ProcessCmdKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly);
+                            Assert.IsNotNull(method);
+                            Assert.AreEqual(true, method.Invoke(form, new object[] { new Message(), Keys.Control | Keys.Shift | Keys.F12 }));
+                        };
                         host.InvokeAsync(c => { clock.Advance(10); c.Tick(false); return true; }).GetAwaiter().GetResult();
-                        toggle.Checked = true;
-                        Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        toggle();
+                        Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && Find<Button>(form, "OfflineSubmit").Enabled);
                         Assert.IsFalse(runtime.InputEnabled); Assert.IsFalse(Find<TabControl>(form, "ExamTasks").Visible);
                         Assert.IsFalse(Find<Button>(form, "NextProject").Enabled); Assert.IsFalse(Find<Button>(form, "RestartProject").Enabled);
                         Assert.IsTrue(Find<Button>(form, "OfflineSubmit").Enabled);
                         Assert.IsTrue(MosWord2019.TestingStaHost.CreateConnectivityMonitor().IsOnline, "A separate exam must not inherit this simulation.");
                         var paused = host.InvokeAsync(c => { clock.Advance(120); c.Tick(false); return c.Session.Elapsed; }).GetAwaiter().GetResult();
                         Assert.AreEqual(TimeSpan.FromSeconds(10), paused);
-                        toggle.Checked = false; Pump(() => !Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        toggle(); Pump(() => !Find<Panel>(form, "OfflineOverlay").Visible && Find<Button>(form, "Submit").Enabled);
                         Assert.IsTrue(runtime.InputEnabled); Assert.IsTrue(Find<TabControl>(form, "ExamTasks").Visible);
                         var resumed = host.InvokeAsync(c => { clock.Advance(5); c.Tick(false); return c.Session.Elapsed; }).GetAwaiter().GetResult();
                         Assert.AreEqual(TimeSpan.FromSeconds(15), resumed);
-                        toggle.Checked = true; Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && toggle.Enabled);
+                        toggle(); Pump(() => Find<Panel>(form, "OfflineOverlay").Visible && Find<Button>(form, "OfflineSubmit").Enabled);
                         if (waitForLimit) host.InvokeAsync(c => { clock.Advance(1800); c.Tick(false); return true; }).GetAwaiter().GetResult();
                         else Find<Button>(form, "OfflineSubmit").PerformClick();
 #else
                         Assert.AreEqual(0, form.Controls.Find("DebugSimulateOffline", true).Length);
+                        Assert.IsNull(typeof(MosWord2019.TestingForm).GetMethod("ProcessCmdKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly));
                         Assert.IsTrue(network is AlwaysOnlineMonitor); Assert.IsTrue(network.IsOnline);
                         Find<Button>(form, "Submit").PerformClick();
 #endif
@@ -392,6 +397,169 @@ namespace MosWord2019.Tests
                         Assert.AreEqual(TimeSpan.FromSeconds(120).Ticks, (long)saved["offlinePeriods"][0]["DurationTicks"]);
                         Assert.AreEqual(waitForLimit ? "OfflineLimit" : "Submitted", (string)saved["finalizeReason"]);
 #endif
+                    }
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow("en")]
+        [DataRow("vi")]
+        public void LoginValidatesCredentialsLocalizesAndRoutesSelectedMode(string language)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    string path = Path.Combine(folder.Folder, "login.txt");
+                    MosWord2019.AppSession selected = null;
+                    using (var form = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), new MosWord2019.LoginPreferences(path), value => selected = value))
+                    {
+                        form.Show();
+                        Assert.IsTrue(Find<RadioButton>(form, "English").Checked);
+                        Assert.IsTrue(Find<RadioButton>(form, "Training").Checked);
+                        Find<RadioButton>(form, language == "vi" ? "Vietnamese" : "English").Checked = true;
+                        Assert.AreEqual(language == "vi" ? "Tài khoản:" : "Username:", Find<Label>(form, "UsernameLabel").Text);
+                        Assert.AreEqual(language == "vi" ? "Mật khẩu:" : "Password:", Find<Label>(form, "PasswordLabel").Text);
+                        Assert.AreSame(Find<Button>(form, "Continue"), form.AcceptButton);
+                        Assert.AreSame(Find<Button>(form, "Exit"), form.CancelButton);
+                        Assert.IsTrue(Find<TextBox>(form, "Password").UseSystemPasswordChar);
+                        foreach (string[] values in new[] { new[] { "", "" }, new[] { "name", "" }, new[] { "", "secret" }, new[] { " ", " " } })
+                        {
+                            Find<TextBox>(form, "Username").Text = values[0]; Find<TextBox>(form, "Password").Text = values[1];
+                            Find<Button>(form, "Continue").PerformClick(); Assert.IsNull(selected);
+                            Assert.AreEqual(language == "vi" ? "Vui lòng nhập tài khoản và mật khẩu." : "Please enter your username and password.", Find<Label>(form, "LoginStatus").Text);
+                        }
+                        Capture(form, "login-error-" + language);
+                        foreach (string mode in new[] { "Training", "Testing" })
+                        {
+                            Find<RadioButton>(form, mode).Checked = true;
+                            Find<TextBox>(form, "Username").Text = "learner"; Find<TextBox>(form, "Password").Text = "private-password";
+                            Find<Button>(form, "Continue").PerformClick();
+                            Assert.AreEqual(mode, selected.Mode.ToString()); Assert.AreEqual(language, selected.Language);
+                            Assert.AreEqual("", Find<TextBox>(form, "Password").Text);
+                        }
+                        Assert.IsFalse(File.ReadAllText(path).Contains("private-password")); Capture(form, "login-" + language);
+                    }
+                    using (var restored = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), new MosWord2019.LoginPreferences(path), _ => { }))
+                    {
+                        Assert.AreEqual("learner", Find<TextBox>(restored, "Username").Text);
+                        Assert.IsTrue(Find<RadioButton>(restored, language == "vi" ? "Vietnamese" : "English").Checked);
+                        Assert.AreEqual("", Find<TextBox>(restored, "Password").Text);
+                    }
+                    File.WriteAllText(path, "corrupt");
+                    var preferences = new MosWord2019.LoginPreferences(path); preferences.Load(); Assert.AreEqual("en", preferences.Language);
+                    var blocked = new MosWord2019.LoginPreferences(folder.Folder); blocked.Load(); blocked.Save();
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow("en", 1366, 768, 1f)]
+        [DataRow("vi", 1366, 768, 1.25f)]
+        [DataRow("vi", 1366, 768, 1.5f)]
+        [DataRow("en", 1920, 1080, 1.25f)]
+        [DataRow("en", 1920, 1080, 1.5f)]
+        [DataRow("vi", 1920, 1080, 1f)]
+        [DataRow("vi", 1366, 768, 1f)]
+        [DataRow("en", 1366, 768, 1.25f)]
+        [DataRow("en", 1366, 768, 1.5f)]
+        [DataRow("vi", 1920, 1080, 1.25f)]
+        [DataRow("vi", 1920, 1080, 1.5f)]
+        [DataRow("en", 1920, 1080, 1f)]
+        public void TestingLayoutHasCenteredRedTimerSequentialTabsAndTaskNavigation(string language, int width, int height, float scale)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var prepared = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json")).Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    using (var form = new MosWord2019.TestingForm(prepared, packages))
+                    {
+                        form.Show(); form.ApplyState(new TestingSessionSnapshot(TestingSessionStatus.Running, TestingFinalizeReason.None, 0, TimeSpan.Zero,
+                            Enumerable.Repeat(TestingProjectState.Active, 7), new ExamTaskGrade[0], null));
+                        typeof(MosWord2019.TestingForm).GetField("arranging", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(form, true);
+                        form.AutoScaleMode = AutoScaleMode.None;
+                        form.Scale(new SizeF(scale, scale));
+                        form.Size = new Size(width, (int)((height - 40) * .35)); Application.DoEvents();
+                        Assert.IsTrue(form.Height <= (int)((height - 40) * .35), "Panel exceeds 35% cap.");
+                        var timer = Find<Label>(form, "Countdown"); var top = Find<TableLayoutPanel>(form, "ExamTopBar");
+                        Assert.AreEqual(Color.Red, timer.ForeColor); Assert.IsTrue(timer.Font.Bold); Assert.IsTrue(timer.Font.Size >= 22);
+                        Assert.IsTrue(Math.Abs(timer.Left + timer.Width / 2 - top.ClientSize.Width / 2) <= 3);
+                        Assert.AreEqual("Project 1/7", Find<Label>(form, "ProjectIndex").Text);
+                        var tabs = Find<TabControl>(form, "ExamTasks");
+                        for (int i = 0; i < tabs.TabCount; i++) Assert.AreEqual("Task " + (i + 1), tabs.TabPages[i].Text);
+                        Assert.AreEqual(0, form.Controls.Find("DebugSimulateOffline", true).Length);
+                        var submitButton = Find<Button>(form, "Submit");
+                        Assert.IsTrue(submitButton.ClientSize.Height >= TextRenderer.MeasureText(submitButton.Text, submitButton.Font).Height + 6, "Submit text is vertically clipped: height=" + submitButton.Height + " text=" + TextRenderer.MeasureText(submitButton.Text, submitButton.Font).Height + " parent=" + submitButton.Parent.Bounds + " rows=" + string.Join(",", ((TableLayoutPanel)submitButton.Parent).GetRowHeights()));
+                        var instruction = (RichTextBox)tabs.TabPages[0].Controls[0];
+                        Assert.IsTrue(instruction.Font.Size >= 18); Assert.IsTrue(instruction.WordWrap && instruction.ReadOnly);
+                        Assert.AreEqual(BorderStyle.None, instruction.BorderStyle); Assert.IsTrue(instruction.ClientSize.Height >= 25);
+                        Assert.IsFalse(Find<Button>(form, "PreviousTask").Enabled);
+                        Find<Button>(form, "NextTask").PerformClick(); Assert.AreEqual(1, tabs.SelectedIndex);
+                        Assert.AreEqual("Task 2/" + tabs.TabCount, Find<Label>(form, "TaskCounter").Text);
+                        Find<Button>(form, "PreviousTask").PerformClick(); Assert.AreEqual(0, tabs.SelectedIndex);
+                        tabs.SelectedIndex = tabs.TabCount - 1; Assert.IsFalse(Find<Button>(form, "NextTask").Enabled);
+                        tabs.SelectedIndex = 0;
+                        foreach (string name in new[] { "PreviousTask", "NextTask", "RestartProject", "NextProject", "Submit", "TaskCounter" })
+                        {
+                            Control control = form.Controls.Find(name, true).Single();
+                            var bounds = form.RectangleToClient(control.RectangleToScreen(control.ClientRectangle));
+                            Assert.IsTrue(form.ClientRectangle.Contains(bounds), name + " clipped at " + width + "/" + scale + " " + bounds + " within " + form.ClientRectangle);
+                        }
+                        Capture(form, "layout-" + language + "-" + width + "-" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow("en", 1366, 768, 1f)]
+        [DataRow("en", 1366, 768, 1.25f)]
+        [DataRow("en", 1366, 768, 1.5f)]
+        [DataRow("en", 1920, 1080, 1f)]
+        [DataRow("en", 1920, 1080, 1.25f)]
+        [DataRow("en", 1920, 1080, 1.5f)]
+        [DataRow("vi", 1366, 768, 1f)]
+        [DataRow("vi", 1366, 768, 1.25f)]
+        [DataRow("vi", 1366, 768, 1.5f)]
+        [DataRow("vi", 1920, 1080, 1f)]
+        [DataRow("vi", 1920, 1080, 1.25f)]
+        [DataRow("vi", 1920, 1080, 1.5f)]
+        public void LoginAndResultDialogsFitTheViewport(string language, int width, int height, float scale)
+        {
+            Sta(() =>
+            {
+                using (var login = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), null, _ => { }))
+                {
+                    login.Show(); Find<RadioButton>(login, language == "vi" ? "Vietnamese" : "English").Checked = true;
+                    login.AutoScaleMode = AutoScaleMode.None; login.Scale(new SizeF(scale, scale)); Application.DoEvents();
+                    Assert.IsTrue(login.Width <= width && login.Height <= height - 40);
+                    Find<Button>(login, "Continue").PerformClick();
+                    foreach (string name in new[] { "Username", "Password", "Continue", "Exit", "LoginStatus" })
+                    {
+                        var control = login.Controls.Find(name, true).Single();
+                        Assert.IsTrue(login.ClientRectangle.Contains(login.RectangleToClient(control.RectangleToScreen(control.ClientRectangle))), name + " clipped");
+                    }
+                    Assert.IsTrue(Find<Label>(login, "LoginStatus").Height >= login.Font.Height);
+                    Capture(login, "login-layout-" + language + "-" + width + "-" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                }
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var prepared = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json")).Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    var result = new ExamScorer(_ => { }).Score(prepared.Definition, new ExamTaskGrade[0]);
+                    using (var form = new MosWord2019.ResultForm(result, packages, language))
+                    {
+                        form.Show(); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new SizeF(scale, scale));
+                        form.Size = new Size(Math.Min(width, form.Width), Math.Min(height - 40, form.Height)); Application.DoEvents();
+                        Assert.IsTrue(form.Width <= width && form.Height <= height - 40);
+                        var wrong = Find<TextBox>(form, "WrongTasks");
+                        Assert.IsTrue(wrong.Height >= 30 && wrong.Font.Size >= 12 && wrong.WordWrap);
+                        Assert.IsTrue(Find<Label>(form, "TotalScore").Font.Size >= 30);
+                        Assert.AreEqual(Color.DarkOrange, Find<Label>(form, "Verdict").ForeColor);
+                        Capture(form, "result-layout-" + language + "-" + width + "-" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     }
                 }
             });

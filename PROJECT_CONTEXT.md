@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## U1 — Giao diện và đăng nhập offline, 2026-11-01
+
+Login có tài khoản/mật khẩu, radio mode/ngôn ngữ và IAuthenticationService thay thế được ở Phase C; file login-preferences.txt chỉ giữ username/ngôn ngữ. Không có server/xác thực thật. Routing và startup recovery giữ nguyên. Training/Testing có tab số thứ tự, chữ20/18pt cuộn dọc; Testing đồng hồ24pt đỏ giữa thanh trên, Submit xanh, review ở thanh dưới. Panel tối đa35% working area. Result/rules/progress tăng cỡ chữ. Checkbox B5 được thay bằng Ctrl+Shift+F12 chỉ trong Testing Debug khi focus Trainer; Release không có handler/simulator. Không đổi nghiệp vụ, timer hoặc grader.
+
+Debug/Release:844/844 mỗi cấu hình,0warnings/errors; giữ806case cũ, thêm38case. Ảnh EN/VI và ma trận scale mô phỏng ở artifacts/u1. Chưa chạy lại Word thật hoặc DPI native sau U1; không mở rộng bằng chứng B5 sang U1. Dừng U1, Phase C chưa triển khai.
+
 ## B5 — Checklist chấp nhận và công tắc offline Debug
 
 `docs/TESTING_MANUAL_TEST.md` giữ nguyên biên bản10bước Word thật do người dùng xác nhận: ngày30/10/2026 bước1–4 PASS lượt đầu; bước5 FAIL lượt đầu rồi PASS sau B4-FIX; bước5–10 PASS sau sửa trên Word16Click-to-Run, DESKTOP-4968L2S, Debug/VI (bước10 mở English). Không coi đây là lượt Codex tự chạy lại. Checklist7bước B4-FIX được giữ thành mục riêng và đối chiếu với bước5–10; có regression set tối thiểu. Full50phút, Font tại timeout, offline giả và resume sau15phút vẫn CHƯA CHẠY native.

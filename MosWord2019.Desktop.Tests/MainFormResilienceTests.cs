@@ -291,6 +291,58 @@ namespace MosWord2019.Tests
             }));
         }
 
+        [DataTestMethod]
+        [DataRow("en", 1366, 768, 1f)]
+        [DataRow("vi", 1366, 768, 1f)]
+        [DataRow("en", 1366, 768, 1.25f)]
+        [DataRow("vi", 1366, 768, 1.25f)]
+        [DataRow("en", 1366, 768, 1.5f)]
+        [DataRow("vi", 1366, 768, 1.5f)]
+        [DataRow("en", 1920, 1080, 1f)]
+        [DataRow("vi", 1920, 1080, 1f)]
+        [DataRow("en", 1920, 1080, 1.25f)]
+        [DataRow("vi", 1920, 1080, 1.25f)]
+        [DataRow("en", 1920, 1080, 1.5f)]
+        [DataRow("vi", 1920, 1080, 1.5f)]
+        public void TrainingPresentationKeepsNavigationAndGradingControls(string language, int width, int height, float scale)
+        {
+            Sta(() => WithForm((form, fake, journal, messages) =>
+            {
+                var package = new ProjectLoader().Load(Path.Combine(TestCaseData.ProjectsRoot, "Word2019_P10"), language);
+                var selector = (ComboBox)form.Controls.Find("Projects", true)[0]; selector.Items.Add(package); selector.SelectedIndex = 0;
+                Set(form, "currentProject", package); Call(form, "BuildTaskTabs");
+                form.Show(); Call(form, "ShowTask", 0); Application.DoEvents();
+                Set(form, "arranging", true); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new System.Drawing.SizeF(scale, scale));
+                form.Size = new System.Drawing.Size(width, (int)((height - 40) * .35)); Application.DoEvents();
+                Assert.IsTrue(form.Height <= (int)((height - 40) * .35));
+                var tabs = (TabControl)form.Controls.Find("tabTasks", true)[0];
+                Assert.AreEqual("Task 1", tabs.TabPages[0].Text);
+                Assert.AreEqual(17, tabs.TabCount); Assert.IsFalse(tabs.Multiline, "Long projects must keep the question viewport available.");
+                var question = (RichTextBox)tabs.TabPages[0].Controls[0];
+                Assert.IsTrue(question.Font.Size >= 20 && question.ReadOnly && question.WordWrap);
+                Assert.IsTrue(question.ClientSize.Height >= 25);
+                foreach (string name in new[] { "Previous", "Next", "Restart", "Grade", "TaskCounter", "Projects", "Go" })
+                {
+                    var control = form.Controls.Find(name, true)[0];
+                    Assert.IsTrue(form.ClientRectangle.Contains(form.RectangleToClient(control.RectangleToScreen(control.ClientRectangle))), name + " clipped.");
+                }
+                Assert.AreEqual(BorderStyle.None, question.BorderStyle);
+                Assert.IsFalse(form.Controls.Find("TrainingCountdown", true)[0].Visible);
+                Assert.AreEqual("Task 1/" + package.Tasks.Count, form.Controls.Find("TaskCounter", true)[0].Text);
+                Assert.IsFalse(form.Controls.Find("Previous", true)[0].Enabled);
+                ((Button)form.Controls.Find("Next", true)[0]).PerformClick(); Assert.AreEqual(1, tabs.SelectedIndex);
+                ((Button)form.Controls.Find("Previous", true)[0]).PerformClick(); Assert.AreEqual(0, tabs.SelectedIndex);
+                Assert.AreEqual(language == "vi" ? "Kiểm tra" : "Grade", form.Controls.Find("Grade", true)[0].Text);
+                string evidence = Environment.GetEnvironmentVariable("B3_UI_EVIDENCE");
+                if (!string.IsNullOrEmpty(evidence))
+                {
+                    using (var image = new System.Drawing.Bitmap(form.Width, form.Height))
+                    { form.DrawToBitmap(image, new System.Drawing.Rectangle(System.Drawing.Point.Empty, form.Size)); image.Save(Path.Combine(evidence, "training-" + language + "-" + width + "-" + scale.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".png")); }
+                }
+                Set(form, "currentProject", null);
+            }, language: language));
+        }
+
         private static void WithForm(Action<MainForm, FakeController, SessionRecoveryJournal, List<string>> test,
             bool retry = false, string language = "en")
         {
