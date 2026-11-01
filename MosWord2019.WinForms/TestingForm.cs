@@ -22,7 +22,7 @@ namespace MosWord2019
         private readonly Button submit = new Button { Name = "Submit", AutoSize = true };
         private readonly Button recover = new Button { Name = "Recover", AutoSize = true, Visible = false };
         private readonly Button offlineSubmit = new Button { Name = "OfflineSubmit", AutoSize = true };
-        private readonly Label countdown = new Label { Name = "Countdown", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) };
+        private readonly Label countdown = new Label { Name = "Countdown", AutoSize = true, Anchor = AnchorStyles.None, TextAlign = ContentAlignment.MiddleCenter, ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) };
         private readonly Label project = new Label { Name = "ProjectIndex", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleRight };
         private readonly Label projectId = new Label { Name = "ProjectId", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
         private readonly Label taskCounter = new Label { Name = "TaskCounter", AutoSize = true };
@@ -47,33 +47,28 @@ namespace MosWord2019
         {
             this.prepared = prepared; this.packages = packages; this.host = host; this.resume = resume;
             Text = "MOS Word 2019 — Testing"; StartPosition = FormStartPosition.Manual; MinimumSize = new Size(640, 100);
-            Font = new Font("Segoe UI", 9); BackColor = Color.White;
-            AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
-            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(2) };
+            UiLayout.ScaleForm(this); BackColor = Color.White;
+            var layout = new TableLayoutPanel { Name = "ExamLayout", Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Padding = new Padding(2) };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52));
-            var top = new TableLayoutPanel { Name = "ExamTopBar", Dock = DockStyle.Fill, ColumnCount = 3, Margin = Padding.Empty, BackColor = Color.White };
-            top.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
-            top.Controls.Add(projectId, 0, 0); top.Controls.Add(countdown, 1, 0); top.Controls.Add(project, 2, 0); layout.Controls.Add(top);
-            var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body);
-            var footer = new TableLayoutPanel { Name = "ExamFooter", Dock = DockStyle.Fill, ColumnCount = 2, Margin = Padding.Empty };
-            footer.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68)); footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32));
-            var left = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, ColumnCount = 1 };
-            left.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            left.RowStyles.Add(new RowStyle(SizeType.AutoSize)); left.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false };
-            actions.Controls.AddRange(new Control[] { start, previousTask, nextTask, restart, next, recover });
-            left.Controls.Add(actions); status.Dock = DockStyle.Fill; status.AutoSize = false; status.AutoEllipsis = true; left.Controls.Add(status);
-            var right = new TableLayoutPanel { Dock = DockStyle.Fill, Margin = Padding.Empty, RowCount = 2, ColumnCount = 1 };
-            right.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            right.RowStyles.Add(new RowStyle(SizeType.Absolute, 20)); right.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var taskInfo = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, Margin = Padding.Empty };
-            taskInfo.Controls.AddRange(new Control[] { taskCounter, review }); right.Controls.Add(taskInfo, 0, 0);
-            submit.Margin = Padding.Empty; submit.AutoSize = false; submit.Dock = DockStyle.Fill; submit.BackColor = Color.FromArgb(30, 125, 65); submit.ForeColor = Color.White;
-            submit.FlatStyle = FlatStyle.Flat; submit.Font = new Font("Segoe UI", 11, FontStyle.Bold); right.Controls.Add(submit, 0, 1);
-            footer.Controls.Add(left, 0, 0); footer.Controls.Add(right, 1, 0); layout.Controls.Add(footer); Controls.Add(layout);
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            foreach (Control c in new Control[] { projectId, countdown, project, taskCounter, review, status, start, previousTask, nextTask, restart, next, recover, submit, offlineSubmit }) { c.Dock = DockStyle.None; UiLayout.Text(c); }
+            projectId.AutoEllipsis = false;
+            layout.Controls.Add(UiLayout.Header(projectId, countdown, project, "ExamTopBar"), 0, 0);
+            var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body, 0, 1);
+            var left = UiLayout.Flow(start, previousTask, nextTask, restart, recover);
+            var center = UiLayout.Flow(next, taskCounter, review);
+            submit.BackColor = Color.FromArgb(30, 125, 65); submit.ForeColor = Color.White;
+            submit.FlatStyle = FlatStyle.Flat; submit.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            submit.MinimumSize = new Size(160, submit.MinimumSize.Height);
+            layout.Controls.Add(new TrainerActionBar("ExamFooter", left, center, submit), 0, 2);
+            UiLayout.TabHeaders(tabs);
+            status.Visible = false; status.TextChanged += (s, e) =>
+            {
+                status.Visible = status.Text.Length > 0;
+                if (IsHandleCreated && Visible) BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) Arrange(); }));
+            };
+            UiLayout.Wrap(status, layout); layout.Controls.Add(status, 0, 3); Controls.Add(layout);
             rules.Font = new Font("Segoe UI", 18); rules.BackColor = Color.White;
             start.Font = new Font("Segoe UI", 12, FontStyle.Bold); start.BackColor = Color.FromArgb(32, 100, 190); start.ForeColor = Color.White; start.FlatStyle = FlatStyle.Flat;
             previousTask.Click += (s, e) => { if (tabs.SelectedIndex > 0) tabs.SelectedIndex--; };
@@ -237,8 +232,8 @@ namespace MosWord2019
             if (arranging || IsDisposed || WindowState == FormWindowState.Minimized) return; arranging = true;
             try
             {
-                Rectangle area = Screen.FromControl(this).WorkingArea; int minimum = (int)Math.Ceiling(Font.Height * 12.5);
-                int height = Math.Min((int)(area.Height * .35), Math.Max((int)(area.Height * .32), minimum)); Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
+                Rectangle area = Screen.FromControl(this).WorkingArea;
+                int height = UiLayout.PanelHeight(this, area); Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
                 if (host != null && snapshot != null && snapshot.Status != TestingSessionStatus.Ready && snapshot.Status != TestingSessionStatus.Completed)
                     await host.InvokeAsync(c => { c.SetWindowBounds(area.Left, area.Top, area.Width, area.Height - height); return true; });
             }

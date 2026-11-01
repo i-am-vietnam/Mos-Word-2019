@@ -481,9 +481,10 @@ namespace MosWord2019.Tests
                             Enumerable.Repeat(TestingProjectState.Active, 7), new ExamTaskGrade[0], null));
                         typeof(MosWord2019.TestingForm).GetField("arranging", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(form, true);
                         form.AutoScaleMode = AutoScaleMode.None;
-                        form.Scale(new SizeF(scale, scale));
-                        form.Size = new Size(width, (int)((height - 40) * .35)); Application.DoEvents();
-                        Assert.IsTrue(form.Height <= (int)((height - 40) * .35), "Panel exceeds 35% cap.");
+                        form.Scale(new SizeF(scale / UiClippingTests.GraphicsScale, scale / UiClippingTests.GraphicsScale));
+                        int panelHeight = UiLayout.PanelHeight(form, new Rectangle(0, 0, width, height - 40));
+                        form.Size = new Size(width, panelHeight); Application.DoEvents();
+                        Assert.AreEqual(panelHeight, form.Height, "Content-sized panel height.");
                         var timer = Find<Label>(form, "Countdown"); var top = Find<TableLayoutPanel>(form, "ExamTopBar");
                         Assert.AreEqual(Color.Red, timer.ForeColor); Assert.IsTrue(timer.Font.Bold); Assert.IsTrue(timer.Font.Size >= 22);
                         Assert.IsTrue(Math.Abs(timer.Left + timer.Width / 2 - top.ClientSize.Width / 2) <= 3);
@@ -495,7 +496,7 @@ namespace MosWord2019.Tests
                         Assert.IsTrue(submitButton.ClientSize.Height >= TextRenderer.MeasureText(submitButton.Text, submitButton.Font).Height + 6, "Submit text is vertically clipped: height=" + submitButton.Height + " text=" + TextRenderer.MeasureText(submitButton.Text, submitButton.Font).Height + " parent=" + submitButton.Parent.Bounds + " rows=" + string.Join(",", ((TableLayoutPanel)submitButton.Parent).GetRowHeights()));
                         var instruction = (RichTextBox)tabs.TabPages[0].Controls[0];
                         Assert.IsTrue(instruction.Font.Size >= 18); Assert.IsTrue(instruction.WordWrap && instruction.ReadOnly);
-                        Assert.AreEqual(BorderStyle.None, instruction.BorderStyle); Assert.IsTrue(instruction.ClientSize.Height >= 25);
+                        Assert.AreEqual(BorderStyle.None, instruction.BorderStyle); Assert.IsTrue(instruction.ClientSize.Height >= 25, "Question viewport=" + instruction.ClientSize + " root rows=" + string.Join(",", ((TableLayoutPanel)form.Controls[0]).GetRowHeights()));
                         Assert.IsFalse(Find<Button>(form, "PreviousTask").Enabled);
                         Find<Button>(form, "NextTask").PerformClick(); Assert.AreEqual(1, tabs.SelectedIndex);
                         Assert.AreEqual("Task 2/" + tabs.TabCount, Find<Label>(form, "TaskCounter").Text);
@@ -534,7 +535,7 @@ namespace MosWord2019.Tests
                 using (var login = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), null, _ => { }))
                 {
                     login.Show(); Find<RadioButton>(login, language == "vi" ? "Vietnamese" : "English").Checked = true;
-                    login.AutoScaleMode = AutoScaleMode.None; login.Scale(new SizeF(scale, scale)); Application.DoEvents();
+                    login.AutoScaleMode = AutoScaleMode.None; login.Scale(new SizeF(scale / UiClippingTests.GraphicsScale, scale / UiClippingTests.GraphicsScale)); Application.DoEvents();
                     Assert.IsTrue(login.Width <= width && login.Height <= height - 40);
                     Find<Button>(login, "Continue").PerformClick();
                     foreach (string name in new[] { "Username", "Password", "Continue", "Exit", "LoginStatus" })
@@ -552,7 +553,7 @@ namespace MosWord2019.Tests
                     var result = new ExamScorer(_ => { }).Score(prepared.Definition, new ExamTaskGrade[0]);
                     using (var form = new MosWord2019.ResultForm(result, packages, language))
                     {
-                        form.Show(); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new SizeF(scale, scale));
+                        form.Show(); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new SizeF(scale / UiClippingTests.GraphicsScale, scale / UiClippingTests.GraphicsScale));
                         form.Size = new Size(Math.Min(width, form.Width), Math.Min(height - 40, form.Height)); Application.DoEvents();
                         Assert.IsTrue(form.Width <= width && form.Height <= height - 40);
                         var wrong = Find<TextBox>(form, "WrongTasks");
@@ -599,9 +600,10 @@ namespace MosWord2019.Tests
         {
             Exception failure = null; var thread = new Thread(() =>
             {
+                IntPtr previousDpi = UiClippingTests.EnterDpiContext();
                 bool original = Control.CheckForIllegalCrossThreadCalls; Control.CheckForIllegalCrossThreadCalls = true;
                 try { action(); } catch (Exception ex) { failure = ex; }
-                finally { Control.CheckForIllegalCrossThreadCalls = original; }
+                finally { Control.CheckForIllegalCrossThreadCalls = original; UiClippingTests.RestoreDpiContext(previousDpi); }
             });
             thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join();
             if (failure != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failure).Throw();

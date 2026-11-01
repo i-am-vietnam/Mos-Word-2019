@@ -88,45 +88,29 @@ namespace MosWord2019
             Font = new Font("Segoe UI", 9F);
             BackColor = Color.WhiteSmoke;
             MaximizeBox = false;
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(4), ColumnCount = 1, RowCount = 3 };
+            UiLayout.ScaleForm(this);
+            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(2), ColumnCount = 1, RowCount = 4 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
-            var top = new TableLayoutPanel { Name = "pnlTopBar", Margin = Padding.Empty, Dock = DockStyle.Fill, BackColor = Color.White, ColumnCount = 3 };
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45));
-            top.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var selection = new FlowLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(2), WrapContents = false };
-            top.Controls.Add(selection, 0, 0);
-            top.Controls.Add(new Label { Name = "TrainingCountdown", Visible = false, Text = "04:00:00", ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold), Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter }, 1, 0);
-            top.Controls.Add(taskCounter, 2, 0);
-            selection.Controls.Add(new Label { Text = T("Project:", "Dự án:"), AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
-            selection.Controls.Add(projects);
-            go.Text = T("Go", "Bắt đầu");
-            selection.Controls.Add(go);
-            layout.Controls.Add(top, 0, 0);
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            foreach (Control c in new Control[] { go, previous, next, restart, grade, taskCounter, status }) { c.Dock = DockStyle.None; UiLayout.Text(c); }
+            var projectLabel = UiLayout.Text(new Label { Text = T("Project:", "Dự án:") });
+            var selection = UiLayout.Flow(projectLabel, projects, go);
+            var future = UiLayout.Text(new Label { Name = "TrainingCountdown", Visible = false, Text = "04:00:00", ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) });
+            layout.Controls.Add(UiLayout.Header(selection, future, new Label { AutoSize = true, Visible = false, Margin = Padding.Empty }, "pnlTopBar", training: true), 0, 0);
             layout.Controls.Add(tabTasks, 0, 1);
-            var actions = new TableLayoutPanel { Name = "pnlFooter", Margin = Padding.Empty, Dock = DockStyle.Fill, Padding = new Padding(2), RowCount = 1, ColumnCount = 5 };
-            actions.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            for (int i = 0; i < 4; i++) actions.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            previous.Text = "← Task";
-            next.Text = "Task →";
-            previous.MinimumSize = next.MinimumSize = new Size(50, 28);
-            go.MinimumSize = new Size(60, 28);
-            restart.Text = T("Restart Project", "Làm lại dự án");
-            restart.MinimumSize = new Size(120, 28);
-            grade.Text = T("Grade", "Kiểm tra");
-            grade.MinimumSize = new Size(110, 28);
-            actions.Controls.Add(previous, 0, 0);
-            actions.Controls.Add(next, 1, 0);
-            actions.Controls.Add(restart, 2, 0);
-            actions.Controls.Add(grade, 3, 0);
-            actions.Controls.Add(status, 4, 0);
-            layout.Controls.Add(actions, 0, 2);
+            previous.Text = "← Task"; next.Text = "Task →"; go.Text = T("Go", "Bắt đầu");
+            restart.Text = T("Restart Project", "Làm lại dự án"); grade.Text = T("Grade", "Kiểm tra");
+            layout.Controls.Add(new TrainerActionBar("pnlFooter", UiLayout.Flow(previous, next, restart), UiLayout.Flow(grade, taskCounter), new Panel { AutoSize = true, Size = Size.Empty, Visible = false, Margin = Padding.Empty }), 0, 2);
+            UiLayout.TabHeaders(tabTasks);
+            status.TextChanged += (s, e) =>
+            {
+                status.Visible = status.Text.Length > 0 && status.Text != taskCounter.Text;
+                if (IsHandleCreated && Visible) BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) ArrangeWorkspace(); }));
+            };
+            status.AutoEllipsis = false; UiLayout.Wrap(status, layout); layout.Controls.Add(status, 0, 3);
             Controls.Add(layout);
+            Shown += (s, e) => ArrangeWorkspace();
             go.Click += (s, e) => Run(OpenSelectedProject);
             previous.Click += (s, e) => Run(() => ShowTask(taskIndex - 1));
             next.Click += (s, e) => Run(() => ShowTask(taskIndex + 1));
@@ -291,8 +275,7 @@ namespace MosWord2019
             try
             {
                 Rectangle area = Screen.FromControl(this).WorkingArea;
-                int minimum = (int)Math.Ceiling(Font.Height * 12.5);
-                int height = Math.Min((int)(area.Height * .35), Math.Max((int)(area.Height * .32), minimum));
+                int height = UiLayout.PanelHeight(this, area);
                 Bounds = new Rectangle(area.Left, area.Bottom - height, area.Width, height);
                 if (currentProject != null && word is IWordWindowLayout placement && word.IsOpened)
                     placement.SetWindowBounds(area.Left, area.Top, area.Width, area.Height - height);

@@ -12,13 +12,13 @@ namespace MosWord2019
         {
             Func<string, string, string> t = (en, vi) => language == "vi" ? vi : en;
             Text = t("Exam result", "Kết quả bài thi"); StartPosition = FormStartPosition.CenterScreen;
-            Font = new Font("Segoe UI", 10); AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi; BackColor = Color.White;
+            UiLayout.ScaleForm(this, 10); BackColor = Color.White;
             ClientSize = new Size(780, 600); MinimumSize = new Size(560, 400);
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(16), ColumnCount = 1, RowCount = 6 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 62)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 35));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 160)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 28));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 35)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 65)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             layout.Controls.Add(new Label { Name = "TotalScore", Text = result.Total + " / 1000", Dock = DockStyle.Fill, Font = new Font(Font.FontFamily, 32, FontStyle.Bold) });
             layout.Controls.Add(new Label { Name = "Verdict", Text = result.Passed ? t("Pass", "Đạt") : t("Needs more practice", "Cần Luyện Tập thêm"),
                 Dock = DockStyle.Fill, Font = new Font(Font.FontFamily, 14, FontStyle.Bold), ForeColor = result.Passed ? Color.DarkGreen : Color.DarkOrange });
@@ -37,6 +37,7 @@ namespace MosWord2019
                 Font = new Font("Segoe UI", 13), Dock = DockStyle.Fill, Text = string.Join(Environment.NewLine, lines) });
             var close = new Button { Text = t("Close", "Đóng"), AutoSize = true, DialogResult = DialogResult.OK }; layout.Controls.Add(close);
             Shown += (s, e) => { var area = Screen.FromControl(this).WorkingArea; Size = new Size(Math.Min(Width, area.Width), Math.Min(Height, area.Height)); CenterToScreen(); };
+            foreach (Control c in layout.Controls) if (c is Label || c is Button) { c.Dock = DockStyle.None; UiLayout.Text(c); }
             Controls.Add(layout); AcceptButton = close; CancelButton = close;
         }
     }

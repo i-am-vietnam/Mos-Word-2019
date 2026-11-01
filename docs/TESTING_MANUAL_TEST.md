@@ -115,3 +115,15 @@ Trước khi chốt thay đổi: build Debug/Release0warnings/0errors, chạy c�
 | Ngày/giờ | Commit + build | Word + máy | SessionId + ngôn ngữ | Bước/biến thể | PASS/FAIL/CHƯA CHẠY | Ảnh/log/hash và ghi chú |
 |---|---|---|---|---|---|---|
 | Chưa ghi nhận lượt mới | | | | O1/O2/O3/O4 hoặc regression | CHƯA CHẠY | Không điền PASS từ test fake. |
+
+## U1-FIX — Retest bố cục và DPI, 2026-11-01
+
+Bằng chứng mới:8ảnh cửa sổ thật EN/VI của Login/Testing/Training/Result tại1920x1080, Windows custom scaling125%, DeviceDpi120, Debug. Host cô lập dùng chính form production, không kích hoạt Word; ảnh gốc và metadata ở artifacts/u1-fix/native-1920x1080-125-*.png/.json. Không đánh dấu lại biên bản Word thật10bước phía trên.
+
+| Profile | Trạng thái | Ghi chú |
+|---|---|---|
+|1920x1080/125%, EN/VI, bốn form | ĐÃ CHỤP cửa sổ thật | Debug; kiểm title/dấu tiếng Việt, countdown, selector, footer và Result. |
+|1920x1080/100%, EN/VI, bốn form | CHƯA CHỤP | Người dùng tự retest sau đăng xuất/đăng nhập. |
+|1366x768/100%, EN/VI, bốn form | CHƯA CHỤP | Người dùng tự retest sau đăng xuất/đăng nhập. |
+
+Windows đang dùng custom scaling nên cần sign-out để đổi100%; không đổi profile hoặc đăng xuất. Guards font100/125/150/175% và viewport1366/1920 là kiểm mô phỏng, không thay thế hai profile thật còn thiếu. Sau khi người dùng đổi profile: mở từng form EN/VI, chụp cửa sổ, ghi DeviceDpi; xác nhận không cắt dấu/countdown, các nhóm nút không chồng, Submit luôn nhìn thấy, cuộn câu hỏi được và Word còn ở phía trên. Thử thêm status PASS/FAIL và cảnh báo Word-busy ở font lớn. Panel được phép tăng vừa đủ nội dung khi font rất lớn theo chấp thuận người dùng. Chạy regression set Word thật phía trên riêng, không suy từ ảnh form cô lập.

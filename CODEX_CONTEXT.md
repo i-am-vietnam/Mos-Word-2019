@@ -1,5 +1,13 @@
 # Technical Context
 
+## U1-FIX layout contract — 2026-11-01
+
+UiLayout centralizes content-measured text minimums, AutoSize headers/flows, native tab header sizing, Dpi autoscaling and content-aware PanelHeight. TrainerActionBar keeps left/right groups on row0 and moves the center group to row1 when needed. MainForm's selector header uses AutoSize side columns; Testing's header remains35/30/35. Text/status rows have no fixed pixel heights. Status changes queue layout after visibility updates; MainForm arranges again on Shown for native DPI initialization. App.config and app.manifest declare PerMonitorV2.
+
+PanelHeight reserves AutoSize rows plus a tab header and one complete instruction line, with32% working-area baseline. It may exceed the old35% cap at large fonts by explicit user authorization; the remaining area is still assigned to Word. No coordinator/grading/authentication/navigation behavior changed.
+
+UiClippingTests checks EN/VI, font100/125/150/175%, viewport1366/1920, measured text, bar sibling intersections, ancestor containment, native tab headers and the question viewport; additional tests cover a status appearing at175%. Real Windows screenshots:8Debug form windows at1920x1080/125% (DeviceDpi120), isolated evidence host with no Word activation. Native100% profiles1920x1080 and1366x768 remain deferred by the user because custom scaling requires sign-out; simulated font tests do not establish native DPI behavior or monitor transitions. Evidence/report: artifacts/u1-fix (ignored). Final Debug/Release rebuilds each have0warnings/0errors;854/854 cases/configuration (701 headless +153 desktop),0skipped, all844 U1 cases retained plus10 new. Original149 resources and150 source/output package/catalog hashes match.
+
 ## U1 presentation/authentication boundary — 2026-11-01
 
 LoginForm uses IAuthenticationService; OfflineAuthenticationService accepts non-whitespace username/password. LoginPreferences optionally stores only username/language at LocalAppData/MosWord2019/login-preferences.txt, swallowing preference I/O/format failures; password is masked, never persisted and cleared after navigation. Existing OpenSession routing and Program.InspectTestingRecovery remain unchanged. Phase C can replace the authentication implementation independently of control layout.

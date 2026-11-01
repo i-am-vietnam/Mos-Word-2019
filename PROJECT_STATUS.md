@@ -1,5 +1,13 @@
 # Project Status
 
+## U1-FIX — Bố cục theo nội dung và DPI, 2026-11-01
+
+Thay hàng chữ cố định bằng AutoSize TableLayoutPanel/FlowLayoutPanel ở Login, Testing, Training và Result; Login hai cột, countdown24pt đủ glyph, footer co theo nội dung và nhóm giữa xuống hàng khi thiếu chỗ, Submit neo phải. Dùng chung AutoScaleMode.Dpi và khai báo PerMonitorV2 trong App.config/manifest. Panel bắt đầu ở32% working area, tăng vừa đủ bars + một dòng câu hỏi khi font lớn; người dùng đã cho phép vượt35% trong trường hợp này, Word vẫn được bố trí phía trên. Dòng trạng thái mới xuất hiện cũng yêu cầu tính lại bố cục. Mốc này thay cap35% ghi ở U1 bên dưới.
+
+Bằng chứng giao diện:8ảnh cửa sổ Windows thật, bốn form EN/VI, Debug,1920x1080/125%, DeviceDpi120, tại artifacts/u1-fix. Host dựng chính form production bằng dữ liệu/controller cô lập, không chạy Program hoặc Word thật. Windows custom scaling125% yêu cầu đăng xuất để đổi100%; người dùng yêu cầu ghi CHƯA CHỤP1920x1080/100% và1366x768/100%, sẽ tự retest sau đăng xuất/đăng nhập. Không đổi profile hoặc đăng xuất. Ma trận font/viewport tự động không phải DPI Windows native.
+
+VS MSBuild Rebuild Debug/Release: mỗi cấu hình0warnings/0errors. Hai suites mỗi cấu hình854/854 PASS (701 headless +153 desktop),0skipped; audit giữ đủ844case U1, thêm10case U1-FIX. Guards RED trước sửa và GREEN cuối; review read-only không còn finding cụ thể.149tài nguyên gốc và150file source/output package/catalog không đổi; diff --check sạch. TRX/log/ảnh/audit và báo cáo ở artifacts/u1-fix/REPORT.md (ignored). Phạm vi chỉ presentation/config/tests/docs; giữ grader, engine, recovery, journal, timer, scoring và tài nguyên project. Dừng U1-FIX trước Phase C.
+
 ## U1 — Làm mới giao diện, 2026-11-01
 
 Hoàn tất Login với radio EN/VI/Training/Testing, kiểm tra tài khoản/mật khẩu qua IAuthenticationService + OfflineAuthenticationService và tùy chọn chỉ nhớ username/language. Routing Training/Testing và recovery trước Login giữ nguyên. Training/Testing dùng tab Task1..n, chữ câu hỏi20/18pt cuộn dọc, counter/nút chuyển task; đồng hồ Testing24pt luôn đỏ/căn giữa, Submit xanh; panel khoảng32–35% working area. Result tăng cỡ điểm/list; rules/overlay/progress cùng kiểu chữ. Debug bỏ checkbox, dùng Ctrl+Shift+F12 khi focus Trainer; Release loại handler và simulator như trước.

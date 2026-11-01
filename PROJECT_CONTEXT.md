@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## U1-FIX — Checkpoint giao diện, 2026-11-01
+
+Login hai cột cân giữa; Testing/Training dùng hàng AutoSize và footer có thể xuống hàng ở nhóm giữa; đồng hồ24pt đỏ không cắt dấu, Submit neo phải; Result dùng hàng chữ theo nội dung. UiLayout dùng Dpi/PerMonitorV2, đo text và tính chiều cao panel từ bars + một dòng câu hỏi. Người dùng cho phép vượt35% khi font lớn, vẫn chừa Word phía trên; trạng thái xuất hiện sẽ bố trí lại. Không đổi nghiệp vụ Training/Testing, grader hoặc lifecycle.
+
+Có8ảnh cửa sổ thật EN/VI ở1920x1080/125%, Debug, dùng form production với dữ liệu cô lập không Word. Ảnh thật100% ở1920x1080 và1366x768 CHƯA CHỤP theo quyết định người dùng: Windows custom scaling cần đăng xuất, người dùng sẽ retest sau. Font100/125/150/175% và viewport1366/1920 được kiểm tự động, không gọi là native DPI. Debug/Release rebuild0warnings/0errors;854/854case mỗi cấu hình (701 headless +153 desktop), giữ844case cũ và thêm10case,0skipped. Evidence cuối: artifacts/u1-fix/REPORT.md. Mốc này thay giới hạn panel35% của U1 bên dưới; Phase C chưa triển khai.
+
 ## U1 — Giao diện và đăng nhập offline, 2026-11-01
 
 Login có tài khoản/mật khẩu, radio mode/ngôn ngữ và IAuthenticationService thay thế được ở Phase C; file login-preferences.txt chỉ giữ username/ngôn ngữ. Không có server/xác thực thật. Routing và startup recovery giữ nguyên. Training/Testing có tab số thứ tự, chữ20/18pt cuộn dọc; Testing đồng hồ24pt đỏ giữa thanh trên, Submit xanh, review ở thanh dưới. Panel tối đa35% working area. Result/rules/progress tăng cỡ chữ. Checkbox B5 được thay bằng Ctrl+Shift+F12 chỉ trong Testing Debug khi focus Trainer; Release không có handler/simulator. Không đổi nghiệp vụ, timer hoặc grader.

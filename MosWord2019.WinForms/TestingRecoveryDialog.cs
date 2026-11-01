@@ -38,6 +38,7 @@ namespace MosWord2019
         {
             var form = new Form { Text = "Khôi phục bài thi / Exam recovery", Name = "TestingRecoveryChoices", ClientSize = new Size(760, 200),
                 StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+            UiLayout.ScaleForm(form);
             form.Controls.Add(new Label { Dock = DockStyle.Fill, Padding = new Padding(16), Text =
                 "Không thể khôi phục bài thi. Dữ liệu đã lưu được giữ nguyên. Hãy thử lại hoặc nộp bài từ autosave/checkpoint đã lưu.\n\n" +
                 "Exam recovery failed. Saved data is retained. Retry, or submit from saved autosaves/checkpoints." });

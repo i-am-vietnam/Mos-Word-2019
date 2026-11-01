@@ -1,5 +1,11 @@
 # Known Issues and Verification Items
 
+## U1-FIX — Khoảng trống kiểm chứng native, 2026-11-01
+
+- Đã chụp8cửa sổ form EN/VI Debug tại Windows1920x1080/125%, DeviceDpi120. Đây là form production dựng bằng host dữ liệu/controller cô lập, không phải một lượt thi với Word thật. Font/viewport guards không thay kiểm thử Word, monitor transition hoặc DPI Windows native khác.
+- Ảnh thật1920x1080/100% và1366x768/100% CHƯA CHỤP. Windows custom scaling125% khóa lựa chọn scale và yêu cầu đăng xuất; người dùng đã chọn tự retest100% sau đăng xuất/đăng nhập. Không thay scale/resolution hoặc đăng xuất trong lượt này.
+- Ở font rất lớn, panel có thể vượt35% để đủ nội dung theo chấp thuận người dùng; Word dùng phần phía trên còn lại. Cần kiểm native mức font/DPI lớn và diện tích Word khi có thông báo dài. Không suy PASS native từ guards tự động.
+
 ## U1 — Giới hạn kiểm chứng giao diện, 2026-11-01
 
 - Bốn form đã qua ma trận viewport/scale WinForms mô phỏng và có ảnh EN/VI Debug/Release; chưa chạy lại với Word thật tại DPI Windows100/125/150% hoặc khi chuyển monitor. Cần kiểm lại diện tích Word, cuộn instruction dài, dialog/timeout và bộ regression trong docs/TESTING_MANUAL_TEST.md trước chấp nhận native U1.

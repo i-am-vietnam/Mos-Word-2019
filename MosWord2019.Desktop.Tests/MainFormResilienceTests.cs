@@ -312,15 +312,16 @@ namespace MosWord2019.Tests
                 var selector = (ComboBox)form.Controls.Find("Projects", true)[0]; selector.Items.Add(package); selector.SelectedIndex = 0;
                 Set(form, "currentProject", package); Call(form, "BuildTaskTabs");
                 form.Show(); Call(form, "ShowTask", 0); Application.DoEvents();
-                Set(form, "arranging", true); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new System.Drawing.SizeF(scale, scale));
-                form.Size = new System.Drawing.Size(width, (int)((height - 40) * .35)); Application.DoEvents();
-                Assert.IsTrue(form.Height <= (int)((height - 40) * .35));
+                Set(form, "arranging", true); form.AutoScaleMode = AutoScaleMode.None; form.Scale(new System.Drawing.SizeF(scale / UiClippingTests.GraphicsScale, scale / UiClippingTests.GraphicsScale));
+                int panelHeight = UiLayout.PanelHeight(form, new System.Drawing.Rectangle(0, 0, width, height - 40));
+                form.Size = new System.Drawing.Size(width, panelHeight); Application.DoEvents();
+                Assert.AreEqual(panelHeight, form.Height);
                 var tabs = (TabControl)form.Controls.Find("tabTasks", true)[0];
                 Assert.AreEqual("Task 1", tabs.TabPages[0].Text);
                 Assert.AreEqual(17, tabs.TabCount); Assert.IsFalse(tabs.Multiline, "Long projects must keep the question viewport available.");
                 var question = (RichTextBox)tabs.TabPages[0].Controls[0];
                 Assert.IsTrue(question.Font.Size >= 20 && question.ReadOnly && question.WordWrap);
-                Assert.IsTrue(question.ClientSize.Height >= 25);
+                Assert.IsTrue(question.ClientSize.Height >= 25, "Question viewport=" + question.ClientSize + " root rows=" + string.Join(",", ((TableLayoutPanel)form.Controls[0]).GetRowHeights()));
                 foreach (string name in new[] { "Previous", "Next", "Restart", "Grade", "TaskCounter", "Projects", "Go" })
                 {
                     var control = form.Controls.Find(name, true)[0];
@@ -377,7 +378,7 @@ namespace MosWord2019.Tests
         private static void Sta(Action test)
         {
             Exception error = null;
-            var thread = new Thread(() => { try { test(); } catch (Exception ex) { error = ex; } });
+            var thread = new Thread(() => { IntPtr previous = UiClippingTests.EnterDpiContext(); try { test(); } catch (Exception ex) { error = ex; } finally { UiClippingTests.RestoreDpiContext(previous); } });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
             Assert.IsTrue(thread.Join(TimeSpan.FromSeconds(20)), "STA verification timed out.");

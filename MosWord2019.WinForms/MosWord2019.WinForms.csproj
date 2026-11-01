@@ -11,6 +11,7 @@
     <LangVersion>7.3</LangVersion>
     <Deterministic>true</Deterministic>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +37,7 @@
   <ItemGroup>
     <Compile Include="AppMode.cs" />
     <Compile Include="Authentication.cs" />
+    <Compile Include="UiLayout.cs" />
     <Compile Include="AppSession.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
@@ -77,6 +79,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup><None Include="App.config" /><None Include="app.manifest" /></ItemGroup>
   <ItemGroup>
     <Folder Include="Projects\Word2019_P01\assets\" />
     <Folder Include="Projects\Word2019_P02\assets\" />
