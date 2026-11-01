@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## U2 — Checkpoint pre-warm/giao diện, 2026-11-01
+
+Tick Testing chỉ đổi countdown mỗi giây khi project/trạng thái không đổi; bars double-buffered và không reflow theo tick. Training hiển thị overlay chờ, khóa bars/repaint trước Go/Restart, batch tabs sau mở tài liệu. Controller Training chạy trên STA nền có pump và giữ nguyên các dịch vụ nghiệp vụ; callback ownership vẫn hoàn tất trên UI trước Save. WordWarmup gộp activation, Go/Start chờ chung task, fallback khi lỗi và re-warm instance đã đóng. Testing warm ở rules trên host STA, không tính giờ thi. Instance rỗng đã chứng minh sở hữu được ẩn sau capture, hiện lại khi mở working copy.
+
+Go có timing theo từng pha; Word có timing activation và Documents.Open. Harness desktop/workspace cô lập đo P24 sau warm0.815s và P26 switch0.679s, cùng PID; pre-warm2.134s, UI vẫn nhận timer, native Save callback về UI. Không chạy Program/state gốc, không đổi grader/scoring/Testing engine/recovery/packages. Debug/Release rebuild0warnings/0errors;865/865case mỗi cấu hình (701 headless +164 desktop), giữ854case cũ và thêm11case,0skipped. Evidence cuối artifacts/u2/REPORT.md. Người dùng tự retest giao diện; không yêu cầu ảnh mới.
+
 ## U1-FIX — Checkpoint giao diện, 2026-11-01
 
 Login hai cột cân giữa; Testing/Training dùng hàng AutoSize và footer có thể xuống hàng ở nhóm giữa; đồng hồ24pt đỏ không cắt dấu, Submit neo phải; Result dùng hàng chữ theo nội dung. UiLayout dùng Dpi/PerMonitorV2, đo text và tính chiều cao panel từ bars + một dòng câu hỏi. Người dùng cho phép vượt35% khi font lớn, vẫn chừa Word phía trên; trạng thái xuất hiện sẽ bố trí lại. Không đổi nghiệp vụ Training/Testing, grader hoặc lifecycle.

@@ -1,5 +1,13 @@
 # Project Status
 
+## U2 — Tick ổn định và pre-warm Word, 2026-11-01
+
+Testing cập nhật countdown chỉ khi mm:ss đổi; tick cùng project/trạng thái không chạm footer/navigation/z-order hoặc tính lại chiều cao. Countdown có vùng đo sẵn; form/bar double-buffered. Training có overlay/trạng thái mở project, khóa bars và repaint trước thao tác dài; rebuild tabs theo lô rồi arrange một lần. TrainingWordController giữ controller trên một STA có message pump, serialize COM và chờ có pump UI với operation gate/deferred close; callback ownership hoàn thành đồng bộ trên UI trước native Save, observation budget được marshal về owner.
+
+WordWarmup gộp yêu cầu activation, giữ selector dùng được khi warm, Go/Start chờ chung task; lỗi dùng lại ordinary open trên cùng controller, instance đóng được warm lại. Testing warm trên host STA trong rules, không khởi động timer hay đổi engine/recovery. Ownership capture/Visible/caption theo đường cũ, sau đó chỉ ẩn instance rỗng đã sở hữu; mở working copy sẽ hiện Word. Go ghi một summary milliseconds theo pha; Word ghi newApplication/visible/ownershipCapture/captionRestore và Documents.Open.
+
+Đã đo Word thật bằng harness/workspace cô lập, không chạy Program/state gốc: bản cuối P24 sau warm0.815s, chuyển P26 giữ PID0.679s; pre-warm2.134s, UI timer vẫn chạy; native Save callback về UI. Đây không phải bảo đảm mọi lượt lạnh đều nhanh tương tự hoặc acceptance màn hình do người dùng chạy. VS MSBuild Rebuild Debug/Release mỗi cấu hình0warnings/0errors; hai suites mỗi cấu hình865/865 PASS (701 headless +164 desktop),0skipped. Audit giữ đủ854case cũ, thêm11case; RED/GREEN tick và warm state, review read-only không còn finding cụ thể.149tài nguyên gốc và150file source/output package/catalog khớp hash; diff --check sạch. Log/state gốc và handoff giữ hash, không chạy Program vào state gốc. TRX/timing/audit/report ở artifacts/u2/REPORT.md (ignored); dừng U2, không triển khai Phase C.
+
 ## U1-FIX — Bố cục theo nội dung và DPI, 2026-11-01
 
 Thay hàng chữ cố định bằng AutoSize TableLayoutPanel/FlowLayoutPanel ở Login, Testing, Training và Result; Login hai cột, countdown24pt đủ glyph, footer co theo nội dung và nhóm giữa xuống hàng khi thiếu chỗ, Submit neo phải. Dùng chung AutoScaleMode.Dpi và khai báo PerMonitorV2 trong App.config/manifest. Panel bắt đầu ở32% working area, tăng vừa đủ bars + một dòng câu hỏi khi font lớn; người dùng đã cho phép vượt35% trong trường hợp này, Word vẫn được bố trí phía trên. Dòng trạng thái mới xuất hiện cũng yêu cầu tính lại bố cục. Mốc này thay cap35% ghi ở U1 bên dưới.

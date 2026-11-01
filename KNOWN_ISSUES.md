@@ -1,5 +1,11 @@
 # Known Issues and Verification Items
 
+## U2 — Giới hạn đo hiệu năng và nghiệm thu, 2026-11-01
+
+- Hai lượt Word desktop cô lập đạt Go sau warm dưới2s; activation chuyển sang thời gian chờ ở màn hình chọn/rules, không loại bỏ chi phí COM/Office. Go bấm trước warm vẫn phải đợi activation, UI tiếp tục pump. Không suy từ hai lượt này rằng mọi cold start/antivirus/COM accepted call đều có cùng độ trễ.
+- Sandbox không có COM logon session (0x80070520); harness đã chạy thành công trong desktop session với workspace dưới artifacts/u2. Log/state gốc không dùng cho run. Kiểm tra callback Save native và giữ PID khi switch đã chạy; full Word acceptance, thao tác tay về ghost text/flicker và closing-during-activation thật vẫn do người dùng retest. Không cần ảnh mới cho U2.
+- Prewarm chỉ ẩn instance rỗng sau khi đã capture ownership bằng Visible/caption như cũ; có thể thoáng hiện cửa sổ trong bước capture. Không thay ownership/termination/recovery rules hoặc attach Word đang chạy của người khác.
+
 ## U1-FIX — Khoảng trống kiểm chứng native, 2026-11-01
 
 - Đã chụp8cửa sổ form EN/VI Debug tại Windows1920x1080/125%, DeviceDpi120. Đây là form production dựng bằng host dữ liệu/controller cô lập, không phải một lượt thi với Word thật. Font/viewport guards không thay kiểm thử Word, monitor transition hoặc DPI Windows native khác.

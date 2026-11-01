@@ -36,7 +36,7 @@ namespace MosWord2019
         }
         internal static FlowLayoutPanel Flow(params Control[] controls)
         {
-            var flow = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            var flow = new BufferedFlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 WrapContents = false, Anchor = AnchorStyles.None, Margin = Padding.Empty };
             flow.Controls.AddRange(controls); return flow;
         }
@@ -48,7 +48,7 @@ namespace MosWord2019
         }
         internal static TableLayoutPanel Header(Control left, Control center, Control right, string name, bool training = false)
         {
-            var bar = new TableLayoutPanel { Name = name, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            var bar = new BufferedTableLayoutPanel { Name = name, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, Margin = Padding.Empty, Padding = new Padding(1), BackColor = Color.White };
             bar.ColumnStyles.Add(new ColumnStyle(training ? SizeType.AutoSize : SizeType.Percent, training ? 0 : 35));
             bar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, training ? 100 : 30));
@@ -90,6 +90,12 @@ namespace MosWord2019
             foreach (Control child in parent.Controls) { if (child is T found) return found; var nested = Find<T>(child); if (nested != null) return nested; }
             return null;
         }
+        internal static void Clock(Label clock)
+        {
+            clock.AutoSize = false;
+            Action fit = () => clock.Size = clock.MinimumSize = TextRenderer.MeasureText("00:00", clock.Font) + clock.Padding.Size;
+            clock.HandleCreated += (s, e) => fit(); clock.FontChanged += (s, e) => fit(); clock.DpiChangedAfterParent += (s, e) => fit(); fit();
+        }
         internal static void EqualButtons(Button first, Button second)
         {
             Action fit = () =>
@@ -102,8 +108,16 @@ namespace MosWord2019
             first.FontChanged += (s, e) => fit(); second.FontChanged += (s, e) => fit(); fit();
         }
     }
+    internal class BufferedTableLayoutPanel : TableLayoutPanel
+    {
+        internal BufferedTableLayoutPanel() { DoubleBuffered = true; SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true); }
+    }
+    internal sealed class BufferedFlowLayoutPanel : FlowLayoutPanel
+    {
+        internal BufferedFlowLayoutPanel() { DoubleBuffered = true; SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true); }
+    }
     // A narrow screen moves the center group onto its own row; the right button never stretches or disappears.
-    internal sealed class TrainerActionBar : TableLayoutPanel
+    internal sealed class TrainerActionBar : BufferedTableLayoutPanel
     {
         private readonly Control left, center, right;
         private bool arranging;

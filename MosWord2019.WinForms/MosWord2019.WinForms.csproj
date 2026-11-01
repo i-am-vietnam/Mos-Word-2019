@@ -38,6 +38,8 @@
     <Compile Include="AppMode.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="UiLayout.cs" />
+    <Compile Include="WordWarmup.cs" />
+    <Compile Include="TrainingWordController.cs" />
     <Compile Include="AppSession.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>

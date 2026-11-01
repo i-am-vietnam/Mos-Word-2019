@@ -36,6 +36,7 @@ namespace MosWord2019
         private readonly Panel offline = new Panel { Name = "OfflineOverlay", Dock = DockStyle.Fill, BackColor = Color.LemonChiffon };
         private readonly Dictionary<string, bool> marks = new Dictionary<string, bool>();
         private TestingSessionSnapshot snapshot;
+        private bool renderedOperation, renderedRecovery;
         private string shownProject;
         private bool operation, allowClose, skipDisposal, arranging, resultShown, closeQueued;
         internal Func<string, bool> ConfirmChoice { get; set; }
@@ -47,12 +48,13 @@ namespace MosWord2019
         {
             this.prepared = prepared; this.packages = packages; this.host = host; this.resume = resume;
             Text = "MOS Word 2019 — Testing"; StartPosition = FormStartPosition.Manual; MinimumSize = new Size(640, 100);
-            UiLayout.ScaleForm(this); BackColor = Color.White;
-            var layout = new TableLayoutPanel { Name = "ExamLayout", Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Padding = new Padding(2) };
+            UiLayout.ScaleForm(this); DoubleBuffered = true; BackColor = Color.White;
+            var layout = new BufferedTableLayoutPanel { Name = "ExamLayout", Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Padding = new Padding(2) };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            foreach (Control c in new Control[] { projectId, countdown, project, taskCounter, review, status, start, previousTask, nextTask, restart, next, recover, submit, offlineSubmit }) { c.Dock = DockStyle.None; UiLayout.Text(c); }
+            foreach (Control c in new Control[] { projectId, project, taskCounter, review, status, start, previousTask, nextTask, restart, next, recover, submit, offlineSubmit }) { c.Dock = DockStyle.None; UiLayout.Text(c); }
+            UiLayout.Clock(countdown);
             projectId.AutoEllipsis = false;
             layout.Controls.Add(UiLayout.Header(projectId, countdown, project, "ExamTopBar"), 0, 0);
             var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabs); body.Controls.Add(rules); body.Controls.Add(offline); layout.Controls.Add(body, 0, 1);
@@ -88,7 +90,16 @@ namespace MosWord2019
             submit.Click += async (s, e) => await Submit(); offlineSubmit.Click += async (s, e) => await Submit();
             recover.Click += (s, e) => { allowClose = true; Close(); };
             if (host != null) { host.StateChanged += HostState; host.Warning += HostWarning; host.WordDialogRequired += BusyWarning; }
-            Shown += async (s, e) => { Arrange(); if (resume && host != null) await Command(() => host.ResumeAsync(), true); };
+            Shown += async (s, e) =>
+            {
+                Arrange();
+                if (resume && host != null) await Command(() => host.ResumeAsync(), true);
+                else if (host != null)
+                {
+                    try { await host.PrewarmAsync(); }
+                    catch (Exception ex) { AppLogger.Write("Testing rules prewarm failed; Start will retry: " + ex.Message); }
+                }
+            };
             Resize += (s, e) => Arrange();
             ApplyState(new TestingSessionSnapshot(TestingSessionStatus.Ready, TestingFinalizeReason.None, 0, TimeSpan.Zero,
                 Enumerable.Repeat(TestingProjectState.NotStarted, 7), new ExamTaskGrade[0], null));
@@ -127,26 +138,42 @@ namespace MosWord2019
 #endif
         internal void ApplyState(TestingSessionSnapshot value)
         {
-            snapshot = value;
+            var previous = snapshot; snapshot = value;
             int seconds = (int)Math.Max(0, Math.Ceiling((TestingSession.Duration - value.Elapsed).TotalSeconds));
-            countdown.Text = (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00"); countdown.ForeColor = Color.Red;
-            project.Text = "Project " + (value.CurrentIndex + 1) + "/7";
-            bool ready = value.Status == TestingSessionStatus.Ready, running = value.Status == TestingSessionStatus.Running;
-            bool lost = value.Status == TestingSessionStatus.Offline;
-            start.Visible = ready; start.Enabled = ready && !operation; rules.Visible = ready;
-            next.Text = value.CurrentIndex == 6 ? T("Submit", "Nộp bài") : T("Next Project →", "Project tiếp theo →");
-            next.Enabled = restart.Enabled = running && !operation && !RecoveryRequired;
-            submit.Enabled = offlineSubmit.Enabled = (running || lost) && !operation && !RecoveryRequired;
-            offline.Visible = lost; tabs.Visible = running && !RecoveryRequired; if (lost) offline.BringToFront(); else if (ready) rules.BringToFront(); else tabs.BringToFront();
-            if (!ready && value.Status != TestingSessionStatus.Completed)
+            string time = (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00");
+            if (countdown.Text != time) countdown.Text = time;
+            // A timer observation must not touch AutoSize bars, z-order or navigation.
+            if (previous != null && previous.Status == value.Status && previous.CurrentIndex == value.CurrentIndex &&
+                renderedOperation == operation && renderedRecovery == RecoveryRequired && value.Status != TestingSessionStatus.Completed) return;
+            bool layoutChanged = previous == null || previous.Status != value.Status || previous.CurrentIndex != value.CurrentIndex || renderedRecovery != RecoveryRequired;
+            renderedOperation = operation; renderedRecovery = RecoveryRequired;
+            var layout = Controls[0]; SuspendLayout(); layout.SuspendLayout();
+            try
             {
-                string id = prepared.Definition.Projects[value.CurrentIndex].ProjectId;
-                if (shownProject != id) { BuildTabs(id); shownProject = id; Arrange(); }
+                SetText(project, "Project " + (value.CurrentIndex + 1) + "/7");
+                bool ready = value.Status == TestingSessionStatus.Ready, running = value.Status == TestingSessionStatus.Running;
+                bool lost = value.Status == TestingSessionStatus.Offline;
+                SetVisible(start, ready); SetEnabled(start, ready && !operation); SetVisible(rules, ready);
+                SetText(next, value.CurrentIndex == 6 ? T("Submit", "Nộp bài") : T("Next Project →", "Project tiếp theo →"));
+                SetEnabled(next, running && !operation && !RecoveryRequired); SetEnabled(restart, next.Enabled);
+                SetEnabled(submit, (running || lost) && !operation && !RecoveryRequired); SetEnabled(offlineSubmit, submit.Enabled);
+                SetVisible(offline, lost); SetVisible(tabs, running && !RecoveryRequired);
+                if (lost) offline.BringToFront(); else if (ready) rules.BringToFront(); else tabs.BringToFront();
+                if (!ready && value.Status != TestingSessionStatus.Completed)
+                {
+                    string id = prepared.Definition.Projects[value.CurrentIndex].ProjectId;
+                    if (shownProject != id) { BuildTabs(id); shownProject = id; }
+                }
+                UpdateTaskNavigation();
             }
-            UpdateTaskNavigation();
+            finally { layout.ResumeLayout(layoutChanged); ResumeLayout(layoutChanged); }
+            if (layoutChanged) Arrange(); // Only a project/interaction-state transition reaches this path.
             if (value.Status == TestingSessionStatus.Submitting && !RecoveryRequired) ShowProgress();
             if (value.Status == TestingSessionStatus.Completed && !resultShown && host != null) { resultShown = true; ShowResult(); }
         }
+        private static void SetText(Control control, string text) { if (control.Text != text) control.Text = text; }
+        private static void SetEnabled(Control control, bool enabled) { if (control.Enabled != enabled) control.Enabled = enabled; }
+        private static void SetVisible(Control control, bool visible) { if (control.Visible != visible) control.Visible = visible; }
         private void BuildTabs(string id)
         {
             shownProject = id;
@@ -173,11 +200,13 @@ namespace MosWord2019
         private void UpdateTaskNavigation()
         {
             bool active = snapshot?.Status == TestingSessionStatus.Running && !operation && !RecoveryRequired;
-            previousTask.Enabled = active && tabs.SelectedIndex > 0; nextTask.Enabled = active && tabs.SelectedIndex < tabs.TabCount - 1;
-            review.Enabled = active; review.Visible = taskCounter.Visible = tabs.TabCount > 0 && snapshot?.Status == TestingSessionStatus.Running && !RecoveryRequired;
-            taskCounter.Text = "Task " + (tabs.SelectedIndex + 1) + "/" + tabs.TabCount;
+            SetEnabled(previousTask, active && tabs.SelectedIndex > 0); SetEnabled(nextTask, active && tabs.SelectedIndex < tabs.TabCount - 1);
+            SetEnabled(review, active);
+            bool visible = tabs.TabCount > 0 && snapshot?.Status == TestingSessionStatus.Running && !RecoveryRequired;
+            SetVisible(review, visible); SetVisible(taskCounter, visible);
+            SetText(taskCounter, "Task " + (tabs.SelectedIndex + 1) + "/" + tabs.TabCount);
             string key = SelectedTaskKey(); updatingReview = true;
-            try { review.Name = key == null ? "MarkForReview" : "Mark_" + key.Substring(key.IndexOf('/') + 1); review.Checked = key != null && marks.ContainsKey(key) && marks[key]; }
+            try { string name = key == null ? "MarkForReview" : "Mark_" + key.Substring(key.IndexOf('/') + 1); if (review.Name != name) review.Name = name; bool marked = key != null && marks.ContainsKey(key) && marks[key]; if (review.Checked != marked) review.Checked = marked; }
             finally { updatingReview = false; }
         }
 #if DEBUG

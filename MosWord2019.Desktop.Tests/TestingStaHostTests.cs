@@ -17,6 +17,47 @@ namespace MosWord2019.Tests
     [TestClass]
     public sealed class TestingStaHostTests
     {
+        [DataTestMethod]
+        [DataRow(false)] [DataRow(true)]
+        public async Task RulesPrewarmDoesNotStartTimerAndStartJoinsIt(bool fail)
+        {
+            using (var folder = new TestWorkspace())
+            using (var gate = new ManualResetEventSlim())
+            {
+                var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, "en");
+                var store = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json"));
+                var prepared = store.Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, "en");
+                var network = new AlwaysOnlineMonitor(); var clock = new TestingSessionTests.FakeClock();
+                TestingSession session = null; int activations = 0, warmThread = 0; TimeSpan rulesElapsed = TimeSpan.MinValue;
+                var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                using (var host = new MosWord2019.TestingStaHost(() =>
+                {
+                    session = new TestingSession(prepared.SessionId, prepared.Definition, clock, network);
+                    return new TestingSessionCoordinator(prepared, session, store, clock, new EmptyRuntime(), () => { }, _ => { });
+                }, network, _ => { }, () =>
+                {
+                    activations++; warmThread = Thread.CurrentThread.ManagedThreadId; entered.TrySetResult(true);
+                    if (!gate.Wait(5000)) throw new TimeoutException("test gate");
+                    clock.Advance(120); rulesElapsed = session.Elapsed;
+                    if (fail) throw new InvalidOperationException("warm failure");
+                }, () => true))
+                {
+                    try
+                    {
+                        var warming = host.PrewarmAsync();
+                        Assert.AreEqual(entered.Task, await Task.WhenAny(entered.Task, Task.Delay(3000)));
+                        var start = host.StartAsync(); Assert.IsFalse(start.IsCompleted);
+                        gate.Set(); if (fail) await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => warming); else await warming;
+                        await start;
+                        Assert.AreEqual(1, activations); Assert.AreEqual(TimeSpan.Zero, rulesElapsed);
+                        Assert.AreEqual(TestingSessionStatus.Running, await host.InvokeAsync(c => c.Session.Status));
+                        Assert.AreEqual(TimeSpan.Zero, await host.InvokeAsync(c => c.Session.Elapsed));
+                        Assert.AreEqual(warmThread, await host.InvokeAsync(c => Thread.CurrentThread.ManagedThreadId));
+                    }
+                    finally { gate.Set(); }
+                }
+            }
+        }
         [TestMethod]
         public void SyntheticConnectivityTypesAndCommandsAreAbsentFromRelease()
         {

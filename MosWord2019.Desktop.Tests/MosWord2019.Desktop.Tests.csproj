@@ -36,6 +36,8 @@
     <Compile Include="TestingStaHostTests.cs" />
     <Compile Include="TestingUiTests.cs" />
     <Compile Include="UiClippingTests.cs" />
+    <Compile Include="WordWarmupTests.cs" />
+    <Compile Include="TrainingWarmupTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

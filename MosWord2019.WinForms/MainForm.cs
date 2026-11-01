@@ -32,6 +32,7 @@ namespace MosWord2019
         private readonly WordGradingService grading = new WordGradingService();
         private readonly TabControl tabTasks = new TabControl { Name = "tabTasks", Dock = DockStyle.Fill, Visible = false, Multiline = false };
         private readonly Label status = new Label { Name = "Status", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, AutoEllipsis = true };
+        private readonly Label openingOverlay = new Label { Name = "OpeningProject", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.White, Font = new Font("Segoe UI", 20), Visible = false };
         private readonly Label taskCounter = new Label { Name = "TaskCounter", AutoSize = true, Anchor = AnchorStyles.Right };
         private ProjectPackage currentProject;
         private string currentWorkPath;
@@ -47,10 +48,13 @@ namespace MosWord2019
         private bool cleanupCompleted;
         private bool deferredCloseQueued;
         private bool deferredCloseAttempted;
+        private bool opening, closeAfterOperation, arrangementQueued;
+        private readonly Timer warmMonitor = new Timer { Interval = 1000 };
+        private TrainingWordController HostedWord => word as TrainingWordController;
 
         public MainForm(AppSession session) : this(session,
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects"),
-            Program.Workspace ?? new TrainingWorkspaceService(Program.Journal), new WordController()) { }
+            Program.Workspace ?? new TrainingWorkspaceService(Program.Journal), new TrainingWordController()) { }
 
         // The form owns the controller. Injection keeps verification packages out of production.
         public MainForm(AppSession session, string projectRoot, TrainingWorkspaceService workspace,
@@ -88,8 +92,8 @@ namespace MosWord2019
             Font = new Font("Segoe UI", 9F);
             BackColor = Color.WhiteSmoke;
             MaximizeBox = false;
-            UiLayout.ScaleForm(this);
-            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(2), ColumnCount = 1, RowCount = 4 };
+            UiLayout.ScaleForm(this); DoubleBuffered = true;
+            var layout = new BufferedTableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(2), ColumnCount = 1, RowCount = 4 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -98,19 +102,48 @@ namespace MosWord2019
             var selection = UiLayout.Flow(projectLabel, projects, go);
             var future = UiLayout.Text(new Label { Name = "TrainingCountdown", Visible = false, Text = "04:00:00", ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) });
             layout.Controls.Add(UiLayout.Header(selection, future, new Label { AutoSize = true, Visible = false, Margin = Padding.Empty }, "pnlTopBar", training: true), 0, 0);
-            layout.Controls.Add(tabTasks, 0, 1);
+            var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabTasks); body.Controls.Add(openingOverlay);
+            layout.Controls.Add(body, 0, 1);
             previous.Text = "← Task"; next.Text = "Task →"; go.Text = T("Go", "Bắt đầu");
             restart.Text = T("Restart Project", "Làm lại dự án"); grade.Text = T("Grade", "Kiểm tra");
             layout.Controls.Add(new TrainerActionBar("pnlFooter", UiLayout.Flow(previous, next, restart), UiLayout.Flow(grade, taskCounter), new Panel { AutoSize = true, Size = Size.Empty, Visible = false, Margin = Padding.Empty }), 0, 2);
             UiLayout.TabHeaders(tabTasks);
             status.TextChanged += (s, e) =>
             {
-                status.Visible = status.Text.Length > 0 && status.Text != taskCounter.Text;
-                if (IsHandleCreated && Visible) BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) ArrangeWorkspace(); }));
+                bool visible = status.Text.Length > 0 && status.Text != taskCounter.Text;
+                if (status.Visible != visible) { status.Visible = visible; QueueArrangement(); }
+                else if (visible) QueueArrangement();
             };
             status.AutoEllipsis = false; UiLayout.Wrap(status, layout); layout.Controls.Add(status, 0, 3);
             Controls.Add(layout);
-            Shown += (s, e) => ArrangeWorkspace();
+            Shown += async (s, e) =>
+            {
+                ArrangeWorkspace();
+                if (HostedWord != null) { warmMonitor.Start(); await WarmWord(); }
+            };
+            if (HostedWord != null) HostedWord.Idle += () =>
+            {
+                if (closeAfterOperation && !opening && HostedWord.Warmup.State != WordWarmupState.Warming && IsHandleCreated && !IsDisposed && !Disposing)
+                { closeAfterOperation = false; BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) Close(); })); }
+            };
+            if (HostedWord != null) HostedWord.Warmup.StateChanged += state =>
+            {
+                if (!IsHandleCreated || IsDisposed || Disposing) return;
+                try { BeginInvoke((Action)(() =>
+                {
+                    if (IsDisposed || Disposing || opening || skipCleanup) return;
+                    string starting = T("Starting Word…", "Đang khởi động Word…");
+                    if (state == WordWarmupState.Warming) status.Text = starting;
+                    else if (status.Text == starting) status.Text = T("Ready", "Sẵn sàng");
+                    if (closeAfterOperation && state != WordWarmupState.Warming) { closeAfterOperation = false; Close(); }
+                })); } catch (InvalidOperationException) { /* Form closed after the state notification. */ }
+            };
+            warmMonitor.Tick += async (s, e) =>
+            {
+                if (opening || skipCleanup || HostedWord == null || HostedWord.IsBusy) return;
+                try { await HostedWord.Warmup.CheckAsync(); }
+                catch (Exception ex) { AppLogger.Write("Training rewarm failed; Go will retry: " + ex.Message); }
+            };
             go.Click += (s, e) => Run(OpenSelectedProject);
             previous.Click += (s, e) => Run(() => ShowTask(taskIndex - 1));
             next.Click += (s, e) => Run(() => ShowTask(taskIndex + 1));
@@ -136,45 +169,90 @@ namespace MosWord2019
 
         private string T(string en, string vi) { return session.Language == "vi" ? vi : en; }
 
+        private async System.Threading.Tasks.Task WarmWord()
+        {
+            if (HostedWord == null || IsDisposed || skipCleanup) return;
+            string starting = T("Starting Word…", "Đang khởi động Word…");
+            status.Text = starting;
+            try { await HostedWord.Warmup.EnsureAsync(); }
+            catch (Exception ex) { AppLogger.Write("Training prewarm failed; Go will retry: " + ex.Message); }
+            finally
+            {
+                if (!IsDisposed && !Disposing && !opening && status.Text == starting) status.Text = T("Ready", "Sẵn sàng");
+                if (closeAfterOperation && !opening && !IsDisposed) { closeAfterOperation = false; Close(); }
+            }
+        }
+        private void OpeningProject(Action work)
+        {
+            if (opening || skipCleanup) return;
+            opening = true; warmMonitor.Stop(); savedOutputMonitor.Stop();
+            var top = Controls.Find("pnlTopBar", true)[0]; var footer = Controls.Find("pnlFooter", true)[0];
+            top.Enabled = footer.Enabled = false; UseWaitCursor = true;
+            status.ForeColor = SystemColors.ControlText; status.Text = T("Opening project…", "Đang mở project…");
+            openingOverlay.Text = status.Text; openingOverlay.Visible = true; openingOverlay.BringToFront();
+            ArrangeWorkspace(); Refresh(); // Paint the busy state before close/reset/COM can take time.
+            try { work(); }
+            finally
+            {
+                openingOverlay.Visible = false; top.Enabled = footer.Enabled = true; UseWaitCursor = false; opening = false;
+                if (!skipCleanup && HostedWord != null) warmMonitor.Start();
+                Invalidate(true); Update();
+                if (closeAfterOperation && !IsDisposed) { closeAfterOperation = false; BeginInvoke((Action)(() => Close())); }
+            }
+        }
+        private void RefreshProjectUi(string message, OperationTimings timing = null)
+        {
+            var layout = Controls[0]; SuspendLayout(); layout.SuspendLayout(); tabTasks.SuspendLayout();
+            try
+            {
+                if (timing == null) BuildTaskTabs(); else timing.Measure("BuildTabs", BuildTaskTabs);
+                ShowTask(0); status.Text = message;
+            }
+            finally { tabTasks.ResumeLayout(false); layout.ResumeLayout(true); ResumeLayout(true); }
+            if (timing == null) ArrangeWorkspace(); else timing.Measure("ArrangeWorkspace", ArrangeWorkspace);
+        }
+        internal string LastGoTiming { get; private set; }
         private void OpenSelectedProject()
         {
             var selected = projects.SelectedItem as ProjectPackage;
             if (selected == null) return;
             ValidateTranslations(selected);
-            AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
-            EndTrainingSession();
-            status.Text = T("Opening project...", "Đang mở dự án...");
-            try
+            OpeningProject(() =>
             {
-                foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected))
-                    AppLogger.Write("Training project asset available " + stagedAsset);
-                string path = workspace.PrepareFreshWorkingCopy(selected);
-                AppLogger.Write("Training working copy prepared " + path);
-                templateOutputs.Register(selected); // Baseline before the owned document opens, never inherited from a previous Go.
-                word.OpenDocument(path);
-                AppLogger.Write("Training Word open " + path);
-                currentProject = selected;
-                currentWorkPath = path;
-            }
-            catch (Exception openError)
-            {
+                var timing = new OperationTimings();
+                AppLogger.Write("Training project selected " + selected.Meta.ProjectId);
                 try
                 {
-                    if (!word.IsOpened)
+                    timing.Measure("EndTrainingSession", EndTrainingSession);
+                    timing.Measure("WarmWait", () => HostedWord?.JoinWarmup());
+                    try
                     {
-                        templateOutputs.Cleanup(true);
-                        workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog));
+                        timing.Measure("StageAssets", () =>
+                        {
+                            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(selected)) AppLogger.Write("Training project asset available " + stagedAsset);
+                        });
+                        string path = null;
+                        timing.Measure("ResetWorkingCopy", () => path = workspace.PrepareFreshWorkingCopy(selected));
+                        AppLogger.Write("Training working copy prepared " + path);
+                        timing.Measure("RegisterLedger", () => templateOutputs.Register(selected));
+                        timing.Measure("OpenDocument", () => word.OpenDocument(path));
+                        AppLogger.Write("Training Word open " + path);
+                        currentProject = selected; currentWorkPath = path;
                     }
+                    catch (Exception openError)
+                    {
+                        try
+                        {
+                            if (!word.IsOpened) { templateOutputs.Cleanup(true); workspace.CleanupProjectAssets(selected, assetLog => AppLogger.Write(assetLog)); }
+                        }
+                        catch (Exception observationError) { AppLogger.Write("Open failed; uncertain document state preserves ownership journal", observationError); }
+                        AppLogger.Write("Training project open failed", openError); throw;
+                    }
+                    timing.Measure("ConfigureExportCheckpoint", ConfigureExportCheckpoint);
+                    RefreshProjectUi(T("Project opened", "Đã mở dự án"), timing);
                 }
-                catch (Exception observationError) { AppLogger.Write("Open failed; uncertain document state preserves ownership journal", observationError); }
-                AppLogger.Write("Training project open failed", openError);
-                throw;
-            }
-            ConfigureExportCheckpoint();
-            BuildTaskTabs();
-            ShowTask(0);
-            status.Text = T("Project opened", "Đã mở dự án");
-            ArrangeWorkspace();
+                finally { LastGoTiming = "Training Go timing " + selected.Meta.ProjectId + " " + timing + " word=[" + (HostedWord?.OpenTiming ?? (word as WordController)?.OpenTiming ?? "fakeController=true") + "]"; AppLogger.Write(LastGoTiming); }
+            });
         }
 
         private static void ValidateTranslations(ProjectPackage package)
@@ -251,8 +329,9 @@ namespace MosWord2019
         }
         private void QueueArrangement()
         {
-            if (IsDisposed || Disposing || !IsHandleCreated) return;
-            try { BeginInvoke((Action)(() => { if (!IsDisposed && !Disposing) ArrangeWorkspace(); })); }
+            if (IsDisposed || Disposing || !IsHandleCreated || arrangementQueued || opening) return;
+            arrangementQueued = true;
+            try { BeginInvoke((Action)(() => { arrangementQueued = false; if (!IsDisposed && !Disposing && !opening && HostedWord?.IsBusy != true) ArrangeWorkspace(); })); }
             catch (InvalidOperationException) { /* Form closed while a system notification was queued. */ }
         }
 
@@ -270,7 +349,7 @@ namespace MosWord2019
 
         private void ArrangeWorkspace()
         {
-            if (skipCleanup || arranging || IsDisposed || WindowState == FormWindowState.Minimized) return;
+            if (skipCleanup || HostedWord?.IsBusy == true || arranging || IsDisposed || WindowState == FormWindowState.Minimized) return;
             arranging = true;
             try
             {
@@ -338,13 +417,16 @@ namespace MosWord2019
             catch (InvalidOperationException) { /* Closing raced the save notification. */ }
         }
 
+        private IDisposable ObservationBudget(int milliseconds) => HostedWord != null ? HostedWord.BeginShortCallBudget(milliseconds) : (word as WordController)?.BeginShortCallBudget(milliseconds);
+
         private void ObserveAfterSave()
         {
+            if (opening || HostedWord?.IsBusy == true) return;
             if (skipCleanup || controllerDisposed || IsDisposed || Disposing) { savedOutputMonitor.Stop(); return; }
             if (saveObservationWindow.ElapsedMilliseconds >= 5000) { StopSaveObservation(); return; }
             try
             {
-                using ((word as WordController)?.BeginShortCallBudget((int)Math.Max(1, Math.Min(250, 5000 - saveObservationWindow.ElapsedMilliseconds))))
+                using (ObservationBudget((int)Math.Max(1, Math.Min(250, 5000 - saveObservationWindow.ElapsedMilliseconds))))
                 {
                     ObserveOwnedOutput();
                     if (word.IsOpened) workspace.ObserveWorkingFiles((word as IWordDocumentState)?.CurrentDocumentPath);
@@ -395,21 +477,18 @@ namespace MosWord2019
             if (!CheckDocument()) return;
             if (!confirmRestart(T("Restart this project?\nYour current changes will be discarded.",
                 "Làm lại dự án này?\nCác thay đổi hiện tại sẽ bị xóa."))) return;
-            var project = currentProject;
-            CloseOwnedOutputDocument(); // Explicit confirmed discard; do not save.
-            // Keep validated project state/assets if reset or reopen fails; the next action can retry safely.
-            foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project))
-                AppLogger.Write("Training project asset available after restart " + stagedAsset);
-            string path = workspace.ResetWorkingCopy(project);
-            templateOutputs.Register(project); // Restart is a new output baseline, captured before Word opens.
-            word.OpenDocument(path);
-            currentWorkPath = path;
-            ConfigureExportCheckpoint();
-            BuildTaskTabs();
-            ShowTask(0);
-            AppLogger.Write("Training restart " + path);
-            status.Text = T("Project restarted", "Đã làm lại dự án");
-            ArrangeWorkspace();
+            OpeningProject(() =>
+            {
+                var project = currentProject;
+                CloseOwnedOutputDocument(); // Explicit confirmed discard; do not save.
+                foreach (string stagedAsset in workspace.StageProjectAssetsToDocuments(project)) AppLogger.Write("Training project asset available after restart " + stagedAsset);
+                string path = workspace.ResetWorkingCopy(project);
+                templateOutputs.Register(project);
+                word.OpenDocument(path); currentWorkPath = path;
+                ConfigureExportCheckpoint();
+                RefreshProjectUi(T("Project restarted", "Đã làm lại dự án"));
+                AppLogger.Write("Training restart " + path);
+            });
         }
 
         private void GradeCurrentTask()
@@ -523,7 +602,7 @@ namespace MosWord2019
 
         private void Run(Action action)
         {
-            if (skipCleanup) return;
+            if (skipCleanup || opening || HostedWord?.IsBusy == true) return;
             try { action(); }
             catch (Exception ex)
             {
@@ -661,6 +740,11 @@ namespace MosWord2019
             {
                 DeferRecovery("Windows shutdown");
             }
+            else if (opening || HostedWord?.IsBusy == true || HostedWord?.Warmup.State == WordWarmupState.Warming)
+            {
+                closeAfterOperation = true; e.Cancel = true;
+                base.OnFormClosing(e); return;
+            }
             else if (!skipCleanup && !cleanupCompleted)
             {
                 if (e.CloseReason == CloseReason.TaskManagerClosing && !deferredCloseAttempted)
@@ -691,6 +775,7 @@ namespace MosWord2019
                     displayEventsSubscribed = false;
                 }
                 if (!skipCleanup) DisposeSafely(CleanupOwnedSession, "Dispose cleanup failed");
+                DisposeSafely(warmMonitor.Dispose, "Dispose warm monitor failed");
                 DisposeSafely(savedOutputMonitor.Dispose, "Dispose save monitor failed");
                 if (!skipCleanup && word is IWordSaveEvents saveEvents)
                 {
@@ -705,6 +790,7 @@ namespace MosWord2019
         internal void CloseOwnedForRecovery()
         {
             if (skipCleanup) return;
+            if (opening || HostedWord?.IsBusy == true) { DeferRecovery("Training operation in progress during fatal cleanup"); return; }
             try { CleanupOwnedSession(); }
             catch (Exception ex) { DeferRecovery("Fatal cleanup failed", ex); throw; }
         }

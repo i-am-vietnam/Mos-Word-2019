@@ -1,5 +1,15 @@
 # Technical Context
 
+## U2 — Presentation updates and owned Word warm-up, 2026-11-01
+
+TestingForm.ApplyState compares presentation state before touching navigation/bars. Elapsed-only observations update a fixed-size countdown label at whole-second changes and return; no tick-driven Arrange/BringToFront. Buffered table/flow panels cover bars; project/state transitions batch layout.
+
+Production MainForm uses TrainingWordController, which creates WordController on a dedicated pumped STA and forwards the existing optional state/layout/checkpoint/view/TOC/save interfaces. Synchronous calls pump UI messages while opening/Run/monitor/arrange/close guards prevent reentrant operations; close is deferred until activation/operation completes. Save ownership callbacks synchronously marshal to UI before native save continues; short observation budgets are created/disposed on the Word owner STA. Fresh Training/reset/grading/cleanup semantics stay in existing MainForm/services.
+
+WordWarmup coalesces activation tasks (NotStarted/Warming/Ready/Failed), does not automatically retry a failed speculative activation, and checks ready instances for closure. Go joins then falls back to ordinary OpenDocument on the same controller; successful open restores Ready. TestingStaHost exposes a separate warm-up command after readiness, before Start, while its coordinator/session/timer/recovery implementations remain unchanged. WordController.Prewarm retains the proven caption/Visible/process capture sequence and hides only an empty owned application; OpenDocument shows it again. No attachment to a running foreign Word is introduced.
+
+OperationTimings is diagnostics only. MainForm.LastGoTiming/AppLogger capture EndTrainingSession, WarmWait, assets, ResetWorkingCopy, ledger, OpenDocument, checkpoint, tabs and placement; WordController adds activation subphases and Documents.Open. Native evidence under artifacts/u2 uses injected workspace paths and no Program/startup recovery. The final desktop run measured warmed P24 Go0.815s, P26 switch0.679s with same PID, activation2.134s and responsive UI pulses; native Save returned its callback to UI. Sandbox COM activation failed0x80070520; desktop run succeeded. Final Debug/Release rebuilds each0warnings/0errors;865/865 cases/configuration (701 headless +164 desktop),0skipped, all854 U1-FIX cases retained plus11 new. Original149 resources and150 source/output package/catalog hashes match. Full verification and limitations: artifacts/u2/REPORT.md.
+
 ## U1-FIX layout contract — 2026-11-01
 
 UiLayout centralizes content-measured text minimums, AutoSize headers/flows, native tab header sizing, Dpi autoscaling and content-aware PanelHeight. TrainerActionBar keeps left/right groups on row0 and moves the center group to row1 when needed. MainForm's selector header uses AutoSize side columns; Testing's header remains35/30/35. Text/status rows have no fixed pixel heights. Status changes queue layout after visibility updates; MainForm arranges again on Shown for native DPI initialization. App.config and app.manifest declare PerMonitorV2.

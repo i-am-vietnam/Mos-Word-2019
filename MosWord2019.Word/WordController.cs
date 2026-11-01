@@ -1,4 +1,5 @@
 using MosWord2019.Core.Interfaces;
+using MosWord2019.Core.Diagnostics;
 using MosWord2019.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -98,7 +99,27 @@ namespace MosWord2019.Word
             }
         }
 
+        public bool IsApplicationRunning
+        {
+            get { EnsureUsable(); return session?.Application != null && !session.Retired && session.Process != null && !session.Process.HasExited; }
+        }
+        public string StartupTiming { get; private set; } = "notActivated=true";
+        public string OpenTiming { get; private set; } = "notOpened=true";
+
         public void StartWord() { RunCom(() => StartWordCore()); }
+
+        /// <summary>Capture ownership through the normal visible startup, then hide only an empty owned instance.</summary>
+        public void Prewarm()
+        {
+            RunCom(() =>
+            {
+                StartWordCore();
+                if (IsOpened) return;
+                Wd.Documents documents = null;
+                try { documents = session.Application.Documents; if (documents.Count == 0) session.Application.Visible = false; }
+                finally { ReleaseCom(documents); }
+            });
+        }
 
         public void ReleaseClosedApplication()
         {
@@ -147,20 +168,21 @@ namespace MosWord2019.Word
                 Close();
             }
 
+            var timing = new OperationTimings();
             var preexisting = WinApiProcessHelper.SnapshotWordProcessIds();
             DateTime activationUtc = DateTime.UtcNow;
             string caption = null;
             try
             {
                 // Never GetActiveObject: activation creates a dedicated automation instance.
-                session = new WordSession { Application = new Wd.Application() };
+                timing.Measure("newApplication", () => session = new WordSession { Application = new Wd.Application() });
                 caption = session.Application.Caption;
                 string token = "MosWord2019-" + Guid.NewGuid().ToString("N");
                 session.Application.Caption = token;
-                session.Application.Visible = true;
-                session.Process = WinApiProcessHelper.Capture(token, preexisting, activationUtc);
+                timing.Measure("visible", () => session.Application.Visible = true);
+                timing.Measure("ownershipCapture", () => session.Process = WinApiProcessHelper.Capture(token, preexisting, activationUtc));
                 OwnedProcessStarted?.Invoke(session.Process.ReadIdentity());
-                session.Application.Caption = caption;
+                timing.Measure("captionRestore", () => session.Application.Caption = caption);
                 session.Application.DisplayAlerts = Wd.WdAlertLevel.wdAlertsNone;
                 session.Application.AutomationSecurity = Office.MsoAutomationSecurity.msoAutomationSecurityForceDisable;
                 session.Application.DocumentBeforeSave += BeforeDocumentSave;
@@ -183,6 +205,7 @@ namespace MosWord2019.Word
                 catch (Exception cleanup) { throw new AggregateException("Word startup and cleanup failed.", ex, cleanup); }
                 throw new InvalidOperationException("Microsoft Word desktop could not be started. Check its installation and desktop COM registration.", ex);
             }
+            finally { StartupTiming = timing.ToString(); AppLogger.Write("Word startup timing " + StartupTiming); }
         }
 
         public void OpenDocument(string filePath) { RunCom(() => OpenDocumentCore(filePath)); }
@@ -193,18 +216,21 @@ namespace MosWord2019.Word
             if (IsOpened) throw new InvalidOperationException("Close the current Word document before opening another.");
             string path = ValidateWorkingCopy(filePath);
             CloseDocument(); // Release a stale reference after manual document closure.
-            StartWord();
+            var timing = new OperationTimings();
+            try { timing.Measure("StartWord", StartWord); }
+            catch { OpenTiming = timing.ToString() + " activation=[" + StartupTiming + "]"; throw; }
             Wd.Documents documents = null;
             try
             {
                 documents = session.Application.Documents;
                 if (documents.Count != 0)
                     throw new InvalidOperationException("This Word instance already contains an externally opened document.");
+                timing.Measure("ShowWord", () => session.Application.Visible = true);
                 // Nonempty unknown passwords avoid interactive password prompts; encrypted files are unsupported.
                 string password = Guid.NewGuid().ToString("N");
-                session.Document = documents.Open(path, ConfirmConversions: false, ReadOnly: false,
+                timing.Measure("DocumentsOpen", () => session.Document = documents.Open(path, ConfirmConversions: false, ReadOnly: false,
                     AddToRecentFiles: false, PasswordDocument: password, WritePasswordDocument: password,
-                    Visible: true, OpenAndRepair: false, NoEncodingDialog: true);
+                    Visible: true, OpenAndRepair: false, NoEncodingDialog: true));
                 session.DocumentPath = path; testingWindow = IntPtr.Zero;
                 if (session.Document.ReadOnly)
                     throw new IOException("Word opened the working copy read-only. Close other users of this file before retrying.");
@@ -218,7 +244,7 @@ namespace MosWord2019.Word
                 catch (Exception cleanup) { throw new AggregateException("Opening the Word document and cleanup failed.", ex, cleanup); }
                 throw new InvalidOperationException("Could not open the Word working copy: " + path, ex);
             }
-            finally { ReleaseCom(documents); }
+            finally { ReleaseCom(documents); OpenTiming = timing.ToString() + " activation=[" + StartupTiming + "]"; }
         }
 
         public void SetInputEnabled(bool enabled)

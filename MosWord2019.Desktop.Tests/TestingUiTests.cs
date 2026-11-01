@@ -29,6 +29,40 @@ namespace MosWord2019.Tests
         [TestMethod]
         public void LoginOffersBothModes() => Sta(() => { using (var form = new MosWord2019.LoginForm(new MosWord2019.OfflineAuthenticationService(), null, _ => { })) Assert.IsFalse(Find<RadioButton>(form, "Testing").Checked); });
         [DataTestMethod]
+        [DataRow("en")] [DataRow("vi")]
+        public void FortyClockTicksDoNotLayoutOrMutateFooter(string language)
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                {
+                    var packages = new ProjectLoader().LoadAll(TestCaseData.ProjectsRoot, language);
+                    var prepared = new TestingSessionStateStore(Path.Combine(folder.Folder, "state.json")).Prepare(Path.Combine(TestCaseData.ProjectsRoot, "testing-catalog.json"), packages, language);
+                    using (var form = new MosWord2019.TestingForm(prepared, packages))
+                    {
+                        Func<double, TestingSessionSnapshot> tick = seconds => new TestingSessionSnapshot(TestingSessionStatus.Running, TestingFinalizeReason.None, 0,
+                            TimeSpan.FromSeconds(seconds), Enumerable.Repeat(TestingProjectState.Active, 7), new ExamTaskGrade[0], null);
+                        form.Show(); form.ApplyState(tick(0)); Application.DoEvents();
+                        var footer = Find<TableLayoutPanel>(form, "ExamFooter");
+                        var controls = AllControls(footer).Prepend(footer).ToArray();
+                        var bounds = controls.Select(c => c.Bounds).ToArray(); var texts = controls.Select(c => c.Text).ToArray();
+                        int layouts = 0, mutations = 0, clockChanges = 0;
+                        foreach (var c in controls) { c.Layout += (s, e) => layouts++; c.TextChanged += (s, e) => mutations++; c.LocationChanged += (s, e) => mutations++; c.SizeChanged += (s, e) => mutations++; }
+                        Find<Label>(form, "Countdown").TextChanged += (s, e) => clockChanges++;
+                        for (int i = 1; i <= 40; i++) { form.ApplyState(tick(i / 4d)); Application.DoEvents(); }
+                        Assert.AreEqual(0, layouts, "A clock tick must not reflow the footer.");
+                        Assert.AreEqual(0, mutations); Assert.AreEqual(10, clockChanges);
+                        CollectionAssert.AreEqual(bounds, controls.Select(c => c.Bounds).ToArray());
+                        CollectionAssert.AreEqual(texts, controls.Select(c => c.Text).ToArray());
+                    }
+                }
+            });
+        }
+        private static System.Collections.Generic.IEnumerable<Control> AllControls(Control root)
+        {
+            foreach (Control child in root.Controls) { yield return child; foreach (Control nested in AllControls(child)) yield return nested; }
+        }
+        [DataTestMethod]
         [DataRow("en")]
         [DataRow("vi")]
         public void TestingButtonsTabsCountdownAndOfflineOverlayFollowState(string language)
