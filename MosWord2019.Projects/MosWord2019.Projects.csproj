@@ -38,6 +38,10 @@
     <Compile Include="OnlinePackages\IPackageTransport.cs" />
     <Compile Include="OnlinePackages\PackageTrust.cs" />
     <Compile Include="OnlineSessions\HeartbeatReply.cs" />
+    <Compile Include="OnlineSessions\OnlineSessionClient.cs" />
+    <Compile Include="OnlineSessions\MachineIdentity.cs" />
+    <Compile Include="OnlineSessions\ResumeCredentialStore.cs" />
+    <Compile Include="OnlineSessions\PinnedHttpClientFactory.cs" />
     <Compile Include="OnlineSessions\IHeartbeatTransport.cs" />
     <Compile Include="OnlineSessions\HttpHeartbeatTransport.cs" />
     <Compile Include="OnlineSessions\SessionConnectivityMonitor.cs" />

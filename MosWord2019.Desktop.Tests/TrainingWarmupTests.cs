@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using System.Threading.Tasks;
+using MosWord2019.Projects.OnlineSessions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MosWord2019;
 using MosWord2019.Core.Interfaces;
@@ -15,6 +17,210 @@ namespace MosWord2019.Tests
     [TestClass]
     public sealed class TrainingWarmupTests
     {
+        [TestMethod]
+        public void TrainingClockFormatsWholeHoursAndClampsExpiredAuthorization()
+        {
+            Assert.AreEqual("04:00:00", MainForm.FormatTrainingTime(TimeSpan.FromHours(4), true));
+            Assert.AreEqual("03:59:59", MainForm.FormatTrainingTime(TimeSpan.FromSeconds(14398.2), true));
+            Assert.AreEqual("00:00:00", MainForm.FormatTrainingTime(TimeSpan.FromSeconds(-1), true));
+            Assert.AreEqual("02:07", MainForm.FormatTrainingTime(TimeSpan.FromMinutes(127), false));
+        }
+
+        [TestMethod]
+        public void TrainingInputGateRunsOnlyOnOwnedControllerSta()
+        {
+            Sta(() =>
+            {
+                using (var host = new TrainingWordController(() => new FakeWord(), w => ((FakeWord)w).Alive))
+                {
+                    var fake = TrainingWordController.Wait(host.InvokeAsync(w => (FakeWord)w));
+                    ((IWordInputLock)host).SetInputEnabled(false);
+                    Assert.IsFalse(fake.InputEnabled);
+                    ((IWordInputLock)host).SetInputEnabled(true);
+                    Assert.IsTrue(fake.InputEnabled);
+                    Assert.AreEqual(0, fake.Opens);
+                    Assert.AreEqual(0, fake.Activations);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void TrainingOfflineBlocksActionsAndOwnedInputThenReconnectRestoresBoth()
+        {
+            Sta(() =>
+            {
+                using (var f = new OnlineFixture())
+                {
+                    Assert.IsFalse(f.Word.InputEnabled);
+                    Assert.IsFalse(f.Form.Controls.Find("pnlTopBar", true).Single().Enabled);
+                    Assert.IsTrue(f.Form.Controls.Find("OpeningProject", true).Single().Visible);
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    Assert.IsTrue(f.Word.InputEnabled);
+                    Assert.IsTrue(f.Form.Controls.Find("pnlTopBar", true).Single().Enabled);
+                    Assert.IsFalse(f.Form.Controls.Find("OpeningProject", true).Single().Visible);
+                    f.Clock.Now = TimeSpan.FromSeconds(90); f.Refresh();
+                    Assert.IsFalse(f.Word.InputEnabled);
+                    Assert.AreEqual("03:58:30", f.Form.Controls.Find("TrainingCountdown", true).Single().Text);
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    Assert.IsTrue(f.Word.InputEnabled);
+                    Assert.AreEqual(0, f.Ends);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void TrainingSelectorUsesVerifiedCatalogBeforeProjectDownloads()
+        {
+            Sta(() =>
+            {
+                var catalog = new[] {
+                    new ProjectPackage { Meta = new ProjectMeta { ProjectId = "Word2019_P01" } },
+                    new ProjectPackage { Meta = new ProjectMeta { ProjectId = "Word2019_P28" } }
+                };
+                using (var f = new OnlineFixture(catalog))
+                {
+                    var selector = (ComboBox)f.Form.Controls.Find("Projects", true).Single();
+                    Assert.AreEqual(2, selector.Items.Count);
+                    Assert.AreEqual("Project 1", ((ProjectPackage)selector.Items[0]).DisplayName);
+                    Assert.AreEqual("Project 28", ((ProjectPackage)selector.Items[1]).DisplayName);
+                    Assert.IsFalse(Directory.EnumerateFiles(f.Context.ProjectsRootPath, "*", SearchOption.AllDirectories).Any());
+                    Assert.AreEqual(0, f.Word.Saves);
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow("expired")]
+        [DataRow("rejected")]
+        [DataRow("offline")]
+        public void TrainingTerminalConditionsEndWithoutSaveOrExitConfirmation(string condition)
+        {
+            Sta(() =>
+            {
+                using (var f = new OnlineFixture())
+                {
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    if (condition == "expired") f.Clock.Now = TimeSpan.FromHours(4);
+                    else if (condition == "rejected") { f.Transport.Reject = true; f.Monitor.PollAsync().GetAwaiter().GetResult(); }
+                    else
+                    {
+                        f.Clock.Now = TimeSpan.FromSeconds(90); f.Refresh();
+                        f.Clock.Now += TimeSpan.FromMinutes(30);
+                    }
+                    f.Refresh(); Application.DoEvents();
+                    Assert.IsTrue(f.Form.IsDisposed);
+                    Assert.AreEqual(1, f.Ends);
+                    Assert.AreEqual(0, f.Confirms);
+                    Assert.AreEqual(0, f.Word.Saves);
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(f.Context.TerminalMessage));
+                }
+            });
+        }
+
+        [TestMethod]
+        public void TrainingEarlyExitCancelKeepsUseThenConfirmedExitAwaitsEnd()
+        {
+            Sta(() =>
+            {
+                using (var f = new OnlineFixture())
+                {
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    f.Form.Close(); Assert.IsFalse(f.Form.IsDisposed); Assert.AreEqual(0, f.Ends);
+                    Assert.AreEqual("Thoát sẽ kết thúc lượt sử dụng này. Bạn còn 04:00.", f.Confirmation);
+                    f.Accept = true;
+                    f.PendingEnd = new TaskCompletionSource<bool>();
+                    f.Form.Close(); Application.DoEvents();
+                    Assert.AreEqual(1, f.Ends); Assert.IsFalse(f.Form.IsDisposed);
+                    Assert.AreEqual(0, f.Word.Saves);
+                    f.PendingEnd.SetResult(true);
+                    var wait = System.Diagnostics.Stopwatch.StartNew();
+                    while (!f.Form.IsDisposed && wait.ElapsedMilliseconds < 3000) { Application.DoEvents(); Thread.Sleep(10); }
+                    Assert.IsTrue(f.Form.IsDisposed);
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow(CloseReason.WindowsShutDown)]
+        [DataRow(CloseReason.TaskManagerClosing)]
+        public void TrainingInterruptedClosePreservesOnlineUseForResume(CloseReason reason)
+        {
+            Sta(() =>
+            {
+                using (var f = new OnlineFixture())
+                {
+                    typeof(MainForm).GetMethod("OnFormClosing", BindingFlags.Instance | BindingFlags.NonPublic)
+                        .Invoke(f.Form, new object[] { new FormClosingEventArgs(reason, false) });
+                    Application.DoEvents();
+                    f.Form.Dispose(); Application.DoEvents();
+                    Assert.AreEqual(0, f.Ends); Assert.AreEqual(0, f.Confirms); Assert.IsNull(f.Context.TerminalMessage);
+                }
+            });
+        }
+
+        private sealed class OnlineFixture : IDisposable
+        {
+            private readonly TestWorkspace folder = new TestWorkspace();
+            internal readonly OnlineClock Clock = new OnlineClock();
+            internal readonly OnlineTransport Transport;
+            internal readonly SessionConnectivityMonitor Monitor;
+            internal readonly OnlineSessionContext Context;
+            internal readonly OnlineWord Word = new OnlineWord();
+            internal readonly MainForm Form;
+            internal int Ends, Confirms;
+            internal bool Accept;
+            internal string Confirmation;
+            internal TaskCompletionSource<bool> PendingEnd;
+            internal OnlineFixture(ProjectPackage[] catalog = null)
+            {
+                Guid id = Guid.NewGuid(); Transport = new OnlineTransport(id, Clock);
+                Monitor = new SessionConnectivityMonitor(id, "Training", "token", Transport, Clock);
+                string packages = Path.Combine(folder.Folder, "Packages"); Directory.CreateDirectory(packages);
+                Context = new OnlineSessionContext(new OnlineSessionCredentials { SessionId = id, Mode = "Training", Language = "vi" }, Monitor, packages,
+                    () => { Ends++; return PendingEnd?.Task ?? Task.CompletedTask; });
+                if (catalog != null) typeof(OnlineSessionContext).GetProperty("TrainingCatalog").SetValue(Context, catalog);
+                Form = new MainForm(new AppSession(AppMode.Training, "vi", Context), packages,
+                    new TrainingWorkspaceService(Path.Combine(folder.Folder, "Working"), Path.Combine(folder.Folder, "Documents"), Path.Combine(folder.Folder, "Pictures")), Word,
+                    confirmRestart: message => { Confirms++; Confirmation = message; return Accept; }, notify: _ => { });
+                Form.OnlineElapsed = () => Clock.Now; Form.Show(); Application.DoEvents();
+            }
+            internal void Refresh() { typeof(MainForm).GetMethod("RefreshOnlineTraining", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(Form, null); Application.DoEvents(); }
+            public void Dispose() { Form.Dispose(); Context.Dispose(); folder.Dispose(); }
+        }
+        private sealed class OnlineClock : ITestingClock
+        {
+            internal TimeSpan Now;
+            public TimeSpan Monotonic => Now;
+            public DateTime UtcNow => throw new AssertFailedException("Training authorization must not use wall time.");
+        }
+        private sealed class OnlineTransport : IHeartbeatTransport
+        {
+            private readonly Guid id; private readonly OnlineClock clock;
+            private readonly DateTimeOffset start = new DateTimeOffset(2026, 11, 2, 0, 0, 0, TimeSpan.Zero);
+            internal bool Reject;
+            internal OnlineTransport(Guid id, OnlineClock clock) { this.id = id; this.clock = clock; }
+            public Task<HeartbeatReply> SendAsync(Guid sessionId, string token, long? elapsed, bool offline, CancellationToken ct)
+            {
+                if (Reject) throw new HeartbeatSessionRejectedException(401);
+                return Task.FromResult(new HeartbeatReply { SessionId = id, Mode = "Training", SessionToken = "renewed", ServerTime = start + clock.Now,
+                    ExpiresAt = start.AddHours(4), RemainingSeconds = (TimeSpan.FromHours(4) - clock.Now).TotalSeconds });
+            }
+        }
+        private sealed class OnlineWord : IWordController, IWordInputLock
+        {
+            internal bool InputEnabled = true;
+            internal int Saves;
+            public bool IsOpened => false;
+            public void SetInputEnabled(bool enabled) { InputEnabled = enabled; }
+            public void StartWord() { }
+            public void OpenDocument(string path) { }
+            public void Save() { Saves++; }
+            public void CloseDocument() { }
+            public void ReleaseClosedApplication() { }
+            public void Close() { }
+            public void Dispose() { }
+        }
+
         [TestMethod]
         public void GoJoinsWarmupWhileUiPaintsAndBarsAreGated()
         {
@@ -113,13 +319,15 @@ namespace MosWord2019.Tests
             thread.SetApartmentState(ApartmentState.STA); thread.Start(); Assert.IsTrue(thread.Join(20000), "Training STA test timed out.");
             if (failure != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failure).Throw();
         }
-        private sealed class FakeWord : IWordController, IWordSaveEvents, IWordDocumentState, IWordWindowLayout
+        private sealed class FakeWord : IWordController, IWordSaveEvents, IWordDocumentState, IWordWindowLayout, IWordInputLock
         {
             internal readonly int Owner = Thread.CurrentThread.ManagedThreadId;
             internal readonly ApartmentState Apartment = Thread.CurrentThread.GetApartmentState();
             internal volatile bool Alive, Opened;
             internal bool FailFirst;
             internal int Activations, Opens, Quits, Retires;
+            internal bool InputEnabled = true;
+            public void SetInputEnabled(bool enabled) { OwnerOnly(); InputEnabled = enabled; }
             internal ManualResetEventSlim StartGate;
             private string path;
             public string CurrentDocumentPath { get { OwnerOnly(); return path; } }

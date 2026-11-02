@@ -9,11 +9,13 @@ namespace MosWord2019
         bool Authenticate(string username, string password);
     }
 
+#if DEBUG
     public sealed class OfflineAuthenticationService : IAuthenticationService
     {
         public bool Authenticate(string username, string password) =>
             !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password);
     }
+#endif
 
     // Optional UI preferences only. Credentials and exam state never belong here.
     internal sealed class LoginPreferences

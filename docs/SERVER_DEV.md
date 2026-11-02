@@ -1,4 +1,6 @@
-# Chạy server C0–C3 trên máy phát triển
+# Chạy server C0–C5 trên máy phát triển
+
+Để thử client online C5 từng bước (certificate, pin, learner3lượt, Word và kết quả admin), xem [C5_LOCAL_TEST.md](C5_LOCAL_TEST.md). Không phát hành Release với pin mặc định; cấu hình triển khai thuộc C6.
 
 Tất cả lệnh dưới đây chạy từ thư mục gốc repository Word, trừ đoạn ghi rõ `Set-Location server`. Cần .NET 10 SDK và Docker Desktop **Linux containers** đang chạy. Client vẫn build bằng VS MSBuild/.NET Framework 4.7.2; không thêm server vào solution client.
 

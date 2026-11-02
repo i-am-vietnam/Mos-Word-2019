@@ -2,6 +2,9 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading.Tasks;
+using MosWord2019.Projects;
+using MosWord2019.Projects.OnlineSessions;
 
 namespace MosWord2019
 {
@@ -24,9 +27,18 @@ namespace MosWord2019
         private readonly IAuthenticationService authentication;
         private readonly LoginPreferences preferences;
         private readonly Action<AppSession> openSession;
+        private bool busy, authenticated;
+        private string errorCode;
         private string T(string en, string vi) => vietnamese.Checked ? vi : en;
 
-        public LoginForm() : this(new OfflineAuthenticationService(), new LoginPreferences(Path.Combine(
+        private static IAuthenticationService DefaultAuthentication()
+        {
+#if DEBUG
+            if (System.Configuration.ConfigurationManager.AppSettings["UseOfflineAuthentication"] == "true") return new OfflineAuthenticationService();
+#endif
+            return new OnlineAuthenticationService();
+        }
+        public LoginForm() : this(DefaultAuthentication(), new LoginPreferences(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MosWord2019", "login-preferences.txt")), null) { }
 
         internal LoginForm(IAuthenticationService authentication, LoginPreferences preferences, Action<AppSession> openSession)
@@ -34,6 +46,7 @@ namespace MosWord2019
             this.authentication = authentication ?? throw new ArgumentNullException(nameof(authentication));
             this.preferences = preferences;
             this.openSession = openSession ?? OpenSession;
+            if (authentication is IOnlineAuthenticationService) { training.Enabled = false; testing.Enabled = false; }
             UiLayout.ScaleForm(this, 10);
             BackColor = Color.White; StartPosition = FormStartPosition.CenterScreen;
             AutoSize = true; AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -61,28 +74,105 @@ namespace MosWord2019
             preferences?.Load(); username.Text = preferences?.Username ?? "";
             if (preferences?.Language == "vi") vietnamese.Checked = true;
             Localize();
+            UiLayout.Wrap(status, layout);
+            if (authentication is IOnlineAuthenticationService resumed && resumed.Credentials != null)
+            {
+                authenticated = true; username.Enabled = password.Enabled = false;
+                training.Enabled = testing.Enabled = true; ShowRemaining();
+            }
         }
         private void Localize()
         {
             Text = heading.Text = enter.Text = T("Login", "Đăng nhập");
             userLabel.Text = T("Username:", "Tài khoản:"); passwordLabel.Text = T("Password:", "Mật khẩu:");
             languageLabel.Text = T("Language:", "Ngôn ngữ:"); functionLabel.Text = T("Function:", "Chức năng:");
-            exit.Text = T("Exit", "Thoát"); if (status.Text.Length > 0) ShowLoginError();
+            exit.Text = T("Exit", "Thoát");
+            if (errorCode != null) ShowLoginError(errorCode);
+            else if (authenticated) ShowRemaining();
         }
-        private void ShowLoginError() => status.Text = T("Please enter your username and password.", "Vui lòng nhập tài khoản và mật khẩu.");
-        private void OpenShell(object sender, EventArgs e)
+        private void ShowLoginError(string code = "missing_credentials")
         {
-            if (!authentication.Authenticate(username.Text, password.Text)) { ShowLoginError(); return; }
-            status.Text = "";
-            if (preferences != null) { preferences.Username = username.Text; preferences.Language = vietnamese.Checked ? "vi" : "en"; preferences.Save(); }
-            try { openSession(new AppSession(testing.Checked ? AppMode.Testing : AppMode.Training, vietnamese.Checked ? "vi" : "en")); }
-            finally { password.Clear(); }
+            errorCode = code; status.ForeColor = Color.Firebrick;
+            switch (code)
+            {
+                case "no_uses_left": status.Text = T("No uses left. Please contact the administrator.", "Đã hết lượt sử dụng. Vui lòng liên hệ quản trị viên."); break;
+                case "account_expired": status.Text = T("This account has expired.", "Tài khoản đã hết hạn."); break;
+                case "account_locked": status.Text = T("This account is locked by the administrator.", "Tài khoản đã bị quản trị viên khóa."); break;
+                case "invalid_credentials": status.Text = T("Incorrect credentials or temporarily locked. Please try again later.", "Sai tài khoản/mật khẩu hoặc tài khoản đang tạm khóa. Vui lòng thử lại sau."); break;
+                case "certificate_mismatch": status.Text = T("Server certificate mismatch. Connection refused.", "Chứng chỉ server không khớp. Đã từ chối kết nối."); break;
+                case "configuration_error": status.Text = T("Configure the server URL and certificate pin before logging in.", "Cần cấu hình địa chỉ server và pin chứng chỉ trước khi đăng nhập."); break;
+                case "server_unreachable": status.Text = T("The server is unreachable. Please check your connection.", "Không kết nối được server. Vui lòng kiểm tra mạng."); break;
+                case "retry_later": status.Text = T("Please wait and try again later.", "Vui lòng chờ và thử lại sau."); break;
+                case "missing_credentials": status.Text = T("Please enter your username and password.", "Vui lòng nhập tài khoản và mật khẩu."); break;
+                default: status.Text = T("The online session could not be opened. Please retry.", "Không thể mở phiên online. Vui lòng thử lại."); break;
+            }
+        }
+        private void ShowRemaining()
+        {
+            var online = authentication as IOnlineAuthenticationService;
+            errorCode = null; status.ForeColor = Color.DarkGreen;
+            status.Text = T("Remaining uses: ", "Số lượt còn lại: ") + online.Credentials.RemainingUses +
+                T(". Choose a mode and continue.", ". Chọn chế độ rồi tiếp tục.");
+            enter.Text = T("Continue", "Tiếp tục");
+        }
+        private async void OpenShell(object sender, EventArgs e)
+        {
+            if (busy) return;
+            var online = authentication as IOnlineAuthenticationService;
+            busy = true; enter.Enabled = false; exit.Enabled = false;
+            OnlineSessionContext context = null;
+            try
+            {
+                if (online != null && !authenticated)
+                {
+                    if (!await online.AuthenticateAsync(username.Text, password.Text)) { ShowLoginError(online.LastErrorCode); return; }
+                    authenticated = true; username.Enabled = password.Enabled = false;
+                    training.Enabled = testing.Enabled = true; password.Clear(); ShowRemaining(); return;
+                }
+                if (online == null && !authentication.Authenticate(username.Text, password.Text)) { ShowLoginError(); return; }
+                string language = vietnamese.Checked ? "vi" : "en";
+                AppMode mode = testing.Checked ? AppMode.Testing : AppMode.Training;
+                if (preferences != null) { preferences.Username = username.Text; preferences.Language = language; preferences.Save(); }
+                if (online != null)
+                {
+                    training.Enabled = testing.Enabled = english.Enabled = vietnamese.Enabled = false;
+                    context = await online.SelectModeAsync(mode, language);
+                }
+                errorCode = null; status.Text = "";
+                openSession(new AppSession(mode, language, context));
+                if (context != null && mode == AppMode.Testing && new TestingSessionStateStore().RequiresRecovery)
+                    Program.DeferRecoveryToNextStart();
+                if (context != null && !Program.RecoveryDeferred) await context.EndAsync();
+                string message = context?.TerminalMessage;
+                authenticated = false; username.Enabled = password.Enabled = true;
+                training.Enabled = testing.Enabled = online == null;
+                english.Enabled = vietnamese.Enabled = true;
+                Localize(); status.Text = message ?? "";
+            }
+            catch (OnlineSessionException ex) { ShowLoginError(ex.ErrorCode); }
+            catch (Exception ex)
+            {
+                MosWord2019.Core.Diagnostics.AppLogger.Write("Online opening deferred (" + ex.GetType().Name + ").");
+                ShowLoginError("server_unreachable");
+            }
+            finally
+            {
+                if (context != null)
+                {
+                    if (Program.RecoveryDeferred) context.Monitor.Dispose();
+                    else context.Dispose();
+                }
+                busy = false; enter.Enabled = exit.Enabled = true; password.Clear();
+                if (authenticated && online?.Credentials?.Mode != null)
+                { training.Checked = online.Credentials.Mode == "Training"; testing.Checked = !training.Checked; training.Enabled = testing.Enabled = false; }
+                if (context != null && Program.RecoveryDeferred) Close();
+            }
         }
         private void OpenSession(AppSession session)
         {
             if (session.Mode == AppMode.Testing)
             {
-                Hide(); try { TestingFlow.Open(this, session.Language); }
+                Hide(); try { TestingFlow.Open(this, session.Language, session.Online); }
                 finally { if (Program.RecoveryDeferred) Close(); else Show(); } return;
             }
             using (var main = new MainForm(session))
@@ -95,7 +185,22 @@ namespace MosWord2019
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.WindowsShutDown) Program.DeferRecoveryToNextStart();
+            if (busy && authentication is IOnlineAuthenticationService && e.CloseReason == CloseReason.UserClosing) { e.Cancel = true; return; }
+            if (authenticated && !Program.RecoveryDeferred && !busy && authentication is IOnlineAuthenticationService online)
+            { e.Cancel = true; _ = CancelPendingLoginAsync(online); return; }
             base.OnFormClosing(e);
+        }
+        private async Task CancelPendingLoginAsync(IOnlineAuthenticationService online)
+        {
+            busy = true;
+            try { await online.CancelAsync(); }
+            catch (Exception) { /* A deliberate local end is retained by the server policy if unreachable. */ }
+            finally { authenticated = false; busy = false; Close(); }
+        }
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            (authentication as IDisposable)?.Dispose();
+            base.OnFormClosed(e);
         }
     }
 }

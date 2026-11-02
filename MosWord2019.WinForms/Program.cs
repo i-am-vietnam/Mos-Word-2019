@@ -11,7 +11,7 @@ using MosWord2019.Projects.OnlineResults;
 
 namespace MosWord2019
 {
-    internal static class Program
+    internal static partial class Program
     {
         internal static SessionRecoveryJournal Journal { get; private set; }
         internal static TrainingWorkspaceService Workspace { get; private set; }
@@ -36,9 +36,18 @@ namespace MosWord2019
                 }
                 // The instance lock must precede recovery: never recover another live trainer's files.
                 Journal = new SessionRecoveryJournal();
-                MosWord2019.Projects.OnlinePackages.OnlinePackageCache.RecoverIncompletePackages(Journal);
-                new TestingSessionStateStore().ProtectPendingRecovery(Journal);
-                Journal.Recover();
+                var startupState = new TestingSessionStateStore();
+                if (startupState.PendingOnlineSessionId.HasValue)
+                {
+                    Journal.PreserveSession(startupState.PendingOnlineSessionId.Value.ToString("N"));
+                    Journal.DeferRecovery(true);
+                }
+                else
+                {
+                    MosWord2019.Projects.OnlinePackages.OnlinePackageCache.RecoverIncompletePackages(Journal);
+                    startupState.ProtectPendingRecovery(Journal);
+                    Journal.Recover();
+                }
                 Workspace = new TrainingWorkspaceService(Journal);
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
                 Application.ThreadException += (sender, args) => HandleFatal(args.Exception);
@@ -51,18 +60,35 @@ namespace MosWord2019
                 {
                     dispatcher.CreateControl();
                     using (var uploadCancellation = new CancellationTokenSource())
-                    using (var uploadTransport = new HttpResultUploadTransport())
                     {
                         // Retry only explicitly registered online evidence; never scan/enqueue offline Results.
                         var uploadWorker = Task.Run(async () =>
                         {
-                            try { await new ResultUploadQueue(uploadTransport).RunAsync(uploadCancellation.Token).ConfigureAwait(false); }
+                            try
+                            {
+                                using (var http = new ServerConnectionSettings().CreateClient())
+                                using (var uploadTransport = new HttpResultUploadTransport(http))
+                                    await new ResultUploadQueue(uploadTransport).RunAsync(uploadCancellation.Token).ConfigureAwait(false);
+                            }
                             catch (Exception ex) { AppLogger.Write("Result upload worker stopped; evidence remains pending (" + ex.GetType().Name + ")."); }
                         });
                         try
                         {
-                            InspectTestingRecovery();
-                            if (PendingTestingRecovery != null) TestingFlow.Open(null, PendingTestingRecovery.Prepared.Language);
+                            if (!InspectOnlineStartup())
+                            {
+#if !DEBUG
+                                if (File.Exists(new TestingSessionStateStore().StatePath))
+                                {
+                                    DeferRecoveryToNextStart();
+                                    MessageBox.Show("Bài offline cũ được giữ để owner khôi phục bằng bản Debug. Release yêu cầu phiên server.\nLegacy offline work is retained for owner recovery with Debug. Release requires a server session.", "MOS Word 2019");
+                                }
+                                else
+#endif
+                                {
+                                InspectTestingRecovery();
+                                if (PendingTestingRecovery != null) TestingFlow.Open(null, PendingTestingRecovery.Prepared.Language);
+                                }
+                            }
                             if (!RecoveryDeferred) Application.Run(new LoginForm());
                         }
                         catch (Exception ex) { HandleFatal(ex); }

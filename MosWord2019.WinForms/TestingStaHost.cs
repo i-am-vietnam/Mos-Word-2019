@@ -10,6 +10,7 @@ using MosWord2019.Core.Models;
 using MosWord2019.Core.Services;
 using MosWord2019.Projects;
 using MosWord2019.Word;
+using MosWord2019.Projects.OnlineSessions;
 namespace MosWord2019
 {
     public enum TestingWarningCode { DocumentReopened, ObservationDelayed, RecoveryRequired }
@@ -26,6 +27,9 @@ namespace MosWord2019
         private bool executing, disposed;
         private readonly Action<string> log;
         private readonly WordWarmup warmup;
+        private readonly SessionConnectivityMonitor onlineNetwork;
+        private bool authorizationFinalizing;
+        public event Action<string> ResultPersisted;
         private TimeSpan nextWarmCheck;
         internal WordWarmupState WarmupState => warmup?.State ?? WordWarmupState.NotStarted;
         internal Task PrewarmAsync() => warmup?.EnsureAsync() ?? Task.CompletedTask;
@@ -47,6 +51,7 @@ namespace MosWord2019
         public TestingStaHost(Func<TestingSessionCoordinator> create, IConnectivityMonitor network, Action<string> log = null, Action warmWord = null, Func<bool> wordAlive = null)
         {
             this.log = log ?? (s => AppLogger.Write(s));
+            onlineNetwork = network as SessionConnectivityMonitor;
 #if DEBUG
             debugNetwork = network as DebugConnectivityMonitor;
 #endif
@@ -71,7 +76,7 @@ namespace MosWord2019
                 }
             }) { IsBackground = true, Name = "Testing Word STA" };
             thread.SetApartmentState(ApartmentState.STA); thread.Start();
-            if (warmWord != null) warmup = new WordWarmup(() => InvokeAsync(c => { warmWord(); return true; }), () => InvokeAsync(c => wordAlive != null && wordAlive()));
+            if (warmWord != null) warmup = new WordWarmup(() => InvokeAsync(c => { RequireAuthorization(); warmWord(); return true; }), () => InvokeAsync(c => wordAlive != null && wordAlive()));
         }
         private readonly Stopwatch pacing = Stopwatch.StartNew();
         private TimeSpan retryAfter;
@@ -82,13 +87,21 @@ namespace MosWord2019
         private void Tick()
         {
             if (executing || disposed) return;
-            if (engine.Session.Status == TestingSessionStatus.Ready && pacing.Elapsed >= nextWarmCheck)
+            if (engine.Session.Status == TestingSessionStatus.Ready && onlineNetwork?.IsAuthorizationExpired != true && pacing.Elapsed >= nextWarmCheck)
             {
                 nextWarmCheck = pacing.Elapsed + TimeSpan.FromSeconds(1); _ = CheckWarmWord();
             }
             bool observe = pacing.Elapsed >= retryAfter;
             executing = true;
-            try { engine.Tick(observe); if (observe) { rejection.Reset(); rejectionLogged = false; failureLogged = false; } }
+            try {
+                if (onlineNetwork?.IsAuthorizationExpired == true && engine.Session.Status != TestingSessionStatus.Ready &&
+                    engine.Session.Status != TestingSessionStatus.Completed && !authorizationFinalizing)
+                {
+                    authorizationFinalizing = true;
+                    try { engine.SubmitSaved(); } finally { authorizationFinalizing = false; }
+                }
+                else engine.Tick(observe);
+                if (observe) { rejection.Reset(); rejectionLogged = false; failureLogged = false; } }
             catch (Exception ex) when (WordBusyException.IsBusy(ex))
             {
                 if (!rejection.IsRunning) rejection.Start(); retryAfter = pacing.Elapsed + TimeSpan.FromMilliseconds(250);
@@ -137,11 +150,16 @@ namespace MosWord2019
         }
         public async Task<bool> StartAsync()
         {
+            RequireAuthorization();
             try { await PrewarmAsync().ConfigureAwait(false); }
             catch (Exception ex) { log("Testing prewarm unavailable; ordinary Start will retry: " + ex.Message); }
-            return await InvokeAsync(e => { e.Start(); return true; }).ConfigureAwait(false);
+            return await InvokeAsync(e => { RequireAuthorization(); e.Start(); return true; }).ConfigureAwait(false);
         }
-        public Task<bool> ResumeAsync() => InvokeAsync(e => { e.Resume(); return true; });
+        private void RequireAuthorization()
+        {
+            if (onlineNetwork?.IsAuthorizationExpired == true) throw new InvalidOperationException("The online session is no longer authorized.");
+        }
+        public Task<bool> ResumeAsync() => InvokeAsync(e => { RequireAuthorization(); e.Resume(); return true; });
         public Task<bool> SubmitAsync() => InvokeAsync(e => { e.Submit(); return true; });
         public Task<bool> SubmitSavedAsync() => InvokeAsync(e => { e.SubmitSaved(); return true; });
         internal static IConnectivityMonitor CreateConnectivityMonitor()
@@ -153,12 +171,12 @@ namespace MosWord2019
 #endif
         }
         public static TestingStaHost Create(PreparedTestingSession prepared, TestingSessionStateStore store, SessionRecoveryJournal journal,
-            IEnumerable<ProjectPackage> packages, TestingRecoveryRecord recovery = null, IConnectivityMonitor network = null)
+            IEnumerable<ProjectPackage> packages, TestingRecoveryRecord recovery = null, IConnectivityMonitor network = null, Action<string> resultPersisted = null, bool enableWarmup = true, ITestingClock sessionClock = null)
         {
             network = network ?? CreateConnectivityMonitor(); TestingStaHost host = null; WordController ownedWord = null;
             host = new TestingStaHost(() =>
             {
-                var clock = new StopwatchTestingClock();
+                var clock = sessionClock ?? new StopwatchTestingClock();
                 var session = recovery == null ? new TestingSession(prepared.SessionId, prepared.Definition, clock, network) : recovery.Restore(clock, network);
                 var workspace = new TestingWorkspaceService(prepared.SessionId, journal, resumeExisting: true);
                 if (recovery != null) workspace.Preflight(prepared, packages, false);
@@ -172,10 +190,12 @@ namespace MosWord2019
                 runner.DocumentReopened += () => host?.Warning?.Invoke(TestingWarningCode.DocumentReopened);
                 var coordinator = new TestingSessionCoordinator(prepared, session, store, clock, runner,
                     () => workspace.Preflight(prepared, packages), s => AppLogger.Write(s));
-                coordinator.Completed += () => { if (coordinator.CleanupPending) journal.DeferRecovery(true);
+                coordinator.ResultPersisted += resultPath => { resultPersisted?.Invoke(resultPath); host?.ResultPersisted?.Invoke(resultPath); };
+                coordinator.Completed += () => {
+                    if (coordinator.CleanupPending) journal.DeferRecovery(true);
                     else { journal.ReleaseSession(prepared.SessionId); journal.DeferRecovery(false); journal.Recover(); } };
                 return coordinator;
-            }, network, warmWord: () => ownedWord.Prewarm(), wordAlive: () => ownedWord.IsApplicationRunning);
+            }, network, warmWord: enableWarmup ? (Action)(() => ownedWord.Prewarm()) : null, wordAlive: () => ownedWord.IsApplicationRunning);
             return host;
         }
         public void Dispose()

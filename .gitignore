@@ -29,3 +29,4 @@ TestResults/
 **/ResultUploads/
 *.upload
 *.receipt
+*.secret

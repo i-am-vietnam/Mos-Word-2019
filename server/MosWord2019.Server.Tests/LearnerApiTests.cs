@@ -196,12 +196,15 @@ public sealed class LearnerApiTests(PostgresFixture postgres)
         using var mode = await ModeAsync(client, session, selected);
         var reply = await ReplyAsync(mode);
         Assert.Equal(selected, reply.GetProperty("mode").GetString());
+        var selectedAt = reply.GetProperty("modeSelectedAt").GetDateTimeOffset();
         using var retry = await ModeAsync(client, session, selected);
         Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
+        Assert.Equal(selectedAt, (await ReplyAsync(retry)).GetProperty("modeSelectedAt").GetDateTimeOffset());
         using var conflict = await ModeAsync(client, session, other);
         Assert.Equal(HttpStatusCode.Conflict, conflict.StatusCode);
         await using var db = PostgresFixture.Open(learner.Connection);
         Assert.Equal(selected, (await db.Sessions.SingleAsync()).Mode);
+        Assert.Equal(selectedAt, (await db.Sessions.SingleAsync()).ModeSelectedAt);
         Assert.Equal(1, (await db.Accounts.SingleAsync()).Used);
     }
 

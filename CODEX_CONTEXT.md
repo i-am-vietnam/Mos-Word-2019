@@ -1,5 +1,17 @@
 # Technical Context
 
+## C5 — Hợp đồng tích hợp online, 2026-11-02
+
+Entry: Program.Online kiểm DPAPI credential và gọi server resume trước journal/package cleanup hoặc recovery local. OnlineAuthenticationService giữ IAuthenticationService và async interface cho UI; LoginForm hiển thị remaining uses trước mode, chỉ sau mode thành công mới tạo shell/pre-warm. Release không chứa OfflineAuthenticationService và không nhận development pin/config override. ServerConnectionSettings dùng CompiledServerSettings sinh bởi MSBuild OnlineServerUrl/OnlineServerSpkiPin trong EXE; pin mặc định zero fail-closed, phải cung cấp pin thật khi phát hành C6.
+
+OnlineSessionContext sở hữu monitor/clock/package leases. ServerSessionClock chiếu UTC từ server và monotonic, clamp lùi và hard cap Testing; client wall clock chỉ chẩn đoán rollback. ModeSelectedAt phải là mốc server persist, không suy ra từ giờ response retry. SessionReply thêm field này; lúc chọn mode truncate 100ns về microsecond trước PostgreSQL Save để round-trip ổn định. Token refresh và DPAPI snapshot giữ cùng machine/session/mode. MachineIdentity băm MachineGuid, không gửi raw. PinnedHttpClientFactory kiểm SPKI, hostname/date, chặn redirect/origin khác; callback cục bộ không đổi TLS toàn cục.
+
+MainForm Training catalog/lazy download, countdown4h đỏ đậm, overlay/owned lock, early exit/end/expiry. TestingFlow/StaHost dùng online definition và real monitor; PreparedTestingSession online giữ server GUID, snapshot/hash và recovery metadata. ResultPersisted chạy sau B4 persist trước runtime close/archive; queue thất bại giữ Completed state và B4 cho retry. Startup server refuse finalize saved-only bằng clock server và quyền upload hẹp; không mở Word. RetainRecoveryPackages giữ lease cache cũ khi redownload; chưa giải quyết owned Word/recovery thì giữ credential/cache và defer. Normal end mới xóa DPAPI resume.
+
+Không thay grader/score/Core/project content; offline Debug/tests giữ hành vi. docs/C5_LOCAL_TEST.md và tools chứng thư phục vụ local. C6 deployment/C7 nghiệm thu còn lại; không push. Các mục cũ bên dưới là lịch sử.
+
+Kiểm chứng cuối C5: client1036/1036 và server193/193 mỗi Debug/Release,0skipped; bốn build VS MSBuild Rebuild/dotnet build warnaserror đều0warnings/0errors. Regression audit giữ đủ981client/193server case C4, thêm55client;150file package không đổi, Debug/test output khớp SHA256, Release app0plaintext package. Smoke HTTPS/PostgreSQL thật qua login3→2/idempotency/resume/exact ModeSelectedAt/heartbeat/7package/HMAC/admin-result/admin-lock; chứng thư sai pin bị từ chối. Review cuối không còn P1/P2; chưa nghiệm thu Word native/VPS. Evidence artifacts/c5 ignored, chi tiết REPORT.md và regression-audit.json. Commit cục bộ, không push; dừng C5, chờ “tiếp tục C6”.
+
 ## C4 — Results contract và upload queue, 2026-11-02
 
 Server ResultHandling/ResultUploads nhận POST /api/results: bearer access hoặc upload-purpose, X-Result-Signature Base64 HMAC-SHA256 đúng byte UTF8 B4, tối đa256KiB. Session.ResultSigningKey là Base64 SHA256 của32byte CSPRNG, source hủy, chỉ key dẫn xuất lưu DB/cấp qua SessionReply.ResultSigningKey; không log key/token. ResultValidation kiểm pinned definition/hash/seed/task/instructionKey/outcome, dùng linked-source ExamScorer/ScoreAllocator; tổng/trọng số client không có thẩm quyền. Instruction câu sai giải mã đúng package version pinned/lang/{vi|en}.json, kiểm GCM/ZIP hash. Result có PayloadHash/Score/Passed/FlagsJson/WrongTasksJson/OfflineGapsJson, migration ResultUploads là migration thứ6.

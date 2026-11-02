@@ -1,5 +1,17 @@
 # Project Status
 
+## C5 — Client online, 2026-11-02
+
+Từ cd7bb9c, nối OnlineAuthenticationService vào IAuthenticationService và LoginForm hai bước: đăng nhập hiển thị lượt còn lại, chọn chế độ rồi mới mở/pre-warm Word. Release không biên dịch offline credentials; chỉ Debug có switch phát triển. Lỗi VI/EN có hết lượt, expiry, admin lock, credential/lockout tạm dùng thông báo chung, unreachable và sai chứng thư.
+
+Pin SHA256 SPKI áp dụng từng HttpClient; Release dùng URL/pin biên dịch trong EXE, Debug có cấu hình dev. MachineGuid chỉ gửi SHA256, credential/resume/signing key lưu DPAPI CurrentUser+ACL ngoài repo. Normal end xóa credential; crash/shutdown giữ để server resume trước local recovery. SessionReply trả modeSelectedAt đã persist, chuẩn hóa độ chính xác microsecond PostgreSQL để retry không dịch hard cap.
+
+Training dùng catalog và tải từng package khi Go; countdown đỏ đậm ở ô giữa dùng UTC server+monotonic và chạy khi offline. Monitor thật điều khiển overlay/khóa owned Word trong cả hai chế độ. Hết hạn/revoke/mất mạng quá giới hạn kết thúc phiên; early exit xác nhận hh:mm. Testing dùng đề ký, 7 gói và SessionId server xuyên B4/recovery. ResultPersisted enqueue trước đóng runtime/archive; startup/sau login retry. Resume bị server từ chối thì finalize saved-only và queue; recovery chưa hoàn tất giữ bằng chứng/credential/cache.
+
+Không sửa grader/assertions, nội dung/starter, thuật toán điểm hoặc framework/solution. Hướng dẫn nghiệm thu local ở docs/C5_LOCAL_TEST.md. Chỉ C5; không push, chờ C6. Các mục C0–C4 bên dưới là lịch sử.
+
+Kiểm chứng cuối C5: client1036/1036 và server193/193 mỗi Debug/Release,0skipped; bốn build VS MSBuild Rebuild/dotnet build warnaserror đều0warnings/0errors. Regression audit giữ đủ981client/193server case C4, thêm55client;150file package không đổi, Debug/test output khớp SHA256, Release app0plaintext package. Smoke HTTPS/PostgreSQL thật qua login3→2/idempotency/resume/exact ModeSelectedAt/heartbeat/7package/HMAC/admin-result/admin-lock; chứng thư sai pin bị từ chối. Review cuối không còn P1/P2; chưa nghiệm thu Word native/VPS. Evidence artifacts/c5 ignored, chi tiết REPORT.md và regression-audit.json. Commit cục bộ, không push; dừng C5, chờ “tiếp tục C6”.
+
 ## C4 — Kết quả online và upload bền vững, 2026-11-02
 
 Triển khai trên main1687920. POST /api/results nhận đúng byte JSON B4 với HMAC-SHA256, khóa dẫn xuất riêng từng phiên cấp khi login/resume/chọn mode; không lưu random seed, không ghi khóa/token vào audit. Migration ResultUploads thêm khóa dẫn xuất, hash payload và dữ liệu điểm/flags/câu sai/gap. Server dùng nguyên ExamScorer/ScoreAllocator qua linked source, đối chiếu đề và task với snapshot đã ghim; bỏ qua tổng điểm/trọng số/verdict client. Instruction câu sai lấy từ ZIP/GCM của đúng version package. Cùng byte payload trả200 lặp; payload khác cùng SessionId trả409/audit, transaction giữ account/session row lock.

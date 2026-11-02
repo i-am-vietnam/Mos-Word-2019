@@ -111,7 +111,14 @@ namespace MosWord2019.Projects.OnlinePackages
             }
             finally { foreach (var package in manifest.Packages) Array.Clear(package.Key, 0, package.Key.Length); }
         }
+        public async Task<IReadOnlyList<string>> TrainingCodesAsync(Guid sessionId, string token, CancellationToken ct = default(CancellationToken))
+        {
+            var manifest = VerifyManifest(await transport.GetManifest(token, ct).ConfigureAwait(false), sessionId, "Training");
+            try { return manifest.Packages.Select(p => p.Code).ToArray(); }
+            finally { foreach (var descriptor in manifest.Packages) Array.Clear(descriptor.Key, 0, descriptor.Key.Length); }
+        }
         public void RecoverIncompletePackages() { PackageCacheLedger.Recover(packagesRoot, journal); }
+        public static IDisposable RetainRecoveryPackages(string root, SessionRecoveryJournal journal) => PackageCacheLedger.Retain(root, journal);
         public static void RecoverIncompletePackages(SessionRecoveryJournal journal, string packagesRoot = null)
         {
             if (journal == null) throw new ArgumentNullException(nameof(journal));

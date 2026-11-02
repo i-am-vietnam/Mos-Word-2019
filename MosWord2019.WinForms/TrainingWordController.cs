@@ -10,7 +10,7 @@ namespace MosWord2019
 {
     /// <summary>Owns the Training controller on one pumped STA. No COM reference crosses this boundary.</summary>
     internal sealed class TrainingWordController : IWordController, IWordDocumentState, IWordSaveFormat,
-        IWordWindowLayout, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents
+        IWordWindowLayout, IWordExportCheckpoint, IWordViewState, IWordTocLayout, IWordSaveEvents, IWordInputLock
     {
         private readonly Control callbacks = new Control();
         private readonly Thread thread;
@@ -114,6 +114,7 @@ namespace MosWord2019
         public void CloseDocument() => Invoke(w => { w.CloseDocument(); hadDocument = false; });
         public void Close() => Invoke(w => { w.Close(); hadDocument = false; });
         public void SetWindowBounds(int left, int top, int width, int height) => Invoke(w => ((IWordWindowLayout)w).SetWindowBounds(left, top, width, height));
+        public void SetInputEnabled(bool enabled) => Invoke(w => (w as IWordInputLock)?.SetInputEnabled(enabled));
         public void ConfigureExportCheckpoint(string path) => Invoke(w => ((IWordExportCheckpoint)w).ConfigureExportCheckpoint(path));
         public string SaveFormattedCheckpoint() => Invoke(w => ((IWordExportCheckpoint)w).SaveFormattedCheckpoint());
         public WordFormattingMarksSnapshot ReadFormattingMarks() => Invoke(w => ((IWordViewState)w).ReadFormattingMarks());

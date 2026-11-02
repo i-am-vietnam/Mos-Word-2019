@@ -1,8 +1,8 @@
 # Kiến trúc server MOS Word 2019
 
-## Phạm vi C0–C3
+## Phạm vi C0–C5
 
-C0 tạo nền tảng server; C1 thêm tài khoản/lượt/phiên và quản trị học viên. C2 bổ sung chính sách phiên tập trung, phân phối package mã hóa, manifest ký và thư viện cache client. C3 thêm heartbeat server, lịch sử liên hệ/offline và monitor client; chưa nối đăng nhập/giao diện online C5; Release mặc định không mang Projects và chưa dùng độc lập cho người học trước C5. Có thể bật package local rõ ràng cho phát triển.
+C0–C4 cung cấp nền tảng, tài khoản/lượt/phiên, package ký/mã hóa, heartbeat và kết quả. C5 nối client WinForms online từ login/mode đến recovery/upload; hướng dẫn thử local ở C5_LOCAL_TEST.md. C6 triển khai VPS và C7 nghiệm thu bảo mật còn lại.
 
 Client tiếp tục WinForms, .NET Framework 4.7.2, C# 7.3 và Word Interop. `server/MosWord2019.Server.sln` không nằm trong `MosWord2019.slnx`, không tham chiếu project WinForms. `server/MosWord2019.ExamComposition` biên dịch liên kết các model/composer hiện có của Core cho server, giữ cùng thuật toán đề và fingerprint. App ASP.NET Core .NET 10 chứa cả HTTP API và Razor Pages; EF Core 10 dùng Npgsql/PostgreSQL 16+. Chọn một app và một database để phù hợp VPS 2 vCPU, 4 GB RAM, 35 GB NVMe.
 
@@ -140,7 +140,7 @@ Razor /Admin/Results liệt kê global hoặc accountId, lọc ngày UTC/phân t
 
 ## Queue client C4 và giữ dữ liệu
 
-OnlineResults tách IResultUploadTransport để test/fake; transport HTTPS dùng validation hệ thống, không redirect hoặc bypass TLS. C5 sẽ nối pin và online auth. Enqueue yêu cầu B4 đã có đúng server SessionId, key32byte và upload token từ phiên; không sửa B4 để gắn định danh sau khi đã persist. C5 phải giữ binding này xuyên finalize/recovery. Kết quả offline lịch sử không có credential nên không tự đưa lên server.
+OnlineResults tách IResultUploadTransport để test/fake; transport HTTPS dùng validation hệ thống, không redirect hoặc bypass TLS. C5 đã nối pinned transport và online auth. Enqueue yêu cầu B4 đã có đúng server SessionId, key32byte và upload token từ phiên; không sửa B4 để gắn định danh sau khi đã persist. C5 giữ binding này xuyên finalize/recovery. Kết quả offline lịch sử không có credential nên không tự đưa lên server.
 
 ResultUploadStore lưu DPAPI CurrentUser ở LocalAppData/MosWord2019/ResultUploads, SID-only ACL, từ chối repo/reparse paths. Record chứa exact payload/key/token/origin/hash/retry state đã mã hóa; file tạm cũng chỉ ciphertext, flush và atomic commit. Pump lease riêng chống nhiều worker; metadata lease ngắn/retry không giữ qua network, nên đăng ký bài mới không bị chặn bởi upload bài cũ. Tối đa1024 pending; accepted record chuyển atomic sang Receipts riêng và không chiếm cap pending. Bảo quản Windows profile/DPAPI, không copy credential sang máy khác.
 
@@ -148,15 +148,22 @@ Program chạy worker lúc startup chỉ cho entry đã đăng ký; timeout requ
 
 HeartbeatRetentionWorker chạy lúc startup để bù downtime rồi mỗi24h theo TimeProvider UTC; scoped ExecuteDelete chỉ Heartbeats.ReceivedAt < now−90ngày (giữ boundary bằng cutoff). Lỗi log metadata rồi retry daily, cancellation dừng sạch. Giữ nguyên Sessions, OfflineGaps, Results và AuditLog; không áp cascade retention lên chúng. Backup/dung lượng những bảng giữ lâu thuộc C6. Production vẫn bắt buộc DataProtection:KeyPath ngoài repo để cookie/token sống qua restart, cùng backup DB và package keys/blob; không public C4 trước cấu hình C5/C6.
 
-## Các bước tiếp theo đã chốt, chưa triển khai
+## C5 — Client online và biên giới bảo mật
 
-- C4: nhận result B4 có HMAC bằng key từng session; upload idempotent/retry; lưu flags chênh lệch thời gian và trang kết quả admin.
-- C5: thay `OfflineAuthenticationService` sau `IAuthenticationService`, giữ login UI U1, DPAPI resumeToken. Chỉ pre-warm Word sau login thành công. Training thoát sớm vẫn kết thúc lượt, xác nhận “Thoát sẽ kết thúc lượt sử dụng này. Bạn còn hh:mm.” Testing giữ50phút,7project,4–6task/project,34–40task,1000điểm, từ700 “Đạt”, dưới700 “Cần Luyện Tập thêm”.
-- C6: Ubuntu 24.04 LTS, PostgreSQL/nginx/systemd/ufw/backup/rotation; không domain, TLS self-signed và SPKI SHA-256 pin compile trong client. Release không cho App.config thay pin; từ chối mọi certificate khác, không tắt validation toàn cục. C0 chỉ dùng HTTPS development certificate cho chạy local.
-- C7: review bảo mật và checklist nghiệm thu online. Chưa tuyên bố server C3 sẵn sàng public trên VPS.
+OnlineAuthenticationService thực thi IAuthenticationService, có async interface cho LoginForm. Login thành công hiển thị lượt, mode POST thành công mới mở/pre-warm Word. OfflineAuthenticationService chỉ biên dịch Debug; Release không nhận offline credentials. Login lỗi credential/unknown/temporary lockout dùng thông báo chung VI/EN có hướng dẫn thử lại sau, tránh account enumeration.
 
-C2 không đổi grader, engine, nội dung package hoặc starter. Cache bổ sung ledger riêng và móc recovery lúc startup, giữ quy tắc ownership của journal chung. C5–C7 vẫn là công việc tiếp theo, chưa có triển khai VPS hoặc đường bỏ qua TLS.
+MachineIdentity SHA256 MachineGuid, không gửi raw. ResumeCredentialStore dùng DPAPI CurrentUser và ACL user-only ngoài repo, ghi atomic; normal end xóa, crash/shutdown giữ. ServerConnectionSettings sinh compiled URL/SPKI trong EXE bằng MSBuild; Release không đọc override App.config, Debug có development URL/pin. PinnedHttpClientFactory kiểm SHA256 SPKI/hostname/validity theo instance và chặn redirect/origin khác, không thay global TLS. Pin mặc định zero fail-closed; C6 cần build với pin thật.
 
+OnlineSessionContext giữ SessionConnectivityMonitor, credential refresh và package leases. MainForm dùng monitor cho overlay/owned Word lock; Training countdown ở ô giữa đỏ đậm, chiếu server UTC+monotonic, vẫn trôi offline. Training tải catalog trước, chỉ tải package khi Go. Normal exit xác nhận thời gian còn lại rồi end; expiry/admin revoke/timeout đóng owned path và về login. Testing giữ engine/timer/score hiện có và đề ký server, chỉ 7 gói được cấp. ServerSessionClock neo UTC response server, không dùng wall clock Windows cho licensing; timestamp finalize kẹp tại hard cap Testing. ModeSelectedAt trong SessionReply là mốc persist, chuẩn hóa microsecond PostgreSQL trước lưu để response đầu/retry/resume giống nhau.
+
+Startup gọi server resume trước local cleanup/recovery. Bị từ chối: chỉ finalize saved-only và queue bằng quyền upload, không pre-warm Word. Không chứng minh được ownership hoặc cache/state bị thay thì giữ bằng chứng để owner xử lý. RetainRecoveryPackages giữ cache lease cũ trong lúc redownload; không xóa đầu vào chấm trước khi recovery hoàn tất. ResultPersisted enqueue sau persist B4 trước close runtime/archive; lỗi enqueue giữ Completed state và B4. Queue dùng pinned transport, retry startup/sau login, chỉ ACK đúng mới xác nhận uploaded. Normal end xóa resume, upload ledger riêng vẫn bền vững; offline Debug lịch sử không tự upload.
+
+Chỉ thay orchestration, không grader/assertions/nội dung/starter/framework. docs/C5_LOCAL_TEST.md có quy trình dev certificate/PG/admin/learner và checklist Word thật; smoke tự động không thay nghiệm thu Word native.
+
+## Các bước tiếp theo chưa triển khai
+
+- C6: publish framework-dependent linux-x64 trên PC, copy lên Ubuntu24.04; nginx TLS self-signed, pin thật, PostgreSQL/systemd/ufw/backup/rotation và tuning VPS4GB. Không build trên VPS.
+- C7: review bảo mật và nghiệm thu online thực tế. C5 chưa xác nhận Word native, nginx hoặc VPS.
 ## Tài liệu gốc
 
 - [EF Core 10 và Npgsql](https://www.npgsql.org/efcore/release-notes/10.0.html).

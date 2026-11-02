@@ -31,12 +31,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppMode.cs" />
     <Compile Include="Authentication.cs" />
+    <Compile Include="OnlineAuthenticationService.cs" />
+    <Compile Include="OnlineSessionContext.cs" />
+    <Compile Include="ServerConnectionSettings.cs" />
+    <Compile Include="ServerSessionClock.cs" />
     <Compile Include="UiLayout.cs" />
     <Compile Include="WordWarmup.cs" />
     <Compile Include="TrainingWordController.cs" />
@@ -48,6 +54,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Program.Online.cs" />
     <Compile Include="TestingStaHost.cs" />
     <Compile Include="DebugConnectivityMonitor.cs" />
     <Compile Include="TestingForm.cs">
@@ -122,6 +129,14 @@
     <Folder Include="Projects\Word2019_P28\assets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <OnlineServerUrl Condition="'$(OnlineServerUrl)' == ''">https://localhost:7118/</OnlineServerUrl>
+    <OnlineServerSpkiPin Condition="'$(OnlineServerSpkiPin)' == ''">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</OnlineServerSpkiPin>
+  </PropertyGroup>
+  <Target Name="CompileServerTrust" BeforeTargets="CoreCompile">
+    <WriteLinesToFile File="$(IntermediateOutputPath)CompiledServerSettings.g.cs" Overwrite="true" Lines="namespace MosWord2019 { internal static class CompiledServerSettings { internal const string Origin = &quot;$(OnlineServerUrl)&quot;%3B internal const string SpkiPin = &quot;$(OnlineServerSpkiPin)&quot;%3B } }" />
+    <ItemGroup><Compile Include="$(IntermediateOutputPath)CompiledServerSettings.g.cs" /></ItemGroup>
+  </Target>
   <Target Name="RemovePreviouslyShippedPackages" AfterTargets="Build" Condition="'$(UseLocalPackages)' != 'true'">
     <ItemGroup>
       <PreviouslyShippedPackage Include="Projects\**\*" />

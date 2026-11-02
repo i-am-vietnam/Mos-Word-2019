@@ -12,7 +12,7 @@ public sealed record ResumeRequest(string? ResumeToken, string? MachineId);
 public sealed record ModeRequest(string? Mode);
 public sealed record SessionReply(Guid SessionId, string SessionToken, string ResumeToken, int RemainingUses,
     DateTimeOffset ServerTime, string? Mode, long? ExamSeed = null, string? DefinitionHash = null,
-    string? UploadToken = null, string? ResultSigningKey = null);
+    string? UploadToken = null, string? ResultSigningKey = null, DateTimeOffset? ModeSelectedAt = null);
 public sealed record SessionError(string Error, string Message);
 public sealed record SessionOperation(int Status, object Body);
 
@@ -31,7 +31,7 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
             tokens.Issue(session.Id, account.CredentialVersion, true), account.MaxUses - account.Used, now, session.Mode,
             session.ExamSeed, session.ExamDefinitionHash,
             session.Mode == "Testing" ? tokens.IssueUpload(session.Id, account.CredentialVersion) : null,
-            session.ResultSigningKey));
+            session.ResultSigningKey, session.ModeSelectedAt));
 
     public async Task<SessionOperation> LoginAsync(LoginRequest request, CancellationToken ct)
     {
@@ -168,7 +168,8 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
                 catch (InvalidDataException) { return Error(503, "packages_unavailable"); }
             }
             session.Mode = request.Mode;
-            session.ModeSelectedAt = now;
+            // PostgreSQL timestamps retain microseconds; the first reply must match later reads exactly.
+            session.ModeSelectedAt = new DateTimeOffset(now.Ticks - now.Ticks % 10, now.Offset);
             session.LastHeartbeatAt = now;
             db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "SessionModeSelected", CreatedAt = now });
             await db.SaveChangesAsync(ct);

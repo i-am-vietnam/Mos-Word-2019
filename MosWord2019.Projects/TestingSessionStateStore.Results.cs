@@ -86,7 +86,7 @@ namespace MosWord2019.Projects
             return new JObject
             {
                 ["version"] = 1, ["sessionId"] = data["sessionId"].DeepClone(), ["seed"] = definition.Seed,
-                ["machine"] = data["machine"]?.DeepClone(), ["language"] = data["language"]?.DeepClone(),
+                ["machine"] = data["onlineMachineId"]?.Type == JTokenType.String ? data["onlineMachineId"].DeepClone() : data["machine"]?.DeepClone(), ["language"] = data["language"]?.DeepClone(),
                 ["definition"] = JToken.FromObject(definition), ["contentHashes"] = data["contentHashes"]?.DeepClone(),
                 ["startedUtc"] = data["startedUtc"]?.DeepClone(), ["completedUtc"] = data["completedUtc"]?.DeepClone(),
                 ["lastHeartbeatUtc"] = data["lastHeartbeatUtc"]?.DeepClone(), ["lastSaveUtc"] = data["lastSaveUtc"]?.DeepClone(),

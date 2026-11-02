@@ -1,5 +1,13 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C5 — Điểm bàn giao hiện tại, 2026-11-02
+
+Client online đã nối end-to-end sau interfaces: login/mode, pin SPKI, DPAPI resume, machine hash, heartbeat/Word lock, Training4h và Testing definition/packages/kết quả/upload queue. Đăng nhập hiển thị lượt trước chọn mode; pre-warm chỉ sau cả hai bước. Release không có offline credentials, chỉ dùng pin/URL biên dịch; Debug có cấu hình dev. Server trả modeSelectedAt chính xác để retry giữ deadline.
+
+Startup hỏi server trước recovery local; server từ chối thì finalize saved-only và queue, không tự tiêu lượt hoặc mở Word. B4 được đăng ký queue trước đóng runtime/archive. Clock online dùng UTC server+monotonic, không lấy wall clock Windows làm licensing. Unresolved recovery giữ cache/credential/owned-process proof; normal end xóa resume credential. Training tải catalog rồi tải gói khi Go, giữ fresh starter/ownership hiện có. Không đổi grading, score, nội dung hay framework. Hướng dẫn local: docs/C5_LOCAL_TEST.md; chi tiết kỹ thuật: CODEX_CONTEXT.md và docs/SERVER_ARCHITECTURE.md. C6/C7 chưa thực hiện; các phần C0–C4 dưới đây là lịch sử.
+
+Kiểm chứng cuối C5: client1036/1036 và server193/193 mỗi Debug/Release,0skipped; bốn build VS MSBuild Rebuild/dotnet build warnaserror đều0warnings/0errors. Regression audit giữ đủ981client/193server case C4, thêm55client;150file package không đổi, Debug/test output khớp SHA256, Release app0plaintext package. Smoke HTTPS/PostgreSQL thật qua login3→2/idempotency/resume/exact ModeSelectedAt/heartbeat/7package/HMAC/admin-result/admin-lock; chứng thư sai pin bị từ chối. Review cuối không còn P1/P2; chưa nghiệm thu Word native/VPS. Evidence artifacts/c5 ignored, chi tiết REPORT.md và regression-audit.json. Commit cục bộ, không push; dừng C5, chờ “tiếp tục C6”.
+
 ## C4 — Kết quả server và queue client, 2026-11-02
 
 POST /api/results kiểm HMAC-SHA256 đúng byte JSON B4 bằng khóa dẫn xuất riêng từng session, cấp ở login/resume/mode. DB chỉ giữ khóa SHA256 dẫn xuất từ nguồn CSPRNG đã hủy. Active Testing dùng FindAsync; offline upload dùng CanUpload24giờ/purpose riêng, không nâng thành access token. Account/session row lock và unique SessionId bảo đảm200 retry cùng hash,409/audit payload khác. Server tái dùng nguyên ExamScorer/ScoreAllocator, kiểm definition/task theo đề ghim, tính lại điểm/700-pass; instruction câu sai lấy từ đúng ZIP/GCM pinned. Kết quả lưu flags/gaps/clock rollback và có admin global/theo account/chi tiết.

@@ -24,6 +24,7 @@ namespace MosWord2019.Projects
         public TestingSession Session { get; }
         public event Action StateChanged;
         public event Action Completed;
+        public event Action<string> ResultPersisted;
         public TestingSessionCoordinator(PreparedTestingSession prepared, TestingSession session, TestingSessionStateStore store,
             ITestingClock clock, ITestingProjectRuntime runtime, Action preflight, Action<string> log)
         {
@@ -108,7 +109,10 @@ namespace MosWord2019.Projects
             for (int i = Session.CurrentIndex + 1; i < 7; i++)
                 if (Session.ProjectStates[i] != TestingProjectState.Locked)
                 { Session.RecordUnvisitedResults(i, runtime.GradeSaved(prepared.Definition.Projects[i].ProjectId)); Save(); }
-            Session.Complete(log); Save(); store.PersistCompletedResult(); // Never clean recovery inputs before the result is durable.
+            Session.Complete(log); Save();
+            string resultPath = store.PersistCompletedResult();
+            // Online registration must be durable before any recovery inputs or credentials can be released.
+            ResultPersisted?.Invoke(resultPath);
             try { runtime.Close(); if (!CleanupPending) store.ArchiveCompleted(); }
             catch (Exception ex) { CleanupPending = true; log("Completed Testing cleanup pending: " + ex.Message); }
             Completed?.Invoke(); StateChanged?.Invoke();

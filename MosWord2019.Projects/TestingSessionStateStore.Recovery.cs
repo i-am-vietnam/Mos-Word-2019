@@ -47,11 +47,20 @@ namespace MosWord2019.Projects
                 throw new InvalidDataException("Invalid Testing state envelope.");
             return root;
         }
+        public OwnedWordProcessIdentity ReadOwnedWord()
+        {
+            lock (gate)
+            {
+                var data = ReadEnvelope();
+                return data["ownedWord"]?.Type == JTokenType.Object ? data["ownedWord"].ToObject<OwnedWordProcessIdentity>() : null;
+            }
+        }
+        public string ReadRecoveryMachine() { lock (gate) return (string)ReadEnvelope()["machine"]; }
         private PreparedTestingSession ReadPrepared(JObject data, string catalogPath, IEnumerable<ProjectPackage> packages)
         {
             var definition = data["definition"] as JObject; var selected = definition?["Projects"] as JArray;
             var hashes = data["contentHashes"] as JObject;
-            if (selected == null || hashes == null || hashes.Count != 15 || hashes.Properties().Any(p => p.Value.Type != JTokenType.String ||
+            if (selected == null || hashes == null || (data["onlineDefinitionHash"]?.Type == JTokenType.String ? hashes.Count < 14 : hashes.Count != 15) || hashes.Properties().Any(p => p.Value.Type != JTokenType.String ||
                 ((string)p.Value).Length != 64 || ((string)p.Value).Any(c => !Uri.IsHexDigit(c))) ||
                 !new[] { "en", "vi" }.Contains((string)data["language"])) throw new InvalidDataException("Invalid Testing definition/audit.");
             var available = packages.ToDictionary(p => p.Meta.ProjectId, StringComparer.Ordinal);
@@ -73,8 +82,8 @@ namespace MosWord2019.Projects
             long seed = (long)data["seed"];
             var exam = new ExamDefinition(seed, projects);
             if ((long?)definition["Seed"] != seed || (int?)definition["N"] != exam.N) throw new InvalidDataException("Saved exam totals/seed are inconsistent.");
-            var prepared = new PreparedTestingSession((string)data["sessionId"], (string)data["language"], exam, Path.GetFullPath(catalogPath),
-                hashes.Properties().ToDictionary(p => p.Name, p => (string)p.Value));
+            var prepared = new PreparedTestingSession((string)data["sessionId"], (string)data["language"], exam, data["onlineDefinitionHash"]?.Type == JTokenType.String ? null : Path.GetFullPath(catalogPath),
+                hashes.Properties().ToDictionary(p => p.Name, p => (string)p.Value), (string)data["onlineDefinitionHash"], data["onlinePackages"] as JObject, data["recoveryPackages"] as JArray);
             prepared.VerifyCatalog(); foreach (var project in projects) prepared.VerifyPackage(available[project.ProjectId]);
             return prepared;
         }
@@ -108,12 +117,19 @@ namespace MosWord2019.Projects
                     data["offlinePeriods"]?.ToObject<List<TestingOfflinePeriod>>(), (bool?)data["historyIncomplete"] ?? data["offlinePeriods"] == null);
                 var owned = data["ownedWord"] == null || data["ownedWord"].Type == JTokenType.Null ? null : data["ownedWord"].ToObject<OwnedWordProcessIdentity>();
                 var record = new TestingRecoveryRecord(prepared, snapshot, (DateTime)data["lastHeartbeatUtc"], (string)data["machine"], owned);
-                var decision = record.Decide(DateTime.UtcNow);
+                var decision = record.Decide(utcNow());
                 if (decision.Action == TestingRecoveryAction.Resume || decision.Action == TestingRecoveryAction.Finalize)
                     using (var checkedState = TestingSession.Restore(prepared.SessionId, prepared.Definition, snapshot, decision,
-                        new StopwatchTestingClock(), new AlwaysOnlineMonitor())) { }
+                        new RecoveryClock(utcNow), new AlwaysOnlineMonitor())) { }
                 return record;
             }
+        }
+        private sealed class RecoveryClock : ITestingClock
+        {
+            private readonly Func<DateTime> utcNow;
+            internal RecoveryClock(Func<DateTime> utcNow) { this.utcNow = utcNow; }
+            public TimeSpan Monotonic => TimeSpan.Zero;
+            public DateTime UtcNow => utcNow();
         }
         public void RecordProjectContext(PreparedTestingSession prepared, string projectId, string sourcePath,
             TrainingGradeContext context, DateTime? savedUtc)

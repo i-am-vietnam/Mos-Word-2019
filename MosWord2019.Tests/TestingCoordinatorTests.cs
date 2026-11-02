@@ -245,6 +245,46 @@ namespace MosWord2019.Tests
                 if (!submit) { Assert.AreEqual(1, lab.Session.CurrentIndex); Assert.AreEqual(TimeSpan.FromSeconds(10), lab.Session.Elapsed); }
             }
         }
+        [TestMethod]
+        public void ResultRegistrationPrecedesRuntimeCleanupAndCompletedNotification()
+        {
+            using (var lab = new Lab())
+            {
+                bool registered = false, completed = false;
+                lab.Engine.ResultPersisted += path =>
+                {
+                    Assert.IsTrue(File.Exists(path)); Assert.IsTrue(File.Exists(lab.Store.StatePath));
+                    Assert.AreEqual("Completed", (string)Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(lab.Store.StatePath))["status"]);
+                    Assert.AreEqual(0, lab.Runtime.Closes); Assert.IsFalse(completed); registered = true;
+                };
+                lab.Engine.Completed += () => { Assert.IsTrue(registered); Assert.AreEqual(1, lab.Runtime.Closes); completed = true; };
+                lab.Engine.Start(); lab.Engine.Submit();
+                Assert.IsTrue(completed); Assert.IsFalse(File.Exists(lab.Store.StatePath));
+            }
+        }
+        [TestMethod]
+        public void FailedResultRegistrationKeepsCompletedStateAndSavedInputsForJournalRetry()
+        {
+            using (var lab = new Lab())
+            {
+                var journal = new SessionRecoveryJournal(Path.Combine(lab.Folder, "journal.json"), _ => { });
+                string saved = Path.Combine(lab.Folder, "owned-saved.docx"); File.WriteAllText(saved, "saved recovery bytes");
+                journal.Track(saved, "working", lab.Prepared.SessionId); journal.PreserveSession(lab.Prepared.SessionId); journal.DeferRecovery(true);
+                string committed = null; bool completed = false;
+                lab.Engine.ResultPersisted += path => { committed = path; throw new IOException("queue disk unavailable"); };
+                lab.Engine.Completed += () => completed = true;
+                lab.Engine.Start(); Assert.ThrowsException<IOException>(() => lab.Engine.Submit());
+                Assert.AreEqual(TestingSessionStatus.Completed, lab.Session.Status); Assert.IsTrue(lab.Engine.NeedsRecovery);
+                Assert.IsTrue(File.Exists(committed)); Assert.IsTrue(File.Exists(lab.Store.StatePath));
+                Assert.AreEqual(0, lab.Runtime.Closes); Assert.IsFalse(completed);
+                byte[] resultBytes = File.ReadAllBytes(committed); journal.Recover(); Assert.IsTrue(File.Exists(saved));
+                // Startup can register the already committed bytes before completing journal recovery.
+                Assert.AreEqual(committed, lab.Store.PersistCompletedResult());
+                lab.Store.ArchiveCompleted(); new TestingStartupRecovery(lab.Store, journal).Release(lab.Prepared.SessionId);
+                CollectionAssert.AreEqual(resultBytes, File.ReadAllBytes(committed));
+                Assert.IsFalse(File.Exists(lab.Store.StatePath)); Assert.IsFalse(File.Exists(saved));
+            }
+        }
         private sealed class Clock : ITestingClock
         {
             public TimeSpan Monotonic { get; private set; }
@@ -259,7 +299,7 @@ namespace MosWord2019.Tests
         }
         private sealed class Runtime : ITestingProjectRuntime, ITestingForceRecovery
         {
-            internal int Saves, FromDisk, Restarts, Entries, BusyRemaining, Forced, EntryBusyRemaining, ReopenFailures; internal bool LastResume; internal bool Enabled, ForceFails; internal int BusyCode;
+            internal int Saves, FromDisk, Restarts, Entries, Closes, BusyRemaining, Forced, EntryBusyRemaining, ReopenFailures; internal bool LastResume; internal bool Enabled, ForceFails; internal int BusyCode;
             private readonly ExamDefinition definition; private string current;
             internal Runtime(ExamDefinition definition) { this.definition = definition; }
             public void Enter(string id, bool resume) { LastResume = resume; if (EntryBusyRemaining-- > 0) throw new MosWord2019.Core.Services.WordBusyException(new Exception("entry dialog")); current = id; Entries++; }
@@ -273,7 +313,7 @@ namespace MosWord2019.Tests
             public void ForceCloseOwnedWord() { Forced++; if (ForceFails) throw new IOException("termination denied"); BusyRemaining = 0; }
             public IReadOnlyList<ExamTaskGrade> GradeSaved(string id) { FromDisk++; return Grades(id); }
             public void Restart(string id) { Restarts++; }
-            public void Close() { if (ForceFails) throw new IOException("cleanup locked"); }
+            public void Close() { Closes++; if (ForceFails) throw new IOException("cleanup locked"); }
             public void Dispose() { }
         }
         private sealed class Lab : IDisposable

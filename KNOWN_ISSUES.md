@@ -1,5 +1,13 @@
 # Known Issues and Verification Items
 
+## C5 — Giới hạn và nghiệm thu còn lại, 2026-11-02
+
+- Release mặc định có pin zero fail-closed; C6 phải build với OnlineServerUrl/OnlineServerSpkiPin thật, publish server trên PC và triển khai theo pin đó. App.config không đổi trust Release. Không coi C5 là nghiệm thu VPS/nginx.
+- Chưa chạy nghiệm thu bằng Word thật, Task Manager kill và ngắt mạng thật; checklist docs/C5_LOCAL_TEST.md là bước xác nhận thủ công cần thực hiện. Smoke HTTPS/PostgreSQL/package/upload/admin dùng client libraries thật nhưng kết quả tổng hợp, không xác nhận hành vi Word native.
+- C2 SessionPolicy từ chối access khi quá15phút không liên hệ, nên server có thể kết thúc phiên trước giới hạn chờ mạng30phút của client. Client không kéo dài quyền; Testing finalize saved-only và queue qua quyền upload riêng khi server từ chối. C5 không đổi chính sách này.
+- Cache/recovery bị xóa hoặc sửa bên ngoài không được dùng để chấm giả hoặc mở starter mới thay câu trả lời. Giữ state/credential để owner xử lý; không kill WINWORD không chứng minh ownership. DPAPI gắn Windows user/machine, không chuyển queue/resume bằng copy file.
+- Giới hạn upload24giờ, admin lock/credential reset và kết quả409 của C4 vẫn áp dụng; giữ B4 và queue khi chưa có ACK hợp lệ. Offline Debug lịch sử không tự upload. Các mục C0–C4 dưới đây là lịch sử.
+
 ## C4 — Giới hạn đã xác nhận, 2026-11-02
 
 - API HMAC/kết quả/admin/queue đã có. C5 mới nối credential/sessionId và Enqueue vào finalize online. Worker startup chỉ retry entry đã đăng ký; offline B4 không có credential server nên không tự upload. Release vẫn chờ C5 để dùng cho học viên.

@@ -26,6 +26,19 @@ namespace MosWord2019.Projects.OnlinePackages
         private FileStream lease;
         private string rootIdentity;
         internal string RecoveryId { get; private set; }
+        internal static IDisposable Retain(string root, SessionRecoveryJournal journal)
+        {
+            var ledger = new PackageCacheLedger(root, journal, true);
+            journal.PreserveSession(ledger.RecoveryId);
+            return new RetainedLease(ledger, journal);
+        }
+        private sealed class RetainedLease : IDisposable
+        {
+            private readonly PackageCacheLedger ledger;
+            private readonly SessionRecoveryJournal journal;
+            internal RetainedLease(PackageCacheLedger ledger, SessionRecoveryJournal journal) { this.ledger = ledger; this.journal = journal; }
+            public void Dispose() { ledger.Dispose(); journal.ReleaseSession(ledger.RecoveryId); }
+        }
         private sealed class Entry { internal string Identity, Hash; internal bool Directory; }
         internal PackageCacheLedger(string root, SessionRecoveryJournal journal)
         {
