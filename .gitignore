@@ -9,3 +9,20 @@ artifacts/
 *.sln.docstates
 TestResults/
 *.nupkg
+
+# Server secrets are supplied through environment variables or external files.
+.env
+.env.*
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/secrets/
+**/data-protection-keys/
+*.pfx
+*.p12
+*.pem
+*.key
+*.pgpass
+*.connection
+*.secrets.json
+*.dump
+*.backup

@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C0 — Nền tảng online, 2026-11-02
+
+Đã bổ sung server độc lập ở server/MosWord2019.Server.sln: .NET10 ASP.NET Core, EF Core/Npgsql/PostgreSQL16+, năm bảng Accounts/Sessions/Results/Packages/AuditLog với migration, health/liveness/readiness, CLI migrate/bootstrap admin và Razor Pages đăng nhập admin có cookie HTTPS/CSRF/rate limit. Secrets lấy từ environment hoặc lưu ngoài repo; không có khóa thật trong source. XUnit kiểm HTTP, bootstrap CLI và persistence trên PostgreSQL thật qua Testcontainers.
+
+Client vẫn giữ nguyên checkpoint U2: WinForms/.NET Framework4.7.2/C#7.3, IAuthenticationService với OfflineAuthenticationService và Word pre-warm sau login thành công. Server chưa tích hợp client; không sửa Training/Testing/grader/recovery/packages. Admin web login không tiêu lượt học viên; login/trừ lượt/mode/resume ở C1 chưa có. Hướng dẫn chạy local: docs/SERVER_DEV.md; kiến trúc và quyết định Phase C: docs/SERVER_ARCHITECTURE.md. Bằng chứng build/test cuối ở PROJECT_STATUS.md và artifacts/c0 (ignored). Dừng C0; chờ “tiếp tục C1”.
+
 ## U2 — Checkpoint pre-warm/giao diện, 2026-11-01
 
 Tick Testing chỉ đổi countdown mỗi giây khi project/trạng thái không đổi; bars double-buffered và không reflow theo tick. Training hiển thị overlay chờ, khóa bars/repaint trước Go/Restart, batch tabs sau mở tài liệu. Controller Training chạy trên STA nền có pump và giữ nguyên các dịch vụ nghiệp vụ; callback ownership vẫn hoàn tất trên UI trước Save. WordWarmup gộp activation, Go/Start chờ chung task, fallback khi lỗi và re-warm instance đã đóng. Testing warm ở rules trên host STA, không tính giờ thi. Instance rỗng đã chứng minh sở hữu được ẩn sau capture, hiện lại khi mở working copy.
@@ -87,10 +93,10 @@ Vai trò tài liệu: `AGENTS.md` chứa quy tắc bắt buộc; tài liệu nà
 
 Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học thực hành trực tiếp trên Microsoft Word desktop thật. Trainer hiển thị câu hỏi, điều hướng task và kiểm tra kết quả trong tài liệu đang làm.
 
-- Hiện triển khai **Training**, hỗ trợ giao diện/câu hỏi **English (`en`) và Tiếng Việt (`vi`)**.
-- `LoginForm` hiện chỉ chọn chế độ/ngôn ngữ, không phải đăng nhập tài khoản hay xác thực.
-- `AppMode` có giá trị `Testing`, nhưng giao diện chỉ cho chọn Training; `MainForm` từ chối Testing vì chưa triển khai.
-- Chưa có thi có tính giờ, tổng điểm, nộp bài, lưu lịch sử vào database hoặc installer/release workflow hoàn chỉnh.
+- Hiện có **Training và offline Testing**, hỗ trợ giao diện/câu hỏi **English (`en`) và Tiếng Việt (`vi`)**.
+- `LoginForm` xác thực qua `IAuthenticationService`; implementation hiện tại `OfflineAuthenticationService` chấp nhận username/password không rỗng, cho chọn Training/Testing và ngôn ngữ. Chưa xác thực với server.
+- Testing có timer50phút, đề7project/34–40task,1000điểm, đạt từ700, nộp/chấm/lưu result và journal recovery theo Phase B.
+- C0 có database server nền tảng và admin login; chưa có đồng bộ result/client licensing hay quy trình triển khai VPS hoàn chỉnh.
 - Có **28 package P01–P28, tổng212 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.

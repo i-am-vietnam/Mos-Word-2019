@@ -1,0 +1,57 @@
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MosWord2019.Server.Data;
+using Npgsql;
+using Testcontainers.PostgreSql;
+
+namespace MosWord2019.Server.Tests;
+
+public sealed class PostgresFixture : IAsyncLifetime
+{
+    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder("postgres:16-alpine")
+        .WithPassword(Convert.ToHexString(RandomNumberGenerator.GetBytes(32))).Build();
+
+    public Task InitializeAsync() => postgres.StartAsync();
+    public Task DisposeAsync() => postgres.DisposeAsync().AsTask();
+
+    public async Task<string> CreateDatabaseAsync(bool migrate = true)
+    {
+        var name = "c0_" + Guid.NewGuid().ToString("N");
+        await using var connection = new NpgsqlConnection(postgres.GetConnectionString());
+        await connection.OpenAsync();
+        await using var command = new NpgsqlCommand($"CREATE DATABASE \"{name}\"", connection);
+        await command.ExecuteNonQueryAsync();
+        var settings = new NpgsqlConnectionStringBuilder(postgres.GetConnectionString()) { Database = name };
+        if (migrate)
+        {
+            await using var db = Open(settings.ConnectionString);
+            await db.Database.MigrateAsync();
+        }
+        return settings.ConnectionString;
+    }
+
+    public static ServerDbContext Open(string connection) => new(
+        new DbContextOptionsBuilder<ServerDbContext>().UseNpgsql(connection).Options);
+}
+
+[CollectionDefinition("PostgreSQL")]
+public sealed class PostgresCollection : ICollectionFixture<PostgresFixture> { }
+
+public sealed class ServerFactory(string connection) : WebApplicationFactory<Program>
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Testing");
+        builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
+            new Dictionary<string, string?> { ["ConnectionStrings:Database"] = connection }));
+        builder.ConfigureServices(services => services.AddDataProtection().UseEphemeralDataProtectionProvider());
+    }
+
+    public HttpClient CreateHttpsClient() => CreateClient(new WebApplicationFactoryClientOptions
+    { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
+}

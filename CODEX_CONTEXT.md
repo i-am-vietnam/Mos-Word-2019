@@ -1,5 +1,15 @@
 # Technical Context
 
+## C0 — Nền tảng server độc lập, 2026-11-02
+
+`server/MosWord2019.Server.sln` tách hoàn toàn solution/client .NET Framework 4.7.2. App ASP.NET Core .NET 10 có Razor Pages admin và health API; EF Core/Npgsql + migration InitialFoundation tạo Accounts, Sessions, Results, Packages, AuditLog. FK Restrict, unique username/session login request/result/package version, check counter/mode/machine hash và JSONB bảo vệ dữ liệu. Timestamp mặc định PostgreSQL CURRENT_TIMESTAMP, expiry dùng TimeProvider UTC của server.
+
+CLI `migrate` áp migration tường minh; `create-admin <username>` đọc MOSWORD_ADMIN_PASSWORD, dùng PasswordHasher Identity PBKDF2 210.000 vòng, transaction/advisory lock và từ chối ghi đè admin hiện có. Không auto-migrate/auto-bootstrap khi web startup. Admin login không tạo lượt học viên. Cookie Secure/HttpOnly/SameSite Strict, hạn30phút không sliding; revalidate admin/lock/expiry mỗi request. Razor Pages /Admin yêu cầu policy Admin trừ Login; POST login/logout có antiforgery và rate limit. Health liveness không đụng DB; readiness kiểm DB/pending migrations, phản hồi chung không tiết lộ cấu hình.
+
+ConnectionStrings__Database và mật khẩu bootstrap nằm trong environment; Data Protection key ring ở ngoài repo theo profile hệ điều hành hoặc DataProtection__KeyPath. Chưa có TLS/package private keys, session token, learner login, trừ lượt, mode lock, heartbeat hoặc upload. Schema C0 không thay cho transaction/idempotency nghiệp vụ của C1. Local HTTPS dùng development certificate; TLS self-signed/SPKI pin và cấu hình VPS thuộc C5/C6. Không đưa server vào MosWord2019.slnx.
+
+IAuthenticationService/OfflineAuthenticationService, LoginForm.OpenShell/OpenSession và WordWarmup/TrainingWordController/TestingStaHost của U1/U2 không sửa. C5 phải thay implementation sau interface, giữ login UI và chỉ bắt đầu pre-warm sau login thành công. Không đổi grader, Training/Testing engine/recovery/journal hay project packages. Kiểm thử server riêng xUnit + PostgreSQL16 Testcontainers và CLI subprocess; dependency/tool ghim phiên bản và lock file. Hướng dẫn: docs/SERVER_DEV.md; thiết kế/ràng buộc Phase C: docs/SERVER_ARCHITECTURE.md. Chỉ tiếp tục C1 khi người dùng yêu cầu.
+
 ## U2 — Presentation updates and owned Word warm-up, 2026-11-01
 
 TestingForm.ApplyState compares presentation state before touching navigation/bars. Elapsed-only observations update a fixed-size countdown label at whole-second changes and return; no tick-driven Arrange/BringToFront. Buffered table/flow panels cover bars; project/state transitions batch layout.

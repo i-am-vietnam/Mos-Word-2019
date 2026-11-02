@@ -1,5 +1,13 @@
 # Project Status
 
+## C0 — Nền tảng server online, 2026-11-02
+
+Từ checkpoint main0ab2497, thêm riêng server/MosWord2019.Server.sln, ASP.NET Core .NET10 + Razor Pages, EF Core/Npgsql và migration Accounts/Sessions/Results/Packages/AuditLog. Có GET /health (liveness), /health/ready (DB + migration), CLI migrate và create-admin đầu tiên bằng PasswordHasher Identity PBKDF2/transaction/advisory lock. Admin login/logout có authorization, cookie Secure/HttpOnly/SameSite Strict, antiforgery và rate limit theo endpoint. Secrets qua environment/tệp ngoài repo, dependency/tool ghim và lock file. Hướng dẫn local: docs/SERVER_DEV.md; kiến trúc/ràng buộc Phase C: docs/SERVER_ARCHITECTURE.md.
+
+VS MSBuild Rebuild Debug/Release mỗi cấu hình0warnings/0errors;865/865client tests mỗi cấu hình (701 headless +164 desktop),0skipped. Đối chiếu TRX U2 giữ nguyên865case/config, không missing/added;150file package/catalog nguồn khớp output Debug/Release. Server dotnet build Debug/Release với warnaserror đạt0warnings/0errors;38/38xUnit tests mỗi cấu hình,0skipped, dùng PostgreSQL16 thật trong Testcontainers. Bao phủ migration Up/Down/reapply, persistence/UTC/JSONB/unique/FK/check, bootstrap hash/validation/concurrency/CLI/no overwrite, auth/expiry/lock/cookie/CSRF/logout/readiness/rate limit. RED health404 và username newline; review phát hiện trailing-slash rate bypass, đã tái hiện RED rồi sửa bằng PageActionDescriptor, regression exact/slash/lowercase GREEN. Review lại không còn finding actionable. Evidence/log/TRX/audit: artifacts/c0 (ignored).
+
+Không sửa source/csproj/solution client, IAuthenticationService/OfflineAuthenticationService hoặc Word pre-warm U2; grader/Training/Testing engine/recovery/journal/packages giữ nguyên. Không chạy một lượt Word thật mới, không nghiệm thu TLS pin hay VPS; đó thuộc các bước sau. C0 không triển khai learner login/trừ lượt/mode/resume, packages online, heartbeat hoặc upload. Cập nhật bốn tệp ngữ cảnh; commit cục bộ theo yêu cầu, không push. Dừng C0, chờ “tiếp tục C1”.
+
 ## U2 — Tick ổn định và pre-warm Word, 2026-11-01
 
 Testing cập nhật countdown chỉ khi mm:ss đổi; tick cùng project/trạng thái không chạm footer/navigation/z-order hoặc tính lại chiều cao. Countdown có vùng đo sẵn; form/bar double-buffered. Training có overlay/trạng thái mở project, khóa bars và repaint trước thao tác dài; rebuild tabs theo lô rồi arrange một lần. TrainingWordController giữ controller trên một STA có message pump, serialize COM và chờ có pump UI với operation gate/deferred close; callback ownership hoàn thành đồng bộ trên UI trước native Save, observation budget được marshal về owner.

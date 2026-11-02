@@ -1,0 +1,15 @@
+@page
+@model MosWord2019.Server.Pages.Admin.LoginModel
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>Administrator login</title></head>
+<body>
+<h1>MOS Word 2019 — Administrator</h1>
+<form method="post">
+    <div asp-validation-summary="All" role="alert"></div>
+    <p><label asp-for="Username"></label> <input asp-for="Username" autocomplete="username" maxlength="64" /></p>
+    <p><label asp-for="Password"></label> <input asp-for="Password" type="password" autocomplete="current-password" maxlength="128" /></p>
+    <button type="submit">Sign in</button>
+</form>
+</body>
+</html>

@@ -1,5 +1,13 @@
 # Known Issues and Verification Items
 
+## C0 — Ranh giới và giới hạn đã xác nhận, 2026-11-02
+
+- Server mới là nền tảng local, chưa sẵn sàng public trên VPS. TLS self-signed/SPKI pin compile trong client, nginx/forwarded headers, firewall, backup và rotation thuộc C5/C6. Không suy HTTPS development certificate của SDK là nghiệm thu pinning thật.
+- Client tiếp tục OfflineAuthenticationService và AlwaysOnlineMonitor trong Release; C0 không xác thực học viên online, trừ lượt, chọn mode, resume qua server, heartbeat, ký/phát package hoặc upload result. Các bước C1–C7 sẽ bổ sung transaction/token/key và migration khi triển khai, không coi unique index C0 là toàn bộ idempotency.
+- Limiter là bộ nhớ theo IP của một app; reverse proxy/multiple instances chưa cấu hình. Khi thêm nginx phải giới hạn trusted forwarded headers để xác định đúng IP trước khi bật public; không nhận tùy ý X-Forwarded-For.
+- Data Protection key ring ngoài repo cần quyền truy cập/backup phù hợp. Trên Linux không mặc định được mã hóa at rest khi chỉ PersistKeysToFileSystem; C6 phải bảo vệ thư mục/key theo tài khoản dịch vụ. Mật khẩu/connection string chỉ qua environment hoặc tệp riêng bên ngoài repo, không ghi vào appsettings.
+- Tests server dùng PostgreSQL16 thật trong Docker/Testcontainers; Docker phải chạy và có quyền truy cập engine. Sandbox có thể báo permission denied dù engine đang chạy; kiểm tra ngoài sandbox trước khi kết luận thiếu điều kiện. Không thay PostgreSQL bằng mock và không skip integration test.
+
 ## U2 — Giới hạn đo hiệu năng và nghiệm thu, 2026-11-01
 
 - Hai lượt Word desktop cô lập đạt Go sau warm dưới2s; activation chuyển sang thời gian chờ ở màn hình chọn/rules, không loại bỏ chi phí COM/Office. Go bấm trước warm vẫn phải đợi activation, UI tiếp tục pump. Không suy từ hai lượt này rằng mọi cold start/antivirus/COM accepted call đều có cùng độ trễ.
