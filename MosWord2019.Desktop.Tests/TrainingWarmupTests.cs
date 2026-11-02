@@ -17,6 +17,109 @@ namespace MosWord2019.Tests
     [TestClass]
     public sealed class TrainingWarmupTests
     {
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void NewOnlineTrainingUseOpensProjectOneOnceAfterWarmupAndKeepsManualSwitching(bool failOpen)
+        {
+            Sta(() =>
+            {
+                for (int use = 0; use < 2; use++)
+                using (var folder = new TestWorkspace())
+                using (var gate = new ManualResetEventSlim())
+                using (var host = new TrainingWordController(() => new FakeWord { StartGate = gate, FailOpen = failOpen }, w => ((FakeWord)w).Alive))
+                {
+                    var clock = new OnlineClock(); Guid id = Guid.NewGuid();
+                    using (var monitor = new SessionConnectivityMonitor(id, "Training", "token", new OnlineTransport(id, clock), clock))
+                    using (var context = new OnlineSessionContext(new OnlineSessionCredentials { SessionId = id, Mode = "Training", Language = "vi" }, monitor, TestCaseData.ProjectsRoot, () => Task.CompletedTask))
+                    {
+                        monitor.PollAsync().GetAwaiter().GetResult();
+                        var fake = TrainingWordController.Wait(host.InvokeAsync(w => (FakeWord)w));
+                        int errors = 0;
+                        using (var form = new MainForm(new AppSession(AppMode.Training, "vi", context), TestCaseData.ProjectsRoot,
+                            new TrainingWorkspaceService(Path.Combine(folder.Folder, "Working"), Path.Combine(folder.Folder, "Documents"), Path.Combine(folder.Folder, "Pictures")),
+                            host, notify: _ => errors++))
+                        {
+                            form.Show(); Application.DoEvents();
+                            Assert.AreEqual(0, fake.Opens, "Auto-open must wait for pre-warm completion.");
+                            ((ComboBox)form.Controls.Find("Projects", true).Single()).SelectedIndex = 1;
+                            gate.Set();
+                            PumpUntil(() => fake.Opens == 1);
+                            var selector = (ComboBox)form.Controls.Find("Projects", true).Single();
+                            Assert.AreEqual("Word2019_P01", ((ProjectPackage)selector.SelectedItem).Meta.ProjectId);
+                            for (int i = 0; i < 4; i++) { typeof(MainForm).GetMethod("RefreshOnlineTraining", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(form, null); Application.DoEvents(); }
+                            Assert.AreEqual(1, fake.Opens, "An auto-open failure must not create a retry loop.");
+                            Assert.AreEqual(failOpen ? 1 : 0, errors);
+                            Assert.IsTrue(selector.Enabled);
+                            var go = (Button)form.Controls.Find("Go", true).Single(); Assert.IsTrue(go.Enabled);
+                            if (!failOpen)
+                            {
+                                selector.SelectedIndex = 1; go.PerformClick();
+                                Assert.AreEqual(2, fake.Opens, "Manual project switching must remain available.");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        private static void PumpUntil(Func<bool> condition)
+        {
+            var wait = System.Diagnostics.Stopwatch.StartNew();
+            while (!condition() && wait.ElapsedMilliseconds < 5000) { Application.DoEvents(); Thread.Sleep(10); }
+            Assert.IsTrue(condition(), "Training operation did not finish."); Application.DoEvents();
+        }
+
+        [TestMethod]
+        public void ConfirmedOnlineCloseDuringPrewarmCancelsAutomaticProjectOpen()
+        {
+            Sta(() =>
+            {
+                using (var folder = new TestWorkspace())
+                using (var gate = new ManualResetEventSlim())
+                using (var host = new TrainingWordController(() => new FakeWord { StartGate = gate }, w => ((FakeWord)w).Alive))
+                {
+                    var clock = new OnlineClock(); Guid id = Guid.NewGuid(); int ends = 0;
+                    using (var monitor = new SessionConnectivityMonitor(id, "Training", "token", new OnlineTransport(id, clock), clock))
+                    using (var context = new OnlineSessionContext(new OnlineSessionCredentials { SessionId = id, Mode = "Training", Language = "vi" }, monitor, TestCaseData.ProjectsRoot, () => { ends++; return Task.CompletedTask; }))
+                    {
+                        monitor.PollAsync().GetAwaiter().GetResult();
+                        var fake = TrainingWordController.Wait(host.InvokeAsync(w => (FakeWord)w));
+                        using (var form = new MainForm(new AppSession(AppMode.Training, "vi", context), TestCaseData.ProjectsRoot,
+                            new TrainingWorkspaceService(Path.Combine(folder.Folder, "Working"), Path.Combine(folder.Folder, "Documents"), Path.Combine(folder.Folder, "Pictures")),
+                            host, confirmRestart: _ => true, notify: _ => { }))
+                        {
+                            form.Show(); Application.DoEvents(); form.Close();
+                            Assert.IsFalse(form.IsDisposed); Assert.AreEqual(0, fake.Opens);
+                            gate.Set(); PumpUntil(() => form.IsDisposed);
+                            Assert.AreEqual(0, fake.Opens, "A confirmed end must cancel auto-open before the pre-warm continuation.");
+                            Assert.AreEqual(1, ends);
+                        }
+                    }
+                }
+            });
+        }
+
+        [DataTestMethod]
+        [DataRow(20, false)]
+        [DataRow(30, true)]
+        public void TrainingReconnectKeepsTwentyMinuteOutageButEndsThirtyMinuteOutage(int minutes, bool ended)
+        {
+            Sta(() =>
+            {
+                using (var f = new OnlineFixture())
+                {
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    f.Clock.Now = TimeSpan.FromSeconds(90); f.Refresh();
+                    f.Clock.Now += TimeSpan.FromMinutes(minutes);
+                    f.Monitor.PollAsync().GetAwaiter().GetResult(); f.Refresh();
+                    Assert.AreEqual(ended ? 1 : 0, f.Ends); Assert.AreEqual(ended, f.Form.IsDisposed);
+                    if (ended) StringAssert.Contains(f.Context.TerminalMessage, "30 phút");
+                    else { Assert.IsTrue(f.Monitor.IsOnline); Assert.IsTrue(f.Word.InputEnabled); }
+                    Assert.AreEqual(0, f.Word.Saves);
+                }
+            });
+        }
         [TestMethod]
         public void TrainingClockFormatsWholeHoursAndClampsExpiredAuthorization()
         {
@@ -324,7 +427,7 @@ namespace MosWord2019.Tests
             internal readonly int Owner = Thread.CurrentThread.ManagedThreadId;
             internal readonly ApartmentState Apartment = Thread.CurrentThread.GetApartmentState();
             internal volatile bool Alive, Opened;
-            internal bool FailFirst;
+            internal bool FailFirst, FailOpen;
             internal int Activations, Opens, Quits, Retires;
             internal bool InputEnabled = true;
             public void SetInputEnabled(bool enabled) { OwnerOnly(); InputEnabled = enabled; }
@@ -344,7 +447,7 @@ namespace MosWord2019.Tests
                 if (StartGate != null && !StartGate.Wait(10000)) throw new TimeoutException("test warm gate");
                 Alive = true; Activations++;
             }
-            public void OpenDocument(string path) { OwnerOnly(); StartWord(); this.path = path; Opened = true; Opens++; }
+            public void OpenDocument(string path) { OwnerOnly(); StartWord(); Opens++; if (FailOpen) throw new IOException("Test open failure."); this.path = path; Opened = true; }
             public void Save() { OwnerOnly(); OwnedDocumentSaving?.Invoke("work"); WorkingFileWritten?.Invoke("work"); }
             public void CloseDocument() { OwnerOnly(); Opened = false; }
             public void ReleaseClosedApplication() { OwnerOnly(); Retires++; Alive = false; }

@@ -38,6 +38,7 @@
     <Compile Include="UiClippingTests.cs" />
     <Compile Include="WordWarmupTests.cs" />
     <Compile Include="TrainingWarmupTests.cs" />
+    <Compile Include="CountdownLayoutTests.cs" />
     <Compile Include="OfflineAuthenticationForTests.cs" />
     <Compile Include="OnlineLoginTests.cs" />
     <None Include="packages.config" />

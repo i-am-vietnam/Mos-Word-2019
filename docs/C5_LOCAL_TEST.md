@@ -98,7 +98,7 @@ Build client bằng Visual Studio hoặc VS MSBuild. Thay đường dẫn MSBuil
 
 Chỉ thay giá trị, giữ các phần XML khác. Config output có thể bị ghi đè khi rebuild; kiểm lại sau mỗi build. Không cần sửa source App.config để lưu cấu hình cá nhân. Các key này chỉ có hiệu lực Debug. Không đặt password/token hoặc PFX password vào config.
 
-Chạy file `.exe` trong output Debug. Chọn ngôn ngữ EN/VI, nhập learner/password rồi bấm **Đăng nhập/Login**. Khi thành công, màn hình hiển thị **Số lượt còn lại/Remaining uses**, bật chọn Training/Testing và nút đổi thành **Tiếp tục/Continue**. Chọn chế độ rồi bấm Tiếp tục. Không coi bước chọn mode là lượt login thứ hai.
+Chạy file `.exe` trong output Debug. Chọn ngôn ngữ EN/VI, nhập learner/password rồi bấm **Đăng nhập/Login**. Khi thành công, màn hình hiển thị **Số lượt còn lại/Remaining uses**, bật chọn Training/Testing và nút đổi thành **Tiếp tục/Continue**. Chọn chế độ rồi bấm Tiếp tục. Training chọn và tự mở Project1 khi Word pre-warm xong; selector/Bắt đầu vẫn dùng để chuyển bài. Use mới luôn bắt đầu P01, không nhớ bài của use trước. Nếu mở lỗi, kiểm tra thông báo rồi bấm Bắt đầu để thử lại, không có retry tự động. Không coi bước chọn mode là lượt login thứ hai.
 
 ## 5. Bảng kiểm thủ công
 
@@ -116,6 +116,16 @@ Ghi lại số lượt, SessionId ở trang Sessions và trạng thái trước/
 | Admin khóa | Khi phiên thử đang chạy, khóa đúng learner trên web; chờ heartbeat | App từ chối tiếp tục khi server thu hồi quyền; không cho đổi mode hoặc tự login offline. Mở khóa rồi login mới là lượt mới, không hồi sinh phiên đã kết thúc. |
 | Sai pin | Đóng client, đổi một ký tự Base64 hợp lệ trong pin output Debug rồi mở/login | Báo certificate mismatch, không tiêu lượt; khôi phục pin đúng trước khi thử tiếp. |
 
+### Thử mất mạng 20 phút (C5-FIX)
+
+1. Build client mới và restart server bằng bản đã có C5-FIX. Server đang chạy dùng DLL cũ không tự nhận thay đổi; dừng bằng Ctrl+C ở cửa sổ server của bạn rồi chạy lại cùng biến môi trường/DB/key/certificate. Không tạo lại database hoặc khóa.
+2. Login Training, ghi Used/SessionId ở admin. Chờ P01 tự mở, kiểm countdown đỏ đậm và footer không nhấp nháy. Đổi P02 bằng selector/Bắt đầu để kiểm chuyển bài vẫn hoạt động; use mới phải tự trở về P01.
+3. Khi đã có heartbeat thành công, dừng server bằng Ctrl+C để giả lập mất mạng local. Giữ client và Word đang chạy. Chờ overlay/Word lock; Training countdown tiếp tục giảm. Giữ mất kết nối **20 phút**, không đóng/restart client.
+4. Chạy lại cùng server/cấu hình. Trong kỳ heartbeat kế tiếp (khoảng30giây), overlay biến mất, Word dùng được; SessionId/Used giữ nguyên, countdown đã trừ20phút. Không password login lại. Lặp với Testing: timer exam dừng trong khoảng offline đã phát hiện, tiếp tục khi nối lại, không đổi đề/lượt; Training4h/Testing hardcap2h không gia hạn.
+5. Trong một use dev khác, giữ mất mạng ít nhất30phút sau khi overlay xuất hiện: Training đóng Word thuộc phiên, thông báo mất kết nối30phút và về login; Testing finalize/queue như trước, upload khi mạng trở lại. Nếu tick UI bị trễ và mạng về đúng lúc đủ30phút, Training vẫn kết thúc. Cần cấp thêm lượt dev giữa các lần login mới.
+6. Phân biệt crash: Task Manager kill/restart vẫn chỉ được server resume trong15phút từ liên hệ cuối. Cửa sổ active35phút/access token40phút chỉ để client còn chạy hồi phục mạng; không tăng cửa sổ crash resume hoặc thời gian học.
+
+Bảng kiểm60tick tự động xác nhận cả Training/Testing không layout lại header/footer; nghiệm thu mắt thường cần làm trên máy đã thấy nhấp nháy. Nếu auto-open thất bại, selector và Bắt đầu phải còn dùng được; không thấy thông báo lặp mỗi giây. Xác nhận thoát trong lúc pre-warm thì app không tải/mở P01 sau đó.
 Máy local dùng `localhost`: rút cáp mạng/Wi-Fi thường **không ngắt loopback**, nên không chứng minh offline bằng cách rút cáp khi server vẫn chạy trên chính máy này. Dừng/chạy lại server là cách thử local rõ ràng. Khi thử server trên máy khác/VPS mới có thể rút mạng client; chưa dùng bảng này để kết luận triển khai VPS đã xong.
 
 Nếu mất mạng đúng lúc login, bấm thử lại trong cùng màn hình để giữ idempotency key; không chủ động mở một lần password login mới chỉ để retry response bị mất. Kiểm server chỉ tăng Used một lần cho key đó. Không in response/token/key ra console để kiểm. Khi resume bị từ chối vì idle/hết hạn/admin khóa, giữ dữ liệu kết quả local để owner kiểm; không sửa đồng hồ hoặc database nhằm kéo dài quyền.

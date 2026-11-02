@@ -81,6 +81,84 @@ public sealed class HeartbeatTests(PostgresFixture postgres)
         Assert.Equal(1, (await db.Accounts.SingleAsync()).Used);
     }
 
+    [Theory]
+    [InlineData("Training", 20, true)]
+    [InlineData("Training", 34, true)]
+    [InlineData("Testing", 20, true)]
+    [InlineData("Testing", 34, true)]
+    [InlineData("Testing", 35, true)]
+    [InlineData("Testing", 36, true)]
+    [InlineData("Testing", 34, false)]
+    [InlineData("Testing", 36, false)]
+    public async Task ActiveHeartbeatUsesThirtyFiveMinuteIdleWindowRegardlessOfOfflineTelemetry(string mode, int minutes, bool offline)
+    {
+        await using var s = await StartAsync(mode);
+        var started = s.Time.Now;
+        using var first = await BeatAsync(s);
+        Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+        s.Time.Now = started.AddMinutes(minutes);
+        using var response = await BeatAsync(s, offline: offline);
+        bool allowed = minutes <= 35;
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Unauthorized, response.StatusCode);
+        await using var db = PostgresFixture.Open(s.Connection);
+        var session = await db.Sessions.SingleAsync();
+        Assert.Equal(allowed ? s.Time.Now : started, session.LastHeartbeatAt);
+        Assert.Equal(started, session.StartedAt);
+        Assert.Equal(started, session.ModeSelectedAt);
+        Assert.Equal(allowed ? 2 : 1, await db.Heartbeats.CountAsync());
+        Assert.Equal(1, (await db.Accounts.SingleAsync()).Used);
+        if (allowed)
+        {
+            var reply = await response.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal(started.AddHours(mode == "Training" ? 4 : 2), reply.GetProperty("expiresAt").GetDateTimeOffset());
+            Assert.NotNull(s.Factory.Services.GetRequiredService<SessionTokens>().Read(reply.GetProperty("sessionToken").GetString()));
+            Assert.Null(session.EndedAt);
+            Assert.Equal(0, await db.AuditLog.CountAsync(a => a.Action == "SessionEnded"));
+        }
+        else
+        {
+            Assert.Equal("Abandoned", session.EndReason);
+            using var retry = await BeatAsync(s, offline: true);
+            Assert.Equal(HttpStatusCode.Unauthorized, retry.StatusCode);
+            Assert.Equal(1, await db.AuditLog.CountAsync(a => a.Action == "SessionEnded"));
+        }
+    }
+
+    [Theory]
+    [InlineData(15, true)]
+    [InlineData(16, false)]
+    public async Task ResumeKeepsFifteenMinuteWindowWithoutEndingOtherwiseActiveSession(int minutes, bool allowed)
+    {
+        await using var s = await StartAsync();
+        var started = s.Time.Now;
+        // Resume measures inactivity from the latest persisted contact, not the session start.
+        s.Time.Now = started.AddMinutes(10);
+        using var beat = await BeatAsync(s);
+        Assert.Equal(HttpStatusCode.OK, beat.StatusCode);
+        s.Time.Now = s.Time.Now.AddMinutes(minutes);
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            using var response = await s.Client.PostAsJsonAsync("/api/sessions/resume",
+                new ResumeRequest(s.ResumeToken, s.Session.MachineId));
+            Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+        await using var db = PostgresFixture.Open(s.Connection);
+        var session = await db.Sessions.SingleAsync();
+        Assert.Equal(started, session.StartedAt);
+        Assert.Equal(started, session.ModeSelectedAt);
+        Assert.Equal(1, (await db.Accounts.SingleAsync()).Used);
+        Assert.Equal(0, await db.AuditLog.CountAsync(a => a.Action == "SessionEnded"));
+        Assert.Equal(allowed ? 2 : 0, await db.AuditLog.CountAsync(a => a.Action == "SessionResumed"));
+        Assert.Equal(allowed ? s.Time.Now : started.AddMinutes(10), session.LastHeartbeatAt);
+        Assert.Null(session.EndedAt);
+        if (!allowed)
+        {
+            s.Time.Now = started.AddMinutes(30);
+            using var runningClient = await BeatAsync(s, offline: true);
+            Assert.Equal(HttpStatusCode.OK, runningClient.StatusCode);
+        }
+    }
+
     [Fact]
     public async Task TenFailedLoginsDoNotEndActiveExamButAdminLockDoes()
     {
@@ -347,7 +425,7 @@ public sealed class HeartbeatTests(PostgresFixture postgres)
     public async Task ClosedAndIdleSessionsCannotBeRevivedByHeartbeat()
     {
         await using var s = await StartAsync();
-        s.Time.Now = s.Time.Now.AddMinutes(15).AddMilliseconds(1);
+        s.Time.Now = s.Time.Now.AddMinutes(35).AddMilliseconds(1);
         using var expired = await BeatAsync(s); Assert.Equal(HttpStatusCode.Unauthorized, expired.StatusCode);
         await using var db = PostgresFixture.Open(s.Connection);
         Assert.Equal("Abandoned", (await db.Sessions.SingleAsync()).EndReason);

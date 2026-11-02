@@ -1,5 +1,15 @@
 # Project Status
 
+## C5-FIX — Nghiệm thu Training và thời gian mất mạng, 2026-11-02
+
+Owner xác nhận C5 với server local/Word thật: admin accounts, online login, tiêu lượt và countdown Training hoạt động. Sửa nhấp nháy: countdown Training cố định theo mẫu00:00:00, không dùng TextChanged đo layout; tick chỉ đổi giá trị khác, giữ double buffer. Desktop regression EN/VI chạy60tick cả Training/Testing, yêu cầu0Layout trên mọi container header/footer, bounds footer không đổi và60TextChanged.
+
+Training online tự chọn/mở P01 một lần khi pre-warm xong và có quyền/mạng; mỗi use mới lại P01. Giữ selector/Go, lỗi cho phép retry thủ công, không retry timer. Confirm close hoặc shutdown hủy auto-open, không mở bài sau end intent. Reconnect sau20phút tiếp tục; đủ30phút chốt session với thông báo dù callback reconnect đến trước tick cuối.
+
+Server active inactivity35phút inclusive, access token40phút; resume vẫn15phút từ liên hệ cuối, từ chối resume cũ không kết thúc phiên chạy còn trong cửa sổ35phút. Chưa chọn mode vẫn15phút; Training4h/Testing2h/expiry/admin-lock/upload permissions giữ nguyên. Thêm test heartbeat20/34/35accept,36deny và resume15accept/16deny rồi heartbeat20accept. Không sửa grader/package/starter/điểm/framework. Chi tiết nghiệm thu: docs/C5_LOCAL_TEST.md. Chỉ C5-FIX, không push.
+
+Kiểm chứng C5-FIX trên worktree hiện tại: client1049/1049, server203/203 mỗi Debug/Release,0skipped; bốn build0warnings/0errors. Giữ đủ1036client/193server case C5 (kỳ vọng access token đổi30→40phút theo yêu cầu). C5-FIX thêm9client/10server; tổng client gồm4case rounding đã có sẵn và được giữ riêng chưacommit. 60tick EN/VI mỗi Training/Testing có0Layout và60TextChanged, footer bounds không đổi; auto-open/failure/close-race/outage20/30 đềuPASS.150file package/hash output giữ nguyên, Release0plaintext; review không còn P1/P2. Evidence artifacts/c5-fix ignored. Server local đang chạy được giữ nguyên, cần restart để nhận code mới; nghiệm thu C5-FIX Word native/outage20phút theo checklist. Commit cục bộ C5-FIX, không push.
+
 ## C5 — Client online, 2026-11-02
 
 Từ cd7bb9c, nối OnlineAuthenticationService vào IAuthenticationService và LoginForm hai bước: đăng nhập hiển thị lượt còn lại, chọn chế độ rồi mới mở/pre-warm Word. Release không biên dịch offline credentials; chỉ Debug có switch phát triển. Lỗi VI/EN có hết lượt, expiry, admin lock, credential/lockout tạm dùng thông báo chung, unreachable và sai chứng thư.

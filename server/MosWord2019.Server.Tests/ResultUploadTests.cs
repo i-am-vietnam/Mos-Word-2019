@@ -262,7 +262,7 @@ public sealed class ResultUploadTests(PostgresFixture postgres)
         var receipt = JObject.Parse(await response.Content.ReadAsStringAsync());
         Assert.NotEqual(access, (string?)receipt["sessionToken"]);
         Assert.NotNull(tokens.Read((string?)receipt["sessionToken"]));
-        s.Time.Now = s.Time.Now.AddMinutes(16);
+        s.Time.Now = s.Time.Now.AddMinutes(36);
         using var expired = await SendAsync(s, token: access); Assert.Equal(HttpStatusCode.Unauthorized, expired.StatusCode);
         await using var db = PostgresFixture.Open(s.Connection); Assert.Equal("Abandoned", (await db.Sessions.SingleAsync()).EndReason);
     }

@@ -90,10 +90,10 @@ namespace MosWord2019
             foreach (Control child in parent.Controls) { if (child is T found) return found; var nested = Find<T>(child); if (nested != null) return nested; }
             return null;
         }
-        internal static void Clock(Label clock)
+        internal static void Clock(Label clock, string sample = "00:00")
         {
             clock.AutoSize = false;
-            Action fit = () => clock.Size = clock.MinimumSize = TextRenderer.MeasureText("00:00", clock.Font) + clock.Padding.Size;
+            Action fit = () => clock.Size = clock.MinimumSize = TextRenderer.MeasureText(sample, clock.Font) + clock.Padding.Size;
             clock.HandleCreated += (s, e) => fit(); clock.FontChanged += (s, e) => fit(); clock.DpiChangedAfterParent += (s, e) => fit(); fit();
         }
         internal static void EqualButtons(Button first, Button second)

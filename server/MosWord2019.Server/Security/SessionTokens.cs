@@ -21,7 +21,7 @@ public sealed class SessionTokens(IDataProtectionProvider provider, TimeProvider
         (forResume ? resumeObservation : accessObservation).Protect(JsonSerializer.Serialize(
             new ObservedToken(new SessionIdentity(sessionId, credentialVersion),
                 IssueCore(forResume ? resume : access, sessionId, credentialVersion,
-                    forResume ? TimeSpan.FromMinutes(255) : TimeSpan.FromMinutes(30)))));
+                    forResume ? TimeSpan.FromMinutes(255) : TimeSpan.FromMinutes(40)))));
 
     public string IssueUpload(Guid sessionId, Guid credentialVersion) =>
         IssueCore(upload, sessionId, credentialVersion, TimeSpan.FromMinutes(1575));

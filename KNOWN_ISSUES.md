@@ -3,8 +3,8 @@
 ## C5 — Giới hạn và nghiệm thu còn lại, 2026-11-02
 
 - Release mặc định có pin zero fail-closed; C6 phải build với OnlineServerUrl/OnlineServerSpkiPin thật, publish server trên PC và triển khai theo pin đó. App.config không đổi trust Release. Không coi C5 là nghiệm thu VPS/nginx.
-- Chưa chạy nghiệm thu bằng Word thật, Task Manager kill và ngắt mạng thật; checklist docs/C5_LOCAL_TEST.md là bước xác nhận thủ công cần thực hiện. Smoke HTTPS/PostgreSQL/package/upload/admin dùng client libraries thật nhưng kết quả tổng hợp, không xác nhận hành vi Word native.
-- C2 SessionPolicy từ chối access khi quá15phút không liên hệ, nên server có thể kết thúc phiên trước giới hạn chờ mạng30phút của client. Client không kéo dài quyền; Testing finalize saved-only và queue qua quyền upload riêng khi server từ chối. C5 không đổi chính sách này.
+- Owner đã xác nhận C5 cơ bản với Word thật: tạo tài khoản, login, tiêu lượt và countdown Training. Cần nghiệm thu lại các sửa C5-FIX (footer, autoP01, mất mạng20phút), Task Manager và mạng thật theo docs/C5_LOCAL_TEST.md; smoke tự động không thay nghiệm thu Word native.
+- C5-FIX đã giải quyết lệch idle15phút: active idle35phút/access40phút để heartbeat nối lại sau outage20phút; crash resume vẫn15phút. Client kết thúc sau30phút offline, hardcaps4h/2h giữ nguyên. Server local đang chạy phải restart để áp dụng thay đổi; kiểm thử dùng output riêng, không tự dừng server của owner.
 - Cache/recovery bị xóa hoặc sửa bên ngoài không được dùng để chấm giả hoặc mở starter mới thay câu trả lời. Giữ state/credential để owner xử lý; không kill WINWORD không chứng minh ownership. DPAPI gắn Windows user/machine, không chuyển queue/resume bằng copy file.
 - Giới hạn upload24giờ, admin lock/credential reset và kết quả409 của C4 vẫn áp dụng; giữ B4 và queue khi chưa có ACK hợp lệ. Offline Debug lịch sử không tự upload. Các mục C0–C4 dưới đây là lịch sử.
 

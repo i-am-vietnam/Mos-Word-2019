@@ -1,5 +1,13 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C5-FIX — Countdown, tự mở Training và idle, 2026-11-02
+
+MainForm dùng UiLayout.Clock(sample00:00:00) thay UiLayout.Text để tick không cập nhật MinimumSize/layout. Đồng bộ text/enabled/visible chỉ khi khác; giữ buffered bars. Testing giữ fast path chỉ countdown và được kiểm tương tự60tick. Training online autoOpenPending một lần sau Shown/pre-warm/online, reset P01 mỗi use; manual Go/confirmed close/end/shutdown hủy intent. Lỗi không lặp tự động. Timeout offline tính trước khi reset offlineSince khi reconnect để30phút vẫn end;20phút nối lại giữ lượt.
+
+SessionPolicy.Evaluate active idle35phút, SessionTokens access40phút. CanResume riêng15phút kiểm sau active policy dưới cùng row lock; stale resume không end phiên còn active35. Mốc pending-mode15phút và hardcap4h/2h không đổi. Cần khởi động lại server local đang chạy để dùng binaries mới; không dừng server của owner trong kiểm thử. Hướng dẫn mất mạng20phút ở docs/C5_LOCAL_TEST.md; không triển khai C6/C7.
+
+Kiểm chứng C5-FIX trên worktree hiện tại: client1049/1049, server203/203 mỗi Debug/Release,0skipped; bốn build0warnings/0errors. Giữ đủ1036client/193server case C5 (kỳ vọng access token đổi30→40phút theo yêu cầu). C5-FIX thêm9client/10server; tổng client gồm4case rounding đã có sẵn và được giữ riêng chưacommit. 60tick EN/VI mỗi Training/Testing có0Layout và60TextChanged, footer bounds không đổi; auto-open/failure/close-race/outage20/30 đềuPASS.150file package/hash output giữ nguyên, Release0plaintext; review không còn P1/P2. Evidence artifacts/c5-fix ignored. Server local đang chạy được giữ nguyên, cần restart để nhận code mới; nghiệm thu C5-FIX Word native/outage20phút theo checklist. Commit cục bộ C5-FIX, không push.
+
 ## C5 — Điểm bàn giao hiện tại, 2026-11-02
 
 Client online đã nối end-to-end sau interfaces: login/mode, pin SPKI, DPAPI resume, machine hash, heartbeat/Word lock, Training4h và Testing definition/packages/kết quả/upload queue. Đăng nhập hiển thị lượt trước chọn mode; pre-warm chỉ sau cả hai bước. Release không có offline credentials, chỉ dùng pin/URL biên dịch; Debug có cấu hình dev. Server trả modeSelectedAt chính xác để retry giữ deadline.

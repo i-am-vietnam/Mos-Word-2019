@@ -52,15 +52,15 @@ public sealed class SessionPolicyTests(PostgresFixture postgres)
     public void IdleBoundaryIsInclusiveAndAbandonmentIsPermanent()
     {
         var (account, session) = State("Training");
-        Assert.True(SessionPolicy.Evaluate(account, session, Start.AddMinutes(15), account.CredentialVersion).Allowed);
-        var denied = SessionPolicy.Evaluate(account, session, Start.AddMinutes(15).AddTicks(1), account.CredentialVersion);
+        Assert.True(SessionPolicy.Evaluate(account, session, Start.AddMinutes(35), account.CredentialVersion).Allowed);
+        var denied = SessionPolicy.Evaluate(account, session, Start.AddMinutes(35).AddTicks(1), account.CredentialVersion);
         Assert.Equal("Abandoned", denied.EndReason);
-        var audit = SessionPolicy.End(session, Start.AddMinutes(16), denied.EndReason!);
+        var audit = SessionPolicy.End(session, Start.AddMinutes(36), denied.EndReason!);
         Assert.NotNull(audit);
         Assert.Contains(session.Id.ToString(), audit.DetailsJson);
-        Assert.Null(SessionPolicy.End(session, Start.AddMinutes(17), "UserEnded"));
-        session.LastHeartbeatAt = Start.AddMinutes(17);
-        Assert.False(SessionPolicy.Evaluate(account, session, Start.AddMinutes(17), account.CredentialVersion).Allowed);
+        Assert.Null(SessionPolicy.End(session, Start.AddMinutes(37), "UserEnded"));
+        session.LastHeartbeatAt = Start.AddMinutes(37);
+        Assert.False(SessionPolicy.Evaluate(account, session, Start.AddMinutes(37), account.CredentialVersion).Allowed);
     }
 
     [Theory]
@@ -124,7 +124,7 @@ public sealed class SessionPolicyTests(PostgresFixture postgres)
     }
 
     [Theory]
-    [InlineData(false, 30)]
+    [InlineData(false, 40)]
     [InlineData(true, 255)]
     public void TokensExpireAtServerDeadlineAndCanBeRefreshed(bool resume, int minutes)
     {
@@ -207,7 +207,7 @@ public sealed class SessionPolicyTests(PostgresFixture postgres)
         var request = new LoginRequest("learner", "password", new string('a', 64), Guid.NewGuid());
         var login = Assert.IsType<SessionReply>((await service.LoginAsync(request, default)).Body);
         Assert.Equal(200, (await service.ModeAsync(login.SessionToken, new ModeRequest("Training"), default)).Status);
-        clock.Now = clock.Now.AddMinutes(16);
+        clock.Now = clock.Now.AddMinutes(36);
         Assert.Equal(409, (await service.LoginAsync(request, default)).Status);
         Assert.Equal("Abandoned", (await db.Sessions.SingleAsync()).EndReason);
         Assert.Equal(1, (await db.Accounts.SingleAsync()).Used);
@@ -231,7 +231,7 @@ public sealed class SessionPolicyTests(PostgresFixture postgres)
         var session = new Session { AccountId = account.Id, AccountCredentialVersion = account.CredentialVersion,
             MachineId = new string('a', 64), StartedAt = clock.Now, Mode = "Training", ModeSelectedAt = clock.Now };
         var token = tokens.Issue(session.Id, account.CredentialVersion);
-        clock.Now = clock.Now.AddMinutes(31);
+        clock.Now = clock.Now.AddMinutes(41);
         session.LastHeartbeatAt = clock.Now;
         db.AddRange(account, session);
         await db.SaveChangesAsync();

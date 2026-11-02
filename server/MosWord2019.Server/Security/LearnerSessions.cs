@@ -142,7 +142,8 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
             return null;
         }
         // Resume proves possession of the session secret; password lockout only blocks new login.
-        return tokenActive ? (session, account) : null;
+        // Refusing a stale resume must not terminate a running client still inside its active window.
+        return tokenActive && (!resume || SessionPolicy.CanResume(session, now)) ? (session, account) : null;
     }
 
     public async Task<SessionOperation> ModeAsync(string? token, ModeRequest request, CancellationToken ct)

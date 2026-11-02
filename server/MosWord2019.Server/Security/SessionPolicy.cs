@@ -18,14 +18,21 @@ public static class SessionPolicy
             return new(false, session.EndedAt == null ? "Expired" : null);
         if (session.EndedAt != null) return new(false);
         if (account.ExpiresAt <= now || now < session.StartedAt) return new(false, "Expired");
-        // Deadlines are exclusive; heartbeat inactivity is inclusive at fifteen minutes.
+        // Deadlines are exclusive; active heartbeat inactivity is inclusive at thirty-five minutes.
         if (session.Mode == null && now >= session.StartedAt.AddMinutes(15)) return new(false, "Expired");
         if (session.Mode == "Training" && now >= session.StartedAt.AddHours(4)) return new(false, "TimeLimit");
         if (session.Mode == "Testing" && (session.ModeSelectedAt == null ||
             now >= session.ModeSelectedAt.Value.AddHours(2))) return new(false, "TimeLimit");
         var lastSeen = session.LastHeartbeatAt ?? session.StartedAt;
-        if (now < lastSeen || now - lastSeen > TimeSpan.FromMinutes(15)) return new(false, "Abandoned");
+        if (now < lastSeen || now - lastSeen > TimeSpan.FromMinutes(35)) return new(false, "Abandoned");
         return new(true);
+    }
+
+    // A restart has a shorter recovery window than a running client's temporary network outage.
+    public static bool CanResume(Session session, DateTimeOffset now)
+    {
+        var lastSeen = session.LastHeartbeatAt ?? session.StartedAt;
+        return now >= lastSeen && now - lastSeen <= TimeSpan.FromMinutes(15);
     }
 
     // Offline upload is a separate permission and never grants active-session access.

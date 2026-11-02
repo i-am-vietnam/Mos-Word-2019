@@ -57,6 +57,7 @@ namespace MosWord2019
         private bool onlineBlocked, onlineEnding, onlineEndCompleted, onlineCloseConfirmed, preserveOnlineSession;
         private string onlineEndMessage;
         private Label trainingCountdown;
+        private bool trainingShown, autoOpenPending;
         private TrainingWordController HostedWord => word as TrainingWordController;
 
         public MainForm(AppSession session) : this(session,
@@ -107,7 +108,8 @@ namespace MosWord2019
             foreach (Control c in new Control[] { go, previous, next, restart, grade, taskCounter, status }) { c.Dock = DockStyle.None; UiLayout.Text(c); }
             var projectLabel = UiLayout.Text(new Label { Text = T("Project:", "Dự án:") });
             var selection = UiLayout.Flow(projectLabel, projects, go);
-            var future = trainingCountdown = UiLayout.Text(new Label { Name = "TrainingCountdown", Visible = session.Online != null, Text = "04:00:00", ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold) });
+            var future = trainingCountdown = new Label { Name = "TrainingCountdown", Visible = session.Online != null, Text = "04:00:00", TextAlign = ContentAlignment.MiddleCenter, ForeColor = Color.Red, Font = new Font("Segoe UI", 24, FontStyle.Bold), Margin = new Padding(1) };
+            UiLayout.Clock(trainingCountdown, "00:00:00");
             layout.Controls.Add(UiLayout.Header(selection, future, new Label { AutoSize = true, Visible = false, Margin = Padding.Empty }, "pnlTopBar", training: true), 0, 0);
             var body = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty }; body.Controls.Add(tabTasks); body.Controls.Add(openingOverlay);
             layout.Controls.Add(body, 0, 1);
@@ -128,6 +130,8 @@ namespace MosWord2019
                 ArrangeWorkspace();
                 RefreshOnlineTraining();
                 if (HostedWord != null) { warmMonitor.Start(); await WarmWord(); }
+                trainingShown = true;
+                TryAutoOpenTraining();
             };
             if (HostedWord != null) HostedWord.Idle += () =>
             {
@@ -154,6 +158,7 @@ namespace MosWord2019
             };
             go.Click += async (s, e) =>
             {
+                autoOpenPending = false;
                 if (session.Online?.TrainingCatalog != null) await OpenOnlineSelectedProject();
                 else Run(() => OpenSelectedProject());
             };
@@ -171,7 +176,7 @@ namespace MosWord2019
                     .Where(p => string.Equals(Path.GetExtension(p.Meta.Starter), ".docx", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(Path.GetExtension(p.Meta.Starter), ".doc", StringComparison.OrdinalIgnoreCase)).ToArray();
                 projects.Items.AddRange(available);
-                if (available.Length > 0) projects.SelectedIndex = 0;
+                if (available.Length > 0) projects.SelectedIndex = Math.Max(0, Array.FindIndex(available, p => p.Meta.ProjectId == "Word2019_P01"));
                 go.Enabled = available.Length > 0;
                 status.Text = available.Length == 0 ? T("No available projects", "Chưa có dự án khả dụng") : T("Ready", "Sẵn sàng");
                 if (loader.LastRejectedCount > 0)
@@ -179,6 +184,7 @@ namespace MosWord2019
             });
             if (session.Online != null)
             {
+                autoOpenPending = true;
                 OnlineElapsed = () => onlineClock.Elapsed;
                 session.Online.Monitor.ConnectivityChanged += OnlineConnectivityChanged;
                 session.Online.Monitor.SessionRejected += OnlineSessionRejected;
@@ -212,38 +218,55 @@ namespace MosWord2019
             if (session.Online == null || IsDisposed || Disposing || skipCleanup || onlineEnding || onlineEndCompleted) return;
             var monitor = session.Online.Monitor;
             TimeSpan? remaining = monitor.TrainingRemaining;
-            if (remaining.HasValue) trainingCountdown.Text = FormatTrainingTime(remaining.Value, true);
+            if (remaining.HasValue) SetText(trainingCountdown, FormatTrainingTime(remaining.Value, true));
             bool connected = monitor.IsOnline;
             TimeSpan now = OnlineElapsed();
+            bool offlineTimedOut = offlineSince.HasValue && now - offlineSince.Value >= TimeSpan.FromMinutes(30);
             if (connected) offlineSince = null;
             else if (!offlineSince.HasValue) offlineSince = now;
             if (monitor.IsSessionRejected)
                 onlineEndMessage = T("This session is no longer authorized. Please sign in again.", "Phiên này không còn được cấp quyền. Vui lòng đăng nhập lại.");
             else if (monitor.IsAuthorizationExpired)
                 onlineEndMessage = T("Your 4-hour Training session has expired. Please sign in again.", "Phiên luyện tập 4 giờ đã hết hạn. Vui lòng đăng nhập lại.");
-            else if (offlineSince.HasValue && now - offlineSince.Value >= TimeSpan.FromMinutes(30))
+            else if (offlineTimedOut)
                 onlineEndMessage = T("The connection has been lost for 30 minutes. This use has ended. Please sign in again.", "Đã mất kết nối 30 phút. Lượt sử dụng này đã kết thúc. Vui lòng đăng nhập lại.");
             onlineBlocked = !connected || onlineEndMessage != null;
             // Update the gates even while an owned STA operation is finishing.
             var top = Controls.Find("pnlTopBar", true).FirstOrDefault();
             var footer = Controls.Find("pnlFooter", true).FirstOrDefault();
-            if (top != null) top.Enabled = !onlineBlocked && !opening;
-            if (footer != null) footer.Enabled = !onlineBlocked && !opening;
-            tabTasks.Enabled = !onlineBlocked;
+            if (top != null) SetEnabled(top, !onlineBlocked && !opening);
+            if (footer != null) SetEnabled(footer, !onlineBlocked && !opening);
+            SetEnabled(tabTasks, !onlineBlocked);
             if ((opening && !downloadingTrainingPackage) || HostedWord?.IsBusy == true || HostedWord?.Warmup.State == WordWarmupState.Warming) return;
             try { if (!controllerDisposed) (word as IWordInputLock)?.SetInputEnabled(!onlineBlocked); }
             catch (Exception ex) { AppLogger.Write("Training owned input gate failed", ex); if (!onlineBlocked) return; }
             if (onlineEndMessage != null) { if (IsHandleCreated) Close(); return; }
             if (downloadingTrainingPackage && !onlineBlocked)
             {
-                openingOverlay.Text = T("Downloading project…", "Đang tải dự án…");
-                openingOverlay.Visible = true; openingOverlay.BringToFront(); return;
+                SetText(openingOverlay, T("Downloading project…", "Đang tải dự án…"));
+                if (!openingOverlay.Visible) { openingOverlay.Visible = true; openingOverlay.BringToFront(); } return;
             }
-            openingOverlay.Text = T("Connection lost. Waiting to reconnect…", "Mất kết nối. Đang chờ kết nối lại…");
+            SetText(openingOverlay, T("Connection lost. Waiting to reconnect…", "Mất kết nối. Đang chờ kết nối lại…"));
             bool wasBlocked = openingOverlay.Visible;
-            openingOverlay.Visible = onlineBlocked;
-            if (onlineBlocked) openingOverlay.BringToFront();
+            if (wasBlocked != onlineBlocked) { openingOverlay.Visible = onlineBlocked; if (onlineBlocked) openingOverlay.BringToFront(); }
             if (wasBlocked && !onlineBlocked) ArrangeWorkspace();
+            TryAutoOpenTraining();
+        }
+
+        private static void SetText(Control control, string text) { if (control.Text != text) control.Text = text; }
+        private static void SetEnabled(Control control, bool enabled) { if (control.Enabled != enabled) control.Enabled = enabled; }
+        private async void TryAutoOpenTraining()
+        {
+            if (!autoOpenPending || !trainingShown || onlineBlocked || onlineEndMessage != null || opening || skipCleanup ||
+                closeAfterOperation || onlineCloseConfirmed || onlineEnding || preserveOnlineSession ||
+                IsDisposed || Disposing || projects.Items.Count == 0 || HostedWord?.IsBusy == true ||
+                HostedWord?.Warmup.State == WordWarmupState.Warming) return;
+            // Consume the intent before opening: errors must leave manual Go available, never retry on a timer.
+            autoOpenPending = false;
+            var first = projects.Items.Cast<ProjectPackage>().FirstOrDefault(p => p.Meta.ProjectId == "Word2019_P01");
+            if (first != null && projects.SelectedItem != first) projects.SelectedItem = first;
+            if (session.Online?.TrainingCatalog != null) await OpenOnlineSelectedProject();
+            else Run(() => OpenSelectedProject());
         }
 
         private async void FinishOnlineTraining()
@@ -870,7 +893,8 @@ namespace MosWord2019
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) preserveOnlineSession = true;
+            if (e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing)
+            { preserveOnlineSession = true; autoOpenPending = false; }
             if (session.Online != null && !preserveOnlineSession && !onlineEndCompleted)
             {
                 e.Cancel = true;
@@ -881,6 +905,7 @@ namespace MosWord2019
                     { base.OnFormClosing(e); return; }
                     onlineCloseConfirmed = true;
                 }
+                autoOpenPending = false;
                 if (opening || HostedWord?.IsBusy == true || HostedWord?.Warmup.State == WordWarmupState.Warming) closeAfterOperation = true;
                 else if (IsHandleCreated) BeginInvoke((Action)FinishOnlineTraining);
                 base.OnFormClosing(e); return;
