@@ -1,0 +1,14 @@
+@page
+@model MosWord2019.Server.Pages.Admin.Accounts.CreateModel
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><title>Create learner</title></head><body>
+<h1>Create learner</h1><p><a asp-page="Index">Learner accounts</a></p>
+<form method="post">
+<div asp-validation-summary="All"></div>
+<p><label asp-for="Username"></label> <input asp-for="Username" autocomplete="off" /></p>
+<p><label asp-for="Password"></label> <input type="password" name="Password" id="Password" autocomplete="new-password" minlength="12" maxlength="128" required /> (12-128 characters)</p>
+<p><label asp-for="MaxUses">Maximum uses</label> <input asp-for="MaxUses" min="0" /></p>
+<p><label asp-for="ExpiresUtc">Expiry (UTC)</label> <input asp-for="ExpiresUtc" type="datetime-local" /> Leave blank for no expiry. All dates are UTC.</p>
+<p><label asp-for="Locked"></label> <input asp-for="Locked" /></p>
+<button type="submit">Create learner</button>
+</form></body></html>

@@ -26,7 +26,7 @@ public sealed class PostgresFixture : IAsyncLifetime
         await connection.OpenAsync();
         await using var command = new NpgsqlCommand($"CREATE DATABASE \"{name}\"", connection);
         await command.ExecuteNonQueryAsync();
-        var settings = new NpgsqlConnectionStringBuilder(postgres.GetConnectionString()) { Database = name };
+        var settings = new NpgsqlConnectionStringBuilder(postgres.GetConnectionString()) { Database = name, Pooling = false };
         if (migrate)
         {
             await using var db = Open(settings.ConnectionString);
@@ -48,7 +48,8 @@ public sealed class ServerFactory(string connection) : WebApplicationFactory<Pro
     {
         builder.UseEnvironment("Testing");
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
-            new Dictionary<string, string?> { ["ConnectionStrings:Database"] = connection }));
+            new Dictionary<string, string?> { ["ConnectionStrings:Database"] = connection,
+                ["DataProtection:KeyPath"] = Path.Combine(Path.GetTempPath(), "MosWord2019-test-keys") }));
         builder.ConfigureServices(services => services.AddDataProtection().UseEphemeralDataProtectionProvider());
     }
 

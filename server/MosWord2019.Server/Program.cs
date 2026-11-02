@@ -1,9 +1,11 @@
 using System.Security.Claims;
+using System.Net;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MosWord2019.Server.Data;
@@ -23,9 +25,22 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 210_000);
 builder.Services.AddSingleton<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddSingleton<AdminAccess>();
-var protection = builder.Services.AddDataProtection().SetApplicationName("MosWord2019.Server");
-if (builder.Configuration["DataProtection:KeyPath"] is { Length: > 0 } keyPath)
-    protection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+builder.Services.AddSingleton<SessionTokens>();
+builder.Services.AddSingleton<LoginThrottle>();
+builder.Services.AddScoped<LearnerSessions>();
+builder.Services.AddScoped<AccountAdministration>();
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 16 * 1024);
+builder.Services.AddDataProtection().SetApplicationName("MosWord2019.Server");
+KeyStorage.Configure(builder);
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = 1;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+    options.KnownProxies.Add(IPAddress.Loopback);
+    options.KnownProxies.Add(IPAddress.IPv6Loopback);
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
     options.LoginPath = "/Admin/Login";
@@ -42,7 +57,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         var db = context.HttpContext.RequestServices.GetRequiredService<ServerDbContext>();
         var time = context.HttpContext.RequestServices.GetRequiredService<TimeProvider>();
         var account = Guid.TryParse(id, out var accountId) ? await db.Accounts.FindAsync(accountId) : null;
-        if (account == null || !AdminAccess.IsAllowed(account, time.GetUtcNow())) context.RejectPrincipal();
+        if (account == null || !AdminAccess.IsAllowed(account, time.GetUtcNow()) ||
+            context.Principal?.FindFirstValue("credential_version") != account.CredentialVersion.ToString()) context.RejectPrincipal();
     };
 });
 builder.Services.AddAuthorization(options => options.AddPolicy("Admin", policy => policy.RequireRole("Admin")));
@@ -59,11 +75,23 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
     {
+        var ip = context.Connection.RemoteIpAddress?.MapToIPv6().ToString() ?? "unknown";
+        if (context.GetEndpoint()?.Metadata.GetMetadata<LearnerLoginEndpoint>() != null)
+            return RateLimitPartition.GetFixedWindowLimiter("learner-ip:" + ip, _ => new FixedWindowRateLimiterOptions
+            { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 });
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            var isResume = context.GetEndpoint()?.Metadata.GetMetadata<LearnerResumeEndpoint>() != null;
+            var identity = isResume ? null : context.RequestServices.GetRequiredService<SessionTokens>().Read(SessionTokens.Bearer(context));
+            if (identity != null) return RateLimitPartition.GetNoLimiter("authenticated-session");
+            return RateLimitPartition.GetFixedWindowLimiter("api-ip:" + ip, _ => new FixedWindowRateLimiterOptions
+            { PermitLimit = 30, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 });
+        }
         if (!context.Request.Path.StartsWithSegments("/Admin"))
             return RateLimitPartition.GetNoLimiter("public");
         var login = context.GetEndpoint()?.Metadata.GetMetadata<PageActionDescriptor>()?.ViewEnginePath == "/Admin/Login" &&
             HttpMethods.IsPost(context.Request.Method);
-        var key = (login ? "login:" : "admin:") + context.Connection.RemoteIpAddress;
+        var key = (login ? "login:" : "admin:") + ip;
         return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
         {
             PermitLimit = login ? 5 : 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0
@@ -72,6 +100,7 @@ builder.Services.AddRateLimiter(options =>
 });
 builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 var app = builder.Build();
+KeyStorage.Validate(app.Configuration, app.Environment);
 
 if (isCommand)
 {
@@ -98,15 +127,33 @@ if (isCommand)
     return;
 }
 
+app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) app.UseHsts();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseRateLimiter();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/Admin"))
+        context.Response.Headers.CacheControl = "no-store";
+    // Access and resume requests share the same singleton budget for the underlying session.
+    if (context.Request.Path.StartsWithSegments("/api") &&
+        context.GetEndpoint()?.Metadata.GetMetadata<LearnerLoginEndpoint>() == null &&
+        context.GetEndpoint()?.Metadata.GetMetadata<LearnerResumeEndpoint>() == null)
+    {
+        var identity = context.RequestServices.GetRequiredService<SessionTokens>().Read(SessionTokens.Bearer(context));
+        if (identity != null && !await context.RequestServices.GetRequiredService<LoginThrottle>()
+            .AllowAsync("session:" + identity.SessionId, context.RequestAborted))
+        { context.Response.StatusCode = 429; return; }
+    }
+    await next(context);
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 app.MapRazorPages();
+app.MapLearnerEndpoints();
 app.Run();
 
 public partial class Program { }

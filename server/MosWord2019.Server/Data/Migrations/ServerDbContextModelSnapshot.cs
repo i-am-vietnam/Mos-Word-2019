@@ -33,14 +33,25 @@ namespace MosWord2019.Server.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<Guid>("CredentialVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
                     b.Property<DateTimeOffset?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FailedLoginCount")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("Locked")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutUntil")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("MaxUses")
                         .HasColumnType("integer");
@@ -70,6 +81,8 @@ namespace MosWord2019.Server.Data.Migrations
 
                     b.ToTable("Accounts", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Accounts_Failures", "\"FailedLoginCount\" BETWEEN 0 AND 10");
+
                             t.HasCheckConstraint("CK_Accounts_Uses", "\"Used\" >= 0 AND \"MaxUses\" >= \"Used\"");
                         });
                 });
@@ -185,6 +198,9 @@ namespace MosWord2019.Server.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountCredentialVersion")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("AccountId")

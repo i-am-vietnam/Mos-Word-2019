@@ -1,0 +1,16 @@
+@page "{id:guid}"
+@model MosWord2019.Server.Pages.Admin.Accounts.SessionsModel
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><title>Learner sessions</title></head><body>
+<h1>Sessions for @Model.Username</h1><p>Account ID: @Model.AccountId</p><p><a asp-page="Index">Learner accounts</a></p>
+<p>All dates are UTC. Machine identifiers show only their first 12 hash characters.</p>
+<table><thead><tr><th>Session ID</th><th>Account ID</th><th>Started (UTC)</th><th>Mode</th><th>Ended (UTC)</th><th>Last heartbeat (UTC)</th><th>Machine hash prefix</th></tr></thead><tbody>
+@foreach (var session in Model.Sessions)
+{
+<tr><td>@session.Id</td><td>@session.AccountId</td><td>@session.StartedAt.UtcDateTime.ToString("u")</td><td>@session.Mode</td><td>@session.EndedAt?.UtcDateTime.ToString("u")</td><td>@session.LastHeartbeatAt?.UtcDateTime.ToString("u")</td><td>@session.MachinePrefix</td></tr>
+}
+</tbody></table>
+@if (Model.PageNumber > 1) { <a asp-route-id="@Model.AccountId" asp-route-pageNumber="@(Model.PageNumber - 1)">Previous</a> }
+<span>Page @Model.PageNumber (50 sessions per page)</span>
+@if (Model.HasNext) { <a asp-route-id="@Model.AccountId" asp-route-pageNumber="@(Model.PageNumber + 1)">Next</a> }
+</body></html>

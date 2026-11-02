@@ -1,5 +1,17 @@
 # Technical Context
 
+## C1 — Tài khoản, lượt và phiên online, 2026-11-02
+
+Server thêm migration AccountsAndUses: Account.FailedLoginCount0..10/LockoutUntil/CredentialVersion và Session.AccountCredentialVersion. LearnerSessions dùng row lock account rồi conditional UPDATE Used+1 RETURNING trong transaction chung với session/audit; retry cùng LoginRequestId/machine trả cùng SessionId, không trừ thêm kể cả lượt cuối. Key khác là lượt mới, kể cả máy khác. Admin bị learner API từ chối, learner không có quyền cookie admin. AccountAdministration/Razor Pages Accounts quản lý tìm kiếm/phân trang/tạo học viên, max/add uses, expiryUTC, permanent lock, reset password và xem phiên; write row lock, không sửa admin qua trang học viên, audit không chứa bí mật.
+
+SessionTokens dùng Data Protection purpose Access/Resume riêng, gắn SessionId/CredentialVersion; mọi session operation kiểm DB, account role/expiry/lock/lockout và credential version. Mode chọn một lần, retry cùng mode idempotent, đổi mode409; end đúng phiên, retry không audit/trừ lượt lặp. Resume cùng SHA-256 machineId hex64, <=15phút từ LastHeartbeatAt hoặc StartedAt theo TimeProvider server, không đổi StartedAt/mode/Used. C1 cập nhật last seen khi login/chọn mode lần đầu/resume; heartbeat thực thuộc C3. Không lưu token thô trong DB/audit; reset password thu hồi token/cookie cũ. Client gửi hash, collector/DPAPI ở C5.
+
+AdminAccess chia sẻ password verification và row lock cho admin/learner;10sai credential liên tiếp khóa15phút, reset khi login được chấp nhận. Wrong password/unknown/lockout cùng401 “Invalid credentials. Please try again later.”; chỉ learner đúng password mới nhận403 phân biệt permanent lock/expiry/no uses. Denial và lockout đều audit. Proxy X-Forwarded-For/Proto chỉ tin127.0.0.1/::1, ForwardLimit1, trước HSTS/HTTPS/rate/auth. Admin login5/IP/phút, admin khác60; learner login10/IP và10/username; API60/session với access+resume chung LoginThrottle singleton, unauthenticated/resume thêm30/IP. API/admin no-store. Limiter in-memory một app, counter/lockout/idempotency bền vững ở PostgreSQL.
+
+KeyStorage đăng ký options theo cấu hình cuối cùng của host; validate sau Build và fail startup ngoài Development nếu thiếu KeyPath hoặc nằm trong repo/không tuyệt đối. Giữ key ring ngoài repo qua restart; .pub public verification key được commit, private .key/.pem/.pfx vẫn ignored. Production sau nginx cùng host, bind loopback ở C6. VPS NVME R2/Ubuntu24.04,2vCPU/4GB/35GB/100Mbps; publish framework-dependent linux-x64 trên PC rồi copy, không build trên VPS. Chi tiết API và triển khai chờ C6: docs/SERVER_ARCHITECTURE.md, docs/SERVER_DEV.md.
+
+Client/solution/Word pre-warm U2, grader, Training/Testing engine/recovery/journal/packages không sửa. Chỉ backend C1, chưa nối UI online/C2–C7. Kiểm chứng riêng và hồi quy client ở artifacts/c1 (ignored); dừng C1, chờ “tiếp tục C2”.
+
 ## C0 — Nền tảng server độc lập, 2026-11-02
 
 `server/MosWord2019.Server.sln` tách hoàn toàn solution/client .NET Framework 4.7.2. App ASP.NET Core .NET 10 có Razor Pages admin và health API; EF Core/Npgsql + migration InitialFoundation tạo Accounts, Sessions, Results, Packages, AuditLog. FK Restrict, unique username/session login request/result/package version, check counter/mode/machine hash và JSONB bảo vệ dữ liệu. Timestamp mặc định PostgreSQL CURRENT_TIMESTAMP, expiry dùng TimeProvider UTC của server.

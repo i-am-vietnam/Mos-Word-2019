@@ -1,0 +1,15 @@
+@page "{id:guid}"
+@model MosWord2019.Server.Pages.Admin.Accounts.EditModel
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><title>Edit learner</title></head><body>
+<h1>Edit learner @Model.Username</h1><p><a asp-page="Index">Learner accounts</a> | <a asp-page="Sessions" asp-route-id="@RouteData.Values["id"]">Sessions</a></p>
+<p>Used: @Model.Used / @Model.CurrentMaxUses</p>
+<form method="post">
+<div asp-validation-summary="All"></div>
+<p><label asp-for="MaxUses">Set maximum uses</label> <input asp-for="MaxUses" min="@Model.Used" /> Leave blank to keep the current maximum.</p>
+<p><label asp-for="AddUses">Add uses</label> <input asp-for="AddUses" min="0" /> Added to the current maximum, or the new maximum entered above.</p>
+<p><label asp-for="ExpiresUtc">Expiry (UTC)</label> <input asp-for="ExpiresUtc" type="datetime-local" /> Leave blank to clear expiry. All dates are UTC.</p>
+<p><label asp-for="Locked"></label> <input asp-for="Locked" /></p>
+<p><label asp-for="NewPassword">Reset password</label> <input type="password" name="NewPassword" id="NewPassword" autocomplete="new-password" minlength="12" maxlength="128" /> Leave blank to keep it; 12-128 characters to reset. Reset invalidates existing credentials and clears login failures.</p>
+<button type="submit">Save changes</button>
+</form></body></html>

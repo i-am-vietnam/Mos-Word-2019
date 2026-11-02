@@ -1,0 +1,17 @@
+@page
+@model MosWord2019.Server.Pages.Admin.Accounts.IndexModel
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><title>Learner accounts</title></head><body>
+<h1>Learner accounts</h1>
+<p><a asp-page="/Admin/Index">Administration</a> | <a asp-page="Create">Create learner</a></p>
+<form method="get"><label asp-for="Search">Search username</label> <input asp-for="Search" maxlength="64" /><button>Search</button></form>
+<table><thead><tr><th>Username</th><th>Used / maximum</th><th>Expiry (UTC)</th><th>Locked</th><th>Actions</th></tr></thead><tbody>
+@foreach (var account in Model.Accounts)
+{
+<tr><td>@account.Username</td><td>@account.Used / @account.MaxUses</td><td>@(account.ExpiresAt?.UtcDateTime.ToString("u") ?? "No expiry")</td><td>@account.Locked</td><td><a asp-page="Edit" asp-route-id="@account.Id">Edit</a> | <a asp-page="Sessions" asp-route-id="@account.Id">Sessions</a></td></tr>
+}
+</tbody></table>
+@if (Model.PageNumber > 1) { <a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-search="@Model.Search">Previous</a> }
+<span>Page @Model.PageNumber (50 accounts per page)</span>
+@if (Model.HasNext) { <a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-search="@Model.Search">Next</a> }
+</body></html>

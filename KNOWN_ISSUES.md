@@ -1,12 +1,13 @@
 # Known Issues and Verification Items
 
-## C0 — Ranh giới và giới hạn đã xác nhận, 2026-11-02
+## C1 — Ranh giới và giới hạn đã xác nhận, 2026-11-02
 
-- Server mới là nền tảng local, chưa sẵn sàng public trên VPS. TLS self-signed/SPKI pin compile trong client, nginx/forwarded headers, firewall, backup và rotation thuộc C5/C6. Không suy HTTPS development certificate của SDK là nghiệm thu pinning thật.
-- Client tiếp tục OfflineAuthenticationService và AlwaysOnlineMonitor trong Release; C0 không xác thực học viên online, trừ lượt, chọn mode, resume qua server, heartbeat, ký/phát package hoặc upload result. Các bước C1–C7 sẽ bổ sung transaction/token/key và migration khi triển khai, không coi unique index C0 là toàn bộ idempotency.
-- Limiter là bộ nhớ theo IP của một app; reverse proxy/multiple instances chưa cấu hình. Khi thêm nginx phải giới hạn trusted forwarded headers để xác định đúng IP trước khi bật public; không nhận tùy ý X-Forwarded-For.
-- Data Protection key ring ngoài repo cần quyền truy cập/backup phù hợp. Trên Linux không mặc định được mã hóa at rest khi chỉ PersistKeysToFileSystem; C6 phải bảo vệ thư mục/key theo tài khoản dịch vụ. Mật khẩu/connection string chỉ qua environment hoặc tệp riêng bên ngoài repo, không ghi vào appsettings.
+- Backend C1 chưa sẵn sàng public trên VPS. Trusted forwarded headers loopback/một hop đã cấu hình và test; nginx/firewall/TLS self-signed/SPKI/backup/rotation vẫn cần C5/C6. Chưa kiểm bằng nginx/VPS thật, không suy từ development certificate rằng pinning đã nghiệm thu.
+- Client tiếp tục OfflineAuthenticationService và AlwaysOnlineMonitor trong Release; chưa gọi API C1, chưa lưu resumeToken DPAPI. Package/signature/upload/heartbeat thực ở C2–C5. LastHeartbeatAt C1 chỉ ghi login/chọn mode/resume; bài chạy dài cần heartbeat C3 trước khi nghiệm thu resume online. MachineId do client gửi hash; collector ổn định trên Windows thuộc C5, không phải hardware attestation.
+- Limiter IP/username/shared session ở bộ nhớ một app; restart reset rate window nhưng Used/lockout/idempotency vẫn bền vững trong PostgreSQL. C6 nginx phải ghi đè header và bind Kestrel loopback; không mở trusted proxy toàn Internet.
+- Data Protection key path bắt buộc ngoài Development, tuyệt đối ngoài repo. Trên Linux key ring filesystem không tự mã hóa at rest; C6 bảo vệ owner/quyền700/backup. Mất key ring làm cookie/token cũ không đọc được, không tự hoàn Used. Bí mật không ghi appsettings/repo; public Ed25519 key C2 có thể dùng .pub, private .key/.pem/.pfx vẫn ignored.
 - Tests server dùng PostgreSQL16 thật trong Docker/Testcontainers; Docker phải chạy và có quyền truy cập engine. Sandbox có thể báo permission denied dù engine đang chạy; kiểm tra ngoài sandbox trước khi kết luận thiếu điều kiện. Không thay PostgreSQL bằng mock và không skip integration test.
+- Fixture mỗi database test không pooling để không giữ hàng trăm kết nối idle; cấu hình runtime production không bị đổi. Chưa chạy nghiệm thu Word thật mới hoặc full online session; bộ hồi quy client độc lập không thay cho checklist C7.
 
 ## U2 — Giới hạn đo hiệu năng và nghiệm thu, 2026-11-01
 

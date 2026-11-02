@@ -10,6 +10,9 @@ public sealed class Account
     public int MaxUses { get; set; }
     public int Used { get; set; }
     public bool Locked { get; set; }
+    public int FailedLoginCount { get; set; }
+    public DateTimeOffset? LockoutUntil { get; set; }
+    public Guid CredentialVersion { get; set; } = Guid.NewGuid();
     public DateTimeOffset? ExpiresAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 }
@@ -19,6 +22,7 @@ public sealed class Session
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid AccountId { get; set; }
     public Guid LoginRequestId { get; set; }
+    public Guid AccountCredentialVersion { get; set; }
     public string MachineId { get; set; } = "";
     public string? Mode { get; set; }
     public DateTimeOffset StartedAt { get; set; }

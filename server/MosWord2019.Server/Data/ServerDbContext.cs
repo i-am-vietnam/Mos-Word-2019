@@ -13,13 +13,18 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
     protected override void OnModelCreating(ModelBuilder model)
     {
         var accounts = model.Entity<Account>();
-        accounts.ToTable("Accounts", t => t.HasCheckConstraint("CK_Accounts_Uses", "\"Used\" >= 0 AND \"MaxUses\" >= \"Used\""));
+        accounts.ToTable("Accounts", t =>
+        {
+            t.HasCheckConstraint("CK_Accounts_Uses", "\"Used\" >= 0 AND \"MaxUses\" >= \"Used\"");
+            t.HasCheckConstraint("CK_Accounts_Failures", "\"FailedLoginCount\" BETWEEN 0 AND 10");
+        });
         accounts.HasKey(x => x.Id);
         accounts.Property(x => x.Username).HasMaxLength(64).IsRequired();
         accounts.Property(x => x.NormalizedUsername).HasMaxLength(64).IsRequired();
         accounts.HasIndex(x => x.NormalizedUsername).IsUnique();
         accounts.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
         accounts.Property(x => x.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+        accounts.Property(x => x.CredentialVersion).HasDefaultValueSql("gen_random_uuid()");
 
         var sessions = model.Entity<Session>();
         sessions.ToTable("Sessions", t =>

@@ -1,5 +1,11 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C1 — Backend tài khoản và lượt, 2026-11-02
+
+Backend có learner login tiêu đúng1lượt bằng UPDATE RETURNING/transaction, retry idempotency cùng phiên không trừ thêm; mode một lần, end idempotent và resume cùng máy <=15phút theo server. Admin web quản lý tìm kiếm/tạo/cấp lượt/expiry/khóa/reset password/xem phiên. Temporary lockout10lỗi/15phút áp dụng admin và learner; audit failures không bí mật. Admin không đăng nhập learner API, learner không vào admin. Reset password đổi credential version để thu hồi token/cookie.
+
+Proxy middleware chỉ tin loopback một hop trước HTTPS/rate/auth; rate limit theo forwarded IP, username và shared session budget. DataProtection__KeyPath tuyệt đối ngoài repo bắt buộc ngoài Development, giữ qua restart. Public key .pub được commit, private key vẫn ngoài repo. C1 chưa có heartbeat thực (C3), package online (C2), upload (C4), client online/DPAPI/SPKI (C5) hoặc VPS deployment (C6). Không đổi client/865tests/Word pre-warm U2/grader/packages. VPS NVME R2 Ubuntu24.04 đã chốt; chỉ publish linux-x64 framework-dependent trên PC và copy, không build VPS. Chi tiết và evidence: docs/SERVER_ARCHITECTURE.md, docs/SERVER_DEV.md, PROJECT_STATUS.md, artifacts/c1 (ignored). Dừng C1, chờ “tiếp tục C2”.
+
 ## C0 — Nền tảng online, 2026-11-02
 
 Đã bổ sung server độc lập ở server/MosWord2019.Server.sln: .NET10 ASP.NET Core, EF Core/Npgsql/PostgreSQL16+, năm bảng Accounts/Sessions/Results/Packages/AuditLog với migration, health/liveness/readiness, CLI migrate/bootstrap admin và Razor Pages đăng nhập admin có cookie HTTPS/CSRF/rate limit. Secrets lấy từ environment hoặc lưu ngoài repo; không có khóa thật trong source. XUnit kiểm HTTP, bootstrap CLI và persistence trên PostgreSQL thật qua Testcontainers.
@@ -96,7 +102,7 @@ Phần mềm Windows Forms luyện thi **MOS Word 2019**, cho người học th�
 - Hiện có **Training và offline Testing**, hỗ trợ giao diện/câu hỏi **English (`en`) và Tiếng Việt (`vi`)**.
 - `LoginForm` xác thực qua `IAuthenticationService`; implementation hiện tại `OfflineAuthenticationService` chấp nhận username/password không rỗng, cho chọn Training/Testing và ngôn ngữ. Chưa xác thực với server.
 - Testing có timer50phút, đề7project/34–40task,1000điểm, đạt từ700, nộp/chấm/lưu result và journal recovery theo Phase B.
-- C0 có database server nền tảng và admin login; chưa có đồng bộ result/client licensing hay quy trình triển khai VPS hoàn chỉnh.
+- C1 có API licensing tài khoản/lượt/phiên và admin quản trị học viên; client vẫn offline, chưa đồng bộ result hoặc triển khai VPS hoàn chỉnh.
 - Có **28 package P01–P28, tổng212 task**, không áp đặt mọi project phải có cùng số task.
 
 Solution là `MosWord2019.slnx`, chương trình khởi động từ `MosWord2019.WinForms/Program.cs`. Repository Word độc lập với repository Excel ở thư mục cha. Origin kỳ vọng: `https://github.com/i-am-vietnam/Mos-Word-2019.git`. Luôn chạy Git/MSBuild với thư mục làm việc là root repository Word; Excel chỉ là tài liệu tham khảo kiến trúc, không sửa hoặc build/clean Excel.

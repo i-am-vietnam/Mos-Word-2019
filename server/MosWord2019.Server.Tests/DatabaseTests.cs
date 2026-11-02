@@ -15,11 +15,37 @@ public sealed class DatabaseTests(PostgresFixture postgres)
     private static string Password() => Guid.NewGuid().ToString("N");
 
     [Fact]
+    public async Task C0DatabaseUpgradePreservesExistingAdminHashCountersAndExpiry()
+    {
+        var connection = await postgres.CreateDatabaseAsync(migrate: false);
+        var id = Guid.NewGuid();
+        var password = Password();
+        var account = new Account { Id = id };
+        var hash = Hasher().HashPassword(account, password);
+        var expiry = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds());
+        await using var db = PostgresFixture.Open(connection);
+        await db.GetService<IMigrator>().MigrateAsync("20261102023613_InitialFoundation");
+        await db.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO "Accounts" ("Id", "Username", "NormalizedUsername", "PasswordHash", "IsAdmin", "MaxUses", "Used", "Locked", "ExpiresAt")
+            VALUES ({id}, 'owner', 'OWNER', {hash}, TRUE, 9, 3, FALSE, {expiry})
+            """);
+        await db.Database.MigrateAsync();
+        var upgraded = await db.Accounts.SingleAsync();
+        Assert.Equal(hash, upgraded.PasswordHash);
+        Assert.Equal(3, upgraded.Used);
+        Assert.Equal(9, upgraded.MaxUses);
+        Assert.Equal(expiry, upgraded.ExpiresAt);
+        Assert.NotEqual(Guid.Empty, upgraded.CredentialVersion);
+        Assert.Equal(0, upgraded.FailedLoginCount);
+        Assert.Null(upgraded.LockoutUntil);
+    }
+
+    [Fact]
     public async Task MigrationsCreateAllFiveTablesAndCanRollBackAndReapply()
     {
         var connection = await postgres.CreateDatabaseAsync();
         await using var db = PostgresFixture.Open(connection);
-        Assert.Single(await db.Database.GetAppliedMigrationsAsync());
+        Assert.Equal(2, (await db.Database.GetAppliedMigrationsAsync()).Count());
         Assert.Empty(await db.Database.GetPendingMigrationsAsync());
         Assert.False(db.Database.HasPendingModelChanges());
         Assert.Empty(await db.Accounts.ToListAsync());

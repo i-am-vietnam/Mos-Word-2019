@@ -18,6 +18,7 @@ public sealed class CliTests(PostgresFixture postgres)
         start.Environment["ConnectionStrings__Database"] = connection;
         start.Environment["MOSWORD_ADMIN_PASSWORD"] = password;
         start.Environment["Logging__LogLevel__Default"] = "Warning";
+        start.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
         using var process = Process.Start(start)!;
         var output = process.StandardOutput.ReadToEndAsync();
         var error = process.StandardError.ReadToEndAsync();

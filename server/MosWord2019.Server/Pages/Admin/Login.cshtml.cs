@@ -24,11 +24,12 @@ public sealed class LoginModel(ServerDbContext db, AdminAccess access, TimeProvi
         ModelState.Remove(nameof(Password));
         if (account == null)
         {
-            ModelState.AddModelError("", "Invalid administrator credentials.");
+            ModelState.AddModelError("", "Invalid administrator credentials. Please try again later.");
             return Page();
         }
         var identity = new ClaimsIdentity([
             new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
+            new Claim("credential_version", account.CredentialVersion.ToString()),
             new Claim(ClaimTypes.Name, account.Username), new Claim(ClaimTypes.Role, "Admin")
         ], CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
