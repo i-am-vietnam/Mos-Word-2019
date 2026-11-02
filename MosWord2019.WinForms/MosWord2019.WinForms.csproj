@@ -50,9 +50,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="TestingStaHost.cs" />
     <Compile Include="DebugConnectivityMonitor.cs" />
-    <Compile Include="TestingForm.cs" />
-    <Compile Include="ResultForm.cs" />
-    <Compile Include="GradingProgress.cs" />
+    <Compile Include="TestingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResultForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GradingProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TestingFlow.cs" />
     <Compile Include="TestingRecoveryDialog.cs" />
     <Compile Include="MissingTranslationException.cs" />
@@ -81,7 +87,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup><None Include="App.config" /><None Include="app.manifest" /></ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="app.manifest" />
+  </ItemGroup>
   <ItemGroup>
     <Folder Include="Projects\Word2019_P01\assets\" />
     <Folder Include="Projects\Word2019_P02\assets\" />
@@ -108,6 +117,5 @@
     <Folder Include="Projects\Word2019_P27\assets\" />
     <Folder Include="Projects\Word2019_P28\assets\" />
   </ItemGroup>
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
