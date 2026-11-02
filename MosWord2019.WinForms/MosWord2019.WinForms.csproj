@@ -82,7 +82,11 @@
       <Name>MosWord2019.Data</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
+  <PropertyGroup>
+    <UseLocalPackages Condition="'$(UseLocalPackages)' == '' and '$(Configuration)' == 'Debug'">true</UseLocalPackages>
+    <UseLocalPackages Condition="'$(UseLocalPackages)' == ''">false</UseLocalPackages>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseLocalPackages)' == 'true'">
     <Content Include="Projects\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -118,4 +122,14 @@
     <Folder Include="Projects\Word2019_P28\assets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="RemovePreviouslyShippedPackages" AfterTargets="Build" Condition="'$(UseLocalPackages)' != 'true'">
+    <ItemGroup>
+      <PreviouslyShippedPackage Include="Projects\**\*" />
+    </ItemGroup>
+    <Delete Files="@(PreviouslyShippedPackage->'$(OutputPath)%(Identity)')" />
+    <ItemGroup>
+      <UnexpectedShippedPackage Include="$(OutputPath)Projects\**\*" />
+    </ItemGroup>
+    <Error Condition="'@(UnexpectedShippedPackage)' != ''" Text="Local packages remain in the output. Use a clean output directory for distribution, or explicitly set UseLocalPackages=true for development." />
+  </Target>
 </Project>

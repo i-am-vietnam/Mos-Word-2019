@@ -64,6 +64,10 @@ public sealed class SessionClockTests(PostgresFixture postgres)
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
         var body = await login.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(start, body.GetProperty("serverTime").GetDateTimeOffset());
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+            "Bearer", body.GetProperty("sessionToken").GetString());
+        using var mode = await client.PostAsJsonAsync("/api/sessions/mode", new { mode = "Training" });
+        Assert.Equal(HttpStatusCode.OK, mode.StatusCode);
         clock.Now = start.AddMinutes(15).AddTicks(extraTicks);
         using var resumed = await client.PostAsJsonAsync("/api/sessions/resume", new
         { resumeToken = body.GetProperty("resumeToken").GetString(), machineId = new string('a', 64), clientTime = start });

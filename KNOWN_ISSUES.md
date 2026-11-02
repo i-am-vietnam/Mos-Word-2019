@@ -1,5 +1,15 @@
 # Known Issues and Verification Items
 
+## C2 — Giới hạn đã xác nhận, 2026-11-02
+
+- C2 có backend gói và thư viện cache client, chưa nối chúng với login/Training/Testing UI. Release mặc định không có Projects nên chưa phát hành cho học viên trước C5; phát triển local có thể build UseLocalPackages=true. Không bỏ guard hoặc bật dev switch cho bản phân phối.
+- Chưa có heartbeat C3; LastHeartbeatAt chỉ cập nhật login/chọn mode đầu/resume. Phiên quá15phút không liên hệ bị Abandoned theo chính sách C2; không lấy việc package/token refresh thành công làm bằng chứng phiên online dài đã hoạt động. Offline/network-loss30phút và resume UI phải được kiểm trong C3/C5/C7.
+- Token C1 cũ bị thay purpose bởi token time-limited C2. Nâng cấp cần dừng các phiên dev/API đang chạy; không tự hoàn Used hay phục hồi phiên đã kết thúc. UploadToken/CanUpload chỉ là quyền hẹp chờ C4; chưa có endpoint nhận kết quả và không được dùng để tải gói/heartbeat.
+- Khóa Ed25519 private hiện tại ở LocalAppData/MosWord2019.Server/secrets/manifest-signing.key ngoài repo. Cần backup private seed, per-package keys/blob, PostgreSQL và DP key ring; mất/đổi private key cần kế hoạch phát hành lại public trust. Public .pub được commit, private key không nằm trong artifact/repo. Linux quyền700/600 đã có trong writer nhưng C6 vẫn phải bảo vệ path có sẵn và backup.
+- Import bị gián đoạn có thể để lại file mã hóa/key không được DB tham chiếu; lần import hợp lệ tiếp theo tự thu hồi dưới advisory lock. Các version còn DB tham chiếu được giữ để bảo toàn đề đang chạy. Không dùng storage chung cho các database độc lập.
+- Cache cleanup không xóa file bị thay native identity/reparse hoặc ngoài ownership claim. Tệp cache ứng dụng còn đúng identity được dọn cả khi sửa nội dung; file đang bị khóa sẽ được thử lại lúc recovery sau. Cần nghiệm thu kill process/mất điện/antivirus/Word thật ở C7; tests hiện dùng ACL/filesystem thật và crash-boundary giả lập có kiểm ownership.
+- HTTP transport C2 dùng TLS chuẩn và từ chối redirect; pin SPKI/self-signed và DPAPI resume là C5/C6, chưa public VPS. Chưa chạy Word native hoặc nginx/VPS mới trong C2; bộ hồi quy903/903 mỗi cấu hình và PostgreSQL138/138 không thay nghiệm thu C7.
+
 ## C1 — Ranh giới và giới hạn đã xác nhận, 2026-11-02
 
 - Backend C1 chưa sẵn sàng public trên VPS. Trusted forwarded headers loopback/một hop đã cấu hình và test; nginx/firewall/TLS self-signed/SPKI/backup/rotation vẫn cần C5/C6. Chưa kiểm bằng nginx/VPS thật, không suy từ development certificate rằng pinning đã nghiệm thu.

@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MosWord2019.Server.Data;
 using MosWord2019.Server.Security;
+using MosWord2019.Server.Packages;
 
 var command = args.FirstOrDefault();
-var isCommand = command is "migrate" or "create-admin";
+var isCommand = command is "migrate" or "create-admin" or "import-packages" or "package-public-key";
 var builder = WebApplication.CreateBuilder(isCommand ? [] : args);
 builder.Services.AddDbContext<ServerDbContext>(options =>
 {
@@ -28,6 +29,9 @@ builder.Services.AddSingleton<AdminAccess>();
 builder.Services.AddSingleton<SessionTokens>();
 builder.Services.AddSingleton<LoginThrottle>();
 builder.Services.AddScoped<LearnerSessions>();
+builder.Services.AddScoped<IServerExamPool, ServerExamPool>();
+builder.Services.AddSingleton<PackageStorage>();
+builder.Services.AddScoped<PackageImporter>();
 builder.Services.AddScoped<AccountAdministration>();
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 16 * 1024);
 builder.Services.AddDataProtection().SetApplicationName("MosWord2019.Server");
@@ -109,6 +113,10 @@ if (isCommand)
         await using var scope = app.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<ServerDbContext>();
         if (command == "migrate" && args.Length == 1) await db.Database.MigrateAsync();
+        else if (command == "import-packages" && args.Length == 2)
+            Console.WriteLine("Imported packages: " + await scope.ServiceProvider.GetRequiredService<PackageImporter>().ImportAsync(args[1]));
+        else if (command == "package-public-key" && args.Length == 1)
+            Console.WriteLine(Convert.ToBase64String(scope.ServiceProvider.GetRequiredService<PackageStorage>().GetPublicKey()));
         else if (command == "create-admin" && args.Length == 2)
         {
             var password = Environment.GetEnvironmentVariable("MOSWORD_ADMIN_PASSWORD") ?? "";
@@ -154,6 +162,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = _ => false }
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 app.MapRazorPages();
 app.MapLearnerEndpoints();
+app.MapPackageEndpoints();
 app.Run();
 
 public partial class Program { }

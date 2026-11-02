@@ -62,6 +62,7 @@
     <Compile Include="Models\ExamResult.cs" />
     <Compile Include="Services\ExamRandom.cs" />
     <Compile Include="Services\ExamComposer.cs" />
+    <Compile Include="Services\ExamDefinitionFingerprint.cs" />
     <Compile Include="Services\ScoreAllocator.cs" />
     <Compile Include="Services\ExamScorer.cs" />
     <Compile Include="Services\TestingRecoveryDecision.cs" />

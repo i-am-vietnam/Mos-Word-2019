@@ -1,5 +1,15 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C2 — Gói online và phiên có giới hạn, 2026-11-02
+
+C2 hoàn tất trên nền C1 e3c3b4f: SessionPolicy chung và token có lifetime, EndedAt/EndReason/audit một lần, quyền offline upload Testing tách biệt chờ C4. Pending15phút, Training4giờ từ login, Testing2giờ từ chọn mode và idle15phút đều do server UTC quyết định. Resume không hồi sinh phiên đã inactive; token hết hạn có hint chỉ để ghi nhận expiration, không cấp quyền.
+
+Server nhập ZIP AES256-GCM/key riêng ngoài repo, ký manifest Ed25519. Testing lưu seed/hash/snapshot và7version, liên kết nguyên source ExamComposer cho .NET10; client dùng cùng composer, kiểm/report definition hash rồi tải đúng7gói. Training tải gói bất kỳ trong phiên active; download ghi audit sessionId. Import có advisory lock/idempotency, cập nhật catalog cho phiên mới và thu hồi orphan khi nhập lần sau. Public trust ở server/manifest-verification.pub và PackageTrust.PublicKey; private seed ở LocalAppData/MosWord2019.Server/secrets ngoài repo, cần backup.
+
+Client giữ net472/C#7.3/Word Interop và login/pre-warm hiện có. Thư viện OnlinePackages qua IPackageTransport có HTTPS chuẩn, kiểm chữ ký/GCM/hash/ZIP, cache SID-only và write-ahead ownership/journal cleanup lúc end/crash; Program gọi recovery trước login. Release mặc định bỏ package local và chặn stale output, Debug/dev có UseLocalPackages. UI/auth online C5 chưa nối nên Release mặc định chưa dành cho học viên; không mở rộng sang C3–C7.
+
+Build client/server Debug/Release0warnings/0errors; client903/903 mỗi cấu hình, giữ865case cũ; server138/138 mỗi cấu hình trên PostgreSQL16 thật,0skipped.150file bài nguồn/grader/ExamComposer/general journal không đổi; Release app0file package plaintext. Chi tiết: docs/SERVER_ARCHITECTURE.md, docs/SERVER_DEV.md, PROJECT_STATUS.md; evidence artifacts/c2 ignored. Commit cục bộ, không push; chờ “tiếp tục C3”.
+
 ## C1 — Backend tài khoản và lượt, 2026-11-02
 
 Backend có learner login tiêu đúng1lượt bằng UPDATE RETURNING/transaction, retry idempotency cùng phiên không trừ thêm; mode một lần, end idempotent và resume cùng máy <=15phút theo server. Admin web quản lý tìm kiếm/tạo/cấp lượt/expiry/khóa/reset password/xem phiên. Temporary lockout10lỗi/15phút áp dụng admin và learner; audit failures không bí mật. Admin không đăng nhập learner API, learner không vào admin. Reset password đổi credential version để thu hồi token/cookie.

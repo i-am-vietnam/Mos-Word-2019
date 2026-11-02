@@ -35,6 +35,7 @@ namespace MosWord2019
                 }
                 // The instance lock must precede recovery: never recover another live trainer's files.
                 Journal = new SessionRecoveryJournal();
+                MosWord2019.Projects.OnlinePackages.OnlinePackageCache.RecoverIncompletePackages(Journal);
                 new TestingSessionStateStore().ProtectPendingRecovery(Journal);
                 Journal.Recover();
                 Workspace = new TrainingWorkspaceService(Journal);

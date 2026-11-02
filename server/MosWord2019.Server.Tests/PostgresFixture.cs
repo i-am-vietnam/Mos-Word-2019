@@ -42,17 +42,32 @@ public sealed class PostgresFixture : IAsyncLifetime
 [CollectionDefinition("PostgreSQL")]
 public sealed class PostgresCollection : ICollectionFixture<PostgresFixture> { }
 
-public sealed class ServerFactory(string connection) : WebApplicationFactory<Program>
+public sealed class ServerFactory(string connection, Dictionary<string, string?>? settings = null,
+    TimeProvider? clock = null, bool realExamPool = false) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
-        builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
-            new Dictionary<string, string?> { ["ConnectionStrings:Database"] = connection,
-                ["DataProtection:KeyPath"] = Path.Combine(Path.GetTempPath(), "MosWord2019-test-keys") }));
-        builder.ConfigureServices(services => services.AddDataProtection().UseEphemeralDataProtectionProvider());
+        builder.ConfigureAppConfiguration((_, configuration) =>
+        {
+            var values = new Dictionary<string, string?>(settings ?? []) { ["ConnectionStrings:Database"] = connection,
+                ["DataProtection:KeyPath"] = Path.Combine(Path.GetTempPath(), "MosWord2019-test-keys") };
+            configuration.AddInMemoryCollection(values);
+        });
+        builder.ConfigureServices(services =>
+        {
+            services.AddDataProtection().UseEphemeralDataProtectionProvider();
+            if (clock != null) services.AddSingleton(clock);
+            if (!realExamPool) services.AddScoped<MosWord2019.Server.Packages.IServerExamPool, FixtureExamPool>();
+        });
     }
 
     public HttpClient CreateHttpsClient() => CreateClient(new WebApplicationFactoryClientOptions
     { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
+}
+
+internal sealed class FixtureExamPool : MosWord2019.Server.Packages.IServerExamPool
+{
+    public Task<MosWord2019.Server.Packages.ServerExam> CreateAsync(CancellationToken ct) => Task.FromResult(
+        new MosWord2019.Server.Packages.ServerExam(123, new string('a', 64), "{\"PackageIds\":[],\"Catalog\":[],\"ExamPool\":[]}"));
 }

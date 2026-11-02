@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Compile Include="../../MosWord2019.Core/Models/ExamDefinition.cs" Link="Models/ExamDefinition.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/ProjectPackage.cs" Link="Models/ProjectPackage.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/ProjectMeta.cs" Link="Models/ProjectMeta.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/TaskDefinition.cs" Link="Models/TaskDefinition.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/TestingCatalogEntry.cs" Link="Models/TestingCatalogEntry.cs" />
+    <Compile Include="../../MosWord2019.Core/Services/ExamComposer.cs" Link="Services/ExamComposer.cs" />
+    <Compile Include="../../MosWord2019.Core/Services/ExamRandom.cs" Link="Services/ExamRandom.cs" />
+    <Compile Include="../../MosWord2019.Core/Services/ExamDefinitionFingerprint.cs" Link="Services/ExamDefinitionFingerprint.cs" />
+  </ItemGroup>
+</Project>

@@ -38,6 +38,10 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
         sessions.HasIndex(x => new { x.AccountId, x.LoginRequestId }).IsUnique();
         sessions.Property(x => x.MachineId).HasMaxLength(64).IsRequired();
         sessions.Property(x => x.Mode).HasMaxLength(16);
+        sessions.Property(x => x.EndReason).HasMaxLength(16);
+        sessions.Property(x => x.ExamDefinitionHash).HasMaxLength(64);
+        sessions.Property(x => x.ReportedDefinitionHash).HasMaxLength(64);
+        sessions.Property(x => x.ExamSnapshotJson).HasColumnType("jsonb");
         sessions.Property(x => x.StartedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         var results = model.Entity<Result>();
@@ -58,6 +62,10 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
         packages.Property(x => x.Version).HasMaxLength(64).IsRequired();
         packages.HasIndex(x => new { x.Code, x.Version }).IsUnique();
         packages.Property(x => x.Sha256).HasMaxLength(64).IsRequired();
+        packages.Property(x => x.ZipSha256).HasMaxLength(64).IsRequired();
+        packages.Property(x => x.MetadataJson).HasColumnType("jsonb");
+        packages.Property(x => x.TasksJson).HasColumnType("jsonb");
+        packages.Property(x => x.CatalogEntryJson).HasColumnType("jsonb");
         packages.Property(x => x.StoragePath).HasMaxLength(1024).IsRequired();
         packages.Property(x => x.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 

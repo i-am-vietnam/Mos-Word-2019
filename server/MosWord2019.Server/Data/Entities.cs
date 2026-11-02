@@ -25,6 +25,12 @@ public sealed class Session
     public Guid AccountCredentialVersion { get; set; }
     public string MachineId { get; set; } = "";
     public string? Mode { get; set; }
+    public DateTimeOffset? ModeSelectedAt { get; set; }
+    public string? EndReason { get; set; }
+    public long? ExamSeed { get; set; }
+    public string? ExamDefinitionHash { get; set; }
+    public string? ReportedDefinitionHash { get; set; }
+    public string? ExamSnapshotJson { get; set; }
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? LastHeartbeatAt { get; set; }
     public DateTimeOffset? EndedAt { get; set; }
@@ -44,6 +50,10 @@ public sealed class Package
     public string Code { get; set; } = "";
     public string Version { get; set; } = "";
     public string Sha256 { get; set; } = "";
+    public string ZipSha256 { get; set; } = "";
+    public string MetadataJson { get; set; } = "{}";
+    public string TasksJson { get; set; } = "[]";
+    public string CatalogEntryJson { get; set; } = "{}";
     public string StoragePath { get; set; } = "";
     public long SizeBytes { get; set; }
     public DateTimeOffset CreatedAt { get; set; }

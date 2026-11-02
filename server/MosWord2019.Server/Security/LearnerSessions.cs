@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using MosWord2019.Server.Data;
+using MosWord2019.Server.Packages;
 using Npgsql;
 
 namespace MosWord2019.Server.Security;
@@ -10,11 +11,13 @@ public sealed record LoginRequest(string? Username, string? Password, string? Ma
 public sealed record ResumeRequest(string? ResumeToken, string? MachineId);
 public sealed record ModeRequest(string? Mode);
 public sealed record SessionReply(Guid SessionId, string SessionToken, string ResumeToken, int RemainingUses,
-    DateTimeOffset ServerTime, string? Mode);
+    DateTimeOffset ServerTime, string? Mode, long? ExamSeed = null, string? DefinitionHash = null,
+    string? UploadToken = null);
 public sealed record SessionError(string Error, string Message);
 public sealed record SessionOperation(int Status, object Body);
 
-public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess credentials, SessionTokens tokens, TimeProvider time)
+public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess credentials, SessionTokens tokens,
+    TimeProvider time, IServerExamPool? examPool = null)
 {
     [GeneratedRegex("\\A[0-9a-f]{64}\\z", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex MachinePattern();
@@ -25,7 +28,9 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
     { AccountId = account.Id, Action = "LoginFailed", DetailsJson = System.Text.Json.JsonSerializer.Serialize(new { channel = "learner", reason }) });
     private SessionOperation Reply(Session session, Account account, DateTimeOffset now) => new(200,
         new SessionReply(session.Id, tokens.Issue(session.Id, account.CredentialVersion),
-            tokens.Issue(session.Id, account.CredentialVersion, true), account.MaxUses - account.Used, now, session.Mode));
+            tokens.Issue(session.Id, account.CredentialVersion, true), account.MaxUses - account.Used, now, session.Mode,
+            session.ExamSeed, session.ExamDefinitionHash,
+            session.Mode == "Testing" ? tokens.IssueUpload(session.Id, account.CredentialVersion) : null));
 
     public async Task<SessionOperation> LoginAsync(LoginRequest request, CancellationToken ct)
     {
@@ -35,6 +40,8 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         var now = time.GetUtcNow();
         var account = await credentials.VerifyAsync(db, request.Username, request.Password, false, now, ct);
+        // Verification takes the account row lock; concurrent retries may have waited for a newer session.
+        now = time.GetUtcNow();
         await db.SaveChangesAsync(ct);
         if (account == null) { await transaction.CommitAsync(ct); return Invalid(); }
         if (account.Locked || account.ExpiresAt <= now)
@@ -48,8 +55,18 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
             x.LoginRequestId == request.IdempotencyKey, ct);
         if (previous != null)
         {
-            if (previous.MachineId != request.MachineId!.ToLowerInvariant() || previous.EndedAt != null ||
-                previous.AccountCredentialVersion != account.CredentialVersion) return Error(409, "idempotency_conflict");
+            var permission = SessionPolicy.Evaluate(account, previous, now, account.CredentialVersion);
+            if (!permission.Allowed && permission.EndReason != null)
+            {
+                var audit = SessionPolicy.End(previous, now, permission.EndReason);
+                if (audit != null) db.AuditLog.Add(audit);
+            }
+            if (previous.MachineId != request.MachineId!.ToLowerInvariant() || !permission.Allowed)
+            {
+                await db.SaveChangesAsync(ct);
+                await transaction.CommitAsync(ct);
+                return Error(409, "idempotency_conflict");
+            }
             AdminAccess.ResetFailures(account);
             await db.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
@@ -86,9 +103,16 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         return Reply(session, account, now);
     }
 
-    private async Task<(Session Session, Account Account)?> FindAsync(string? token, bool resume, CancellationToken ct)
+    // Caller owns a transaction and commits denied results to preserve expiration and audit.
+    public Task<(Session Session, Account Account)?> FindAsync(string? token, bool resume, CancellationToken ct) =>
+        FindCoreAsync(token, resume, false, ct);
+
+    private async Task<(Session Session, Account Account)?> FindCoreAsync(string? token, bool resume,
+        bool allowEndReceipt, CancellationToken ct)
     {
         var identity = tokens.Read(token, resume);
+        var tokenActive = identity != null;
+        identity ??= tokens.ReadExpirationHint(token, resume);
         if (identity == null) return null;
         var hint = await db.Sessions.AsNoTracking().SingleOrDefaultAsync(x => x.Id == identity.SessionId, ct);
         if (hint == null) return null;
@@ -102,10 +126,21 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         var session = sessions.Single();
         await db.Entry(session).ReloadAsync(ct);
         var now = time.GetUtcNow();
-        if (account.IsAdmin || account.Locked || account.ExpiresAt <= now || account.LockoutUntil > now ||
-            identity.CredentialVersion != account.CredentialVersion || session.AccountCredentialVersion != account.CredentialVersion)
+        if (tokenActive && allowEndReceipt && session.EndReason == "UserEnded" && session.EndedAt != null &&
+            SessionPolicy.ValidIdentity(account, session, identity.CredentialVersion) &&
+            (account.ExpiresAt == null || account.ExpiresAt > now) && !(account.LockoutUntil > now)) return (session, account);
+        var permission = SessionPolicy.Evaluate(account, session, now, identity.CredentialVersion);
+        if (!permission.Allowed)
+        {
+            if (permission.EndReason != null)
+            {
+                var audit = SessionPolicy.End(session, now, permission.EndReason);
+                if (audit != null) db.AuditLog.Add(audit);
+                await db.SaveChangesAsync(ct);
+            }
             return null;
-        return (session, account);
+        }
+        return tokenActive ? (session, account) : null;
     }
 
     public async Task<SessionOperation> ModeAsync(string? token, ModeRequest request, CancellationToken ct)
@@ -113,14 +148,25 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         if (request.Mode is not ("Training" or "Testing")) return Error(400, "invalid_mode");
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         var found = await FindAsync(token, false, ct);
-        if (found == null || found.Value.Session.EndedAt != null) return Invalid();
+        if (found == null) { await transaction.CommitAsync(ct); return Invalid(); }
         var (session, account) = found.Value;
         if (session.Mode != null && session.Mode != request.Mode) return Error(409, "mode_already_selected");
         var now = time.GetUtcNow();
-        if (request.Mode == "Training" && now >= session.StartedAt.AddHours(4)) return Error(409, "session_expired");
         if (session.Mode == null)
         {
+            if (request.Mode == "Testing")
+            {
+                try
+                {
+                    var exam = await (examPool ?? new ServerExamPool(db)).CreateAsync(ct);
+                    session.ExamSeed = exam.Seed;
+                    session.ExamDefinitionHash = exam.DefinitionHash;
+                    session.ExamSnapshotJson = exam.SnapshotJson;
+                }
+                catch (InvalidDataException) { return Error(503, "packages_unavailable"); }
+            }
             session.Mode = request.Mode;
+            session.ModeSelectedAt = now;
             session.LastHeartbeatAt = now;
             db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "SessionModeSelected", CreatedAt = now });
             await db.SaveChangesAsync(ct);
@@ -132,18 +178,19 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
     public async Task<SessionOperation> EndAsync(string? token, Guid id, CancellationToken ct)
     {
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        var found = await FindAsync(token, false, ct);
-        if (found == null || found.Value.Session.Id != id) return Invalid();
+        var found = await FindCoreAsync(token, false, true, ct);
+        if (found == null || found.Value.Session.Id != id) { await transaction.CommitAsync(ct); return Invalid(); }
         var (session, account) = found.Value;
         var now = time.GetUtcNow();
         if (session.EndedAt == null)
         {
-            session.EndedAt = now;
-            db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "SessionEnded", CreatedAt = now });
+            var audit = SessionPolicy.End(session, now, "UserEnded");
+            if (audit != null) db.AuditLog.Add(audit);
             await db.SaveChangesAsync(ct);
         }
         await transaction.CommitAsync(ct);
-        return new(200, new { sessionId = session.Id, serverTime = now, endedAt = session.EndedAt });
+        return new(200, new { sessionId = session.Id, serverTime = now, endedAt = session.EndedAt,
+            sessionToken = tokens.Issue(session.Id, account.CredentialVersion) });
     }
 
     public async Task<SessionOperation> ResumeAsync(ResumeRequest request, CancellationToken ct)
@@ -151,13 +198,10 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         if (!ValidMachine(request.MachineId)) return Error(400, "invalid_request");
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         var found = await FindAsync(request.ResumeToken, true, ct);
-        if (found == null) return Invalid();
+        if (found == null) { await transaction.CommitAsync(ct); return Invalid(); }
         var (session, account) = found.Value;
         var now = time.GetUtcNow();
-        var lastSeen = session.LastHeartbeatAt ?? session.StartedAt;
-        if (session.EndedAt != null || session.MachineId != request.MachineId!.ToLowerInvariant() ||
-            now < lastSeen || now - lastSeen > TimeSpan.FromMinutes(15) ||
-            (session.Mode == "Training" && now >= session.StartedAt.AddHours(4))) return Invalid();
+        if (session.MachineId != request.MachineId!.ToLowerInvariant()) return Invalid();
         session.LastHeartbeatAt = now;
         db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "SessionResumed", CreatedAt = now });
         await db.SaveChangesAsync(ct);

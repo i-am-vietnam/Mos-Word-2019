@@ -127,6 +127,10 @@ namespace MosWord2019.Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CatalogEntryJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -136,6 +140,10 @@ namespace MosWord2019.Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("MetadataJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("Sha256")
                         .IsRequired()
@@ -150,7 +158,16 @@ namespace MosWord2019.Server.Data.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
+                    b.Property<string>("TasksJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("ZipSha256")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
@@ -206,8 +223,22 @@ namespace MosWord2019.Server.Data.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("EndReason")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<DateTimeOffset?>("EndedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExamDefinitionHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<long?>("ExamSeed")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExamSnapshotJson")
+                        .HasColumnType("jsonb");
 
                     b.Property<DateTimeOffset?>("LastHeartbeatAt")
                         .HasColumnType("timestamp with time zone");
@@ -223,6 +254,13 @@ namespace MosWord2019.Server.Data.Migrations
                     b.Property<string>("Mode")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset?>("ModeSelectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReportedDefinitionHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<DateTimeOffset>("StartedAt")
                         .ValueGeneratedOnAdd()

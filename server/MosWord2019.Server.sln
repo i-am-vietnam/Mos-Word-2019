@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MosWord2019.Server", "MosWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MosWord2019.Server.Tests", "MosWord2019.Server.Tests\MosWord2019.Server.Tests.csproj", "{6F25B06C-73C1-4D61-B573-FCCDE60C9F5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MosWord2019.ExamComposition", "MosWord2019.ExamComposition\MosWord2019.ExamComposition.csproj", "{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{6F25B06C-73C1-4D61-B573-FCCDE60C9F5D}.Release|x64.Build.0 = Release|Any CPU
 		{6F25B06C-73C1-4D61-B573-FCCDE60C9F5D}.Release|x86.ActiveCfg = Release|Any CPU
 		{6F25B06C-73C1-4D61-B573-FCCDE60C9F5D}.Release|x86.Build.0 = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|x64.Build.0 = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E79DC8D-6CBD-4A64-9CB5-1F0320BDF6C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
