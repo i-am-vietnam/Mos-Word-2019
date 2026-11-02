@@ -1,0 +1,26 @@
+@page "{id:guid}"
+@model MosWord2019.Server.Pages.Admin.Results.DetailsModel
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8" /><title>Chi tiết kết quả</title></head><body>
+<h1>Chi tiết kết quả — @Model.Username</h1>
+<p><a asp-page="Index">Tất cả kết quả</a> | <a asp-page="Index" asp-route-accountId="@Model.AccountId">Kết quả tài khoản</a></p>
+<dl>
+<dt>Mã kết quả</dt><dd>@Model.Result.Id</dd>
+<dt>Mã phiên</dt><dd>@Model.Result.SessionId</dd>
+<dt>Ngày nhận (UTC)</dt><dd>@Model.Result.ReceivedAt.UtcDateTime.ToString("u")</dd>
+<dt>Điểm / 1000</dt><dd>@Model.Result.Score / 1000</dd>
+<dt>Kết quả</dt><dd>@(Model.Result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</dd>
+<dt>Cờ (gồm đồng hồ client lùi / thời gian không nhất quán nếu có)</dt><dd>@Model.Result.FlagsJson</dd>
+</dl>
+<p>Điểm do server tính lại từ kết quả từng câu do client gửi. Cờ thời gian không tự thay đổi điểm hoặc kết quả đạt.</p>
+<h2>Câu cần luyện tập</h2>
+<table><thead><tr><th>Project</th><th>Task</th><th>Khóa hướng dẫn</th><th>Nội dung hướng dẫn</th></tr></thead><tbody>
+@foreach (var task in Model.WrongTasks)
+{
+<tr><td>@task.ProjectId</td><td>@task.TaskId</td><td>@task.InstructionKey</td><td style="white-space: pre-wrap">@task.Instruction</td></tr>
+}
+</tbody></table>
+@if (Model.WrongTasks.Count == 0) { <p>Không có câu cần luyện tập.</p> }
+<h2>Các khoảng mất kết nối</h2>
+<pre>@Model.Result.OfflineGapsJson</pre>
+</body></html>

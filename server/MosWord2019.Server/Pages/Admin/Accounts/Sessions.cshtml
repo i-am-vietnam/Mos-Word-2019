@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8" /><title>Learner sessions</title></head><body>
 <h1>Sessions for @Model.Username</h1><p>Account ID: @Model.AccountId</p><p><a asp-page="Index">Learner accounts</a></p>
+<p><a asp-page="/Admin/Results/Index" asp-route-accountId="@Model.AccountId">Kết quả thi</a></p>
 <p>All dates are UTC. Machine identifiers show only their first 12 hash characters.</p>
 <table><thead><tr><th>Session ID</th><th>Account ID</th><th>Started (UTC)</th><th>Mode</th><th>Ended (UTC)</th><th>Last heartbeat (UTC)</th><th>Machine hash prefix</th></tr></thead><tbody>
 @foreach (var session in Model.Sessions)

@@ -94,7 +94,7 @@ public sealed class HeartbeatTests(PostgresFixture postgres)
         await using var db = PostgresFixture.Open(s.Connection);
         Assert.True((await db.Accounts.SingleAsync()).LockoutUntil > s.Time.Now);
         using var resume = await s.Client.PostAsJsonAsync("/api/sessions/resume", new { resumeToken = s.ResumeToken, machineId = s.Session.MachineId });
-        Assert.Equal(HttpStatusCode.Unauthorized, resume.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, resume.StatusCode);
         using var heartbeat = await BeatAsync(s);
         Assert.Equal(HttpStatusCode.OK, heartbeat.StatusCode);
         Assert.Null((await db.Sessions.AsNoTracking().SingleAsync()).EndedAt);
@@ -105,6 +105,68 @@ public sealed class HeartbeatTests(PostgresFixture postgres)
         Assert.Equal("Expired", (await db.Sessions.AsNoTracking().SingleAsync()).EndReason);
         Assert.Equal(1, await db.AuditLog.CountAsync(a => a.Action == "SessionEnded"));
         Assert.Equal(1, (await db.Accounts.AsNoTracking().SingleAsync()).Used);
+    }
+
+    [Theory]
+    [InlineData("locked")]
+    [InlineData("expired")]
+    [InlineData("credential")]
+    public async Task ResumeStillRejectsRevokedAccountAndEndsSessionOnlyOnce(string reason)
+    {
+        await using var s = await StartAsync();
+        await using (var db = PostgresFixture.Open(s.Connection))
+        {
+            var account = await db.Accounts.SingleAsync();
+            account.LockoutUntil = s.Time.Now.AddMinutes(15);
+            if (reason == "locked") account.Locked = true;
+            if (reason == "expired") account.ExpiresAt = s.Time.Now;
+            if (reason == "credential") account.CredentialVersion = Guid.NewGuid();
+            await db.SaveChangesAsync();
+        }
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            using var denied = await s.Client.PostAsJsonAsync("/api/sessions/resume",
+                new { resumeToken = s.ResumeToken, machineId = s.Session.MachineId });
+            Assert.Equal(HttpStatusCode.Unauthorized, denied.StatusCode);
+        }
+        await using var reopened = PostgresFixture.Open(s.Connection);
+        Assert.Equal("Expired", (await reopened.Sessions.SingleAsync()).EndReason);
+        Assert.Equal(1, await reopened.AuditLog.CountAsync(x => x.Action == "SessionEnded"));
+        Assert.Equal(0, await reopened.AuditLog.CountAsync(x => x.Action == "SessionResumed"));
+        Assert.Equal(1, (await reopened.Accounts.SingleAsync()).Used);
+    }
+
+    [Fact]
+    public async Task ResumeDuringPasswordLockoutStillRequiresSecretAndSameMachine()
+    {
+        await using var s = await StartAsync();
+        await using (var db = PostgresFixture.Open(s.Connection))
+        {
+            var account = await db.Accounts.SingleAsync();
+            account.LockoutUntil = s.Time.Now.AddMinutes(15);
+            account.FailedLoginCount = 10;
+            await db.SaveChangesAsync();
+        }
+        foreach (var request in new[]
+        {
+            new ResumeRequest(s.ResumeToken, new string('b', 64)),
+            new ResumeRequest(s.Token, s.Session.MachineId),
+            new ResumeRequest("invalid", s.Session.MachineId)
+        })
+        {
+            using var denied = await s.Client.PostAsJsonAsync("/api/sessions/resume", request);
+            Assert.Equal(HttpStatusCode.Unauthorized, denied.StatusCode);
+        }
+        using var resumed = await s.Client.PostAsJsonAsync("/api/sessions/resume",
+            new ResumeRequest(s.ResumeToken, s.Session.MachineId));
+        Assert.Equal(HttpStatusCode.OK, resumed.StatusCode);
+        await using var reopened = PostgresFixture.Open(s.Connection);
+        Assert.Null((await reopened.Sessions.SingleAsync()).EndedAt);
+        Assert.Equal(1, await reopened.AuditLog.CountAsync(x => x.Action == "SessionResumed"));
+        var persisted = await reopened.Accounts.SingleAsync();
+        Assert.Equal(10, persisted.FailedLoginCount);
+        Assert.True(persisted.LockoutUntil > s.Time.Now);
+        Assert.Equal(1, persisted.Used);
     }
 
     [Fact]

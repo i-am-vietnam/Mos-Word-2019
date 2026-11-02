@@ -39,6 +39,7 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
         sessions.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
         sessions.HasIndex(x => new { x.AccountId, x.LoginRequestId }).IsUnique();
         sessions.Property(x => x.MachineId).HasMaxLength(64).IsRequired();
+        sessions.Property(x => x.ResultSigningKey).HasMaxLength(44).IsRequired();
         sessions.Property(x => x.Mode).HasMaxLength(16);
         sessions.Property(x => x.EndReason).HasMaxLength(16);
         sessions.Property(x => x.ExamDefinitionHash).HasMaxLength(64);
@@ -69,6 +70,10 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
         results.HasKey(x => x.Id);
         results.HasOne<Session>().WithOne().HasForeignKey<Result>(x => x.SessionId).OnDelete(DeleteBehavior.Restrict);
         results.Property(x => x.PayloadJson).HasColumnType("jsonb").IsRequired();
+        results.Property(x => x.PayloadHash).HasMaxLength(64).IsRequired();
+        results.Property(x => x.FlagsJson).HasColumnType("jsonb").IsRequired();
+        results.Property(x => x.WrongTasksJson).HasColumnType("jsonb").IsRequired();
+        results.Property(x => x.OfflineGapsJson).HasColumnType("jsonb").IsRequired();
         results.Property(x => x.ReceivedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         var packages = model.Entity<Package>();

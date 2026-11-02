@@ -1,5 +1,13 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C4 — Kết quả server và queue client, 2026-11-02
+
+POST /api/results kiểm HMAC-SHA256 đúng byte JSON B4 bằng khóa dẫn xuất riêng từng session, cấp ở login/resume/mode. DB chỉ giữ khóa SHA256 dẫn xuất từ nguồn CSPRNG đã hủy. Active Testing dùng FindAsync; offline upload dùng CanUpload24giờ/purpose riêng, không nâng thành access token. Account/session row lock và unique SessionId bảo đảm200 retry cùng hash,409/audit payload khác. Server tái dùng nguyên ExamScorer/ScoreAllocator, kiểm definition/task theo đề ghim, tính lại điểm/700-pass; instruction câu sai lấy từ đúng ZIP/GCM pinned. Kết quả lưu flags/gaps/clock rollback và có admin global/theo account/chi tiết.
+
+Temporary password lockout chỉ chặn login mới, không chặn resume possession-token cùng máy. Admin Locked/expiry/credential reset vẫn thu hồi. Worker startup/24h chỉ xóa Heartbeats cũ hơn90ngày, không đụng phiên/gap/kết quả/audit.
+
+OnlineResults giữ payload/key/token trong DPAPI CurrentUser+ACL ngoài repo, retry/backoff qua restart và xác minh receipt200/hash/session. Program retry entry đã đăng ký; auth/sessionId/Enqueue của finalize online chờ C5. B4 local không sửa/xóa, receipt riêng quyết định GetStatus.PendingUpload. Giữ grader/UI/Training/Testing engine/Word pre-warm và framework. Kiểm chứng cuối981/981client và193/193server mỗi Debug/Release,0skipped/0warnings/0errors; giữ đủ942/160case C3,150file nguồn và Release0plaintext package. Chi tiết contract: docs/SERVER_ARCHITECTURE.md, docs/SERVER_DEV.md; evidence artifacts/c4 ignored. Dừng trước C5, không push. Các mục C3 trở xuống là lịch sử.
+
 ## C3 — Liên hệ định kỳ và thời gian server, 2026-11-02
 
 C3 bổ sung heartbeat transaction/row lock, lịch sử Heartbeats/OfflineGaps và reply UTC/deadline/remaining/access token mới, budget6/phút/session. Deadline Training4h từ login/Testing2h từ mode không đổi; không tiêu thêm lượt. Temporary lockout chỉ chặn login/resume, không phá exam active hoặc cookie admin đang hoạt động; admin lock/expiry/reset vẫn thu hồi. TimingInconsistent theo SessionId và audit một lần chuẩn bị cho C4, không thay grading hoặc thêm result endpoint.

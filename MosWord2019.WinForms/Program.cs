@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MosWord2019.Core.Diagnostics;
 using MosWord2019.Projects;
+using MosWord2019.Projects.OnlineResults;
 
 namespace MosWord2019
 {
@@ -49,17 +50,29 @@ namespace MosWord2019
                 using (dispatcher = new Control())
                 {
                     dispatcher.CreateControl();
-                    try
+                    using (var uploadCancellation = new CancellationTokenSource())
+                    using (var uploadTransport = new HttpResultUploadTransport())
                     {
-                        InspectTestingRecovery();
-                        if (PendingTestingRecovery != null) TestingFlow.Open(null, PendingTestingRecovery.Prepared.Language);
-                        if (!RecoveryDeferred) Application.Run(new LoginForm());
-                    }
-                    catch (Exception ex) { HandleFatal(ex); }
-                    finally
-                    {
-                        if (!RecoveryDeferred) { Journal.Recover(); Workspace.CleanupWorkingFiles(); }
-                        else AppLogger.Write("Shutdown left journal intact for recovery at next startup.");
+                        // Retry only explicitly registered online evidence; never scan/enqueue offline Results.
+                        var uploadWorker = Task.Run(async () =>
+                        {
+                            try { await new ResultUploadQueue(uploadTransport).RunAsync(uploadCancellation.Token).ConfigureAwait(false); }
+                            catch (Exception ex) { AppLogger.Write("Result upload worker stopped; evidence remains pending (" + ex.GetType().Name + ")."); }
+                        });
+                        try
+                        {
+                            InspectTestingRecovery();
+                            if (PendingTestingRecovery != null) TestingFlow.Open(null, PendingTestingRecovery.Prepared.Language);
+                            if (!RecoveryDeferred) Application.Run(new LoginForm());
+                        }
+                        catch (Exception ex) { HandleFatal(ex); }
+                        finally
+                        {
+                            uploadCancellation.Cancel();
+                            if (!uploadWorker.Wait(TimeSpan.FromSeconds(2))) AppLogger.Write("Result upload shutdown deferred; durable queue retained.");
+                            if (!RecoveryDeferred) { Journal.Recover(); Workspace.CleanupWorkingFiles(); }
+                            else AppLogger.Write("Shutdown left journal intact for recovery at next startup.");
+                        }
                     }
                 }
             }

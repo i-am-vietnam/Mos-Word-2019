@@ -1,5 +1,17 @@
 # Project Status
 
+## C4 — Kết quả online và upload bền vững, 2026-11-02
+
+Triển khai trên main1687920. POST /api/results nhận đúng byte JSON B4 với HMAC-SHA256, khóa dẫn xuất riêng từng phiên cấp khi login/resume/chọn mode; không lưu random seed, không ghi khóa/token vào audit. Migration ResultUploads thêm khóa dẫn xuất, hash payload và dữ liệu điểm/flags/câu sai/gap. Server dùng nguyên ExamScorer/ScoreAllocator qua linked source, đối chiếu đề và task với snapshot đã ghim; bỏ qua tổng điểm/trọng số/verdict client. Instruction câu sai lấy từ ZIP/GCM của đúng version package. Cùng byte payload trả200 lặp; payload khác cùng SessionId trả409/audit, transaction giữ account/session row lock.
+
+Testing active dùng FindAsync; uploadToken purpose riêng dùng CanUpload24giờ sau min(end,hardcap). Upload token không cấp quyền heartbeat/package/mode hoặc mint access token. Kết quả giữ TimingInconsistent/Network/Unobserved gaps/ClockRollbackDetected và audit; flags không tự đổi điểm/verdict. Admin /Admin/Results có lọc tài khoản/ngày UTC, phân trang và chi tiết câu sai có instruction.
+
+Sửa review C3: temporary failed-login lockout chỉ chặn password login mới, không chặn resume token cùng máy; admin Locked/expiry/credential version vẫn bị từ chối. HeartbeatRetentionWorker chạy startup và mỗi24giờ, chỉ xóa Heartbeats ReceivedAt < UTCnow−90ngày; giữ Sessions/OfflineGaps/Results/AuditLog.
+
+Client OnlineResults có transport sau interface; snapshot byte B4/key/token được DPAPI CurrentUser+ACL bảo vệ ngoài repo. Backoff5giây→1giờ, timeout15giây, retry qua restart; receipt200 phải khớp SessionId/hash và score/verdict hợp lệ. Receipt archive riêng, GetStatus cho biết pending hiệu lực; không xóa/sửa JSON B4 hoặc pendingUpload gốc. Program retry entry đã đăng ký; C5 mới nối auth/sessionId/key/Enqueue vào finalize online. Offline hiện có không tự upload. Giữ UI/grader/engine/Word pre-warm/nội dung/framework.
+
+Kiểm chứng cuối: client981/981 và server193/193 mỗi Debug/Release,0skipped; bốn build VS MSBuild Rebuild/dotnet build warnaserror đều0warnings/0errors, locked restore PASS. Đối chiếu TRX giữ đủ942case client/160case server C3, thêm39client/33server;150file package nguồn không đổi, Debug/test output khớp SHA256, Release app0file plaintext package. Bao phủ HMAC/key qua login/resume/host restart, concurrency/idempotency409, task/definition giả,24h bounds, access/upload purpose và shared limiter, ZIP/GCM instruction câu sai, timing/ongoing gap/rollback, admin quyền/filter/XSS và retention strict90d/daily/cancellation; client DPAPI/restart/backoff/ACK mất/receipt sai/metadata contention đều PASS. Review cuối không còn P1/P2 actionable. Evidence artifacts/c4 ignored. Commit cục bộ theo yêu cầu, không push; dừng C4, chờ “tiếp tục C5”. Các mục C0–C3 bên dưới là lịch sử; chính sách resume C4 thay chính sách lockout/resume cũ.
+
 ## C3 — Heartbeat và thời gian server, 2026-11-02
 
 Từ main25c8ed1, bổ sung POST /api/sessions/{id}/heartbeat: FindAsync kiểm quyền và giữ row lock, cập nhật LastHeartbeatAt/lưu lịch sử trong transaction, trả serverTime/expiresAt/remainingSeconds/mode/sessionToken mới. Training deadline=StartedAt+4h, Testing hardcap=ModeSelectedAt+2h; heartbeat không kéo dài deadline hoặc tiêu thêm lượt. Budget6heartbeat/phút theo SessionId dùng chung giữa các token refresh, bên cạnh budget API hiện có. Migration HeartbeatHistory thêm Heartbeats/OfflineGaps, anchor/baseline Testing và cờ TimingInconsistent bền vững.

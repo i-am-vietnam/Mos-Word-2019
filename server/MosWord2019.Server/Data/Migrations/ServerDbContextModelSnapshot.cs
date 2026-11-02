@@ -191,6 +191,22 @@ namespace MosWord2019.Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("FlagsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OfflineGapsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("Passed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PayloadHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<string>("PayloadJson")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -200,8 +216,15 @@ namespace MosWord2019.Server.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("WrongTasksJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.HasKey("Id");
 
@@ -261,6 +284,11 @@ namespace MosWord2019.Server.Data.Migrations
                     b.Property<string>("ReportedDefinitionHash")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<string>("ResultSigningKey")
+                        .IsRequired()
+                        .HasMaxLength(44)
+                        .HasColumnType("character varying(44)");
 
                     b.Property<DateTimeOffset>("StartedAt")
                         .ValueGeneratedOnAdd()

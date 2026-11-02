@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using MosWord2019.Server.Data;
 using MosWord2019.Server.Security;
 using MosWord2019.Server.Packages;
+using MosWord2019.Server.ResultHandling;
 
 var command = args.FirstOrDefault();
 var isCommand = command is "migrate" or "create-admin" or "import-packages" or "package-public-key";
@@ -30,6 +31,9 @@ builder.Services.AddSingleton<SessionTokens>();
 builder.Services.AddSingleton<LoginThrottle>();
 builder.Services.AddScoped<LearnerSessions>();
 builder.Services.AddScoped<SessionHeartbeats>();
+builder.Services.AddScoped<HeartbeatRetention>();
+builder.Services.AddHostedService<HeartbeatRetentionWorker>();
+builder.Services.AddScoped<ResultUploads>();
 builder.Services.AddScoped<IServerExamPool, ServerExamPool>();
 builder.Services.AddSingleton<PackageStorage>();
 builder.Services.AddScoped<PackageImporter>();
@@ -87,7 +91,10 @@ builder.Services.AddRateLimiter(options =>
         if (context.Request.Path.StartsWithSegments("/api"))
         {
             var isResume = context.GetEndpoint()?.Metadata.GetMetadata<LearnerResumeEndpoint>() != null;
-            var identity = isResume ? null : context.RequestServices.GetRequiredService<SessionTokens>().Read(SessionTokens.Bearer(context));
+            var tokenService = context.RequestServices.GetRequiredService<SessionTokens>();
+            var identity = isResume ? null : tokenService.Read(SessionTokens.Bearer(context));
+            if (context.GetEndpoint()?.Metadata.GetMetadata<ResultUploadEndpoint>() != null)
+                identity ??= tokenService.ReadUpload(SessionTokens.Bearer(context));
             if (identity != null) return RateLimitPartition.GetNoLimiter("authenticated-session");
             return RateLimitPartition.GetFixedWindowLimiter("api-ip:" + ip, _ => new FixedWindowRateLimiterOptions
             { PermitLimit = 30, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 });
@@ -151,6 +158,8 @@ app.Use(async (context, next) =>
         context.GetEndpoint()?.Metadata.GetMetadata<LearnerResumeEndpoint>() == null)
     {
         var identity = context.RequestServices.GetRequiredService<SessionTokens>().Read(SessionTokens.Bearer(context));
+        if (context.GetEndpoint()?.Metadata.GetMetadata<ResultUploadEndpoint>() != null)
+            identity ??= context.RequestServices.GetRequiredService<SessionTokens>().ReadUpload(SessionTokens.Bearer(context));
         if (identity != null && !await context.RequestServices.GetRequiredService<LoginThrottle>()
             .AllowAsync("session:" + identity.SessionId, context.RequestAborted))
         { context.Response.StatusCode = 429; return; }
@@ -164,6 +173,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check 
 app.MapRazorPages();
 app.MapLearnerEndpoints();
 app.MapPackageEndpoints();
+ResultUploads.Map(app);
 app.Run();
 
 public partial class Program { }

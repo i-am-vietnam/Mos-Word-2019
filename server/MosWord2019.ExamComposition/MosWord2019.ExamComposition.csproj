@@ -14,5 +14,10 @@
     <Compile Include="../../MosWord2019.Core/Services/ExamComposer.cs" Link="Services/ExamComposer.cs" />
     <Compile Include="../../MosWord2019.Core/Services/ExamRandom.cs" Link="Services/ExamRandom.cs" />
     <Compile Include="../../MosWord2019.Core/Services/ExamDefinitionFingerprint.cs" Link="Services/ExamDefinitionFingerprint.cs" />
+    <Compile Include="../../MosWord2019.Core/Services/ExamScorer.cs" Link="Services/ExamScorer.cs" />
+    <Compile Include="../../MosWord2019.Core/Services/ScoreAllocator.cs" Link="Services/ScoreAllocator.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/ExamResult.cs" Link="Models/ExamResult.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/TaskGradeResult.cs" Link="Models/TaskGradeResult.cs" />
+    <Compile Include="../../MosWord2019.Core/Models/TaskGradeOutcome.cs" Link="Models/TaskGradeOutcome.cs" />
   </ItemGroup>
 </Project>

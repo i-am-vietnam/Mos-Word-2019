@@ -1,10 +1,19 @@
 # Known Issues and Verification Items
 
+## C4 — Giới hạn đã xác nhận, 2026-11-02
+
+- API HMAC/kết quả/admin/queue đã có. C5 mới nối credential/sessionId và Enqueue vào finalize online. Worker startup chỉ retry entry đã đăng ký; offline B4 không có credential server nên không tự upload. Release vẫn chờ C5 để dùng cho học viên.
+- JSON B4 là bằng chứng bất biến, giữ pendingUpload=true; trạng thái hiệu lực nằm trong DPAPI ledger/receipt qua ResultUploadQueue.GetStatus. Kết quả local không bị xóa. Giữ Windows profile/DPAPI để đọc queue sau restart; không copy queue sang máy/user khác.
+- Hết cửa sổ24giờ, admin lock hoặc reset credential sẽ từ chối upload. 400/401/409/429/503 hoặc receipt sai đều giữ bằng chứng và retry backoff; không tự sửa payload xung đột/gia hạn quyền. Owner cần xem xét bản local nếu quyền đã hết, không tự hoàn lượt.
+- HMAC chống sửa trên đường truyền và chứng minh sở hữu khóa, không attestation grader/client. Timing/clock rollback chỉ là cờ, không tự phạt điểm. Thiếu/hỏng blob/key/instruction pinned trả503; queue giữ để retry khi owner phục hồi storage.
+- Heartbeats quá90ngày được dọn daily; Sessions/OfflineGaps/Results/AuditLog giữ lâu, cần tính dung lượng/backup C6. Chưa nghiệm thu Word native, mạng/VPS/nginx thực hoặc C7 trong C4.
+- Chính sách resume C4 thay mục lịch sử C3: temporary password lockout không chặn resume hợp lệ cùng máy; admin lock/expiry/credential change vẫn chặn.
+
 ## C3 — Giới hạn đã xác nhận, 2026-11-02
 
 - Heartbeat endpoint và monitor/server countdown đã có; C5 mới nối auth/token/monitor vào Training/Testing UI và Word lock. Existing offline flow giữ nguyên; Release mặc định không có Projects vẫn chưa phát hành cho học viên trước C5. Event monitor chạy trên caller/ThreadPool, UI phải marshal, không chờ đồng bộ trong callback.
 - SessionPolicy vẫn đóng phiên quá15phút không liên hệ theo C2, heartbeat/resume không hồi sinh phiên đã inactive. Engine Testing chờ mạng tối đa30phút giữ nguyên; tích hợp C5 cần xử lý server rejection sớm và kết quả offline theo quyền upload riêng, không tự trừ lượt lần nữa hoặc mở lại session đã end.
-- TimingInconsistent là cờ bền vững trên Session, audit một lần; C4 phải gắn với result theo SessionId và đánh giá elapsed khi upload bằng SessionTiming.IsInconsistent. Chưa có endpoint result/HMAC/pendingUpload. Cờ chẩn đoán không chứng minh gian lận hoặc tự đổi verdict/điểm.
+- TimingInconsistent là cờ bền vững trên Session; C4 đã gắn với result và đánh giá elapsed khi upload bằng SessionTiming.IsInconsistent. Cờ chẩn đoán không chứng minh gian lận hoặc tự đổi verdict/điểm.
 - Network gap là suy luận từ contact90giây/telemetry WasOffline; mất response có thể xảy ra dù server nhận POST. Dung sai90giây nền+90giây mỗi episode Network hợp/clip, kể cả gap0giây, giữ sai số từng outage. Client telemetry không được tin để gia hạn quyền; Training4h/Testing hardcap2h không trừ Network gap. Khoảng Unobserved/crash vẫn tính vào elapsed; chưa có khả năng attestation trên client.
 - Monitor dùng monotonic để chiếu UTC server, không dùng UtcNow client. Chấp nhận drift projection2giây và clamp remaining, nhưng UTC server thực sự lùi hoặc deadline tăng làm monitor khóa; C5 cần xử lý rejection/resume phù hợp. Watchdog vẫn hoạt động khi request treo, chỉ giữ một request và bỏ reply muộn.
 - Manifest schema1 bị client C3 từ chối; server C3 dùng schema2. Phát hành client/server đồng bộ; snapshot session C2 cũ còn pool nội bộ được server nâng definition một lần, không gửi28project ra client. Không thay public trust/private key trong C3.

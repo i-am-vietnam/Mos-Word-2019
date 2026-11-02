@@ -19,6 +19,14 @@ public sealed class Account
 
 public sealed class Session
 {
+    // Only the derived HMAC key is persisted; its random source is discarded.
+    public string ResultSigningKey { get; set; } = DeriveResultKey();
+    private static string DeriveResultKey()
+    {
+        var source = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+        try { return Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(source)); }
+        finally { System.Security.Cryptography.CryptographicOperations.ZeroMemory(source); }
+    }
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid AccountId { get; set; }
     public Guid LoginRequestId { get; set; }
@@ -62,6 +70,12 @@ public sealed class Result
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid SessionId { get; set; }
     public string PayloadJson { get; set; } = "{}";
+    public string PayloadHash { get; set; } = "";
+    public int Score { get; set; }
+    public bool Passed { get; set; }
+    public string FlagsJson { get; set; } = "[]";
+    public string WrongTasksJson { get; set; } = "[]";
+    public string OfflineGapsJson { get; set; } = "[]";
     public DateTimeOffset ReceivedAt { get; set; }
 }
 

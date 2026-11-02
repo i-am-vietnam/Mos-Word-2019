@@ -26,3 +26,6 @@ TestResults/
 *.secrets.json
 *.dump
 *.backup
+**/ResultUploads/
+*.upload
+*.receipt

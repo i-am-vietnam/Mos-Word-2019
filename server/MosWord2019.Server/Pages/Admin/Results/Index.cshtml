@@ -1,0 +1,30 @@
+@page
+@model MosWord2019.Server.Pages.Admin.Results.IndexModel
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8" /><title>Kết quả thi</title></head><body>
+<h1>Kết quả thi@(Model.Username == null ? "" : " — " + Model.Username)</h1>
+<p><a asp-page="/Admin/Index">Quản trị</a> | <a asp-page="/Admin/Accounts/Index">Tài khoản học viên</a> | <a asp-page="Index">Tất cả kết quả</a></p>
+<form method="get">
+<input type="hidden" asp-for="AccountId" />
+<label asp-for="FromDate">Từ ngày (UTC)</label> <input asp-for="FromDate" type="date" />
+<label asp-for="ToDate">Đến ngày (UTC, gồm cả ngày)</label> <input asp-for="ToDate" type="date" />
+<button type="submit">Lọc</button>
+</form>
+<p>Thời gian nhận kết quả theo UTC. Điểm do server tính lại từ kết quả từng câu do client gửi; các cờ cần được xem xét riêng.</p>
+<table><thead><tr><th>Ngày nhận (UTC)</th><th>Tài khoản</th><th>Điểm / 1000</th><th>Kết quả</th><th>Cờ</th><th>Chi tiết</th></tr></thead><tbody>
+@foreach (var result in Model.Results)
+{
+<tr><td>@result.ReceivedAt.UtcDateTime.ToString("u")</td><td><a asp-page="Index" asp-route-accountId="@result.AccountId">@result.Username</a></td><td>@result.Score / 1000</td><td>@(result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</td><td>@result.FlagsJson</td><td><a asp-page="Details" asp-route-id="@result.Id">Xem</a></td></tr>
+}
+</tbody></table>
+@if (Model.Results.Count == 0) { <p>Không có kết quả.</p> }
+@if (Model.PageNumber > 1)
+{
+<a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-accountId="@Model.AccountId" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Trước</a>
+}
+<span>Trang @Model.PageNumber (50 kết quả mỗi trang)</span>
+@if (Model.HasNext)
+{
+<a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-accountId="@Model.AccountId" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Tiếp</a>
+}
+</body></html>

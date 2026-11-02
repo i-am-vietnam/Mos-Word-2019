@@ -8,7 +8,7 @@
 <table><thead><tr><th>Username</th><th>Used / maximum</th><th>Expiry (UTC)</th><th>Locked</th><th>Actions</th></tr></thead><tbody>
 @foreach (var account in Model.Accounts)
 {
-<tr><td>@account.Username</td><td>@account.Used / @account.MaxUses</td><td>@(account.ExpiresAt?.UtcDateTime.ToString("u") ?? "No expiry")</td><td>@account.Locked</td><td><a asp-page="Edit" asp-route-id="@account.Id">Edit</a> | <a asp-page="Sessions" asp-route-id="@account.Id">Sessions</a></td></tr>
+<tr><td>@account.Username</td><td>@account.Used / @account.MaxUses</td><td>@(account.ExpiresAt?.UtcDateTime.ToString("u") ?? "No expiry")</td><td>@account.Locked</td><td><a asp-page="Edit" asp-route-id="@account.Id">Edit</a> | <a asp-page="Sessions" asp-route-id="@account.Id">Sessions</a> | <a asp-page="/Admin/Results/Index" asp-route-accountId="@account.Id">Kết quả thi</a></td></tr>
 }
 </tbody></table>
 @if (Model.PageNumber > 1) { <a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-search="@Model.Search">Previous</a> }

@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8" /><title>Edit learner</title></head><body>
 <h1>Edit learner @Model.Username</h1><p><a asp-page="Index">Learner accounts</a> | <a asp-page="Sessions" asp-route-id="@RouteData.Values["id"]">Sessions</a></p>
+<p><a asp-page="/Admin/Results/Index" asp-route-accountId="@RouteData.Values["id"]">Kết quả thi</a></p>
 <p>Used: @Model.Used / @Model.CurrentMaxUses</p>
 <form method="post">
 <div asp-validation-summary="All"></div>

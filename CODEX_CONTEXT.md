@@ -1,5 +1,17 @@
 # Technical Context
 
+## C4 — Results contract và upload queue, 2026-11-02
+
+Server ResultHandling/ResultUploads nhận POST /api/results: bearer access hoặc upload-purpose, X-Result-Signature Base64 HMAC-SHA256 đúng byte UTF8 B4, tối đa256KiB. Session.ResultSigningKey là Base64 SHA256 của32byte CSPRNG, source hủy, chỉ key dẫn xuất lưu DB/cấp qua SessionReply.ResultSigningKey; không log key/token. ResultValidation kiểm pinned definition/hash/seed/task/instructionKey/outcome, dùng linked-source ExamScorer/ScoreAllocator; tổng/trọng số client không có thẩm quyền. Instruction câu sai giải mã đúng package version pinned/lang/{vi|en}.json, kiểm GCM/ZIP hash. Result có PayloadHash/Score/Passed/FlagsJson/WrongTasksJson/OfflineGapsJson, migration ResultUploads là migration thứ6.
+
+Upload active access đi qua LearnerSessions.FindAsync. FindUploadAsync riêng dùng SessionPolicy.Evaluate/End và CanUpload24h, account/session row lock theo cùng thứ tự; purpose upload không mint access token hoặc cấp quyền khác. Retry cùng exact bytes/hash trả200; khác payload409 + ResultUploadConflict audit; Save+commit một lần. Snapshot timing giữ sticky flag, gap server và extended ongoing Network chỉ khi last heartbeat WasOffline xác nhận; crash/Unobserved không trừ. ClockRollbackDetected ghi ResultClockRollback audit, flags không đổi điểm.
+
+Review C3 được sửa: FindCore không chặn resume bởi LockoutUntil; cùng machine/secret/admin Locked/expiry/credential version vẫn kiểm. HeartbeatRetention scoped/worker startup và24h, TimeProvider UTC, delete Heartbeats ReceivedAt < now−90d, giữ mọi bảng khác.
+
+Client Projects/OnlineResults có IResultUploadTransport/HttpResultUploadTransport, ResultUploadQueue/Store; DPAPI CurrentUser+SID ACL ngoài repo, atomic records/receipt, immutable payload, pendingcap1024, backoff5s→1h/timeout15s, pump lease tách metadata lease. Receipt200 cần đúng session/hash, score0..1000 và passed==(score>=700), không yêu cầu tổng client bằng tổng server. Program retry đăng ký cũ trước login, cancellation lúc shutdown; Enqueue online cần C5 nối session/key và server SessionId vào B4 trước khi persist. Giữ JSON B4/pendingUpload gốc; GetStatus/receipt là trạng thái hiệu lực. Offline không tự enqueue. Framework/UI/grader/engine/Word pre-warm không đổi. Chỉ C4, chưa C5–C7; evidence artifacts/c4 ignored. Nội dung C3 bên dưới là lịch sử.
+
+Kiểm chứng cuối: VS MSBuild Rebuild client Debug/Release và server dotnet build -warnaserror đều0warnings/0errors; locked restore PASS. Client981/981, server193/193 mỗi cấu hình,0skipped; regression audit giữ đủ942/160case C3, thêm39/33.150file source/output khớp SHA256, Release app0plaintext package; TRX/log/audit artifacts/c4. Review cuối không còn P1/P2; chưa chạy Word native/VPS/nginx/C7 mới. Commit cục bộ, không push, chờ C5.
+
 ## C3 — Heartbeat, clock và manifest tối thiểu, 2026-11-02
 
 SessionHeartbeats.BeatAsync qua POST /api/sessions/{id}/heartbeat dùng LearnerSessions.FindAsync và account/session row lock, commit cả denied expiration. Request ClientElapsedMilliseconds nullable0..86400000, WasOffline bool; reply SessionId/Mode/ServerTime/ExpiresAt/RemainingSeconds/SessionToken. LoginThrottle heartbeat:SessionId6/min ngoài shared API60; token refresh không tách bucket. Deadline Training=StartedAt+4h, Testing=ModeSelectedAt+2h; heartbeat không gia hạn hoặc tiêu lượt. SessionPolicy bỏ LockoutUntil khỏi quyền active/upload; FindCore chỉ chặn resume khi lockout tạm, admin Locked/expiry/credential vẫn end. End receipt không bị lockout tạm chặn.
