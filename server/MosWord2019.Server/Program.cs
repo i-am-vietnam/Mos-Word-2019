@@ -29,6 +29,7 @@ builder.Services.AddSingleton<AdminAccess>();
 builder.Services.AddSingleton<SessionTokens>();
 builder.Services.AddSingleton<LoginThrottle>();
 builder.Services.AddScoped<LearnerSessions>();
+builder.Services.AddScoped<SessionHeartbeats>();
 builder.Services.AddScoped<IServerExamPool, ServerExamPool>();
 builder.Services.AddSingleton<PackageStorage>();
 builder.Services.AddScoped<PackageImporter>();
@@ -61,7 +62,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         var db = context.HttpContext.RequestServices.GetRequiredService<ServerDbContext>();
         var time = context.HttpContext.RequestServices.GetRequiredService<TimeProvider>();
         var account = Guid.TryParse(id, out var accountId) ? await db.Accounts.FindAsync(accountId) : null;
-        if (account == null || !AdminAccess.IsAllowed(account, time.GetUtcNow()) ||
+        if (account == null || !AdminAccess.IsAllowed(account, time.GetUtcNow(), newLogin: false) ||
             context.Principal?.FindFirstValue("credential_version") != account.CredentialVersion.ToString()) context.RejectPrincipal();
     };
 });

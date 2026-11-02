@@ -6,7 +6,8 @@ public sealed class LoginThrottle : IDisposable
 {
     private readonly PartitionedRateLimiter<string> limiter = PartitionedRateLimiter.Create<string, string>(key =>
         RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
-        { PermitLimit = key.StartsWith("user:", StringComparison.Ordinal) ? 10 : 60,
+        { PermitLimit = key.StartsWith("heartbeat:", StringComparison.Ordinal) ? 6 :
+                key.StartsWith("user:", StringComparison.Ordinal) ? 10 : 60,
             Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 
     public async Task<bool> AllowAsync(string key, CancellationToken cancellationToken)

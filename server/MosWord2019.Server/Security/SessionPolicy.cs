@@ -14,7 +14,7 @@ public static class SessionPolicy
         Guid credentialVersion)
     {
         if (credentialVersion != session.AccountCredentialVersion) return new(false);
-        if (!ValidIdentity(account, session, credentialVersion) || account.LockoutUntil > now)
+        if (!ValidIdentity(account, session, credentialVersion))
             return new(false, session.EndedAt == null ? "Expired" : null);
         if (session.EndedAt != null) return new(false);
         if (account.ExpiresAt <= now || now < session.StartedAt) return new(false, "Expired");
@@ -31,7 +31,7 @@ public static class SessionPolicy
     // Offline upload is a separate permission and never grants active-session access.
     public static bool CanUpload(Account account, Session session, DateTimeOffset now,
         Guid credentialVersion, DateTimeOffset finalizedAt) =>
-        ValidIdentity(account, session, credentialVersion) && !(account.LockoutUntil > now) &&
+        ValidIdentity(account, session, credentialVersion) &&
         session.Mode == "Testing" && session.ModeSelectedAt is { } selected &&
         session.EndedAt is { } ended && finalizedAt >= selected && finalizedAt <= ended &&
         finalizedAt <= selected.AddHours(2) && now >= ended &&

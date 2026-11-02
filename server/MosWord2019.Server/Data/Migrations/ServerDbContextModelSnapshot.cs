@@ -267,6 +267,15 @@ namespace MosWord2019.Server.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<long?>("TestingClockBaselineMilliseconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("TestingClockStartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("TimingInconsistent")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId", "LoginRequestId")
@@ -279,6 +288,70 @@ namespace MosWord2019.Server.Data.Migrations
                             t.HasCheckConstraint("CK_Sessions_Machine", "\"MachineId\" ~ '^[0-9a-f]{64}$'");
 
                             t.HasCheckConstraint("CK_Sessions_Mode", "\"Mode\" IS NULL OR \"Mode\" IN ('Training', 'Testing')");
+                        });
+                });
+
+            modelBuilder.Entity("MosWord2019.Server.Data.SessionHeartbeat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ClientElapsedMilliseconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("WasOffline")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId", "ReceivedAt");
+
+                    b.ToTable("Heartbeats", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Heartbeats_Elapsed", "\"ClientElapsedMilliseconds\" IS NULL OR \"ClientElapsedMilliseconds\" BETWEEN 0 AND 86400000");
+                        });
+                });
+
+            modelBuilder.Entity("MosWord2019.Server.Data.SessionOfflineGap", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("EndedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId", "StartedAt");
+
+                    b.ToTable("OfflineGaps", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_OfflineGaps_Kind", "\"Kind\" IN ('Network', 'Unobserved')");
+
+                            t.HasCheckConstraint("CK_OfflineGaps_Time", "\"EndedAt\" >= \"StartedAt\"");
                         });
                 });
 
@@ -304,6 +377,24 @@ namespace MosWord2019.Server.Data.Migrations
                     b.HasOne("MosWord2019.Server.Data.Account", null)
                         .WithMany()
                         .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MosWord2019.Server.Data.SessionHeartbeat", b =>
+                {
+                    b.HasOne("MosWord2019.Server.Data.Session", null)
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MosWord2019.Server.Data.SessionOfflineGap", b =>
+                {
+                    b.HasOne("MosWord2019.Server.Data.Session", null)
+                        .WithMany()
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

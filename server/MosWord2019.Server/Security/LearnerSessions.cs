@@ -59,7 +59,7 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
             if (!permission.Allowed && permission.EndReason != null)
             {
                 var audit = SessionPolicy.End(previous, now, permission.EndReason);
-                if (audit != null) db.AuditLog.Add(audit);
+                if (audit != null) { db.AuditLog.Add(audit); RecordGap(previous, now); }
             }
             if (previous.MachineId != request.MachineId!.ToLowerInvariant() || !permission.Allowed)
             {
@@ -128,19 +128,20 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         var now = time.GetUtcNow();
         if (tokenActive && allowEndReceipt && session.EndReason == "UserEnded" && session.EndedAt != null &&
             SessionPolicy.ValidIdentity(account, session, identity.CredentialVersion) &&
-            (account.ExpiresAt == null || account.ExpiresAt > now) && !(account.LockoutUntil > now)) return (session, account);
+            (account.ExpiresAt == null || account.ExpiresAt > now)) return (session, account);
         var permission = SessionPolicy.Evaluate(account, session, now, identity.CredentialVersion);
         if (!permission.Allowed)
         {
             if (permission.EndReason != null)
             {
                 var audit = SessionPolicy.End(session, now, permission.EndReason);
-                if (audit != null) db.AuditLog.Add(audit);
+                if (audit != null) { db.AuditLog.Add(audit); RecordGap(session, now); }
                 await db.SaveChangesAsync(ct);
             }
             return null;
         }
-        return tokenActive ? (session, account) : null;
+        // Failed-login lockout blocks resuming/new authentication, never an already authorized exam.
+        return tokenActive && !(resume && account.LockoutUntil > now) ? (session, account) : null;
     }
 
     public async Task<SessionOperation> ModeAsync(string? token, ModeRequest request, CancellationToken ct)
@@ -185,7 +186,7 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         if (session.EndedAt == null)
         {
             var audit = SessionPolicy.End(session, now, "UserEnded");
-            if (audit != null) db.AuditLog.Add(audit);
+            if (audit != null) { db.AuditLog.Add(audit); RecordGap(session, now); }
             await db.SaveChangesAsync(ct);
         }
         await transaction.CommitAsync(ct);
@@ -202,10 +203,17 @@ public sealed partial class LearnerSessions(ServerDbContext db, AdminAccess cred
         var (session, account) = found.Value;
         var now = time.GetUtcNow();
         if (session.MachineId != request.MachineId!.ToLowerInvariant()) return Invalid();
+        RecordGap(session, now);
         session.LastHeartbeatAt = now;
         db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "SessionResumed", CreatedAt = now });
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
         return Reply(session, account, now);
+    }
+
+    private void RecordGap(Session session, DateTimeOffset now)
+    {
+        var gap = SessionTiming.Gap(session, now, false);
+        if (gap != null) db.OfflineGaps.Add(gap);
     }
 }

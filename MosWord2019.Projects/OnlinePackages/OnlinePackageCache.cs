@@ -132,7 +132,7 @@ namespace MosWord2019.Projects.OnlinePackages
             // No payload field is parsed or trusted until its exact UTF-8 bytes have been verified.
             var value = Parse(payload);
             Guid actualSession;
-            if (value["schemaVersion"]?.Type != JTokenType.Integer || (int)value["schemaVersion"] != 1 ||
+            if (value["schemaVersion"]?.Type != JTokenType.Integer || value["schemaVersion"].ToString() != "2" ||
                 !Guid.TryParse(String(value, "sessionId"), out actualSession) || actualSession == Guid.Empty || actualSession != sessionId || String(value, "mode") != mode || (mode != "Training" && mode != "Testing"))
                 throw new InvalidDataException("Manifest session context does not match.");
             var array = value["packages"] as JArray;
@@ -158,15 +158,62 @@ namespace MosWord2019.Projects.OnlinePackages
             if (mode == "Testing")
             {
                 long numericSeed;
-                if (seed == null || definition == null || !long.TryParse(seed, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out numericSeed) || !(value["catalog"] is JArray) || !(value["examPool"] is JArray)) throw new InvalidDataException("Testing manifest requires full signed exam metadata.");
-                var catalog = value["catalog"].ToObject<List<TestingCatalogEntry>>();
-                var pool = value["examPool"].ToObject<List<ProjectPackage>>();
-                if (catalog.Count == 0 || catalog.Count > 100 || pool.Count != catalog.Count || pool.Any(p => p?.Meta == null || !CodePattern.IsMatch(p.Meta.ProjectId))) throw new InvalidDataException("Invalid signed exam pool.");
-                exam = ExamComposer.Compose(catalog, pool, numericSeed);
-                if (ExamDefinitionFingerprint.Compute(exam) != definition) throw new InvalidDataException("Signed exam definition does not match the existing composer.");
-                if (!new HashSet<string>(exam.Projects.Select(p => p.ProjectId), StringComparer.Ordinal).SetEquals(packages.Select(p => p.Code))) throw new InvalidDataException("Manifest packages do not match the composed exam.");
+                if (seed == null || definition == null || !long.TryParse(seed, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out numericSeed) ||
+                    value["catalog"] != null || !(value["examDefinition"] is JObject) || !(value["examPool"] is JArray))
+                    throw new InvalidDataException("Testing manifest requires the signed server definition.");
+                exam = ReadDefinition((JObject)value["examDefinition"], numericSeed);
+                if (ExamDefinitionFingerprint.Compute(exam) != definition) throw new InvalidDataException("Signed exam definition hash does not match.");
+                if (packages.Count != 7 || !new HashSet<string>(exam.Projects.Select(p => p.ProjectId), StringComparer.Ordinal).SetEquals(packages.Select(p => p.Code)))
+                    throw new InvalidDataException("Manifest packages do not match the signed exam.");
+                var pool = ((JArray)value["examPool"]).ToObject<List<ProjectPackage>>();
+                if (pool.Count != 7 || pool.Any(p => p == null || p.Meta == null || p.Tasks == null) ||
+                    pool.Select(p => p.Meta.ProjectId).Distinct(StringComparer.Ordinal).Count() != 7 ||
+                    !new HashSet<string>(exam.Projects.Select(p => p.ProjectId), StringComparer.Ordinal).SetEquals(pool.Select(p => p.Meta.ProjectId)))
+                    throw new InvalidDataException("Invalid signed exam metadata.");
+                foreach (var project in exam.Projects)
+                {
+                    var tasks = pool.Single(p => p.Meta.ProjectId == project.ProjectId).Tasks;
+                    if (tasks.Count != project.TaskIds.Count || tasks.Any(t => t == null || !project.TaskIds.Contains(t.TaskId) || t.InstructionKey != project.InstructionKeys[t.TaskId]) ||
+                        tasks.Select(t => t.TaskId).Distinct(StringComparer.Ordinal).Count() != tasks.Count)
+                        throw new InvalidDataException("Signed task metadata does not match the exam definition.");
+                }
             }
             return new OnlinePackageManifest { SessionId = actualSession, Mode = mode, ExamSeed = seed, DefinitionHash = definition, Packages = packages.AsReadOnly(), ExamDefinition = exam };
+        }
+        private static ExamDefinition ReadDefinition(JObject value, long seed)
+        {
+            long actualSeed;
+            var projects = value["projects"] as JArray;
+            if (value.Properties().Count() != 3 || value["seed"]?.Type != JTokenType.Integer ||
+                !long.TryParse(value["seed"].ToString(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out actualSeed) || actualSeed != seed ||
+                value["n"]?.Type != JTokenType.Integer || projects == null || projects.Count != 7)
+                throw new InvalidDataException("Invalid signed exam definition.");
+            var selected = new List<ExamProjectDefinition>();
+            foreach (var token in projects)
+            {
+                var project = token as JObject;
+                if (project == null || project.Properties().Count() != 3) throw new InvalidDataException("Invalid signed exam project.");
+                string id = String(project, "projectId");
+                var ids = project["taskIds"] as JArray;
+                var keys = project["instructionKeys"] as JObject;
+                if (!CodePattern.IsMatch(id) || ids == null || ids.Count < 4 || ids.Count > 6 || keys == null || keys.Properties().Count() != ids.Count)
+                    throw new InvalidDataException("Invalid signed exam tasks.");
+                var tasks = new List<TaskDefinition>();
+                foreach (var task in ids)
+                {
+                    if (task.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)task) || ((string)task).Length > 64)
+                        throw new InvalidDataException("Invalid signed task identifier.");
+                    string taskId = (string)task;
+                    string key = String(keys, taskId);
+                    if (string.IsNullOrWhiteSpace(key) || key.Length > 256) throw new InvalidDataException("Invalid signed instruction key.");
+                    tasks.Add(new TaskDefinition { TaskId = taskId, InstructionKey = key });
+                }
+                selected.Add(new ExamProjectDefinition(id, tasks));
+            }
+            var definition = new ExamDefinition(seed, selected);
+            if (value["n"].ToString() != definition.N.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                throw new InvalidDataException("Signed task count does not match.");
+            return definition;
         }
         private static byte[] Decrypt(OnlinePackageDescriptor package, byte[] blob)
         {

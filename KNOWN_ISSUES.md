@@ -1,5 +1,15 @@
 # Known Issues and Verification Items
 
+## C3 — Giới hạn đã xác nhận, 2026-11-02
+
+- Heartbeat endpoint và monitor/server countdown đã có; C5 mới nối auth/token/monitor vào Training/Testing UI và Word lock. Existing offline flow giữ nguyên; Release mặc định không có Projects vẫn chưa phát hành cho học viên trước C5. Event monitor chạy trên caller/ThreadPool, UI phải marshal, không chờ đồng bộ trong callback.
+- SessionPolicy vẫn đóng phiên quá15phút không liên hệ theo C2, heartbeat/resume không hồi sinh phiên đã inactive. Engine Testing chờ mạng tối đa30phút giữ nguyên; tích hợp C5 cần xử lý server rejection sớm và kết quả offline theo quyền upload riêng, không tự trừ lượt lần nữa hoặc mở lại session đã end.
+- TimingInconsistent là cờ bền vững trên Session, audit một lần; C4 phải gắn với result theo SessionId và đánh giá elapsed khi upload bằng SessionTiming.IsInconsistent. Chưa có endpoint result/HMAC/pendingUpload. Cờ chẩn đoán không chứng minh gian lận hoặc tự đổi verdict/điểm.
+- Network gap là suy luận từ contact90giây/telemetry WasOffline; mất response có thể xảy ra dù server nhận POST. Dung sai90giây nền+90giây mỗi episode Network hợp/clip, kể cả gap0giây, giữ sai số từng outage. Client telemetry không được tin để gia hạn quyền; Training4h/Testing hardcap2h không trừ Network gap. Khoảng Unobserved/crash vẫn tính vào elapsed; chưa có khả năng attestation trên client.
+- Monitor dùng monotonic để chiếu UTC server, không dùng UtcNow client. Chấp nhận drift projection2giây và clamp remaining, nhưng UTC server thực sự lùi hoặc deadline tăng làm monitor khóa; C5 cần xử lý rejection/resume phù hợp. Watchdog vẫn hoạt động khi request treo, chỉ giữ một request và bỏ reply muộn.
+- Manifest schema1 bị client C3 từ chối; server C3 dùng schema2. Phát hành client/server đồng bộ; snapshot session C2 cũ còn pool nội bộ được server nâng definition một lần, không gửi28project ra client. Không thay public trust/private key trong C3.
+- Download dùng stream có kiểm SHA256 trước gửi, nên vẫn đọc blob để kiểm integrity trước khi gửi nhưng không giữ toàn bộ blob trong RAM. Import/storage/key/backup và TLS/SPKI/DPAPI vẫn theo C2/C5/C6. Chưa nghiệm thu Word native, mạng/VPS/nginx thực hoặc C7 trong C3.
+
 ## C2 — Giới hạn đã xác nhận, 2026-11-02
 
 - C2 có backend gói và thư viện cache client, chưa nối chúng với login/Training/Testing UI. Release mặc định không có Projects nên chưa phát hành cho học viên trước C5; phát triển local có thể build UseLocalPackages=true. Không bỏ guard hoặc bật dev switch cho bản phân phối.

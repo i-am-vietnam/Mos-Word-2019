@@ -19,8 +19,8 @@ public sealed partial class AdminAccess(IPasswordHasher<Account> hasher)
         return username.ToUpperInvariant();
     }
 
-    public static bool IsAllowed(Account account, DateTimeOffset now) =>
-        account.IsAdmin && !account.Locked && (account.LockoutUntil == null || account.LockoutUntil <= now) &&
+    public static bool IsAllowed(Account account, DateTimeOffset now, bool newLogin = true) =>
+        account.IsAdmin && !account.Locked && (!newLogin || account.LockoutUntil == null || account.LockoutUntil <= now) &&
         (account.ExpiresAt == null || account.ExpiresAt > now);
 
     public async Task<Account?> AuthenticateAsync(ServerDbContext db, string username, string password,

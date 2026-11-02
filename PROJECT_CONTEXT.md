@@ -1,5 +1,15 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C3 — Liên hệ định kỳ và thời gian server, 2026-11-02
+
+C3 bổ sung heartbeat transaction/row lock, lịch sử Heartbeats/OfflineGaps và reply UTC/deadline/remaining/access token mới, budget6/phút/session. Deadline Training4h từ login/Testing2h từ mode không đổi; không tiêu thêm lượt. Temporary lockout chỉ chặn login/resume, không phá exam active hoặc cookie admin đang hoạt động; admin lock/expiry/reset vẫn thu hồi. TimingInconsistent theo SessionId và audit một lần chuẩn bị cho C4, không thay grading hoặc thêm result endpoint.
+
+Client có SessionConnectivityMonitor sau interface:30giây gửi,3failure hoặc90giây mất reply thì offline; watchdog độc lập, timeout10giây, không overlap, bỏ reply muộn. Countdown/projected UTC dựa server+monotonic và vẫn chạy offline, không tin wall clock client. Tolerance drift2giây với clamp quyền, không cho UTC lùi/deadline tăng. UI/auth/Word lock C5 chưa nối, Training/Testing và pre-warm hiện có không sửa.
+
+Manifest schema2 gửi definition đã compose/ký và metadata/task chỉ7gói; client kiểm chữ ký/hash rồi dùng definition, không recompose runtime. Snapshot C2 thiếu definition được server compose/persist một lần từ pool ghim nội bộ; tests giữ diagnostic composer parity. Download dùng FileStream kiểm hash/bounds và ownership/dispose. Không thêm dependency/bí mật, không thay target framework hoặc solution client.
+
+Server phân biệt Unobserved/crash không pause với Network suy luận; trường hợp POST tới nhưng response mất cũng được lưu. Timing review hợp/clip các gap, giữ episode0giây và dung sai theo từng đợt để không gắn cờ sai khi nhiều mất response ngắn. WasOffline chỉ là tín hiệu không tin cậy, không tăng deadline. C4 sẽ nhận/đánh giá result; C5 nối monitor/cache/auth/UI; C6/C7 chưa triển khai. Kiểm chứng cuối942/942client và160/160server mỗi Debug/Release,0skipped/0warnings/0errors; giữ đủ903client/138server case cũ và150file nguồn. Review không còn P1/P2. Chi tiết: docs/SERVER_ARCHITECTURE.md và docs/SERVER_DEV.md; evidence artifacts/c3 ignored. Dừng C3, chờ “tiếp tục C4”; không push.
+
 ## C2 — Gói online và phiên có giới hạn, 2026-11-02
 
 C2 hoàn tất trên nền C1 e3c3b4f: SessionPolicy chung và token có lifetime, EndedAt/EndReason/audit một lần, quyền offline upload Testing tách biệt chờ C4. Pending15phút, Training4giờ từ login, Testing2giờ từ chọn mode và idle15phút đều do server UTC quyết định. Resume không hồi sinh phiên đã inactive; token hết hạn có hint chỉ để ghi nhận expiration, không cấp quyền.

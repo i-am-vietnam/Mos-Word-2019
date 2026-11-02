@@ -45,7 +45,7 @@ public sealed class DatabaseTests(PostgresFixture postgres)
     {
         var connection = await postgres.CreateDatabaseAsync();
         await using var db = PostgresFixture.Open(connection);
-        Assert.Equal(4, (await db.Database.GetAppliedMigrationsAsync()).Count());
+        Assert.Equal(5, (await db.Database.GetAppliedMigrationsAsync()).Count());
         Assert.Empty(await db.Database.GetPendingMigrationsAsync());
         Assert.False(db.Database.HasPendingModelChanges());
         Assert.Empty(await db.Accounts.ToListAsync());
@@ -53,6 +53,8 @@ public sealed class DatabaseTests(PostgresFixture postgres)
         Assert.Empty(await db.Results.ToListAsync());
         Assert.Empty(await db.Packages.ToListAsync());
         Assert.Empty(await db.AuditLog.ToListAsync());
+        Assert.Empty(await db.Heartbeats.ToListAsync());
+        Assert.Empty(await db.OfflineGaps.ToListAsync());
         await db.GetService<IMigrator>().MigrateAsync("0");
         Assert.Empty(await db.Database.GetAppliedMigrationsAsync());
         await db.Database.MigrateAsync();

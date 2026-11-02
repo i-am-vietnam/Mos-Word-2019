@@ -198,8 +198,9 @@ namespace MosWord2019.Tests
                 f.Payload["mode"] = "Testing";
                 f.Payload["examSeed"] = seed.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 f.Payload["definitionHash"] = ExamDefinitionFingerprint.Compute(definition);
-                f.Payload["catalog"] = JArray.FromObject(catalog);
-                f.Payload["examPool"] = JArray.FromObject(pool.Select(p => new { meta = p.Meta, tasks = p.Tasks }));
+                // Composer is used only to build this local diagnostic fixture, never by the online client.
+                f.Payload["examDefinition"] = JObject.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(definition, new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver { NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy(processDictionaryKeys: false, overrideSpecifiedNames: false) } }));
+                f.Payload["examPool"] = JArray.FromObject(definition.Projects.Select(d => new { meta = pool.Single(p => p.Meta.ProjectId == d.ProjectId).Meta, tasks = d.TaskIds.Select(id => pool.Single(p => p.Meta.ProjectId == d.ProjectId).Tasks.Single(t => t.TaskId == id)) }));
                 var journal = new SessionRecoveryJournal(Path.Combine(workspace.Folder, "journal.json"), _ => { });
                 using (var session = await f.Cache(journal, workspace.Folder).LoadAsync(f.Session, "Testing", null, "token"))
                 {
@@ -212,6 +213,27 @@ namespace MosWord2019.Tests
                 f.Payload["definitionHash"] = new string('a', 64);
                 await Assert.ThrowsExceptionAsync<InvalidDataException>(async () => { await f.Cache(journal, workspace.Folder).LoadAsync(f.Session, "Testing", null, "token"); });
                 Assert.AreEqual(7, f.Downloads.Count, "Definition mismatch must fail before any further download.");
+                Assert.AreEqual(1, f.Reports.Count);
+                f.Payload["definitionHash"] = ExamDefinitionFingerprint.Compute(definition);
+                var valid = (JObject)f.Payload.DeepClone();
+                var invalid = new Action<JObject>[]
+                {
+                    p => p["schemaVersion"] = 1,
+                    p => p["catalog"] = new JArray(),
+                    p => p["examDefinition"]["seed"] = seed.ToString(),
+                    p => p["examDefinition"]["n"] = definition.N + 1,
+                    p => p["examDefinition"]["projects"][0]["taskIds"][0] = "unknown",
+                    p => ((JArray)p["examPool"]).Add(p["examPool"][0].DeepClone()),
+                    p => ((JArray)p["examPool"][0]["tasks"]).RemoveAt(0)
+                };
+                foreach (var mutation in invalid)
+                {
+                    f.Payload.RemoveAll();
+                    foreach (var property in valid.Properties()) f.Payload.Add(property.Name, property.Value.DeepClone());
+                    mutation(f.Payload);
+                    await Assert.ThrowsExceptionAsync<InvalidDataException>(async () => { await f.Cache(journal, workspace.Folder).LoadAsync(f.Session, "Testing", null, "token"); });
+                }
+                Assert.AreEqual(7, f.Downloads.Count);
                 Assert.AreEqual(1, f.Reports.Count);
             }
         }
@@ -357,7 +379,7 @@ namespace MosWord2019.Tests
             {
                 var seed = new byte[32]; using (var rng = RandomNumberGenerator.Create()) rng.GetBytes(seed);
                 key = new Ed25519PrivateKeyParameters(seed, 0);
-                Payload = new JObject { ["schemaVersion"] = 1, ["sessionId"] = Session, ["mode"] = "Training", ["packages"] = new JArray() };
+                Payload = new JObject { ["schemaVersion"] = 2, ["sessionId"] = Session, ["mode"] = "Training", ["packages"] = new JArray() };
             }
             internal OnlinePackageCache Cache(SessionRecoveryJournal journal, string root)
             { return new OnlinePackageCache(this, journal, key.GeneratePublicKey().GetEncoded(), Path.Combine(root, "cache")); }

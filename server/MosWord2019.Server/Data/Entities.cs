@@ -31,9 +31,30 @@ public sealed class Session
     public string? ExamDefinitionHash { get; set; }
     public string? ReportedDefinitionHash { get; set; }
     public string? ExamSnapshotJson { get; set; }
+    public DateTimeOffset? TestingClockStartedAt { get; set; }
+    public long? TestingClockBaselineMilliseconds { get; set; }
+    public bool TimingInconsistent { get; set; }
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? LastHeartbeatAt { get; set; }
     public DateTimeOffset? EndedAt { get; set; }
+}
+
+public sealed class SessionHeartbeat
+{
+    public long Id { get; set; }
+    public Guid SessionId { get; set; }
+    public DateTimeOffset ReceivedAt { get; set; }
+    public long? ClientElapsedMilliseconds { get; set; }
+    public bool WasOffline { get; set; }
+}
+
+public sealed class SessionOfflineGap
+{
+    public long Id { get; set; }
+    public Guid SessionId { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset EndedAt { get; set; }
+    public string Kind { get; set; } = "Unobserved";
 }
 
 public sealed class Result

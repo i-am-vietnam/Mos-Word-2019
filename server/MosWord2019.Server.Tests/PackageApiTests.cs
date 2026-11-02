@@ -144,7 +144,19 @@ public sealed class PackageApiTests(PostgresFixture postgres)
         await using var s = await StartAsync("Testing");
         var manifest = await ManifestAsync(s);
         Assert.Equal(7, manifest.GetProperty("packages").GetArrayLength());
-        Assert.Equal(8, manifest.GetProperty("examPool").GetArrayLength());
+        Assert.Equal(2, manifest.GetProperty("schemaVersion").GetInt32());
+        Assert.False(manifest.TryGetProperty("catalog", out _));
+        Assert.Equal(7, manifest.GetProperty("examPool").GetArrayLength());
+        Assert.Equal(7, manifest.GetProperty("examDefinition").GetProperty("projects").GetArrayLength());
+        var codes = manifest.GetProperty("packages").EnumerateArray().Select(p => p.GetProperty("code").GetString()).Order().ToArray();
+        Assert.Equal(codes, manifest.GetProperty("examPool").EnumerateArray().Select(p => p.GetProperty("meta").GetProperty("projectId").GetString()).Order().ToArray());
+        foreach (var project in manifest.GetProperty("examDefinition").GetProperty("projects").EnumerateArray())
+        {
+            var metadata = manifest.GetProperty("examPool").EnumerateArray().Single(p => p.GetProperty("meta").GetProperty("projectId").GetString() == project.GetProperty("projectId").GetString());
+            Assert.Equal(project.GetProperty("taskIds").EnumerateArray().Select(t => t.GetString()).ToArray(), metadata.GetProperty("tasks").EnumerateArray().Select(t => t.GetProperty("taskId").GetString()).ToArray());
+            foreach (var task in metadata.GetProperty("tasks").EnumerateArray())
+                Assert.Equal(task.GetProperty("instructionKey").GetString(), project.GetProperty("instructionKeys").GetProperty(task.GetProperty("taskId").GetString()!).GetString());
+        }
         var firstPath = manifest.GetProperty("packages")[0].GetProperty("downloadPath").GetString()!;
         using var unreported = await SendAsync(s, HttpMethod.Get, firstPath);
         Assert.Equal(HttpStatusCode.Conflict, unreported.StatusCode);
@@ -187,6 +199,30 @@ public sealed class PackageApiTests(PostgresFixture postgres)
     }
 
     [Fact]
+    public async Task OlderPinnedSnapshotIsUpgradedOnceOnServerWithoutExposingItsPool()
+    {
+        await using var s = await StartAsync("Testing");
+        var original = await ManifestAsync(s);
+        await using (var db = PostgresFixture.Open(s.Connection))
+        {
+            var session = await db.Sessions.SingleAsync();
+            var snapshot = Newtonsoft.Json.Linq.JObject.Parse(session.ExamSnapshotJson!);
+            Assert.NotNull(snapshot["Definition"]);
+            snapshot.Remove("Definition");
+            session.ExamSnapshotJson = snapshot.ToString();
+            await db.SaveChangesAsync();
+        }
+        var upgraded = await ManifestAsync(s);
+        Assert.Equal(original.GetProperty("definitionHash").GetString(), upgraded.GetProperty("definitionHash").GetString());
+        Assert.Equal(original.GetProperty("examDefinition").GetRawText(), upgraded.GetProperty("examDefinition").GetRawText());
+        Assert.Equal(7, upgraded.GetProperty("examPool").GetArrayLength());
+        Assert.False(upgraded.TryGetProperty("catalog", out _));
+        await using var verify = PostgresFixture.Open(s.Connection);
+        var persisted = Newtonsoft.Json.Linq.JObject.Parse((await verify.Sessions.SingleAsync()).ExamSnapshotJson!);
+        Assert.NotNull(persisted["Definition"]);
+    }
+
+    [Fact]
     public async Task RealRepositoryImportIsIdempotentAndRefreshesCatalogWithoutChangingPinnedExam()
     {
         await using var s = await StartAsync("Testing");
@@ -226,7 +262,7 @@ public sealed class PackageApiTests(PostgresFixture postgres)
         // A real source import cannot change the seven immutable versions pinned to this earlier exam.
         var manifest = await ManifestAsync(s);
         Assert.Equal(7, manifest.GetProperty("packages").GetArrayLength());
-        Assert.Equal(8, manifest.GetProperty("examPool").GetArrayLength());
+        Assert.Equal(7, manifest.GetProperty("examPool").GetArrayLength());
     }
 
     [Fact]

@@ -43,6 +43,7 @@
     <Compile Include="TestingWorkspaceTests.cs" />
     <Compile Include="PackageLoadingTests.cs" />
     <Compile Include="OnlinePackageTests.cs" />
+    <Compile Include="OnlineSessionTests.cs" />
     <Compile Include="PlainTextMetadataTests.cs" />
     <Compile Include="GradingErrorTests.cs" />
     <Compile Include="NearMissFixtureTests.cs" />

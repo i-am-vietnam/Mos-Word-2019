@@ -1,4 +1,4 @@
-# Chạy server C0–C2 trên máy phát triển
+# Chạy server C0–C3 trên máy phát triển
 
 Tất cả lệnh dưới đây chạy từ thư mục gốc repository Word, trừ đoạn ghi rõ `Set-Location server`. Cần .NET 10 SDK và Docker Desktop **Linux containers** đang chạy. Client vẫn build bằng VS MSBuild/.NET Framework 4.7.2; không thêm server vào solution client.
 
@@ -66,9 +66,9 @@ dotnet run --project server/MosWord2019.Server --launch-profile https
 
 Mở [admin local](https://localhost:7118/Admin), đăng nhập bằng admin vừa tạo và vào Accounts: tìm kiếm, Create, Edit để đặt MaxUses hoặc AddUses, expiryUTC, lock/unlock/reset password; Sessions xem lịch sử phiên. Khi cộng lượt, để trống ô đặt MaxUses tuyệt đối để cộng trên giá trị mới nhất từ DB. Để trống expiry để bỏ hạn; để trống new password để giữ mật khẩu. Không tạo/admin-promote qua trang học viên. Kiểm tra [liveness](https://localhost:7118/health) và [readiness](https://localhost:7118/health/ready). HTTP5273 chuyển sang HTTPS7118; cookie admin/antiforgery chỉ HTTPS.
 
-Development certificate là cơ chế local của SDK, không dùng cho VPS hoặc bỏ TLS validation. SPKI pin thuộc C5/C6. Ngoài Development yêu cầu DataProtection__KeyPath ngoài Development (kể cả CLI mặc định Production); đường dẫn phải tuyệt đối và ngoài repo. Development được dùng key ring profile mặc định, nhưng nên giữ cùng path để token/cookie không mất khi đổi profile. Không xóa key ring giữa các deploy. Trên Linux C6 dùng thư mục riêng, owner service và mode700; bảo vệ/backup vì key filesystem không tự mã hóa at rest. Key ring không phải khóa package/TLS.
+Development certificate là cơ chế local của SDK, không dùng cho VPS hoặc bỏ TLS validation. SPKI pin thuộc C5/C6. Ngoài Development yêu cầu DataProtection__KeyPath (kể cả CLI mặc định Production); đường dẫn phải tuyệt đối và ngoài repo. Development được dùng key ring profile mặc định, nhưng nên giữ cùng path để token/cookie không mất khi đổi profile. Không xóa key ring giữa các deploy. Trên Linux C6 dùng thư mục riêng, owner service và mode700; bảo vệ/backup vì key filesystem không tự mã hóa at rest. Key ring không phải khóa package/TLS.
 
-Đặc tả JSON/status API nằm trong docs/SERVER_ARCHITECTURE.md. Login learner cần idempotencyKey UUID mới cho mỗi lượt và giữ nguyên key/machineId khi retry mạng. Admin credentials luôn bị learner API từ chối. Sai password/unknown/temporary lockout cùng thông báo; sau10lỗi credential thử lại sau15phút. Không ghi response bearer/resume token vào log; C5 mới lưu resume bằng DPAPI. C2 vẫn chưa có heartbeat C3: cửa sổ resume tính từ server login/chọn mode/resume gần nhất; chạy bài dài cần C3/C5 trước nghiệm thu online.
+Đặc tả JSON/status API nằm trong docs/SERVER_ARCHITECTURE.md. Login learner cần idempotencyKey UUID mới cho mỗi lượt và giữ nguyên key/machineId khi retry mạng. Admin credentials luôn bị learner API từ chối. Sai password/unknown/temporary lockout cùng thông báo; sau10lỗi credential thử lại sau15phút. Không ghi response bearer/resume token vào log; C5 mới lưu resume bằng DPAPI. C3 đã có endpoint heartbeat và monitor thư viện; C5 mới nối auth/UI. Cửa sổ resume tính từ heartbeat/login/chọn mode/resume gần nhất theo server; temporary lockout chặn login mới/resume nhưng không cắt phiên active/end/upload.
 
 Production sau nginx cùng host chỉ tin peer127.0.0.1/::1 và một hop; X-Forwarded-For/Proto từ remote khác bị bỏ qua. C6 phải bind Kestrel loopback và nginx ghi đè forwarded headers. Không dùng ASPNETCORE_FORWARDEDHEADERS_ENABLED để mở tin cậy mọi proxy.
 
@@ -109,9 +109,9 @@ Trên Linux C6, chọn thư mục ví dụ `/var/lib/mosword/packages`, `/var/li
 
 ## Kiểm tra luồng package và giới hạn phiên
 
-Login learner rồi chọn mode qua API hiện có. Chọn Testing tạo seed/hash/snapshot, trả examSeed/definitionHash/uploadToken; khi pool không đủ trả503 và không chốt mode. GET `/api/packages/manifest` bằng access token active trả envelope payload/signature ký Ed25519. Payload gồm full pool metadata để compose lại đề và đúng7descriptor/version/key được chọn; không có starter/assets/key của project ngoài đề. Client xác minh chữ ký toàn payload, session/mode và compose bằng cùng ExamComposer; POST `/api/sessions/definition` với definitionHash phải được chấp nhận trước GET `/api/packages/{id}/download`. Testing không tải id ngoài snapshot; download/report có audit. Không ghi manifest chứa key hoặc bearer token ra log.
+Login learner rồi chọn mode qua API hiện có. Chọn Testing tạo seed/hash/snapshot, trả examSeed/definitionHash/uploadToken; khi pool không đủ trả503 và không chốt mode. GET `/api/packages/manifest` bằng access token active trả envelope payload/signature ký Ed25519. Payload schemaVersion2 chứa ExamDefinition đã compose tại server, metadata/task được chọn và đúng7descriptor/version/key; không phát catalog/toàn pool hoặc task/project ngoài đề. Client xác minh chữ ký toàn payload, session/mode, cấu trúc và hash đề rồi dùng trực tiếp; POST `/api/sessions/definition` với definitionHash phải được chấp nhận trước GET `/api/packages/{id}/download`. Testing không tải id ngoài snapshot; download/report có audit. Không ghi manifest chứa key hoặc bearer token ra log.
 
-Pending hết hạn tại15phút từ StartedAt; Training4giờ từ StartedAt; Testing2giờ từ ModeSelectedAt. Phiên còn phải liên hệ trong15phút gần nhất và account/version hợp lệ. Quá idle15phút bị Abandoned vĩnh viễn; login retry cùng key không hồi sinh phiên. Chưa có heartbeat C3, nên gọi API vài lần không chứng minh bài online dài hoạt động; mốc LastHeartbeatAt chỉ do login/chọn mode đầu/resume cập nhật. Server quan sát inactivity sẽ lưu EndedAt/EndReason và đúng một audit, kể cả phản hồi401; giữ commit nhánh denied nếu viết caller mới của FindAsync.
+Pending hết hạn tại15phút từ StartedAt; Training4giờ từ StartedAt; Testing2giờ từ ModeSelectedAt. Phiên còn phải liên hệ trong15phút gần nhất và account/version hợp lệ. Quá idle15phút bị Abandoned vĩnh viễn; login retry cùng key không hồi sinh phiên. Heartbeat C3 update LastHeartbeatAt sau khi được chấp nhận; API package không tự thay heartbeat. C5 vẫn cần nối monitor vào vòng đời online trước nghiệm thu bài dài. Server quan sát inactivity sẽ lưu EndedAt/EndReason và đúng một audit, kể cả phản hồi401; giữ commit nhánh denied nếu viết caller mới của FindAsync.
 
 Access token30phút, resume255phút; dùng token mới từ response phiên hoặc header Session-Token của API package. Identity hint trong token hết hạn chỉ cho phép quan sát/chốt phiên vốn đã inactive, không cấp quyền. End retry chỉ là receipt UserEnded và trả sessionToken mới, không mở lại phiên. Upload token purpose riêng1575phút là nền tảng C4, chưa có endpoint upload; policy yêu cầu finalizedAt không sau2giờ từ chọn Testing và không sau EndedAt, nhận tới min(EndedAt,ModeSelectedAt+2giờ)+24giờ inclusive. End quan sát muộn không kéo dài quyền upload.
 
@@ -127,7 +127,31 @@ Debug mặc định UseLocalPackages=true; Release mặc định false, không s
 MSBuild.exe MosWord2019.slnx /t:Rebuild /p:Configuration=Release /p:UseLocalPackages=true
 ```
 
-Switch này dành cho phát triển, không phải cấu hình distribution. Release mặc định hiện chưa dùng độc lập cho người học vì online UI/auth/session refresh và heartbeat C3 còn chờ C5; không kết luận bản production đã sẵn sàng chỉ vì build không có Projects. Grader, nội dung bài và engine hiện có vẫn giữ nguyên.
+Switch này dành cho phát triển, không phải cấu hình distribution. Release mặc định hiện chưa dùng độc lập cho người học vì online UI/auth/session refresh và kết nối monitor heartbeat C3 còn chờ C5; không kết luận bản production đã sẵn sàng chỉ vì build không có Projects. Grader, nội dung bài và engine hiện có vẫn giữ nguyên.
+
+## Heartbeat C3: kiểm API và monitor
+
+POST heartbeat chỉ dùng Bearer access token, không gửi username/password/resume token/key package. Chuẩn bị $sessionId và $sessionToken trong bộ nhớ từ response login/mode đã xác thực, không dùng giá trị ví dụ trên tài khoản production. Đoạn sau chạy một request, chỉ hiển thị field không bí mật và giữ access token mới trong biến:
+
+```powershell
+$heartbeatUri = "https://localhost:7118/api/sessions/$sessionId/heartbeat"
+$heartbeatHeaders = @{ Authorization = "Bearer $sessionToken" }
+$heartbeatBody = @{ clientElapsedMilliseconds = $null; wasOffline = $false } | ConvertTo-Json -Compress
+$heartbeatReply = Invoke-RestMethod -Uri $heartbeatUri -Method Post -Headers $heartbeatHeaders -ContentType 'application/json' -Body $heartbeatBody
+$sessionToken = $heartbeatReply.sessionToken
+$heartbeatReply | Select-Object sessionId, mode, serverTime, expiresAt, remainingSeconds
+Remove-Variable heartbeatHeaders, heartbeatBody, heartbeatReply -ErrorAction SilentlyContinue
+```
+
+Dùng certificate development đã trust ở bước5; không thêm SkipCertificateCheck, curl -k hoặc callback bỏ TLS. Không in toàn response vì chứa sessionToken, không dùng verbose/trace/transcript ghi headers. Với Testing, clientElapsedMilliseconds là active elapsed từ engine hoặc null khi chưa chạy; hợp lệ0..86400000. WasOffline phản ánh client đã quan sát offline sau reply hợp lệ trước đó, không phải giá trị luôn true; request đầu phải false. Endpoint trả400 với elapsed sai,409 khi chưa chọn mode,401 khi phiên sai/hết quyền và429 khi vượt giới hạn. Heartbeat có bucket riêng6/phút theo SessionId kể cả token đã refresh; API chung60/session/phút vẫn giữ. Một script kiểm thủ công không thay monitor hay bằng chứng nghiệm thu UI.
+
+Reply có serverTime/expiresAt/remainingSeconds để chiếu deadline server: Training StartedAt+4giờ, Testing ModeSelectedAt+2giờ. Heartbeat không gia hạn deadline; Training vẫn trôi khi mất mạng. Temporary lockout chỉ chặn login mới/resume; heartbeat/end/active package/upload hẹp không bị temporary lockout cắt, nhưng admin Locked/credential reset vẫn thu hồi quyền.
+
+SessionHeartbeats lưu từng heartbeat và gap server vào DB. Khoảng lastHeartbeat+90giây tới now là Unobserved nếu không có quan sát offline, hoặc Network khi client WasOffline phù hợp. Nếu request vẫn tới nhưng response bị mất, server dùng last heartbeat WasOffline=false cộng30giây để ước lượng/extend Network gap, không suy online chỉ từ việc nhận POST. Chỉ Network gap được trừ khi đối chiếu Testing active elapsed; crash/Unobserved vẫn tính. Heartbeat Testing đầu có elapsed tạo anchor server và baseline để không tính Rules wait; elapsed đi trước mode wall hơn90giây đặt flag; các lần sau dùng tolerance nền90giây cộng90giây mỗi episode Network riêng biệt sau hợp/clip. Gap start=end vẫn được ghi để giữ episode suy luận, tránh false flag khi nhiều lần mất response ngắn trung thực; freeze vượt tổng bất định mới đặt TimingInconsistent sticky/audit một lần. Đây là tín hiệu tham khảo, không chứng minh gian lận. WasOffline không tin cậy và không cấp quyền; deadline4giờ/2giờ không trừ Network gap. Chưa có endpoint result C4; C4 sẽ đọc cờ theo SessionId và gọi SessionTiming.IsInconsistent tại upload.
+
+SessionConnectivityMonitor gửi mỗi30giây, watchdog1giây, timeout10giây, không overlap; bỏ reply muộn/cancel/dispose. Ban đầu offline, sau đó offline khi3lỗi liên tiếp hoặc90giây từ reply thành công cuối. Chiếu thời gian server bằng monotonic clock, tolerance drift2giây cho NTP slew nhỏ và clamp remaining không tăng, nhưng UTC server thực sự lùi vẫn bị từ chối; không căn đồng hồ vào UtcNow client. TrainingRemaining là countdown4giờ liên tục; TestingRemaining là server hard cap2giờ, không thay active timer50phút/pause hiện có. Notification FIFO chạy ngoài state lock, drainer không chờ để tránh khóa chéo với Testing engine; event có thể ở caller/background thread nên C5 cần marshal về UI. C3 chưa nối auth/UI/Word lock, nên các luồng offline đang chạy giữ nguyên.
+
+Manifest C3 schema2 chỉ đưa đề server đã compose và metadata/task của7project/task được chọn; client không nhận catalog/toàn pool để tự compose. Snapshot server giữ pinned pool và Definition nội bộ; snapshot C2 cũ thiếu Definition được server compose một lần rồi persist. Download dùng OpenBlob kiểm hash bằng stream có giới hạn, reset Position0, commit audit rồi trả FileStream để framework gửi/dispose; không load toàn blob vào RAM mỗi request.
 
 ## 6. Build và test
 
@@ -138,7 +162,7 @@ dotnet build server/MosWord2019.Server.sln -c Release --no-restore -warnaserror
 dotnet test server/MosWord2019.Server.sln -c Release --no-restore
 ```
 
-Testcontainers dùng postgres:16-alpine, database riêng/test, password ngẫu nhiên và tự dọn container. Các connection test không pooling để không giữ pool idle cho hàng trăm database; production không bị đổi chính sách pool. Không đọc DB dev hoặc state Word. Docker lỗi thì FAIL, không skip. Suite kiểm nền tảng C0/C1 và C2: migration/CLI/health, concurrency login/key/maxuses, deadline/idle/end/audit/persistence, lockout/thời gian server, admin/CSRF/proxy/rate limit, durable DP tokens, import/crypto/manifest/download/report/snapshot và nâng cấp dữ liệu. Client có kiểm chữ ký/GCM/hash/tampering, compose parity, extraction/ACL/ownership/cleanup và regression hiện có.
+Testcontainers dùng postgres:16-alpine, database riêng/test, password ngẫu nhiên và tự dọn container. Các connection test không pooling để không giữ pool idle cho hàng trăm database; production không bị đổi chính sách pool. Không đọc DB dev hoặc state Word. Docker lỗi thì FAIL, không skip. Suite kiểm nền tảng C0–C3: migration/CLI/health, concurrency login/key/maxuses, deadline/idle/end/audit/persistence, lockout/thời gian server, admin/CSRF/proxy/rate limit, durable DP tokens, import/crypto/manifest/download/report/snapshot và nâng cấp dữ liệu; C3 có persistence heartbeat/gaps, rate limit theo session, lockout không cắt phiên active và timing flags. Client có kiểm chữ ký/GCM/hash/tampering, đề schema2 tối thiểu, compose parity trong chẩn đoán/tests, extraction/ACL/ownership/cleanup, monitor/watchdog/monotonic/countdown và regression hiện có.
 
 Dependency NuGet ghim trong csproj và `packages.lock.json`; local tool `dotnet-ef` ghim trong `server/dotnet-tools.json`. Để tạo migration mới ở bước được cho phép:
 
@@ -163,4 +187,4 @@ Remove-Item Env:Packages__StorageRoot -ErrorAction SilentlyContinue
 Remove-Item Env:Packages__SigningKeyPath -ErrorAction SilentlyContinue
 ```
 
-Chưa public app C2 ra VPS. C6 sẽ publish framework-dependent linux-x64 trên PC, copy scp/rsync, không build trên VPS; thêm nginx/firewall/TLS pin/systemd/backup/rotation, tuning4GB/swap2GB và hướng dẫn chuyển VPS bằng pg_dump/restore. Key xác minh manifest công khai có thể commit đuôi .pub, private keys vẫn để ngoài repo.
+Chưa public app C3 ra VPS. C6 sẽ publish framework-dependent linux-x64 trên PC, copy scp/rsync, không build trên VPS; thêm nginx/firewall/TLS pin/systemd/backup/rotation, tuning4GB/swap2GB và hướng dẫn chuyển VPS bằng pg_dump/restore. Key xác minh manifest công khai có thể commit đuôi .pub, private keys vẫn để ngoài repo.

@@ -9,6 +9,8 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
     public DbSet<Result> Results => Set<Result>();
     public DbSet<Package> Packages => Set<Package>();
     public DbSet<AuditEntry> AuditLog => Set<AuditEntry>();
+    public DbSet<SessionHeartbeat> Heartbeats => Set<SessionHeartbeat>();
+    public DbSet<SessionOfflineGap> OfflineGaps => Set<SessionOfflineGap>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -43,6 +45,24 @@ public sealed class ServerDbContext(DbContextOptions<ServerDbContext> options) :
         sessions.Property(x => x.ReportedDefinitionHash).HasMaxLength(64);
         sessions.Property(x => x.ExamSnapshotJson).HasColumnType("jsonb");
         sessions.Property(x => x.StartedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        var heartbeats = model.Entity<SessionHeartbeat>();
+        heartbeats.ToTable("Heartbeats", t => t.HasCheckConstraint("CK_Heartbeats_Elapsed",
+            "\"ClientElapsedMilliseconds\" IS NULL OR \"ClientElapsedMilliseconds\" BETWEEN 0 AND 86400000"));
+        heartbeats.HasKey(x => x.Id);
+        heartbeats.HasOne<Session>().WithMany().HasForeignKey(x => x.SessionId).OnDelete(DeleteBehavior.Restrict);
+        heartbeats.HasIndex(x => new { x.SessionId, x.ReceivedAt });
+
+        var gaps = model.Entity<SessionOfflineGap>();
+        gaps.ToTable("OfflineGaps", t =>
+        {
+            t.HasCheckConstraint("CK_OfflineGaps_Time", "\"EndedAt\" >= \"StartedAt\"");
+            t.HasCheckConstraint("CK_OfflineGaps_Kind", "\"Kind\" IN ('Network', 'Unobserved')");
+        });
+        gaps.HasKey(x => x.Id);
+        gaps.HasOne<Session>().WithMany().HasForeignKey(x => x.SessionId).OnDelete(DeleteBehavior.Restrict);
+        gaps.Property(x => x.Kind).HasMaxLength(16).IsRequired();
+        gaps.HasIndex(x => new { x.SessionId, x.StartedAt });
 
         var results = model.Entity<Result>();
         results.ToTable("Results");

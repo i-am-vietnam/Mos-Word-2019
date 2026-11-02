@@ -24,6 +24,15 @@ public static class LearnerEndpoints
         app.MapPost("/api/sessions/{id:guid}/end", async (Guid id, HttpContext context,
             LearnerSessions sessions, CancellationToken ct) =>
                 Result(await sessions.EndAsync(SessionTokens.Bearer(context), id, ct)));
+        app.MapPost("/api/sessions/{id:guid}/heartbeat", async (Guid id, HeartbeatRequest request, HttpContext context,
+            SessionTokens tokens, LoginThrottle throttle, SessionHeartbeats heartbeats, CancellationToken ct) =>
+        {
+            string? token = SessionTokens.Bearer(context);
+            var identity = tokens.Read(token);
+            if (identity != null && !await throttle.AllowAsync("heartbeat:" + identity.SessionId, ct))
+                return Results.StatusCode(429);
+            return Result(await heartbeats.BeatAsync(id, token, request, ct));
+        });
         app.MapPost("/api/sessions/resume", async (ResumeRequest request, SessionTokens tokens,
             LoginThrottle throttle, LearnerSessions sessions, CancellationToken ct) =>
         {

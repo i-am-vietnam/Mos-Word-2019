@@ -77,7 +77,7 @@ public sealed class SessionPolicyTests(PostgresFixture postgres)
         if (denial == "expired") account.ExpiresAt = Start;
         if (denial == "lockout") account.LockoutUntil = Start.AddMinutes(1);
         if (denial == "credential") account.CredentialVersion = Guid.NewGuid();
-        Assert.False(SessionPolicy.Evaluate(account, session, Start, session.AccountCredentialVersion).Allowed);
+        Assert.Equal(denial == "lockout", SessionPolicy.Evaluate(account, session, Start, session.AccountCredentialVersion).Allowed);
     }
 
     [Fact]

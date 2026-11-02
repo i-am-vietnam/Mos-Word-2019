@@ -127,6 +127,28 @@ public sealed class AdminWebTests(PostgresFixture postgres)
         Assert.Equal(HttpStatusCode.Redirect, denied.StatusCode);
     }
 
+    [Fact]
+    public async Task TemporaryLockoutBlocksNewAdminLoginButKeepsExistingCookie()
+    {
+        var (connection, password) = await CreateAdminAsync();
+        await using var factory = new ServerFactory(connection);
+        using var current = factory.CreateHttpsClient();
+        using var login = await SignInAsync(current, await AntiforgeryTokenAsync(current), password);
+        Assert.Equal(HttpStatusCode.Redirect, login.StatusCode);
+        await using (var db = PostgresFixture.Open(connection))
+        {
+            var account = await db.Accounts.SingleAsync(); account.FailedLoginCount = 10;
+            account.LockoutUntil = DateTimeOffset.UtcNow.AddMinutes(15); await db.SaveChangesAsync();
+        }
+        using var stillSignedIn = await current.GetAsync("/Admin");
+        Assert.Equal(HttpStatusCode.OK, stillSignedIn.StatusCode);
+        using var fresh = factory.CreateHttpsClient();
+        using var denied = await SignInAsync(fresh, await AntiforgeryTokenAsync(fresh), password);
+        Assert.Contains("Invalid administrator credentials.", await denied.Content.ReadAsStringAsync());
+        using var protectedPage = await fresh.GetAsync("/Admin");
+        Assert.Equal(HttpStatusCode.Redirect, protectedPage.StatusCode);
+    }
+
     [Theory]
     [InlineData("/Admin/Login")]
     [InlineData("/Admin/Login/")]

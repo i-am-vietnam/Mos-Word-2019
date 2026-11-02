@@ -12,7 +12,10 @@ public sealed record DefinitionReport(string? DefinitionHash);
 
 public static class PackageEndpoints
 {
-    private static readonly JsonSerializerSettings Json = new() { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+    private static readonly JsonSerializerSettings Json = new()
+    {
+        ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy(processDictionaryKeys: false, overrideSpecifiedNames: false) }
+    };
 
     public static void MapPackageEndpoints(this WebApplication app)
     {
@@ -45,6 +48,20 @@ public static class PackageEndpoints
         if (packages.Count == 0) return Results.StatusCode(503);
         try
         {
+            var definition = snapshot == null ? null : ServerExamPool.Definition(snapshot, session.ExamSeed ?? throw new InvalidDataException("Missing pinned seed."));
+            if (definition != null && MosWord2019.Core.Services.ExamDefinitionFingerprint.Compute(definition) != session.ExamDefinitionHash)
+                throw new InvalidDataException("Pinned definition integrity check failed.");
+            if (snapshot != null && snapshot.Definition == null)
+            {
+                snapshot = snapshot with { Definition = Newtonsoft.Json.Linq.JObject.FromObject(definition!) };
+                session.ExamSnapshotJson = JsonConvert.SerializeObject(snapshot);
+                await db.SaveChangesAsync(ct);
+            }
+            var selectedPool = definition?.Projects.Select(project =>
+            {
+                var entry = snapshot!.ExamPool.Single(p => p.Meta.ProjectId == project.ProjectId);
+                return new ExamPoolEntry(entry.Meta, project.TaskIds.Select(id => entry.Tasks.Single(t => t.TaskId == id)).ToList());
+            }).ToArray();
             var descriptors = packages.OrderBy(p => p.Code, StringComparer.Ordinal).Select(p => new
             {
                 p.Id, p.Code, p.Version, p.Sha256, p.ZipSha256, p.SizeBytes,
@@ -52,9 +69,9 @@ public static class PackageEndpoints
             }).ToArray();
             byte[] payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
             {
-                schemaVersion = 1, sessionId = session.Id, mode = session.Mode,
+                schemaVersion = 2, sessionId = session.Id, mode = session.Mode,
                 examSeed = session.ExamSeed?.ToString(CultureInfo.InvariantCulture), definitionHash = session.ExamDefinitionHash,
-                catalog = snapshot?.Catalog, examPool = snapshot?.ExamPool, packages = descriptors
+                examDefinition = definition, examPool = selectedPool, packages = descriptors
             }, Json));
             var envelope = new { payload = Convert.ToBase64String(payload), signature = Convert.ToBase64String(storage.Sign(payload)) };
             Refresh(context, tokens, session, account);
@@ -103,15 +120,19 @@ public static class PackageEndpoints
         }
         var package = await db.Packages.AsNoTracking().SingleOrDefaultAsync(p => p.Id == id, ct);
         if (package == null) return Results.NotFound();
-        byte[] blob;
-        try { blob = storage.ReadBlob(package); }
+        FileStream blob;
+        try { blob = storage.OpenBlob(package); }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or System.Security.Cryptography.CryptographicException)
         { return Results.StatusCode(503); }
-        db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "PackageDownloaded", CreatedAt = time.GetUtcNow(),
-            DetailsJson = JsonConvert.SerializeObject(new { sessionId = session.Id, packageId = id, package.Code, package.Version, package.SizeBytes }) });
-        await db.SaveChangesAsync(ct);
-        Refresh(context, tokens, session, account);
-        await transaction.CommitAsync(ct);
-        return Results.File(blob, "application/octet-stream", enableRangeProcessing: false);
+        try
+        {
+            db.AuditLog.Add(new AuditEntry { AccountId = account.Id, Action = "PackageDownloaded", CreatedAt = time.GetUtcNow(),
+                DetailsJson = JsonConvert.SerializeObject(new { sessionId = session.Id, packageId = id, package.Code, package.Version, package.SizeBytes }) });
+            await db.SaveChangesAsync(ct);
+            Refresh(context, tokens, session, account);
+            await transaction.CommitAsync(ct);
+            return Results.File(blob, "application/octet-stream", enableRangeProcessing: false);
+        }
+        catch { await blob.DisposeAsync(); throw; }
     }
 }

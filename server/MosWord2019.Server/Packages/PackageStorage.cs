@@ -79,12 +79,44 @@ public sealed class PackageStorage(IConfiguration configuration, IHostEnvironmen
 
     public byte[] ReadBlob(Package package)
     {
+        using var stream = OpenBlob(package);
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        return buffer.ToArray();
+    }
+
+    public FileStream OpenBlob(Package package)
+    {
         if (package.StoragePath != package.Id.ToString("N") + ".bin") throw new InvalidDataException("Invalid package storage identity.");
-        var blob = ReadBounded(Path.Combine(ExternalPath("Packages:StorageRoot"), package.StoragePath), MaximumBlobBytes);
-        if (blob.Length < 36 || blob.LongLength != package.SizeBytes || !blob.AsSpan(0, 8).SequenceEqual(Header) ||
-            !CryptographicOperations.FixedTimeEquals(SHA256.HashData(blob), Convert.FromHexString(package.Sha256)))
-            throw new InvalidDataException("Package storage integrity check failed.");
-        return blob;
+        var path = Path.Combine(ExternalPath("Packages:StorageRoot"), package.StoragePath);
+        RejectReparsePoints(path);
+        var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.SequentialScan);
+        try
+        {
+            if (stream.Length < 36 || stream.Length > MaximumBlobBytes || stream.Length != package.SizeBytes)
+                throw new InvalidDataException("Package storage integrity check failed.");
+            Span<byte> header = stackalloc byte[8];
+            stream.ReadExactly(header);
+            if (!header.SequenceEqual(Header)) throw new InvalidDataException("Package storage integrity check failed.");
+            stream.Position = 0;
+            using var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var buffer = new byte[81920];
+            long remaining = package.SizeBytes;
+            while (remaining > 0)
+            {
+                int count = stream.Read(buffer, 0, (int)Math.Min(buffer.Length, remaining));
+                if (count == 0) throw new InvalidDataException("Package storage integrity check failed.");
+                hasher.AppendData(buffer, 0, count);
+                remaining -= count;
+            }
+            if (stream.ReadByte() != -1) throw new InvalidDataException("Package storage integrity check failed.");
+            var hash = hasher.GetHashAndReset();
+            if (!CryptographicOperations.FixedTimeEquals(hash, Convert.FromHexString(package.Sha256)))
+                throw new InvalidDataException("Package storage integrity check failed.");
+            stream.Position = 0;
+            return stream;
+        }
+        catch { stream.Dispose(); throw; }
     }
 
     public byte[] Sign(byte[] payload)

@@ -48,6 +48,21 @@ public sealed class PackageStorageTests : IDisposable
     }
 
     [Fact]
+    public void VerifiedBlobStreamStartsAtBeginningAndReleasesHandle()
+    {
+        var package = NewPackage();
+        storage.Store(package, Encoding.UTF8.GetBytes("streamed content"));
+        using (var stream = storage.OpenBlob(package))
+        {
+            Assert.IsType<FileStream>(stream);
+            Assert.Equal(0, stream.Position);
+            Assert.Equal(package.SizeBytes, stream.Length);
+            Assert.Equal((byte)'M', stream.ReadByte());
+        }
+        using var exclusive = new FileStream(Path.Combine(configuration["Packages:StorageRoot"]!, package.StoragePath), FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+    }
+
+    [Fact]
     public void EveryPackageGetsIndependentNonceAndKey()
     {
         var first = NewPackage();
