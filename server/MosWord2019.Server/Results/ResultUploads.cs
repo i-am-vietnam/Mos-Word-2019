@@ -12,7 +12,7 @@ namespace MosWord2019.Server.ResultHandling;
 public sealed class ResultUploadEndpoint;
 
 public sealed class ResultUploads(ServerDbContext db, LearnerSessions sessions, SessionTokens tokens,
-    PackageStorage storage, TimeProvider time)
+    PackageStorage storage, TimeProvider time, ILogger<ResultUploads> logger)
 {
     public const int MaximumPayloadBytes = 256 * 1024;
 
@@ -65,9 +65,17 @@ public sealed class ResultUploads(ServerDbContext db, LearnerSessions sessions, 
         try { validated = ResultValidation.Validate(session, payload, now); }
         catch (Exception ex) when (InvalidInput(ex)) { await transaction.CommitAsync(ct); return Error(400, "invalid_result"); }
         string wrongTasks;
-        try { wrongTasks = await ResultValidation.WrongTasksAsync(validated, db, storage, ct); }
-        catch (Exception ex) when (ex is IOException or CryptographicException or InvalidOperationException or JsonException)
-        { await transaction.CommitAsync(ct); return Error(503, "pinned_instructions_unavailable"); }
+        string packageCode = "unresolved";
+        try { wrongTasks = await ResultValidation.WrongTasksAsync(validated, db, storage, ct, code => packageCode = code); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or CryptographicException or
+            InvalidOperationException or JsonException or System.Text.DecoderFallbackException)
+        {
+            // Log only safe context, never the exception object/message or package contents.
+            logger.LogWarning("Pinned instructions unavailable: sessionId={SessionId} packageCode={PackageCode} language={Language} exceptionType={ExceptionType}",
+                session.Id, packageCode, validated.Language, ex.GetType().Name);
+            await transaction.CommitAsync(ct);
+            return Error(503, "pinned_instructions_unavailable");
+        }
         var gaps = await db.OfflineGaps.Where(g => g.SessionId == session.Id).OrderBy(g => g.StartedAt).ToListAsync(ct);
         var lastContact = await db.Heartbeats.Where(h => h.SessionId == session.Id)
             .OrderByDescending(h => h.ReceivedAt).FirstOrDefaultAsync(ct);

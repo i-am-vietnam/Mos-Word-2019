@@ -1,5 +1,10 @@
 # Known Issues and Verification Items
 
+## C7-FIX2 — Cần triển khai server trước hạn upload, 2026-11-03
+
+- Đã xác nhận nguyên nhân503 là UTF-8 BOM trong22langVI của gói lưu trữ; parser gói riêng đã sửa, payload kết quả vẫnstrict. Không cần sửa/re-import gói, đổi hash/version, schema hoặc build lại client. Artifactclient20261103T151755Z-7b41671b giữ nguyên.
+- Chưa deploy/ACKproduction. Owner chạy publish.ps1, restartclient rồi kiểm Admin → Kết quả thi và nginx/journalctl. Kết quảb906807d… cần được nhận trước~04/11/2026 14:40UTC (21:40VN); không gia hạn quyền, không xóa/sửa queue hoặc token. Warning503 mới chỉ có session/package/language/type; lỗi pinneddata khác tiếp tục retry để bảo toàn bằng chứng.
+
 ## C7-FIX — Nghiệm thu còn lại, 2026-11-03
 
 - Chưa cài server/client mới trên VPS/máy học viên hoặc xác nhận ACK thật. Owner chạy publish.ps1 và build-client.ps1 theo docs/DEPLOY_VPS.md, giữ nguyên trust/keys và LocalAppData, nghiệm thu lại bước4/5. Kết quả b906807d… còn pending; hạn khoảng04/11/2026 21:40VN, server quyết định thực tế, không gia hạn bằng chỉnh file/đồng hồ.

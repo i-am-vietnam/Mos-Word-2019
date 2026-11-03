@@ -1,5 +1,11 @@
 # Project Status
 
+## C7-FIX2 — Hotfix BOM cho upload kết quả, 2026-11-03
+
+Sửa riêng server: `PackageJson.Parse` bỏ đúng một UTF-8 BOM đầu JSON gói, giữ strict UTF-8/depth64/duplicate-error/trailing-data/4MiB. `ResultValidation.Parse` dành cho payload kết quả không đổi. `ResultUploads` ghi warning sessionId/packageCode/language/exceptionType, không exception message/token/key/nội dung; InvalidDataException và DecoderFallbackException từ hướng dẫn trả503 retryable. Rà ZIP reader chỉ có Instructions; ServerExamPool/PackageEndpoints/admin detail đọc JSON DB, importer File.ReadAllText đã xử lý BOM. Không sửa client/Projects/schema/phiên bản hoặc hash gói, không re-import production.
+
+Regression tái hiện lỗi trước sửa; kiểm thử mới đọc đủ28gói thật,22VI BOM,212task/424tổ hợp ngôn ngữ qua WrongTasksAsync, uploadVI200/idempotency, payloadBOM vẫn400 và503/log an toàn. Kiểm chứng: server229/229 và client1077/1077 mỗi Debug/Release,0skipped; giữ đủ213servercase cũ. VS MSBuild Rebuild và dotnet build -warnaserror đều0warning/0error. Hash150file gói, parserpayload và artifactclientproduction giữ nguyên. Bằng chứng tại artifacts/c7-fix2 (ignored). Owner chỉ publish server bằng server/deploy/publish.ps1 rồi restart client cũ để retry; giữ nguyên artifact20261103T151755Z-7b41671b. Cần ACKproduction trước~04/11/2026 14:40UTC (21:40VN); agent không truy cập VPS. Chỉ C7-FIX2, commit cục bộ, không push.
+
 ## C7-FIX — Resume, upload và admin, 2026-11-03
 
 Sửa resume Testing theo SessionId + ExamDefinitionFingerprint thay reference; regression qua prepare/start/save/dispose/reload/heartbeat/Next/Submit, chấm trên bản sao tài liệu và enqueue DPAPI thật. Rà client không còn reference comparison liên quan. Bản sao state đang dở được kiểm tra Save/heartbeat và nhánh saved-only quá15phút, không chạy Word hoặc sửa bằng chứng gốc.

@@ -76,7 +76,8 @@ public static class ResultValidation
             (bool)payload["clockRollbackDetected"]!, language, definition, snapshot);
     }
 
-    public static async Task<string> WrongTasksAsync(ValidatedResult result, ServerDbContext db, PackageStorage storage, CancellationToken ct)
+    public static async Task<string> WrongTasksAsync(ValidatedResult result, ServerDbContext db, PackageStorage storage, CancellationToken ct,
+        Action<string>? readingPackage = null)
     {
         var wrong = new JArray();
         if (result.Score.WrongTasks.Count == 0) return "[]";
@@ -85,6 +86,7 @@ public static class ResultValidation
         {
             var failures = result.Score.WrongTasks.Where(t => t.ProjectCode == ProjectCode(project.ProjectId)).ToList();
             if (failures.Count == 0) continue;
+            readingPackage?.Invoke(project.ProjectId);
             var package = packages.SingleOrDefault(p => p.Code == project.ProjectId)
                 ?? throw new InvalidDataException("The pinned package is unavailable.");
             var instructions = Instructions(storage, package, result.Language);
@@ -117,7 +119,7 @@ public static class ResultValidation
             using var buffer = new MemoryStream();
             input.CopyTo(buffer);
             if (buffer.Length > 4 * 1024 * 1024) throw new InvalidDataException("Instruction data exceeds its size limit.");
-            return Parse(buffer.ToArray());
+            return PackageJson.Parse(buffer.ToArray());
         }
         finally { CryptographicOperations.ZeroMemory(key); CryptographicOperations.ZeroMemory(zip); }
     }
