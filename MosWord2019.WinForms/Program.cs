@@ -62,16 +62,7 @@ namespace MosWord2019
                     using (var uploadCancellation = new CancellationTokenSource())
                     {
                         // Retry only explicitly registered online evidence; never scan/enqueue offline Results.
-                        var uploadWorker = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                using (var http = new ServerConnectionSettings().CreateClient())
-                                using (var uploadTransport = new HttpResultUploadTransport(http))
-                                    await new ResultUploadQueue(uploadTransport).RunAsync(uploadCancellation.Token).ConfigureAwait(false);
-                            }
-                            catch (Exception ex) { AppLogger.Write("Result upload worker stopped; evidence remains pending (" + ex.GetType().Name + ")."); }
-                        });
+                        var uploadWorker = Task.Run(() => RunResultUploadWorkerAsync(uploadCancellation.Token));
                         try
                         {
                             if (!InspectOnlineStartup())

@@ -59,7 +59,7 @@ namespace MosWord2019
             try
             {
                 using (var transport = new HttpResultUploadTransport(http))
-                    await new ResultUploadQueue(transport).PumpAsync().ConfigureAwait(false);
+                    await new ResultUploadQueue(transport, expectedOrigin: settings.Origin).PumpAsync(forceDue: true).ConfigureAwait(false);
             }
             catch (Exception ex) { MosWord2019.Core.Diagnostics.AppLogger.Write("Post-login result retry deferred (" + ex.GetType().Name + ")."); }
         }

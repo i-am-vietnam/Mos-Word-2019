@@ -7,9 +7,9 @@ namespace MosWord2019.Server.Pages.Admin.Accounts;
 
 public sealed class CreateModel(AccountAdministration administration) : PageModel
 {
-    [BindProperty, Required, StringLength(64)] public string Username { get; set; } = "";
-    [BindProperty, Required, StringLength(128, MinimumLength = 12), DataType(DataType.Password)] public string Password { get; set; } = "";
-    [BindProperty, Range(0, int.MaxValue)] public int MaxUses { get; set; }
+    [BindProperty, Required(ErrorMessage = "Vui lòng nhập tài khoản."), StringLength(64, ErrorMessage = "Tài khoản tối đa 64 ký tự.")] public string Username { get; set; } = "";
+    [BindProperty, DataType(DataType.Password)] public string Password { get; set; } = "";
+    [BindProperty, Range(0, int.MaxValue, ErrorMessage = "Số lượt tối đa phải từ 0 đến 2147483647.")] public int MaxUses { get; set; }
     [BindProperty] public DateTime? ExpiresUtc { get; set; }
     [BindProperty] public bool Locked { get; set; }
 
@@ -20,12 +20,12 @@ public sealed class CreateModel(AccountAdministration administration) : PageMode
         Password = "";
         ModelState.Remove(nameof(Password));
         if (!AccountAdministration.ValidPassword(password))
-            ModelState.AddModelError(nameof(Password), "Password must contain 12-128 characters and cannot be blank.");
+            ModelState.AddModelError(nameof(Password), "Mật khẩu phải có 12–128 ký tự và không được để trống.");
         if (!ModelState.IsValid) return Page();
-        var expiry = ExpiresUtc.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(ExpiresUtc.Value, DateTimeKind.Utc)) : (DateTimeOffset?)null;
+        var expiry = ExpiresUtc.HasValue ? AdminDisplay.Utc(ExpiresUtc.Value) : (DateTimeOffset?)null;
         var result = await administration.CreateAsync(Username, password, MaxUses, expiry, Locked, cancellationToken);
         if (result.Success) return RedirectToPage("Edit", new { id = result.AccountId });
-        ModelState.AddModelError("", result.Error!);
+        ModelState.AddModelError("", AdminDisplay.Error(result.Error));
         return Page();
     }
 }

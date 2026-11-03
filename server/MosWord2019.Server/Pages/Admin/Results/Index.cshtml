@@ -1,30 +1,23 @@
 @page
 @model MosWord2019.Server.Pages.Admin.Results.IndexModel
-<!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8" /><title>Kết quả thi</title></head><body>
+@{ ViewData["Title"] = "Kết quả thi"; }
 <h1>Kết quả thi@(Model.Username == null ? "" : " — " + Model.Username)</h1>
-<p><a asp-page="/Admin/Index">Quản trị</a> | <a asp-page="/Admin/Accounts/Index">Tài khoản học viên</a> | <a asp-page="Index">Tất cả kết quả</a></p>
-<form method="get">
-<input type="hidden" asp-for="AccountId" />
-<label asp-for="FromDate">Từ ngày (UTC)</label> <input asp-for="FromDate" type="date" />
-<label asp-for="ToDate">Đến ngày (UTC, gồm cả ngày)</label> <input asp-for="ToDate" type="date" />
-<button type="submit">Lọc</button>
-</form>
-<p>Thời gian nhận kết quả theo UTC. Điểm do server tính lại từ kết quả từng câu do client gửi; các cờ cần được xem xét riêng.</p>
-<table><thead><tr><th>Ngày nhận (UTC)</th><th>Tài khoản</th><th>Điểm / 1000</th><th>Kết quả</th><th>Cờ</th><th>Chi tiết</th></tr></thead><tbody>
+<form method="get" class="panel filters"><input type="hidden" asp-for="AccountId" />
+<div><label class="form-label" asp-for="Account">Tài khoản</label><input class="form-control" asp-for="Account" maxlength="64" /></div>
+<div><label class="form-label" asp-for="FromDate">Từ ngày (giờ VN)</label><input class="form-control" asp-for="FromDate" type="date" /></div>
+<div><label class="form-label" asp-for="ToDate">Đến ngày (giờ VN)</label><input class="form-control" asp-for="ToDate" type="date" /></div>
+<div><label class="form-label" asp-for="Verdict">Kết quả</label><select class="form-select" asp-for="Verdict"><option value="">Tất cả</option><option value="passed">Đạt</option><option value="practice">Cần Luyện Tập thêm</option></select></div>
+<div><label class="form-label" asp-for="Flag">Cờ cần xem xét</label><select class="form-select" asp-for="Flag"><option value="">Tất cả</option><option value="any">Có cờ</option><option value="TimingInconsistent">Thời gian không nhất quán</option><option value="ClockRollbackDetected">Đồng hồ máy lùi</option></select></div>
+<button class="btn btn-primary" type="submit">Lọc</button><a class="btn btn-outline-secondary" asp-page="Index">Xóa bộ lọc</a></form>
+<p class="hint">Ngày kết thúc gồm cả ngày theo giờ Việt Nam. Điểm do máy chủ tính lại; các cờ không tự thay đổi điểm hoặc kết quả.</p>
+<div class="table-responsive"><table class="table"><thead><tr><th>Ngày nhận (giờ VN)</th><th>Tài khoản</th><th>Điểm / 1000</th><th>Kết quả</th><th>Cờ</th><th></th></tr></thead><tbody>
 @foreach (var result in Model.Results)
 {
-<tr><td>@result.ReceivedAt.UtcDateTime.ToString("u")</td><td><a asp-page="Index" asp-route-accountId="@result.AccountId">@result.Username</a></td><td>@result.Score / 1000</td><td>@(result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</td><td>@result.FlagsJson</td><td><a asp-page="Details" asp-route-id="@result.Id">Xem</a></td></tr>
+<tr><td>@AdminDisplay.Time(result.ReceivedAt)</td><td><a asp-page="Index" asp-route-accountId="@result.AccountId">@result.Username</a></td><td class="score">@result.Score / 1000</td><td><span class="badge @(result.Passed ? "text-bg-success" : "badge-practice")">@(result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</span></td><td>@foreach (var flag in AdminDisplay.Flags(result.FlagsJson)) { <span class="badge flag" title="@AdminDisplay.FlagDescription(flag)" data-code="@flag">@AdminDisplay.Flag(flag)</span> }</td><td><a asp-page="Details" asp-route-id="@result.Id">Chi tiết</a></td></tr>
 }
-</tbody></table>
-@if (Model.Results.Count == 0) { <p>Không có kết quả.</p> }
-@if (Model.PageNumber > 1)
-{
-<a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-accountId="@Model.AccountId" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Trước</a>
-}
-<span>Trang @Model.PageNumber (50 kết quả mỗi trang)</span>
-@if (Model.HasNext)
-{
-<a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-accountId="@Model.AccountId" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Tiếp</a>
-}
-</body></html>
+@if (Model.Results.Count == 0) { <tr><td colspan="6" class="empty">Không có kết quả phù hợp.</td></tr> }
+</tbody></table></div>
+<div class="pagination-bar"><span>Trang @Model.PageNumber · 50 kết quả mỗi trang</span><div class="actions">
+@if (Model.PageNumber > 1) { <a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-accountId="@Model.AccountId" asp-route-account="@Model.Account" asp-route-verdict="@Model.Verdict" asp-route-flag="@Model.Flag" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Trước</a> }
+@if (Model.HasNext) { <a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-accountId="@Model.AccountId" asp-route-account="@Model.Account" asp-route-verdict="@Model.Verdict" asp-route-flag="@Model.Flag" asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")">Tiếp</a> }
+</div></div>

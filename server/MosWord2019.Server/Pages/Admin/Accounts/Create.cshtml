@@ -1,14 +1,11 @@
 @page
 @model MosWord2019.Server.Pages.Admin.Accounts.CreateModel
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8" /><title>Create learner</title></head><body>
-<h1>Create learner</h1><p><a asp-page="Index">Learner accounts</a></p>
-<form method="post">
-<div asp-validation-summary="All"></div>
-<p><label asp-for="Username"></label> <input asp-for="Username" autocomplete="off" /></p>
-<p><label asp-for="Password"></label> <input type="password" name="Password" id="Password" autocomplete="new-password" minlength="12" maxlength="128" required /> (12-128 characters)</p>
-<p><label asp-for="MaxUses">Maximum uses</label> <input asp-for="MaxUses" min="0" /></p>
-<p><label asp-for="ExpiresUtc">Expiry (UTC)</label> <input asp-for="ExpiresUtc" type="datetime-local" /> Leave blank for no expiry. All dates are UTC.</p>
-<p><label asp-for="Locked"></label> <input asp-for="Locked" /></p>
-<button type="submit">Create learner</button>
-</form></body></html>
+@{ ViewData["Title"] = "Tạo học viên"; }
+<h1>Tạo tài khoản học viên</h1><p><a asp-page="Index">← Danh sách học viên</a></p>
+<form method="post" class="panel form-panel"><div asp-validation-summary="All" role="alert"></div>
+<p><label class="form-label" asp-for="Username">Tài khoản</label><input class="form-control" asp-for="Username" autocomplete="off" maxlength="64" required /><span class="hint">3–64 ký tự: chữ A–Z, a–z, chữ số, dấu chấm, gạch dưới hoặc gạch ngang.</span></p>
+<p><label class="form-label" asp-for="Password">Mật khẩu</label><input class="form-control" type="password" name="Password" id="Password" autocomplete="new-password" minlength="12" maxlength="128" required /><span class="hint">12–128 ký tự; không được chỉ có khoảng trắng.</span></p>
+<p><label class="form-label" asp-for="MaxUses">Số lượt tối đa</label><input class="form-control" asp-for="MaxUses" min="0" /></p>
+<p><label class="form-label" asp-for="ExpiresUtc">Hạn sử dụng (giờ VN)</label><input class="form-control" asp-for="ExpiresUtc" type="datetime-local" /><span class="hint">Để trống nếu không giới hạn ngày sử dụng.</span></p>
+<p class="form-check"><input class="form-check-input" asp-for="Locked" /><label class="form-check-label" asp-for="Locked">Khóa tài khoản</label></p>
+<button class="btn btn-primary" type="submit">Tạo học viên</button></form>

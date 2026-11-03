@@ -61,7 +61,7 @@ public sealed class AccountPagesTests(PostgresFixture postgres)
         };
         using var invalid = await client.PostAsync("/Admin/Accounts/Create", new FormUrlEncodedContent(form));
         var invalidHtml = await invalid.Content.ReadAsStringAsync();
-        Assert.Contains("Username must contain", invalidHtml);
+        Assert.Contains("Tên tài khoản phải có", WebUtility.HtmlDecode(invalidHtml));
         Assert.DoesNotContain("learner-password-123", invalidHtml);
         form["Username"] = "learner";
         using var created = await client.PostAsync("/Admin/Accounts/Create", new FormUrlEncodedContent(form));
@@ -90,7 +90,7 @@ public sealed class AccountPagesTests(PostgresFixture postgres)
         }));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Password must contain 12-128 characters and cannot be blank.", body);
+        Assert.Contains("Mật khẩu phải có 12–128 ký tự và không được để trống.", WebUtility.HtmlDecode(body));
         await using var db = PostgresFixture.Open(connection);
         Assert.False(await db.Accounts.AnyAsync(x => !x.IsAdmin));
         Assert.False(await db.AuditLog.AnyAsync(x => x.Action == "LearnerCreated"));
@@ -157,7 +157,7 @@ public sealed class AccountPagesTests(PostgresFixture postgres)
         var html = await client.GetStringAsync("/Admin/Accounts");
         Assert.Contains("learner49", html);
         Assert.DoesNotContain("learner50", html);
-        Assert.Contains(">Next</a>", html);
+        Assert.Contains(">Tiếp</a>", WebUtility.HtmlDecode(html));
         var next = await client.GetStringAsync("/Admin/Accounts?PageNumber=2");
         Assert.Contains("learner50", next);
         Assert.DoesNotContain("learner49", next);
@@ -166,7 +166,7 @@ public sealed class AccountPagesTests(PostgresFixture postgres)
         Assert.DoesNotContain("learner49", search);
         var sessions = await client.GetStringAsync($"/Admin/Accounts/Sessions/{id}");
         Assert.Contains(id.ToString(), sessions);
-        Assert.Contains("Training", sessions);
+        Assert.Contains("Luyện tập", WebUtility.HtmlDecode(sessions));
         Assert.Contains(new string('a', 12), sessions);
         Assert.DoesNotContain(machine, sessions);
         Assert.DoesNotContain("PasswordHash", sessions);

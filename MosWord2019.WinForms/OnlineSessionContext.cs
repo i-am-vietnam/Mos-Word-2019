@@ -119,7 +119,7 @@ namespace MosWord2019
         {
             if (registerOverride != null) { registerOverride(resultPath); return; }
             using (var transport = new HttpResultUploadTransport(http))
-                new ResultUploadQueue(transport).Enqueue(resultPath, Credentials.SessionId, origin,
+                new ResultUploadQueue(transport, expectedOrigin: origin).Enqueue(resultPath, Credentials.SessionId, origin,
                     Convert.FromBase64String(Credentials.ResultSigningKey), Credentials.UploadToken);
             // The startup worker also retries after a lost acknowledgement or process exit.
             _ = PumpResultsAsync();
@@ -129,7 +129,7 @@ namespace MosWord2019
             try
             {
                 using (var transport = new HttpResultUploadTransport(http))
-                    await new ResultUploadQueue(transport).PumpAsync().ConfigureAwait(false);
+                    await new ResultUploadQueue(transport, expectedOrigin: origin).PumpAsync().ConfigureAwait(false);
             }
             catch (Exception ex) { AppLogger.Write("Online result retry deferred (" + ex.GetType().Name + ")."); }
         }

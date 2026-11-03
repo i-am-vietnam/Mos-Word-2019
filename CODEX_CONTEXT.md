@@ -1,5 +1,15 @@
 # Technical Context
 
+## C7-FIX — Checkpoint khôi phục và upload, 2026-11-03
+
+TestingFlow.OpenOnline chuẩn bị definition A nhưng LoadOnline/Restore hydrate definition B; StateStore.SaveCore phải kiểm SessionId + canonical ExamDefinitionFingerprint, không reference A/B. Không thay luật chấm, thứ tự task, dữ liệu bài hoặc ownershipWord. Test OnlineTestingPreparationTests đi qua disk thật cả resume/expired/saved-only và queue DPAPI; TestingRecoveryTests kiểm mismatch seed/project/task/order/key/sessionId không ghi state.
+
+ResultUploadQueue nhận expectedOrigin tại mọi callsite app; recordv1 cũ giữ nguyên origin/payload/key/token. Decode/validate/transport lỗi riêng từng item, permanent sang Parked encrypted+reason; server401/403 quyết định expiredpermission, không suy ra từ completedUtc/clientwallclock. RunAsync thử ngay lần đầu và định kỳ, login Pump forceDue một lần rồi giữbackoff. Program.RunResultUploadWorkerAsync dựng lại worker sau lỗiinit; safe diagnostic whitelist không ghi tùy ý ex.Message/URL/token. B4/receipt bất biến, ACK kiểmsession/hash trước archive.
+
+SessionRecoveryJournal.RecoverCore log summary theoSessionId/count cho retainedclaims. Razor admin dùng AdminDisplay chuyển VNtime/filterday→UTC; sharedlayout/localBootstrap5+CSS, dashboardCountLearnersWithUses, globalSessions/Audit và ResultValidation/ExamScorer sẵn có cho detail. CSPself/noinlineJS; authorization/CSRF/rates/cookies giữ nguyên. HTMLcapture trong tests chỉ từ fixture giả và dưới artifacts.
+
+Bằng chứng user sao chép ra thư mục riêng LocalAppData ngoài repo. Log6fd226fc… là assetclaimowner; state Testing thực tế bf2843c1bb7e448790dae245a922634c, quá15phút và đã probe saved-only trên Scratch. Queueb906807d… còn pending và origin khớp Release; không HTTP thật/VPS/ACK thật. Owner phải cài cập nhật sớm trước cửa sổ24h (~04/11/2026 21:40VN), kiểm admin và nghiệm thu bước4/5 theoDEPLOY_VPS. ArgumentException21:33 không cómessage/stack trong logcũ; không suy đoán làđãbiếtexactcause. Chỉ C7-FIX, chờ owner cho phép C7 còn lại.
+
 ## C6 — Bộ triển khai VPS, 2026-11-03
 
 Từ main f5511c1, bổ sung server/deploy và docs/DEPLOY_VPS.md; không truy cập hoặc chạy lệnh trên VPS. Provision Ubuntu24.04x64 cài ASP.NET Core Runtime10/PostgreSQL16/nginx/ufw/fail2ban/security-updates, swap2GiB và tuning4GB. SSH giữ nguyên nếu chưa xác minh authorized_keys + xác nhận terminal; có rollback config khi sshd validation/reload lỗi. DB runtime CRUD tách migrator/root600 env. Signing seed root:moswordsvc640, thư mục keys root:moswordsvc750; service chỉ đọc, không có DDL password trong env runtime.

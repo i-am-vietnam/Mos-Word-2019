@@ -228,7 +228,9 @@ namespace MosWord2019.Projects
         { lock (gate) SaveCore(prepared, session, lastSaveUtc); }
         private void SaveCore(PreparedTestingSession prepared, TestingSession session, DateTime? lastSaveUtc, JObject initial = null)
         {
-            if (prepared == null || (session != null && (session.SessionId != prepared.SessionId || session.Definition != prepared.Definition)))
+            // Recovery rehydrates equivalent definitions into separate objects; bind snapshots by value and session ID.
+            if (prepared == null || (session != null && (session.SessionId != prepared.SessionId ||
+                ExamDefinitionFingerprint.Compute(session.Definition) != ExamDefinitionFingerprint.Compute(prepared.Definition))))
                 throw new InvalidDataException("Testing snapshot does not match its prepared definition.");
             PreparedTestingSession.CheckPath(StatePath);
             var prior = initial ?? JObject.Parse(File.ReadAllText(StatePath));

@@ -82,6 +82,35 @@ public sealed class ResultUploadTests(PostgresFixture postgres)
     }
 
     [Fact]
+    public async Task AdminDetailUsesServerProjectScoringAndShowsCorrectCountsInsteadOfClientTotals()
+    {
+        await using var s = await StartAsync();
+        using var uploaded = await SendAsync(s);
+        Assert.Equal(HttpStatusCode.OK, uploaded.StatusCode);
+        Guid id;
+        await using (var db = PostgresFixture.Open(s.Connection))
+        {
+            await AdminBootstrap.CreateFirstAsync(db, new PasswordHasher<Account>(), "owner", "admin-password-12345");
+            id = (await db.Results.SingleAsync()).Id;
+        }
+        var login = await s.Client.GetStringAsync("/Admin/Login");
+        var token = WebUtility.HtmlDecode(System.Text.RegularExpressions.Regex.Match(login,
+            "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"").Groups[1].Value);
+        using var signed = await s.Client.PostAsync("/Admin/Login", new FormUrlEncodedContent(new Dictionary<string, string>
+        { ["Username"] = "owner", ["Password"] = "admin-password-12345", ["__RequestVerificationToken"] = token }));
+        Assert.Equal(HttpStatusCode.Redirect, signed.StatusCode);
+        var detail = WebUtility.HtmlDecode(await s.Client.GetStringAsync($"/Admin/Results/Details/{id}"));
+        Assert.Contains("1000 / 1000", detail);
+        Assert.DoesNotContain("-999", detail);
+        Assert.Equal(7, System.Text.RegularExpressions.Regex.Matches(detail, "5 / 5").Count);
+        var expected = new ExamScorer(_ => { }).Score(
+            ServerExamPool.Definition(JsonConvert.DeserializeObject<ExamSnapshot>(s.Session.ExamSnapshotJson!)!, s.Session.ExamSeed!.Value),
+            ((JArray)s.Payload["tasks"]!).Select(t => new ExamTaskGrade((string)t["projectId"]!, (string)t["taskId"]!, new TaskGradeResult(TaskGradeOutcome.Pass, "", "", (string)t["taskId"]!))));
+        foreach (var project in expected.PerProject) Assert.Contains($"{project.Points} / {project.MaximumPoints}", detail);
+        await AdminHtmlCapture.SaveAsync(s.Client, "result-detail", $"/Admin/Results/Details/{id}");
+    }
+
+    [Fact]
     public async Task RecomputesScoreAndAcknowledgesExactPayloadWithoutTrustingClientTotals()
     {
         await using var s = await StartAsync();

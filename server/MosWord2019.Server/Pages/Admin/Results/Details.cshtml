@@ -1,26 +1,20 @@
 @page "{id:guid}"
 @model MosWord2019.Server.Pages.Admin.Results.DetailsModel
-<!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8" /><title>Chi tiết kết quả</title></head><body>
+@{ ViewData["Title"] = "Chi tiết kết quả"; }
 <h1>Chi tiết kết quả — @Model.Username</h1>
-<p><a asp-page="Index">Tất cả kết quả</a> | <a asp-page="Index" asp-route-accountId="@Model.AccountId">Kết quả tài khoản</a></p>
-<dl>
-<dt>Mã kết quả</dt><dd>@Model.Result.Id</dd>
-<dt>Mã phiên</dt><dd>@Model.Result.SessionId</dd>
-<dt>Ngày nhận (UTC)</dt><dd>@Model.Result.ReceivedAt.UtcDateTime.ToString("u")</dd>
-<dt>Điểm / 1000</dt><dd>@Model.Result.Score / 1000</dd>
-<dt>Kết quả</dt><dd>@(Model.Result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</dd>
-<dt>Cờ (gồm đồng hồ client lùi / thời gian không nhất quán nếu có)</dt><dd>@Model.Result.FlagsJson</dd>
-</dl>
-<p>Điểm do server tính lại từ kết quả từng câu do client gửi. Cờ thời gian không tự thay đổi điểm hoặc kết quả đạt.</p>
-<h2>Câu cần luyện tập</h2>
-<table><thead><tr><th>Project</th><th>Task</th><th>Khóa hướng dẫn</th><th>Nội dung hướng dẫn</th></tr></thead><tbody>
-@foreach (var task in Model.WrongTasks)
-{
-<tr><td>@task.ProjectId</td><td>@task.TaskId</td><td>@task.InstructionKey</td><td style="white-space: pre-wrap">@task.Instruction</td></tr>
-}
-</tbody></table>
-@if (Model.WrongTasks.Count == 0) { <p>Không có câu cần luyện tập.</p> }
-<h2>Các khoảng mất kết nối</h2>
-<pre>@Model.Result.OfflineGapsJson</pre>
-</body></html>
+<div class="actions mb-3"><a asp-page="Index">← Tất cả kết quả</a><a asp-page="Index" asp-route-accountId="@Model.AccountId">Kết quả tài khoản</a></div>
+<div class="summary-grid"><div class="stat"><div class="label">Điểm</div><div class="value">@Model.Result.Score / 1000</div><span class="badge @(Model.Result.Passed ? "text-bg-success" : "badge-practice")">@(Model.Result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</span></div><div class="stat"><div class="label">Bắt đầu (giờ VN)</div><strong>@AdminDisplay.Time(Model.StartedAt)</strong></div><div class="stat"><div class="label">Nộp bài (giờ VN)</div><strong>@AdminDisplay.Time(Model.CompletedAt)</strong></div><div class="stat"><div class="label">Thời gian làm bài</div><strong>@(Model.Duration?.ToString(@"hh\:mm\:ss") ?? "—")</strong></div></div>
+<div class="panel"><dl class="row mb-0"><dt class="col-sm-3">Tài khoản</dt><dd class="col-sm-9">@Model.Username</dd><dt class="col-sm-3">Mã tài khoản</dt><dd class="col-sm-9"><code>@Model.AccountId</code></dd><dt class="col-sm-3">Mã kết quả / phiên</dt><dd class="col-sm-9"><code>@Model.Result.Id / @Model.Result.SessionId</code></dd><dt class="col-sm-3">Ngày nhận (giờ VN)</dt><dd class="col-sm-9">@AdminDisplay.Time(Model.Result.ReceivedAt)</dd><dt class="col-sm-3">Cờ cần xem xét</dt><dd class="col-sm-9">@foreach (var flag in AdminDisplay.Flags(Model.Result.FlagsJson)) { <span class="badge flag" title="@AdminDisplay.FlagDescription(flag)" data-code="@flag">@AdminDisplay.Flag(flag)</span> }@if (AdminDisplay.Flags(Model.Result.FlagsJson).Length == 0) { <span>Không có cờ.</span> }</dd></dl></div>
+<p class="hint">Điểm được máy chủ tính lại bằng bộ chấm điểm hiện có. Các cờ thời gian không tự thay đổi điểm hoặc kết quả đạt.</p>
+<h2>Điểm từng dự án</h2><div class="table-responsive"><table class="table"><thead><tr><th>Dự án</th><th>Điểm / tối đa</th><th>Số câu đúng / tổng</th></tr></thead><tbody>
+@foreach (var project in Model.Projects) { <tr><td>@project.ProjectId</td><td>@project.Points / @project.Maximum</td><td>@project.Correct / @project.Count</td></tr> }
+@if (Model.Projects.Count == 0) { <tr><td colspan="3" class="empty">Không có dữ liệu điểm từng dự án.</td></tr> }
+</tbody></table></div>
+<h2>Câu cần luyện tập</h2><div class="table-responsive"><table class="table"><thead><tr><th>Dự án</th><th>Mã câu</th><th>Khóa hướng dẫn</th><th>Nội dung hướng dẫn</th></tr></thead><tbody>
+@foreach (var task in Model.WrongTasks) { <tr><td>@task.ProjectId</td><td>@task.TaskId</td><td>@task.InstructionKey</td><td class="instruction">@task.Instruction</td></tr> }
+@if (Model.WrongTasks.Count == 0) { <tr><td colspan="4" class="empty">Không có câu cần luyện tập.</td></tr> }
+</tbody></table></div>
+<h2>Các khoảng mất kết nối</h2><div class="table-responsive"><table class="table"><thead><tr><th>Loại</th><th>Bắt đầu (giờ VN)</th><th>Kết thúc (giờ VN)</th><th>Thời lượng</th></tr></thead><tbody>
+@foreach (var gap in Model.Gaps) { <tr><td data-code="@gap.Kind">@AdminDisplay.Flag(gap.Kind)</td><td>@AdminDisplay.Time(gap.StartedAt)</td><td>@AdminDisplay.Time(gap.EndedAt)</td><td>@((gap.EndedAt-gap.StartedAt).ToString(@"hh\:mm\:ss"))</td></tr> }
+@if (Model.Gaps.Count == 0) { <tr><td colspan="4" class="empty">Không có khoảng mất kết nối.</td></tr> }
+</tbody></table></div>

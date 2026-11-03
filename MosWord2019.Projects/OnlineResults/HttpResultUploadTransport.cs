@@ -45,6 +45,8 @@ namespace MosWord2019.Projects.OnlineResults
                 using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false))
                 {
                     if (response.RequestMessage == null || response.RequestMessage.RequestUri != target) throw new InvalidDataException("Redirected result response.");
+                    // Only a successful receipt needs a body; errors must retain their status even with oversized/untrusted content.
+                    if ((int)response.StatusCode != 200) return new ResultUploadResponse((int)response.StatusCode, null);
                     if (response.Content == null) return new ResultUploadResponse((int)response.StatusCode, null);
                     if (response.Content.Headers.ContentLength > 65536) throw new InvalidDataException("Result receipt is too large.");
                     using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))

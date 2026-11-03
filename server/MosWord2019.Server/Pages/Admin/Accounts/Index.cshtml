@@ -1,17 +1,16 @@
 @page
 @model MosWord2019.Server.Pages.Admin.Accounts.IndexModel
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8" /><title>Learner accounts</title></head><body>
-<h1>Learner accounts</h1>
-<p><a asp-page="/Admin/Index">Administration</a> | <a asp-page="Create">Create learner</a></p>
-<form method="get"><label asp-for="Search">Search username</label> <input asp-for="Search" maxlength="64" /><button>Search</button></form>
-<table><thead><tr><th>Username</th><th>Used / maximum</th><th>Expiry (UTC)</th><th>Locked</th><th>Actions</th></tr></thead><tbody>
+@{ ViewData["Title"] = "Học viên"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="mb-0">Học viên</h1><a class="btn btn-primary" asp-page="Create">Tạo học viên</a></div>
+<form method="get" class="panel filters"><div><label class="form-label" asp-for="Search">Tìm tài khoản</label><input class="form-control" asp-for="Search" maxlength="64" /></div><button class="btn btn-primary" type="submit">Tìm kiếm</button></form>
+<div class="table-responsive"><table class="table"><thead><tr><th>Tài khoản</th><th>Lượt đã dùng / tối đa</th><th>Hạn sử dụng (giờ VN)</th><th>Trạng thái</th><th>Đăng nhập gần nhất (giờ VN)</th><th>Thao tác</th></tr></thead><tbody>
 @foreach (var account in Model.Accounts)
 {
-<tr><td>@account.Username</td><td>@account.Used / @account.MaxUses</td><td>@(account.ExpiresAt?.UtcDateTime.ToString("u") ?? "No expiry")</td><td>@account.Locked</td><td><a asp-page="Edit" asp-route-id="@account.Id">Edit</a> | <a asp-page="Sessions" asp-route-id="@account.Id">Sessions</a> | <a asp-page="/Admin/Results/Index" asp-route-accountId="@account.Id">Kết quả thi</a></td></tr>
+<tr><td><strong>@account.Username</strong></td><td>@account.Used / @account.MaxUses<meter class="usage-meter" min="0" max="@Math.Max(1, account.MaxUses)" value="@account.Used" aria-label="Lượt đã sử dụng"></meter></td><td>@(account.ExpiresAt.HasValue ? AdminDisplay.Time(account.ExpiresAt) : "Không giới hạn")</td><td><span class="badge @(AdminDisplay.Status(account, Model.Now) == "Hoạt động" ? "text-bg-success" : "text-bg-secondary")">@AdminDisplay.Status(account, Model.Now)</span></td><td>@AdminDisplay.Time(Model.LastLogins.GetValueOrDefault(account.Id))</td><td><div class="actions"><a asp-page="Edit" asp-route-id="@account.Id">Sửa</a><a asp-page="Edit" asp-route-id="@account.Id" asp-fragment="uses">Cấp lượt</a><a asp-page="Edit" asp-route-id="@account.Id" asp-fragment="lock">Khóa / mở</a><a asp-page="Edit" asp-route-id="@account.Id" asp-fragment="password">Đặt lại mật khẩu</a><a asp-page="Sessions" asp-route-id="@account.Id">Phiên</a><a asp-page="/Admin/Results/Index" asp-route-accountId="@account.Id">Kết quả</a></div></td></tr>
 }
-</tbody></table>
-@if (Model.PageNumber > 1) { <a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-search="@Model.Search">Previous</a> }
-<span>Page @Model.PageNumber (50 accounts per page)</span>
-@if (Model.HasNext) { <a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-search="@Model.Search">Next</a> }
-</body></html>
+@if (Model.Accounts.Count == 0) { <tr><td colspan="6" class="empty">Không tìm thấy học viên.</td></tr> }
+</tbody></table></div>
+<div class="pagination-bar"><span>Trang @Model.PageNumber · 50 học viên mỗi trang</span><div class="actions">
+@if (Model.PageNumber > 1) { <a class="btn btn-sm btn-outline-primary" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-search="@Model.Search">Trước</a> }
+@if (Model.HasNext) { <a class="btn btn-sm btn-outline-primary" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-search="@Model.Search">Tiếp</a> }
+</div></div>

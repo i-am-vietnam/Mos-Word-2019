@@ -1,12 +1,16 @@
 @page
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8" /><title>MOS Word 2019 administration</title></head>
-<body>
-<h1>MOS Word 2019 administration</h1>
-<p>Signed in as @User.Identity?.Name</p>
-<p><a asp-page="/Admin/Accounts/Index">Learner accounts</a></p>
-<p><a asp-page="/Admin/Results/Index">Kết quả thi</a></p>
-<form method="post" asp-page="/Admin/Logout"><button type="submit">Sign out</button></form>
-</body>
-</html>
+@model MosWord2019.Server.Pages.Admin.IndexModel
+@{ ViewData["Title"] = "Tổng quan"; }
+<h1>Tổng quan</h1><p class="text-secondary">Đã đăng nhập: @User.Identity?.Name</p>
+<div class="summary-grid">
+<div class="stat"><div class="label">Tổng học viên</div><div class="value">@Model.Learners</div></div>
+<div class="stat"><div class="label">Học viên còn lượt</div><div class="value">@Model.LearnersWithUses</div></div>
+<div class="stat"><div class="label">Phiên đang hoạt động</div><div class="value">@Model.ActiveSessions</div></div>
+<div class="stat"><div class="label">Kết quả hôm nay (giờ VN)</div><div class="value">@Model.ResultsToday</div></div>
+<div class="stat"><div class="label">Điểm trung bình tuần này</div><div class="value">@(Model.WeeklyAverage?.ToString("0.0") ?? "—")</div></div>
+</div>
+<div class="d-flex justify-content-between align-items-center"><h2>10 kết quả gần nhất</h2><a asp-page="/Admin/Results/Index">Xem tất cả</a></div>
+<div class="table-responsive"><table class="table"><thead><tr><th>Học viên</th><th>Ngày nhận (giờ VN)</th><th>Điểm / 1000</th><th>Kết quả</th><th></th></tr></thead><tbody>
+@foreach (var result in Model.Latest) { <tr><td>@result.Username</td><td>@AdminDisplay.Time(result.ReceivedAt)</td><td class="score">@result.Score / 1000</td><td><span class="badge @(result.Passed ? "text-bg-success" : "badge-practice")">@(result.Passed ? "Đạt" : "Cần Luyện Tập thêm")</span></td><td><a asp-page="/Admin/Results/Details" asp-route-id="@result.Id">Chi tiết</a></td></tr> }
+@if (Model.Latest.Count == 0) { <tr><td colspan="5" class="empty">Chưa có kết quả thi.</td></tr> }
+</tbody></table></div>

@@ -1,5 +1,12 @@
 # Known Issues and Verification Items
 
+## C7-FIX — Nghiệm thu còn lại, 2026-11-03
+
+- Chưa cài server/client mới trên VPS/máy học viên hoặc xác nhận ACK thật. Owner chạy publish.ps1 và build-client.ps1 theo docs/DEPLOY_VPS.md, giữ nguyên trust/keys và LocalAppData, nghiệm thu lại bước4/5. Kết quả b906807d… còn pending; hạn khoảng04/11/2026 21:40VN, server quyết định thực tế, không gia hạn bằng chỉnh file/đồng hồ.
+- Bản sao phiên đang dở đã qua Save/heartbeat, fingerprint giống sau deserialize; quá15phút đi saved-only finalize. Điều này không thay nghiệm thu Word thật. Claim6fd226fc… tronglog là assetowner, không phải SessionId trongstate (bf2843c1…). Không sửa ID/state gốc để épresume.
+- Log21:33 chỉ tên ArgumentException, thiếu message/stack: chưa xác định được exactexception lịch sử. Đã tái hiện/cố định các ranh giới làm worker dừng (init/scan/unexpectedtransport/origin mismatch), cósafe diagnostic cho lần sau; không khẳng định nguyên nhân lịch sử là pin hay payload.
+- Parked giữ nguyên encryptedrecord+reason và JSONB4 vẫn ởResults; cần owner xem lý do khi bị từchối vĩnhviễn. Không retry tựđộng item saiorigin/4xxtrừ429, không tự chuyển devitem sangproduction hoặc tự hoànlượt. 429/503/mạng tiếp tụcbackoff. Đồng hồWindows không quyết định hạn24h.
+
 ## C6 — Giới hạn triển khai cần owner xác nhận, 2026-11-03
 
 - Bộ script đã có; agent không truy cập VPS. Container dùng PostgreSQL/nginx/runtime/crypto thật nhưng mock systemctl/UFW/swapon để không tác động host; không chứng minh systemd sandbox/firewall/SSH network thật. Owner chạy docs/DEPLOY_VPS.md và99verify, giữ phiên SSH/provider console đến khi kiểm khóa/sudo phiên mới.
@@ -20,7 +27,7 @@
 
 - API HMAC/kết quả/admin/queue đã có. C5 mới nối credential/sessionId và Enqueue vào finalize online. Worker startup chỉ retry entry đã đăng ký; offline B4 không có credential server nên không tự upload. Release vẫn chờ C5 để dùng cho học viên.
 - JSON B4 là bằng chứng bất biến, giữ pendingUpload=true; trạng thái hiệu lực nằm trong DPAPI ledger/receipt qua ResultUploadQueue.GetStatus. Kết quả local không bị xóa. Giữ Windows profile/DPAPI để đọc queue sau restart; không copy queue sang máy/user khác.
-- Hết cửa sổ24giờ, admin lock hoặc reset credential sẽ từ chối upload. 400/401/409/429/503 hoặc receipt sai đều giữ bằng chứng và retry backoff; không tự sửa payload xung đột/gia hạn quyền. Owner cần xem xét bản local nếu quyền đã hết, không tự hoàn lượt.
+- Hết cửa sổ24giờ, admin lock hoặc reset credential sẽ từ chối upload. C7-FIX thay chính sách cũ: 400/401/409 được park với reason, 429/503 hoặc receipt sai tiếp tục backoff; giữ bằng chứng, không tự sửa payload xung đột/gia hạn quyền. Owner cần xem xét bản local nếu quyền đã hết, không tự hoàn lượt.
 - HMAC chống sửa trên đường truyền và chứng minh sở hữu khóa, không attestation grader/client. Timing/clock rollback chỉ là cờ, không tự phạt điểm. Thiếu/hỏng blob/key/instruction pinned trả503; queue giữ để retry khi owner phục hồi storage.
 - Heartbeats quá90ngày được dọn daily; Sessions/OfflineGaps/Results/AuditLog giữ lâu, cần tính dung lượng/backup C6. Chưa nghiệm thu Word native, mạng/VPS/nginx thực hoặc C7 trong C4.
 - Chính sách resume C4 thay mục lịch sử C3: temporary password lockout không chặn resume hợp lệ cùng máy; admin lock/expiry/credential change vẫn chặn.

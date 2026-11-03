@@ -155,9 +155,11 @@ namespace MosWord2019.Projects
             // Refuse recovery if the journal path has become redirected since construction.
             try { RejectReparse(journalPath); }
             catch (Exception ex) when (Recoverable(ex)) { log("Recovery deferred: " + ex.Message); return; }
+            foreach (var session in entries.Values.Where(claim => preservedSessions.Contains(claim.SessionId)).GroupBy(claim => claim.SessionId))
+                log("Recovery retained Testing session " + session.Key + ": " + session.Count().ToString(CultureInfo.InvariantCulture) + " claims.");
             foreach (var claim in entries.Values.ToArray())
             {
-                if (preservedSessions.Contains(claim.SessionId)) { log("Recovery retained Testing session " + claim.SessionId); continue; }
+                if (preservedSessions.Contains(claim.SessionId)) continue;
                 try
                 {
                     Validate(claim);

@@ -1,4 +1,36 @@
-# Triển khai MOS Word 2019 trên VPS — C6
+# Triển khai MOS Word 2019 trên VPS
+
+## Cập nhật C7-FIX: phải thay cả server và client
+
+Bản này sửa resume qua dữ liệu lưu trên đĩa, worker upload và giao diện admin. Giữ nguyên IP, chứng thư/SPKI, Ed25519 signing key và Data Protection keys. Không chạy lại provision, import hoặc tạo tài khoản chỉ để cập nhật. Các lệnh dưới đây do owner chạy; agent không truy cập VPS.
+
+1. Trên PC, lưu tài liệu Word đang mở. Đóng bản Trainer cũ; nếu đang mắc ở màn khôi phục và không thể đóng, chỉ kết thúc tiến trình Trainer bằng Task Manager. Không xóa Word, cache, journal hoặc dữ liệu trả lời thủ công. Không mở đồng thời hai bản Trainer.
+2. Sao chép nguyên thư mục `%LocalAppData%\MosWord2019` sang một thư mục backup riêng ngoài repo, giữ trên chính Windows user/máy này (DPAPI không chuyển sang máy khác). Sao chép thêm thư mục working Testing trong Documents nếu cần giữ bằng chứng tài liệu. Giữ nguyên log gốc; phân tích bản sao. Không đưa backup có token/khóa vào Git hay gửi vào chat.
+3. Giữ một backup VPS theo mục 7, rồi chạy PowerShell tại repo:
+
+```powershell
+$VpsIp = Read-Host 'IPv4 VPS đang sử dụng'
+$SshKey = Read-Host 'Đường dẫn private SSH key trên PC'
+.\server\deploy\publish.ps1 -VpsHost $VpsIp -IdentityFile $SshKey
+```
+
+Installer dùng bản publish Release linux-x64 trên PC, migrate, đổi symlink và kiểm health; tự quay lại binary trước nếu health lỗi. Không build trên VPS. Sau thành công, kiểm `https://<VPS_IP>/Admin`: menu Tổng quan/Học viên/Kết quả thi/Phiên đăng nhập/Nhật ký; thời gian hiển thị giờ VN. Có thể cần Ctrl+F5 để nạp CSS local mới.
+
+4. Dùng đúng hai public values của VPS đã cấp ở mục 3/5 (không tạo khóa mới). Build client mới:
+
+```powershell
+$SpkiPin = Read-Host 'SPKI pin Base64 hiện tại, không có tiền tố sha256//'
+$ManifestPublicKey = Read-Host 'Ed25519 public key Base64 hiện tại'
+.\server\deploy\build-client.ps1 -ServerUrl "https://$VpsIp/" -SpkiPin $SpkiPin -ManifestPublicKey $ManifestPublicKey
+```
+
+Script in đường dẫn thư mục mới dưới `artifacts/client-production`; dùng toàn bộ thư mục output, không chỉ chép EXE. Mở EXE mới bằng chính Windows user đã thi. Release vẫn ghim URL/SPKI/public key trong assembly; App.config không thay trust. Không xóa `%LocalAppData%\MosWord2019` khi đổi bản.
+
+5. Giữ mạng hoạt động và mở Trainer: worker thử ngay khi khởi động, sau đăng nhập và tiếp tục định kỳ. Kiểm Admin → Kết quả thi với kết quả `b906807d…`; cần xử lý **trước khoảng 21:40 ngày 04/11/2026 (giờ VN)**. Giới hạn thực tế do server quyết định, không gia hạn bằng sửa đồng hồ/file/token. Chỉ receipt hợp lệ mới đánh dấu đã nhận; JSON kết quả local vẫn được giữ. Nếu server từ chối vĩnh viễn, xem reason trong `ResultUploads\Parked` và giữ nguyên bằng chứng, không coi đó là upload thành công.
+6. Phiên Testing bị gián đoạn sẽ hỏi server trước. Trong 15 phút có thể tiếp tục; quá hạn thì chốt từ dữ liệu đã lưu và đăng ký upload, không mở starter mới thay câu trả lời. Claim `6fd226fc…` trong log thuộc tài sản cache; state Testing được đối chiếu theo SessionId thực tế và fingerprint đề. Không sửa ID để ép khớp.
+7. **Chạy lại bước 4 và 5 của danh sách nghiệm thu đã dùng trên VPS** (crash/resume và upload kết quả), xác nhận heartbeat/Next/Nộp bài hoạt động sau reload, điểm hiện ở admin. Kiểm thêm queue dev được chuyển Parked và không gửi sang production; một item lỗi không chặn kết quả khác. Agent chỉ kiểm thử tự động và bản sao dữ liệu, không thay cho nghiệm thu Word/VPS thật.
+
+`Parked` chứa nguyên record mã hóa cùng `<sessionId>.reason.json` (mã lý do, thời gian UTC, không token/khóa). Các mã thường gặp: `origin_mismatch`, `invalid_record`, `http_401`, `http_403`, `http_409`. 429/503 và lỗi mạng tiếp tục backoff. Không chép item dev sang production, không sửa payload hoặc tự chuyển item Parked trở lại queue. Cửa sổ upload 24 giờ được kiểm bởi server; đồng hồ Windows không có quyền kết luận quyền upload còn/hết.
 
 Hướng dẫn cho Ubuntu24.04 LTS x64,2vCPU/4GB/35GB, user `mosword` có sudo và SSH key. Owner đã xác nhận SSH key từ PC ngày2026-11-03; script vẫn kiểm tra lại file khóa và yêu cầu xác nhận trước khi tắt mật khẩu/root SSH. Agent không truy cập VPS. Không gửi IP/password/private key vào chat, không thêm chúng vào repository.
 

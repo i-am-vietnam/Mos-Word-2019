@@ -57,7 +57,7 @@ public sealed class AdminWebTests(PostgresFixture postgres)
         Assert.Contains("httponly", cookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=strict", cookie, StringComparison.OrdinalIgnoreCase);
         var index = await client.GetStringAsync("/Admin");
-        Assert.Contains("Signed in as owner", index);
+        Assert.Contains("Đã đăng nhập: owner", WebUtility.HtmlDecode(index));
         using var getLogout = await client.GetAsync("/Admin/Logout");
         Assert.Equal(HttpStatusCode.MethodNotAllowed, getLogout.StatusCode);
         using var badLogout = await client.PostAsync("/Admin/Logout", new FormUrlEncodedContent([]));
@@ -97,7 +97,7 @@ public sealed class AdminWebTests(PostgresFixture postgres)
             scenario == "wrong-password" ? "incorrect" : password, scenario == "unknown" ? "missing" : "owner");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Invalid administrator credentials.", body);
+        Assert.Contains("Thông tin quản trị không hợp lệ.", WebUtility.HtmlDecode(body));
         Assert.DoesNotContain(password, body);
         Assert.False(response.Headers.TryGetValues("Set-Cookie", out var cookies) && cookies.Any(c => c.StartsWith("__Host-MosWordAdmin=")));
         using var denied = await client.GetAsync("/Admin");
@@ -144,7 +144,7 @@ public sealed class AdminWebTests(PostgresFixture postgres)
         Assert.Equal(HttpStatusCode.OK, stillSignedIn.StatusCode);
         using var fresh = factory.CreateHttpsClient();
         using var denied = await SignInAsync(fresh, await AntiforgeryTokenAsync(fresh), password);
-        Assert.Contains("Invalid administrator credentials.", await denied.Content.ReadAsStringAsync());
+        Assert.Contains("Thông tin quản trị không hợp lệ.", WebUtility.HtmlDecode(await denied.Content.ReadAsStringAsync()));
         using var protectedPage = await fresh.GetAsync("/Admin");
         Assert.Equal(HttpStatusCode.Redirect, protectedPage.StatusCode);
     }

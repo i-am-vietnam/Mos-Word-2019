@@ -1,5 +1,13 @@
 # Kiến trúc server MOS Word 2019
 
+## C7-FIX — Khôi phục, upload và admin
+
+Snapshot Testing so khớp SessionId và `ExamDefinitionFingerprint` (seed, project/task ID theo thứ tự, instruction key), không dùng reference của đối tượng sau deserialize. Đường resume và saved-only finalize giữ nguyên grader, ownership Word và dữ liệu câu trả lời. Journal ghi một dòng cho mỗi session được giữ, kèm số claim, thay vì một dòng mỗi file.
+
+Queue DPAPI v1 tương thích dữ liệu cũ, mỗi item gắn origin bất biến. Worker chỉ gửi tới origin đang cấu hình/pin; origin khác được chuyển nguyên record mã hóa vào `ResultUploads/Parked` kèm reason không chứa bí mật. Lỗi giải mã/record hoặc HTTP 4xx (trừ 429) được park; mạng/429/503 retry backoff riêng. Một item hỏng không dừng vòng lặp; worker khởi động lại sau lỗi khởi tạo và thử định kỳ/sau login. Server là nguồn quyết định cửa sổ 24 giờ; không suy diễn quyền từ đồng hồ Windows. Receipt đúng session/hash mới xác nhận upload; không xóa JSON B4 local.
+
+Razor admin dùng layout chung, Bootstrap 5 local có license và CSS riêng. Không CDN/inline script; CSP chỉ cho tài nguyên cùng origin. Authorization, antiforgery trên POST, rate limits và cookie bảo mật giữ nguyên. Hiển thị `Asia/Ho_Chi_Minh` với `dd/MM/yyyy HH:mm`; date filter là ngày Việt Nam, đổi đầu/cuối khoảng sang UTC trước query PostgreSQL. Dashboard, học viên, kết quả/detail, phiên và audit dùng phân trang; DB/lifetime vẫn UTC. Không thay ngưỡng điểm hoặc dùng tổng điểm client thay server scorer.
+
 ## Phạm vi C0–C6
 
 C0–C4 cung cấp nền tảng, tài khoản/lượt/phiên, package ký/mã hóa, heartbeat và kết quả. C5 nối client WinForms online từ login/mode đến recovery/upload; hướng dẫn thử local ở C5_LOCAL_TEST.md. C6 cung cấp bộ deploy PC/VPS, owner tự thực thi theo DEPLOY_VPS.md; agent không truy cập VPS. C7 nghiệm thu bảo mật còn lại.
@@ -144,7 +152,7 @@ OnlineResults tách IResultUploadTransport để test/fake; transport HTTPS dùn
 
 ResultUploadStore lưu DPAPI CurrentUser ở LocalAppData/MosWord2019/ResultUploads, SID-only ACL, từ chối repo/reparse paths. Record chứa exact payload/key/token/origin/hash/retry state đã mã hóa; file tạm cũng chỉ ciphertext, flush và atomic commit. Pump lease riêng chống nhiều worker; metadata lease ngắn/retry không giữ qua network, nên đăng ký bài mới không bị chặn bởi upload bài cũ. Tối đa1024 pending; accepted record chuyển atomic sang Receipts riêng và không chiếm cap pending. Bảo quản Windows profile/DPAPI, không copy credential sang máy khác.
 
-Program chạy worker lúc startup chỉ cho entry đã đăng ký; timeout request15s, backoff5s nhân đôi tối đa1h, quét5s và hỗ trợ cancellation. Crash trước/sau gửi đều retry exact bytes. Chỉ receipt200 đúng session/hash, score0..1000 và passed==(score>=700), flags/time hợp lệ mới chuyển accepted; server có thể sửa total client. Mọi failure/401/409/hết quyền giữ pending và evidence, không tự sửa kết quả hoặc cấp lại quyền. JSON B4 gốc và pendingUpload=true giữ bất biến để recovery SameCommittedResult không thay đổi; trạng thái pending hiệu lực qua GetStatus/receipt riêng. Không xóa local result kể cả sau accepted.
+Program chạy worker lúc startup chỉ cho entry đã đăng ký; timeout request15s, backoff5s nhân đôi tối đa1h, quét5s và hỗ trợ cancellation. Crash trước/sau gửi đều retry exact bytes. Chỉ receipt200 đúng session/hash, score0..1000 và passed==(score>=700), flags/time hợp lệ mới chuyển accepted; server có thể sửa total client. Từ C7-FIX, lỗi permanent (sai origin/record hỏng/HTTP4xx trừ429, gồm401/409/hết quyền) chuyển encryptedrecord sang Parked và giữ evidence; lỗi tạm giữ pending/backoff. Không tự sửa kết quả hoặc cấp lại quyền. JSON B4 gốc và pendingUpload=true giữ bất biến để recovery SameCommittedResult không thay đổi; trạng thái pending hiệu lực qua GetStatus/receipt riêng. Không xóa local result kể cả sau accepted.
 
 HeartbeatRetentionWorker chạy lúc startup để bù downtime rồi mỗi24h theo TimeProvider UTC; scoped ExecuteDelete chỉ Heartbeats.ReceivedAt < now−90ngày (giữ boundary bằng cutoff). Lỗi log metadata rồi retry daily, cancellation dừng sạch. Giữ nguyên Sessions, OfflineGaps, Results và AuditLog; không áp cascade retention lên chúng. Backup/dung lượng những bảng giữ lâu thuộc C6. Production vẫn bắt buộc DataProtection:KeyPath ngoài repo để cookie/token sống qua restart, cùng backup DB và package keys/blob; không public C4 trước cấu hình C5/C6.
 

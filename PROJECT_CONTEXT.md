@@ -1,5 +1,13 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C7-FIX — Sau nghiệm thu VPS, 2026-11-03
+
+Chỉ sửa resume Testing, delivery kết quả, log recovery và admin. SaveCore dùng SessionId+fingerprint đề thay reference sau deserialize; disk E2E có resume/heartbeat/Next/Submit/resultpersist/queue. Worker cô lập từng item, giữ bindingorigin, park nguyên record mã hóa khi lỗi permanent, retry mạng/backoff, phục hồi startup/login/định kỳ. Không xóa B4; chỉ ACK hợp lệ mới xác nhận. Hạnupload do server, không đồng hồ Windows. Journal retainedsummary một dòng/session với count.
+
+Admin Bootstrap5local/MIT+CSS responsive/layout chung, dashboard/họcviên/kếtquả/detail/phiên/audit; bộlọc ngàyVN quyđổiUTC, hiển thị dd/MM/yyyy HH:mm. Giữ auth/CSRF/rate/cookies, CSPself không inlineJS. Grader/starter/tasks/Training/timer/hardcaps không đổi. docs/DEPLOY_VPS có rollout cảpublish.ps1/build-client.ps1 và yêu cầu chạy lại nghiệmthu4/5.
+
+Bản sao bằng chứng riêng ngoài repo; pendingstate được probe saved-only, queueproductionb906807d… origin đúng và payload còn. Chưa deploy/ACKVPS, owner cần cập nhật trước~04/11/2026 21:40VN. ExactArgumentException21:33 không truy được vìlogcũ chỉtype; instrumentationmới ghi safe cause. Thay đổi build-client.ps1 cósẵn được giữ riêng không commit. Kiểm chứng ởartifacts/c7-fix; dừng C7-FIX, chưa làm phầnC7còn lại.
+
 ## C6 — Bộ triển khai VPS, 2026-11-03
 
 Từ main f5511c1, bổ sung server/deploy và docs/DEPLOY_VPS.md; không truy cập hoặc chạy lệnh trên VPS. Provision Ubuntu24.04x64 cài ASP.NET Core Runtime10/PostgreSQL16/nginx/ufw/fail2ban/security-updates, swap2GiB và tuning4GB. SSH giữ nguyên nếu chưa xác minh authorized_keys + xác nhận terminal; có rollback config khi sshd validation/reload lỗi. DB runtime CRUD tách migrator/root600 env. Signing seed root:moswordsvc640, thư mục keys root:moswordsvc750; service chỉ đọc, không có DDL password trong env runtime.

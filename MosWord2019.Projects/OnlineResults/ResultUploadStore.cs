@@ -48,6 +48,20 @@ namespace MosWord2019.Projects.OnlineResults
         }
         private string PathFor(Guid id) { return Path.Combine(root, id.ToString("N") + ".upload"); }
         private string ReceiptPath(Guid id) { return Path.Combine(root, "Receipts", id.ToString("N") + ".receipt"); }
+        private string ParkedPath(Guid id) { return Path.Combine(root, "Parked", id.ToString("N") + ".upload"); }
+        internal bool IsParked(Guid id) { return File.Exists(ParkedPath(id)); }
+        internal void Park(Guid id, string reason, DateTimeOffset now)
+        {
+            string source = PathFor(id), target = ParkedPath(id);
+            OnlinePackageCache.CreatePrivateDirectory(Path.GetDirectoryName(target));
+            OnlinePackageCache.RejectReparse(target);
+            // Reasons are fixed codes supplied by the queue, never server bodies, paths or credentials.
+            string reasonPath = Path.ChangeExtension(target, ".reason.json");
+            OnlinePackageCache.RejectReparse(reasonPath);
+            File.WriteAllText(reasonPath, new JObject { ["sessionId"] = id.ToString("N"), ["reason"] = reason,
+                ["parkedUtc"] = now.ToString("O") }.ToString(Formatting.None), new UTF8Encoding(false));
+            AtomicFile.Commit(source, target, false, () => { OnlinePackageCache.RejectReparse(root); OnlinePackageCache.RejectReparse(target); });
+        }
         internal void ArchiveReceipt(Guid id)
         {
             string source = PathFor(id), target = ReceiptPath(id);
@@ -65,6 +79,7 @@ namespace MosWord2019.Projects.OnlineResults
         {
             string path = PathFor(id); OnlinePackageCache.RejectReparse(path);
             if (!File.Exists(path)) path = ReceiptPath(id);
+            if (!File.Exists(path)) path = ParkedPath(id);
             OnlinePackageCache.RejectReparse(path);
             if (!File.Exists(path)) return null;
             byte[] encrypted = ReadBounded(path, MaximumRecordBytes);

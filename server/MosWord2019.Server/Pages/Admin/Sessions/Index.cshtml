@@ -1,0 +1,13 @@
+@page
+@model MosWord2019.Server.Pages.Admin.Sessions.IndexModel
+@{ ViewData["Title"] = "Phiên đăng nhập"; }
+<h1>Phiên đăng nhập</h1>
+<form method="get" class="panel filters"><div><label class="form-label" asp-for="Search">Tài khoản</label><input class="form-control" asp-for="Search" maxlength="64" /></div><button class="btn btn-primary" type="submit">Lọc</button></form>
+<div class="table-responsive"><table class="table"><thead><tr><th>Tài khoản</th><th>Chế độ</th><th>Bắt đầu (giờ VN)</th><th>Liên hệ cuối (giờ VN)</th><th>Kết thúc (giờ VN)</th><th>Lý do</th><th>Mã máy rút gọn</th></tr></thead><tbody>
+@foreach (var row in Model.Sessions) { <tr><td>@row.Username</td><td>@AdminDisplay.Mode(row.Mode)</td><td>@AdminDisplay.Time(row.StartedAt)</td><td>@AdminDisplay.Time(row.LastHeartbeatAt)</td><td>@AdminDisplay.Time(row.EndedAt)</td><td>@AdminDisplay.Reason(row.EndReason)</td><td><code>@row.MachinePrefix</code></td></tr> }
+@if (Model.Sessions.Count == 0) { <tr><td colspan="7" class="empty">Chưa có phiên đăng nhập phù hợp.</td></tr> }
+</tbody></table></div>
+<div class="pagination-bar"><span>Trang @Model.PageNumber · 50 phiên mỗi trang</span><div class="actions">
+@if (Model.PageNumber > 1) { <a asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-search="@Model.Search">Trước</a> }
+@if (Model.HasNext) { <a asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-search="@Model.Search">Tiếp</a> }
+</div></div>

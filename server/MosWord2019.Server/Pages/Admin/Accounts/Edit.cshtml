@@ -1,16 +1,13 @@
 @page "{id:guid}"
 @model MosWord2019.Server.Pages.Admin.Accounts.EditModel
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8" /><title>Edit learner</title></head><body>
-<h1>Edit learner @Model.Username</h1><p><a asp-page="Index">Learner accounts</a> | <a asp-page="Sessions" asp-route-id="@RouteData.Values["id"]">Sessions</a></p>
-<p><a asp-page="/Admin/Results/Index" asp-route-accountId="@RouteData.Values["id"]">Kết quả thi</a></p>
-<p>Used: @Model.Used / @Model.CurrentMaxUses</p>
-<form method="post">
-<div asp-validation-summary="All"></div>
-<p><label asp-for="MaxUses">Set maximum uses</label> <input asp-for="MaxUses" min="@Model.Used" /> Leave blank to keep the current maximum.</p>
-<p><label asp-for="AddUses">Add uses</label> <input asp-for="AddUses" min="0" /> Added to the current maximum, or the new maximum entered above.</p>
-<p><label asp-for="ExpiresUtc">Expiry (UTC)</label> <input asp-for="ExpiresUtc" type="datetime-local" /> Leave blank to clear expiry. All dates are UTC.</p>
-<p><label asp-for="Locked"></label> <input asp-for="Locked" /></p>
-<p><label asp-for="NewPassword">Reset password</label> <input type="password" name="NewPassword" id="NewPassword" autocomplete="new-password" minlength="12" maxlength="128" /> Leave blank to keep it; 12-128 characters to reset. Reset invalidates existing credentials and clears login failures.</p>
-<button type="submit">Save changes</button>
-</form></body></html>
+@{ ViewData["Title"] = "Sửa học viên"; }
+<h1>Sửa học viên — @Model.Username</h1>
+<div class="actions mb-3"><a asp-page="Index">← Danh sách học viên</a><a asp-page="Sessions" asp-route-id="@RouteData.Values["id"]">Phiên đăng nhập</a><a asp-page="/Admin/Results/Index" asp-route-accountId="@RouteData.Values["id"]">Kết quả thi</a></div>
+<form method="post" class="panel form-panel"><div asp-validation-summary="All" role="alert"></div>
+<p>Đã dùng <strong>@Model.Used / @Model.CurrentMaxUses lượt</strong>.</p>
+<p id="uses"><label class="form-label" asp-for="MaxUses">Đặt số lượt tối đa</label><input class="form-control" asp-for="MaxUses" min="@Model.Used" /><span class="hint">Để trống để giữ nguyên. Không được thấp hơn số lượt đã dùng.</span></p>
+<p><label class="form-label" asp-for="AddUses">Cấp thêm lượt</label><input class="form-control" asp-for="AddUses" min="0" /><span class="hint">Cộng vào số lượt tối đa hiện tại, hoặc số tối đa vừa nhập.</span></p>
+<p><label class="form-label" asp-for="ExpiresUtc">Hạn sử dụng (giờ VN)</label><input class="form-control" asp-for="ExpiresUtc" type="datetime-local" /><span class="hint">Để trống để bỏ giới hạn ngày sử dụng.</span></p>
+<p id="lock" class="form-check"><input class="form-check-input" asp-for="Locked" /><label class="form-check-label" asp-for="Locked">Khóa tài khoản</label></p>
+<p id="password"><label class="form-label" asp-for="NewPassword">Đặt lại mật khẩu</label><input class="form-control" type="password" name="NewPassword" id="NewPassword" autocomplete="new-password" minlength="12" maxlength="128" /><span class="hint">Để trống để giữ nguyên; mật khẩu mới cần 12–128 ký tự. Đặt lại sẽ thu hồi thông tin đăng nhập cũ và xóa khóa đăng nhập tạm.</span></p>
+<button class="btn btn-primary" type="submit">Lưu thay đổi</button></form>

@@ -12,8 +12,8 @@ public sealed class EditModel(ServerDbContext db, AccountAdministration administ
     public string Username { get; private set; } = "";
     public int Used { get; private set; }
     public int CurrentMaxUses { get; private set; }
-    [BindProperty, Range(0, int.MaxValue)] public int? MaxUses { get; set; }
-    [BindProperty, Range(0, int.MaxValue)] public int AddUses { get; set; }
+    [BindProperty, Range(0, int.MaxValue, ErrorMessage = "Số lượt tối đa phải từ 0 đến 2147483647.")] public int? MaxUses { get; set; }
+    [BindProperty, Range(0, int.MaxValue, ErrorMessage = "Số lượt cấp thêm phải từ 0 đến 2147483647.")] public int AddUses { get; set; }
     [BindProperty] public DateTime? ExpiresUtc { get; set; }
     [BindProperty] public bool Locked { get; set; }
     [BindProperty, DataType(DataType.Password)] public string? NewPassword { get; set; }
@@ -22,7 +22,7 @@ public sealed class EditModel(ServerDbContext db, AccountAdministration administ
     {
         var account = await LoadAsync(id, cancellationToken);
         if (account == null) return NotFound();
-        ExpiresUtc = account.ExpiresAt?.UtcDateTime;
+        ExpiresUtc = account.ExpiresAt.HasValue ? AdminDisplay.Local(account.ExpiresAt.Value) : null;
         Locked = account.Locked;
         return Page();
     }
@@ -33,13 +33,13 @@ public sealed class EditModel(ServerDbContext db, AccountAdministration administ
         NewPassword = null;
         ModelState.Remove(nameof(NewPassword));
         if (password != null && !AccountAdministration.ValidPassword(password))
-            ModelState.AddModelError(nameof(NewPassword), "Password must contain 12-128 characters and cannot be blank.");
+            ModelState.AddModelError(nameof(NewPassword), "Mật khẩu phải có 12–128 ký tự và không được để trống.");
         if (await LoadAsync(id, cancellationToken) == null) return NotFound();
         if (!ModelState.IsValid) return Page();
-        var expiry = ExpiresUtc.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(ExpiresUtc.Value, DateTimeKind.Utc)) : (DateTimeOffset?)null;
+        var expiry = ExpiresUtc.HasValue ? AdminDisplay.Utc(ExpiresUtc.Value) : (DateTimeOffset?)null;
         var result = await administration.UpdateAsync(id, MaxUses, AddUses, expiry, Locked, password, cancellationToken);
         if (result.Success) return RedirectToPage(new { id });
-        ModelState.AddModelError("", result.Error!);
+        ModelState.AddModelError("", AdminDisplay.Error(result.Error));
         return Page();
     }
 

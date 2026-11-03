@@ -11,20 +11,20 @@ namespace MosWord2019.Server.Pages.Admin;
 
 public sealed class LoginModel(ServerDbContext db, AdminAccess access, TimeProvider time) : PageModel
 {
-    [BindProperty, Required, StringLength(64)] public string Username { get; set; } = "";
-    [BindProperty, Required, StringLength(128), DataType(DataType.Password)] public string Password { get; set; } = "";
+    [BindProperty, Required(ErrorMessage = "Vui lòng nhập tài khoản."), StringLength(64, ErrorMessage = "Tài khoản tối đa 64 ký tự.")] public string Username { get; set; } = "";
+    [BindProperty, Required(ErrorMessage = "Vui lòng nhập mật khẩu."), StringLength(128, ErrorMessage = "Mật khẩu tối đa 128 ký tự."), DataType(DataType.Password)] public string Password { get; set; } = "";
 
     public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid) { Password = ""; ModelState.Remove(nameof(Password)); ModelState.AddModelError("", "Vui lòng nhập tài khoản và mật khẩu hợp lệ."); return Page(); }
         var account = await access.AuthenticateAsync(db, Username, Password, time.GetUtcNow(), cancellationToken);
         Password = "";
         ModelState.Remove(nameof(Password));
         if (account == null)
         {
-            ModelState.AddModelError("", "Invalid administrator credentials. Please try again later.");
+            ModelState.AddModelError("", "Thông tin quản trị không hợp lệ. Vui lòng thử lại sau.");
             return Page();
         }
         var identity = new ClaimsIdentity([

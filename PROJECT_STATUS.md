@@ -1,5 +1,15 @@
 # Project Status
 
+## C7-FIX — Resume, upload và admin, 2026-11-03
+
+Sửa resume Testing theo SessionId + ExamDefinitionFingerprint thay reference; regression qua prepare/start/save/dispose/reload/heartbeat/Next/Submit, chấm trên bản sao tài liệu và enqueue DPAPI thật. Rà client không còn reference comparison liên quan. Bản sao state đang dở được kiểm tra Save/heartbeat và nhánh saved-only quá15phút, không chạy Word hoặc sửa bằng chứng gốc.
+
+Upload cô lập từng item, binding origin bất biến tương thích queuev1; record hỏng/saiorigin/HTTP4xxtrừ429 chuyển nguyên mã hóa sang Parked+reason, mạng/429/503 backoff. Worker tự phục hồi, thử ngay startup/login rồi định kỳ. ACK phải đúng session/hash; không xóa B4. Server quyết định hạn24h, không dùng giờ Windows để tự park legacy item. Log có item/type/nguyên nhân được whitelist; log21:33 cũ thiếu message/stack nên không thể kết luận chính xác ArgumentException lịch sử. Journal gom một dòng/session kèm sốclaim.
+
+Admin có Bootstrap5local+CSS/layout responsive, dashboard, học viên, kết quả/detail, phiên và audit/filter/pagination; hiển thị/lọc ngày VNUTC+7, dữ liệuUTC. Giữ auth/antiforgery/rates/cookies và thêmCSPself. Kiểm tra browser desktop/mobile390px bằng dữ liệu thử; không truy cập VPS. docs/DEPLOY_VPS.md hướng dẫn thay cả server/client và nghiệm thu lại bước4/5; không triển khai phần C7 còn lại.
+
+Kiểm chứng: client1077/1077 mỗi Debug/Release, server213/213 mỗi Debug/Release,0skipped; admin36case sau sửa thống kê và2case presentation cuối mỗi cấu hình đềuPASS. VS MSBuild Rebuild/dotnet build -warnaserror cuối đều0warnings/0errors. Ba expectation cũ về401/409/corruptrecord được thay bằng regression park theo yêu cầu; baseline còn lại giữ đủ. Bản Release production mới build/verify bằng trust cũ,0plaintextProjects; Debug config giữ nguyên. Evidence artifacts/c7-fix ignored. NuGet vulnerability feed không truy cập được, locked restore từcache dùng NuGetAudit=false riêng lệnh; chưa làm securityreviewC7 còn lại. Không sửa grader/task/starter/framework. File server/deploy/build-client.ps1 đã dirty trước bước này được giữ riêng, không đưa vào commit C7-FIX. Commit cục bộ, không push.
+
 ## C6 — Bộ triển khai VPS, 2026-11-03
 
 Từ main f5511c1, bổ sung server/deploy và docs/DEPLOY_VPS.md; không truy cập hoặc chạy lệnh trên VPS. Provision Ubuntu24.04x64 cài ASP.NET Core Runtime10/PostgreSQL16/nginx/ufw/fail2ban/security-updates, swap2GiB và tuning4GB. SSH giữ nguyên nếu chưa xác minh authorized_keys + xác nhận terminal; có rollback config khi sshd validation/reload lỗi. DB runtime CRUD tách migrator/root600 env. Signing seed root:moswordsvc640, thư mục keys root:moswordsvc750; service chỉ đọc, không có DDL password trong env runtime.

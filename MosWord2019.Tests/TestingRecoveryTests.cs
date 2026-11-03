@@ -313,6 +313,44 @@ namespace MosWord2019.Tests
             }
         }
 
+        [DataTestMethod]
+        [DataRow("session")]
+        [DataRow("seed")]
+        [DataRow("project-id")]
+        [DataRow("project-order")]
+        [DataRow("task-order")]
+        [DataRow("task-id")]
+        [DataRow("instruction-key")]
+        public void SnapshotIdentityMismatchCannotOverwriteDurableState(string change)
+        {
+            using (var lab = new Lab())
+            {
+                var original = lab.Prepared.Definition;
+                var projects = original.Projects.ToList();
+                if (change == "project-id") projects[0] = new ExamProjectDefinition("Word2019_P99",
+                    projects[0].TaskIds.Select(id => new TaskDefinition { TaskId = id, InstructionKey = projects[0].InstructionKeys[id] }));
+                if (change == "project-order") projects.Reverse();
+                if (change == "task-order" || change == "task-id" || change == "instruction-key")
+                {
+                    var first = projects[0];
+                    var tasks = first.TaskIds.Select(id => new TaskDefinition { TaskId = id, InstructionKey = first.InstructionKeys[id] }).ToList();
+                    if (change == "task-order") tasks.Reverse();
+                    if (change == "task-id") tasks[0].TaskId += "-changed";
+                    if (change == "instruction-key") tasks[0].InstructionKey += "-changed";
+                    projects[0] = new ExamProjectDefinition(first.ProjectId, tasks);
+                }
+                var definition = new ExamDefinition(change == "seed" ? unchecked(original.Seed + 1) : original.Seed, projects);
+                using (var session = new TestingSession(change == "session" ? Guid.NewGuid().ToString("N") : lab.Prepared.SessionId,
+                    definition, lab.Clock, new AlwaysOnlineMonitor()))
+                {
+                    session.Start(); byte[] before = File.ReadAllBytes(lab.Store.StatePath);
+                    Assert.ThrowsException<InvalidDataException>(() => lab.Store.Save(lab.Prepared, session, lab.Clock.UtcNow));
+                    Assert.ThrowsException<InvalidDataException>(() => lab.Store.SaveHeartbeat(lab.Prepared, session));
+                    CollectionAssert.AreEqual(before, File.ReadAllBytes(lab.Store.StatePath));
+                }
+            }
+        }
+
         private sealed class FakeIdentitySource : IWordProcessIdentity
         {
             public OwnedWordProcessIdentity OwnedProcessIdentity { get; private set; }

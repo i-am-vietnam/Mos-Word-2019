@@ -16,6 +16,30 @@ namespace MosWord2019.Tests
     [TestClass]
     public class SessionRecoveryJournalTests
     {
+        [TestMethod]
+        public void PreservedSessionsLogOneSummaryWithClaimCountAndKeepEveryClaim()
+        {
+            using (var workspace = new TestWorkspace())
+            {
+                var messages = new List<string>();
+                var journal = new SessionRecoveryJournal(JournalPath(workspace), messages.Add);
+                string first = Guid.NewGuid().ToString("N"), second = Guid.NewGuid().ToString("N");
+                for (int i = 0; i < 12; i++)
+                    journal.Track(Write(workspace, i + ".dat", "retained"), "working", i < 9 ? first : second);
+                journal.PreserveSession(first);
+                journal.PreserveSession(second);
+                string before = File.ReadAllText(JournalPath(workspace));
+                journal.Recover();
+                CollectionAssert.AreEquivalent(new[] {
+                    "Recovery retained Testing session " + first + ": 9 claims.",
+                    "Recovery retained Testing session " + second + ": 3 claims."
+                }, messages);
+                Assert.AreEqual(12, journal.Count);
+                Assert.AreEqual(before, File.ReadAllText(JournalPath(workspace)));
+                Assert.IsTrue(Enumerable.Range(0, 12).All(i => File.Exists(Path.Combine(workspace.Folder, i + ".dat"))));
+            }
+        }
+
         [DataTestMethod]
         [DataRow("asset")]
         [DataRow("output")]

@@ -5,12 +5,14 @@ using MosWord2019.Server.Data;
 
 namespace MosWord2019.Server.Pages.Admin.Accounts;
 
-public sealed class IndexModel(ServerDbContext db) : PageModel
+public sealed class IndexModel(ServerDbContext db, TimeProvider time) : PageModel
 {
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
     public List<Account> Accounts { get; private set; } = [];
     public bool HasNext { get; private set; }
+    public DateTimeOffset Now => time.GetUtcNow();
+    public Dictionary<Guid, DateTimeOffset?> LastLogins { get; private set; } = [];
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
@@ -26,5 +28,8 @@ public sealed class IndexModel(ServerDbContext db) : PageModel
             .ToListAsync(cancellationToken);
         HasNext = Accounts.Count > 50;
         if (HasNext) Accounts.RemoveAt(50);
+        var ids = Accounts.Select(a => a.Id).ToArray();
+        LastLogins = await db.Sessions.AsNoTracking().Where(s => ids.Contains(s.AccountId)).GroupBy(s => s.AccountId)
+            .Select(g => new { Id = g.Key, Last = (DateTimeOffset?)g.Max(s => s.StartedAt) }).ToDictionaryAsync(x => x.Id, x => x.Last, cancellationToken);
     }
 }

@@ -78,7 +78,21 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
 });
 builder.Services.AddRazorPages(options => options.Conventions.AuthorizeFolder("/Admin", "Admin")
-    .AllowAnonymousToPage("/Admin/Login"));
+    .AllowAnonymousToPage("/Admin/Login")).AddMvcOptions(options =>
+{
+    var messages = options.ModelBindingMessageProvider;
+    messages.SetAttemptedValueIsInvalidAccessor((_, _) => "Giá trị không hợp lệ. Vui lòng kiểm tra lại.");
+    messages.SetValueMustBeANumberAccessor(_ => "Vui lòng nhập một số hợp lệ.");
+    messages.SetValueMustNotBeNullAccessor(_ => "Vui lòng nhập giá trị.");
+    messages.SetValueIsInvalidAccessor(_ => "Giá trị không hợp lệ.");
+    messages.SetUnknownValueIsInvalidAccessor(_ => "Giá trị không hợp lệ.");
+    messages.SetMissingBindRequiredValueAccessor(_ => "Vui lòng nhập giá trị bắt buộc.");
+    messages.SetMissingKeyOrValueAccessor(() => "Thiếu thông tin bắt buộc.");
+    messages.SetMissingRequestBodyRequiredValueAccessor(() => "Thiếu nội dung yêu cầu.");
+    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(_ => "Giá trị không hợp lệ.");
+    messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => "Giá trị không hợp lệ.");
+    messages.SetNonPropertyValueMustBeANumberAccessor(() => "Vui lòng nhập một số hợp lệ.");
+});
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -146,6 +160,13 @@ if (isCommand)
 app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) app.UseHsts();
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    await next(context);
+});
+app.UseStaticFiles();
 app.UseRouting();
 app.UseRateLimiter();
 app.Use(async (context, next) =>

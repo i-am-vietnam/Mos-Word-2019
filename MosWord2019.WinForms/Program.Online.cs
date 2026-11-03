@@ -1,12 +1,14 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using MosWord2019.Core.Diagnostics;
 using MosWord2019.Core.Models;
 using MosWord2019.Projects;
 using MosWord2019.Projects.OnlinePackages;
 using MosWord2019.Projects.OnlineSessions;
+using MosWord2019.Projects.OnlineResults;
 using MosWord2019.Word;
 
 namespace MosWord2019
@@ -14,6 +16,28 @@ namespace MosWord2019
     internal static partial class Program
     {
         internal static OnlineSessionCredentials ResumedPendingMode { get; set; }
+        internal static async Task RunResultUploadWorkerAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var settings = new ServerConnectionSettings();
+                    using (var http = settings.CreateClient())
+                    using (var transport = new HttpResultUploadTransport(http))
+                        await new ResultUploadQueue(transport, expectedOrigin: settings.Origin).RunAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return; }
+                catch (Exception ex)
+                {
+                    AppLogger.Write("Result upload item=none exception=" + ex.GetType().Name +
+                        " cause=" + ResultUploadQueue.DescribeFailure(ex) +
+                        " message=worker initialization or execution failed; periodic retry scheduled; encrypted evidence retained.");
+                }
+                try { await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false); }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return; }
+            }
+        }
         private static bool InspectOnlineStartup()
         {
             var state = new TestingSessionStateStore();

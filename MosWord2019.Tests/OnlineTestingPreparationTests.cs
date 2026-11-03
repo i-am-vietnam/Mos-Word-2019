@@ -227,6 +227,129 @@ namespace MosWord2019.Tests
                 }
             }
         }
+        [DataTestMethod]
+        [DataRow("resume")]
+        [DataRow("expired")]
+        [DataRow("saved-only")]
+        public void DiskRestartWithSeparatelyHydratedDefinitionPersistsAndQueuesResult(string recoveryMode)
+        {
+            using (var lab = new Lab())
+            {
+                var clock = new TestingSessionTests.FakeClock();
+                var network = new AlwaysOnlineMonitor();
+                string statePath = lab.Store.StatePath;
+                var store = new TestingSessionStateStore(statePath, () => clock.UtcNow);
+                var prepared = store.PrepareOnline(lab.Online, lab.Packages, "en");
+                string work = Path.Combine(Path.GetDirectoryName(statePath), "working");
+                using (var session = new TestingSession(prepared.SessionId, prepared.Definition, clock, network))
+                using (var engine = new TestingSessionCoordinator(prepared, session, store, clock,
+                    new DiskRuntime(prepared.Definition, lab.Packages, work), () => { }, _ => { }))
+                {
+                    engine.Start(); clock.Advance(42); store.Save(prepared, session, clock.UtcNow);
+                }
+                clock.Advance(recoveryMode == "expired" ? 901 : 10);
+                // Match OpenOnline: preparation and recovery deserialize independent definitions.
+                store = new TestingSessionStateStore(statePath, () => clock.UtcNow);
+                prepared = store.PrepareOnline(lab.Online, lab.Packages, "en");
+                var record = store.LoadOnline(lab.Online, lab.Packages);
+                Assert.AreNotSame(prepared.Definition, record.Prepared.Definition);
+                Assert.AreEqual(ExamDefinitionFingerprint.Compute(prepared.Definition), ExamDefinitionFingerprint.Compute(record.Prepared.Definition));
+                string queueParent = Path.Combine(Path.GetTempPath(), "MosWord-resume-queue-tests-" + Guid.NewGuid().ToString("N"));
+                try
+                {
+                    string queueRoot = Path.Combine(queueParent, "queue");
+                    var transport = new DeferredUploadTransport();
+                    var queue = new MosWord2019.Projects.OnlineResults.ResultUploadQueue(transport, queueRoot, () => clock.UtcNow, _ => { });
+                    Guid id = Guid.Parse(prepared.SessionId); string resultPath = null; byte[] resultBytes = null;
+                    using (var restored = record.Restore(clock, network))
+                    {
+                        var runtime = new DiskRuntime(prepared.Definition, lab.Packages, work);
+                        using (var engine = new TestingSessionCoordinator(prepared, restored, store, clock, runtime, () => { }, _ => { }))
+                        {
+                            engine.ResultPersisted += path =>
+                            {
+                                Assert.IsTrue(File.Exists(statePath)); Assert.AreEqual(0, runtime.Closes);
+                                resultPath = path; resultBytes = File.ReadAllBytes(path);
+                                queue.Enqueue(path, id, new Uri("https://example.test/"), new byte[32], "isolated-resume-test");
+                                Assert.IsTrue(queue.GetStatus(id).PendingUpload);
+                            };
+                            if (recoveryMode == "saved-only") engine.SubmitSaved();
+                            else engine.Resume();
+                            if (recoveryMode == "resume")
+                            {
+                                Assert.AreEqual(TimeSpan.FromSeconds(52), restored.Elapsed);
+                                store.Save(prepared, restored, clock.UtcNow);
+                                using (var heartbeat = new TestingHeartbeat(prepared, restored, store, clock, false))
+                                {
+                                    clock.Advance(5); heartbeat.Pulse();
+                                    Assert.AreEqual(clock.UtcNow, (DateTime)JObject.Parse(File.ReadAllText(statePath))["lastHeartbeatUtc"]);
+                                }
+                                engine.Next(); Assert.AreEqual(1, restored.CurrentIndex); engine.Submit();
+                            }
+                            Assert.AreEqual(TestingSessionStatus.Completed, restored.Status);
+                            Assert.IsFalse(engine.NeedsRecovery); Assert.IsNotNull(resultPath);
+                            Assert.AreEqual(recoveryMode == "resume" ? 2 : 0, runtime.Entries);
+                            Assert.AreEqual(1, runtime.Closes);
+                        }
+                    }
+                    Assert.IsFalse(File.Exists(statePath));
+                    CollectionAssert.AreEqual(resultBytes, File.ReadAllBytes(resultPath));
+                    var restartedQueue = new MosWord2019.Projects.OnlineResults.ResultUploadQueue(transport, queueRoot, () => clock.UtcNow, _ => { });
+                    Assert.IsTrue(restartedQueue.GetStatus(id).PendingUpload);
+                    restartedQueue.PumpAsync().GetAwaiter().GetResult();
+                    Assert.AreEqual(1, transport.Calls); CollectionAssert.AreEqual(resultBytes, transport.Payload);
+                    Assert.IsTrue(restartedQueue.GetStatus(id).PendingUpload);
+                    CollectionAssert.AreEqual(resultBytes, File.ReadAllBytes(resultPath));
+                    Assert.AreEqual(prepared.SessionId, (string)JObject.Parse(File.ReadAllText(resultPath))["sessionId"]);
+                }
+                finally
+                {
+                    if (Directory.Exists(queueParent)) Directory.Delete(queueParent, true);
+                }
+            }
+        }
+        private sealed class DeferredUploadTransport : MosWord2019.Projects.OnlineResults.IResultUploadTransport
+        {
+            internal int Calls; internal byte[] Payload;
+            public System.Threading.Tasks.Task<MosWord2019.Projects.OnlineResults.ResultUploadResponse> SendAsync(Uri origin, string token, string signature, byte[] payload, System.Threading.CancellationToken cancellationToken)
+            {
+                Calls++; Payload = (byte[])payload.Clone();
+                return System.Threading.Tasks.Task.FromResult(new MosWord2019.Projects.OnlineResults.ResultUploadResponse(503, null));
+            }
+        }
+        // Disk documents and the production grader are real; only Word desktop control is replaced.
+        private sealed class DiskRuntime : ITestingProjectRuntime
+        {
+            private readonly ExamDefinition definition;
+            private readonly IReadOnlyList<ProjectPackage> packages;
+            private readonly string workingRoot;
+            private string current;
+            internal int Entries, Closes;
+            internal DiskRuntime(ExamDefinition definition, IReadOnlyList<ProjectPackage> packages, string workingRoot)
+            { this.definition = definition; this.packages = packages; this.workingRoot = workingRoot; }
+            private string Working(string id) => Path.Combine(workingRoot, id + ".docx");
+            public void Enter(string id, bool resume)
+            {
+                Directory.CreateDirectory(workingRoot); var package = packages.Single(p => p.Meta.ProjectId == id);
+                if (!resume || !File.Exists(Working(id))) File.Copy(Path.Combine(package.ProjectFolderPath, package.Meta.Starter), Working(id), true);
+                current = id; Entries++;
+            }
+            public IReadOnlyList<ExamTaskGrade> GradeSaved(string id)
+            {
+                var package = packages.Single(p => p.Meta.ProjectId == id);
+                string source = File.Exists(Working(id)) ? Working(id) : Path.Combine(package.ProjectFolderPath, package.Meta.Starter);
+                var grader = new WordGradingService(() => workingRoot);
+                return definition.Projects.Single(p => p.ProjectId == id).TaskIds.Select(taskId =>
+                    new ExamTaskGrade(id, taskId, grader.CheckTask(source, package.Tasks.Single(t => t.TaskId == taskId)))).ToList();
+            }
+            public void LeaveAndGrade(Action<IReadOnlyList<ExamTaskGrade>> persist) => persist(GradeSaved(current));
+            public void AutosaveCurrent() { }
+            public void Observe() { }
+            public void SetInputEnabled(bool enabled) { }
+            public void Restart(string id) => Enter(id, false);
+            public void Close() { Closes++; }
+            public void Dispose() { }
+        }
         private sealed class Lab : IDisposable
         {
             private readonly TestWorkspace folder = new TestWorkspace();

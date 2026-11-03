@@ -13,7 +13,7 @@ public sealed class SessionsModel(ServerDbContext db) : PageModel
     [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
     public bool HasNext { get; private set; }
     public sealed record SessionSummary(Guid Id, Guid AccountId, DateTimeOffset StartedAt, string? Mode,
-        DateTimeOffset? EndedAt, DateTimeOffset? LastHeartbeatAt, string MachinePrefix);
+        DateTimeOffset? EndedAt, DateTimeOffset? LastHeartbeatAt, string MachinePrefix, string? EndReason);
 
     public async Task<IActionResult> OnGetAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -25,7 +25,7 @@ public sealed class SessionsModel(ServerDbContext db) : PageModel
         Sessions = await db.Sessions.AsNoTracking().Where(x => x.AccountId == id)
             .OrderByDescending(x => x.StartedAt).ThenBy(x => x.Id).Skip((PageNumber - 1) * 50).Take(51)
             .Select(x => new SessionSummary(x.Id, x.AccountId, x.StartedAt, x.Mode, x.EndedAt,
-                x.LastHeartbeatAt, x.MachineId.Substring(0, 12))).ToListAsync(cancellationToken);
+                x.LastHeartbeatAt, x.MachineId.Substring(0, 12), x.EndReason)).ToListAsync(cancellationToken);
         HasNext = Sessions.Count > 50;
         if (HasNext) Sessions.RemoveAt(50);
         return Page();

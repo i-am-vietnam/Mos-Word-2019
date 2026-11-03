@@ -1,15 +1,9 @@
 @page
 @model MosWord2019.Server.Pages.Admin.LoginModel
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>Administrator login</title></head>
-<body>
-<h1>MOS Word 2019 — Administrator</h1>
-<form method="post">
-    <div asp-validation-summary="All" role="alert"></div>
-    <p><label asp-for="Username"></label> <input asp-for="Username" autocomplete="username" maxlength="64" /></p>
-    <p><label asp-for="Password"></label> <input asp-for="Password" type="password" autocomplete="current-password" maxlength="128" /></p>
-    <button type="submit">Sign in</button>
-</form>
-</body>
-</html>
+@{ ViewData["Title"] = "Đăng nhập quản trị"; }
+<div class="panel form-panel mx-auto"><h1>Đăng nhập quản trị</h1>
+<p class="text-secondary">Quản lý học viên và kết quả MOS Word 2019.</p>
+<form method="post"><div asp-validation-summary="All" role="alert"></div>
+<p><label class="form-label" asp-for="Username">Tài khoản</label><input class="form-control" asp-for="Username" autocomplete="username" maxlength="64" /></p>
+<p><label class="form-label" asp-for="Password">Mật khẩu</label><input class="form-control" asp-for="Password" type="password" autocomplete="current-password" maxlength="128" /></p>
+<button class="btn btn-primary" type="submit">Đăng nhập</button></form></div>
