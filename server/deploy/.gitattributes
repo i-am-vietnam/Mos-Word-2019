@@ -1,0 +1,8 @@
+*.sh text eol=lf
+*.service text eol=lf
+*.timer text eol=lf
+*.conf text eol=lf
+*.template text eol=lf
+Dockerfile* text eol=lf
+50unattended-upgrades text eol=lf
+fail2ban.local text eol=lf

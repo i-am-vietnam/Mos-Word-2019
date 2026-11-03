@@ -1,0 +1,9 @@
+[Unit]
+Description=MOS Word consistent database and secret-state backup
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/local/lib/mosword-deploy/06-backup.sh

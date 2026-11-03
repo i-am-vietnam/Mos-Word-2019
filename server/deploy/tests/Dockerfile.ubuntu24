@@ -1,0 +1,10 @@
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    aspnetcore-runtime-10.0 postgresql-16 nginx ufw fail2ban unattended-upgrades \
+    openssl openssh-server ca-certificates python3 python3-systemd shellcheck \
+    curl iproute2 sudo util-linux && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends systemd && rm -rf /var/lib/apt/lists/*
+COPY ubuntu-smoke.sh /usr/local/bin/mosword-deploy-smoke
+RUN chmod 755 /usr/local/bin/mosword-deploy-smoke
+ENTRYPOINT ["/usr/local/bin/mosword-deploy-smoke"]

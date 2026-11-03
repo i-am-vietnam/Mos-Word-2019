@@ -30,3 +30,7 @@ TestResults/
 *.upload
 *.receipt
 *.secret
+*.env
+daily-*.tar.gz
+weekly-*.tar.gz
+*.tar.gz.enc

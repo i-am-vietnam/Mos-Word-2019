@@ -1,5 +1,15 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C6 — Bộ triển khai VPS, 2026-11-03
+
+Từ main f5511c1, bổ sung server/deploy và docs/DEPLOY_VPS.md; không truy cập hoặc chạy lệnh trên VPS. Provision Ubuntu24.04x64 cài ASP.NET Core Runtime10/PostgreSQL16/nginx/ufw/fail2ban/security-updates, swap2GiB và tuning4GB. SSH giữ nguyên nếu chưa xác minh authorized_keys + xác nhận terminal; có rollback config khi sshd validation/reload lỗi. DB runtime CRUD tách migrator/root600 env. Signing seed root:moswordsvc640, thư mục keys root:moswordsvc750; service chỉ đọc, không có DDL password trong env runtime.
+
+Release publish framework-dependent linux-x64 trên Windows PC; installer snapshot/SHA/validate archive, migrate bằng credential riêng, atomic current, health và binary rollback, giữ3release. Backup DB+packages/per-package keys/signing seed/DP/env/TLS nhất quán, daily03:15UTC,14ngày/8weekly; export mã hóa/password qua FD để tải PC. Import xác minh28gói trước dọn plaintext; bootstrap admin đọcẩn/env. TLS ECDSAP256 SANIPv4/3650ngày, pin không đổi khi rerun trừ --rotate; nginx chỉ443, proxyloopback và optional Admin allow-list.
+
+build-client.ps1 nhận URL/SPKI/Ed25519 public key, sinh trust trong obj/assembly Release, không sửa nguồn PackageTrust/.pub/App.config. MSBuild PackageManifestPublicKey chỉ chọn public trust khi build; default dev/test giữ nguyên. Không đổi grader, bài tập, framework hoặc solution client. Private values không ghi repo; .gitignore thêm *.env và backup archives. Chi tiết kiểm chứng cuối và giới hạn systemd/firewall/SSH thật nằm trong evidence artifacts/c6; nghiệm thu VPS do owner chạy, C7 chưa triển khai.
+
+Kiểm chứng C6: client1049/1049 và server203/203 mỗi Debug/Release,0skipped; VS MSBuild Rebuild/dotnet build warnaserror đều0warnings/0errors, locked restorePASS. Giữ đủcase C5-FIX và150file/hash package, Release0plaintext. Build production custom URL/pin/Ed25519 key + reflectionPASS; publish PrepareOnly archive thật, khôngSSH/SCP. PowerShell validation/mockPASS; ShellCheck/bash-n sạch. Ubuntu24.04 containerPASS provision2lần/giữsecret/root-readonlysigningkey/TLS-SAN-pin/nginx-no80/migrate/quyềnDB/healthrollback/retention3/archiveattack/import28/retention14ngày/backuprestore/admin/env/exportcrypto/SSHconfirm/unitverify/pinsai/ports. Systemctl/UFW/swapon được mock, SSH mạng/systemd sandbox/firewall thật cần owner nghiệm thu. Evidence artifacts/c6 và artifacts/c6-windows ignored; chưa truy cập VPS. Commit cục bộ, không push; dừng C6 chờ C7.
+
 ## C5-FIX — Countdown, tự mở Training và idle, 2026-11-02
 
 MainForm dùng UiLayout.Clock(sample00:00:00) thay UiLayout.Text để tick không cập nhật MinimumSize/layout. Đồng bộ text/enabled/visible chỉ khi khác; giữ buffered bars. Testing giữ fast path chỉ countdown và được kiểm tương tự60tick. Training online autoOpenPending một lần sau Shown/pre-warm/online, reset P01 mỗi use; manual Go/confirmed close/end/shutdown hủy intent. Lỗi không lặp tự động. Timeout offline tính trước khi reset offlineSince khi reconnect để30phút vẫn end;20phút nối lại giữ lượt.

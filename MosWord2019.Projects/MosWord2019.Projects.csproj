@@ -36,7 +36,7 @@
     <Compile Include="OnlineResults\ResultUploadStore.cs" />
     <Compile Include="OnlineResults\ResultUploadQueue.cs" />
     <Compile Include="OnlinePackages\IPackageTransport.cs" />
-    <Compile Include="OnlinePackages\PackageTrust.cs" />
+    <Compile Include="OnlinePackages\PackageTrust.cs" Condition="'$(PackageManifestPublicKey)' == ''" />
     <Compile Include="OnlineSessions\HeartbeatReply.cs" />
     <Compile Include="OnlineSessions\OnlineSessionClient.cs" />
     <Compile Include="OnlineSessions\MachineIdentity.cs" />
@@ -74,4 +74,10 @@
   <ItemGroup><ProjectReference Include="..\MosWord2019.Core\MosWord2019.Core.csproj"><Project>{81177DAA-9487-42DB-8881-3985E00981E4}</Project><Name>MosWord2019.Core</Name></ProjectReference></ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="CompilePackageTrust" BeforeTargets="CoreCompile" Condition="'$(PackageManifestPublicKey)' != ''">
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(PackageManifestPublicKey)', '^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$'))" Text="PackageManifestPublicKey must be a canonical Base64 Ed25519 public key (32 bytes)." />
+    <Error Condition="'$(PackageManifestPublicKey)' == 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='" Text="PackageManifestPublicKey cannot be all zero." />
+    <WriteLinesToFile File="$(IntermediateOutputPath)CompiledPackageTrust.g.cs" Overwrite="true" Lines="namespace MosWord2019.Projects.OnlinePackages { public static class PackageTrust { public const string PublicKey = &quot;$(PackageManifestPublicKey)&quot;%3B } }" />
+    <ItemGroup><Compile Include="$(IntermediateOutputPath)CompiledPackageTrust.g.cs" /></ItemGroup>
+  </Target>
 </Project>

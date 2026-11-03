@@ -1,5 +1,13 @@
 # Known Issues and Verification Items
 
+## C6 — Giới hạn triển khai cần owner xác nhận, 2026-11-03
+
+- Bộ script đã có; agent không truy cập VPS. Container dùng PostgreSQL/nginx/runtime/crypto thật nhưng mock systemctl/UFW/swapon để không tác động host; không chứng minh systemd sandbox/firewall/SSH network thật. Owner chạy docs/DEPLOY_VPS.md và99verify, giữ phiên SSH/provider console đến khi kiểm khóa/sudo phiên mới.
+- Rollback tự động chỉ binary/symlink. Migration phải tương thích ngược; schema downgrade/restore production cần maintenance và DB+state cùng backup. Import dọn plaintext bằng shred best-effort; NVMe/provider snapshot không bảo đảm xóa vật lý.
+- Daily backup dừng app ngắn để DB/key/package nhất quán.14ngày UTC một snapshot/ngày và8weekly, nhưng kích thước/thời gian dừng phụ thuộc dữ liệu; theo dõi35GB và tải bản mã hóa offsite mỗi tuần. Mất signing key buộc client mới; mất DP keys làm token/cookie cũ mất hiệu lực. Không xóa per-package keys hoặc phiên bản còn được DB dùng.
+- Khi đổi IP, phải cấp TLS SAN/pin/URL mới và client mới; giữ Ed25519 seed nếu muốn giữ public trust. Kết thúc/upload hết các kết quả chờ trước đổiIP vì queue ghim origin cũ. Backup state không có nginx site/allow-list: phải chạy02 sau restore vớiIP đích trước99verify.
+- Release production phải dùng build-client.ps1 với public values của VPS; mặc định dev pin zero tiếp tục fail-closed. App.config không thay trust Release. Các mục C5 trở xuống là lịch sử và nghiệm thu Word native/C7 vẫn áp dụng.
+
 ## C5 — Giới hạn và nghiệm thu còn lại, 2026-11-02
 
 - Release mặc định có pin zero fail-closed; C6 phải build với OnlineServerUrl/OnlineServerSpkiPin thật, publish server trên PC và triển khai theo pin đó. App.config không đổi trust Release. Không coi C5 là nghiệm thu VPS/nginx.

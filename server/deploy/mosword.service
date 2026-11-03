@@ -1,0 +1,32 @@
+[Unit]
+Description=MOS Word 2019 server
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=moswordsvc
+Group=moswordsvc
+WorkingDirectory=/opt/mosword/current
+ExecStart=/usr/bin/dotnet /opt/mosword/current/MosWord2019.Server.dll
+EnvironmentFile=/etc/mosword/mosword.env
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/mosword
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+SyslogIdentifier=mosword
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,8 @@
 # Kiến trúc server MOS Word 2019
 
-## Phạm vi C0–C5
+## Phạm vi C0–C6
 
-C0–C4 cung cấp nền tảng, tài khoản/lượt/phiên, package ký/mã hóa, heartbeat và kết quả. C5 nối client WinForms online từ login/mode đến recovery/upload; hướng dẫn thử local ở C5_LOCAL_TEST.md. C6 triển khai VPS và C7 nghiệm thu bảo mật còn lại.
+C0–C4 cung cấp nền tảng, tài khoản/lượt/phiên, package ký/mã hóa, heartbeat và kết quả. C5 nối client WinForms online từ login/mode đến recovery/upload; hướng dẫn thử local ở C5_LOCAL_TEST.md. C6 cung cấp bộ deploy PC/VPS, owner tự thực thi theo DEPLOY_VPS.md; agent không truy cập VPS. C7 nghiệm thu bảo mật còn lại.
 
 Client tiếp tục WinForms, .NET Framework 4.7.2, C# 7.3 và Word Interop. `server/MosWord2019.Server.sln` không nằm trong `MosWord2019.slnx`, không tham chiếu project WinForms. `server/MosWord2019.ExamComposition` biên dịch liên kết các model/composer hiện có của Core cho server, giữ cùng thuật toán đề và fingerprint. App ASP.NET Core .NET 10 chứa cả HTTP API và Razor Pages; EF Core 10 dùng Npgsql/PostgreSQL 16+. Chọn một app và một database để phù hợp VPS 2 vCPU, 4 GB RAM, 35 GB NVMe.
 
@@ -160,10 +160,19 @@ Startup gọi server resume trước local cleanup/recovery. Bị từ chối: c
 
 Chỉ thay orchestration, không grader/assertions/nội dung/starter/framework. docs/C5_LOCAL_TEST.md có quy trình dev certificate/PG/admin/learner và checklist Word thật; smoke tự động không thay nghiệm thu Word native.
 
+## C6 — Triển khai và vận hành
+
+server/deploy/01 tạo runtime10/PG16/nginx/UFW22+443/fail2ban/security updates, swap2GiB/tuning4GB; SSH xác minh khóa+sự xác nhận terminal, có config rollback. Runtime moswordsvc nologin chỉ ghi state trong /var/lib/mosword theo systemd; packages/DP svc700, signing seedroot:svc640 và keysroot:svc750 chỉ đọc. Runtime DB CRUD khác migrator DDL, hai envroot600, CLI dùng env kế thừa thay secretargv.
+
+02TLS ECDSAP256 SANIPv4/3650ngày, preserve qua rerun, rotate phải client mới. Nginx TLS1.2/1.3 chỉ443, body512k, HSTS, optional Admin allow-list, overwriteXFF/proto từ edge; Kestrel5000 vàPG5432 localhost. publish.ps1 chỉ build PC linux-x64 framework-dependent;03snapshot/hash/validate archive, backup/migrate, atomic current, restart/health/binaryrollback và3release. Không tự downgrade schema; chỉ migration tương thích ngược.
+
+04import đủ28 trước dọn plaintext best-effort;05bootstrap passwordẩn/env;08chỉin public values.06backup DB+package/per-package keys/signingseed/DP/env/TLS trong lúc app dừng ngắn,03:15UTC,14ngày/8weekly;07export AES256CBC/PBKDF2 bằngpassFD vàciphertext600, SHA256 từroot để đối chiếu downloadPC. Không coi CBC là chữ ký; bảo quản passphrase/offsite.99kiểm service/ready/CA+SPKI/UFW/TCP-UDP/timer/backup/disk. Restore/move phải giữ DB+state đồng bộ và dựng lại nginx02/allow-list; đổiIP cần client mới, drain queue ghim origin trước cutover.
+
+Client production key sinh trongobj khi MSBuild PackageManifestPublicKey được truyền, defaultdev/test source public key không đổi. build-client.ps1 kiểm URL/SPKI/key, build Release không Projects plaintext và phản chiếu compiled trust; không có runtime override mới. Không thay grader/framework/nội dung. Container test realapt/PG/nginx/runtime/crypto, mocksystemctl/UFW/swapon; owner phải nghiệm thu host thật theo docs/DEPLOY_VPS.md.
+
 ## Các bước tiếp theo chưa triển khai
 
-- C6: publish framework-dependent linux-x64 trên PC, copy lên Ubuntu24.04; nginx TLS self-signed, pin thật, PostgreSQL/systemd/ufw/backup/rotation và tuning VPS4GB. Không build trên VPS.
-- C7: review bảo mật và nghiệm thu online thực tế. C5 chưa xác nhận Word native, nginx hoặc VPS.
+- C7: review bảo mật và nghiệm thu online thực tế sau khi owner triển khai C6. Không coi Docker mock là nghiệm thu VPS/firewall/systemd/SSH thật.
 ## Tài liệu gốc
 
 - [EF Core 10 và Npgsql](https://www.npgsql.org/efcore/release-notes/10.0.html).
