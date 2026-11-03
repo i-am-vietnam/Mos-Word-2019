@@ -146,7 +146,8 @@ namespace MosWord2019.Projects.OnlineSessions
             if (r == null || r.SessionId != sessionId || r.Mode != mode || r.ServerTime.Offset != TimeSpan.Zero || r.ExpiresAt.Offset != TimeSpan.Zero ||
                 r.ExpiresAt <= r.ServerTime || (r.ExpiresAt - r.ServerTime).TotalSeconds > cap ||
                 double.IsNaN(r.RemainingSeconds) || double.IsInfinity(r.RemainingSeconds) || r.RemainingSeconds < 0 ||
-                r.RemainingSeconds > (r.ExpiresAt - r.ServerTime).TotalSeconds || !ValidToken(r.SessionToken) ||
+                // .NET 10 and .NET Framework round TotalSeconds differently; allow one 100 ns tick.
+                r.RemainingSeconds > (r.ExpiresAt - r.ServerTime).TotalSeconds + 1.0 / TimeSpan.TicksPerSecond || !ValidToken(r.SessionToken) ||
                 (hasReply && (r.ServerTime < serverTime ||
                     r.ServerTime + TimeSpan.FromSeconds(2) < serverTime + (sentAt > projectionAnchor ? sentAt - projectionAnchor : TimeSpan.Zero) ||
                     r.ExpiresAt > expiresAt)))

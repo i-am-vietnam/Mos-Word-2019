@@ -227,6 +227,49 @@ namespace MosWord2019.Tests
         }
 
         [DataTestMethod]
+        [DataRow("Training", 143000000001L, 14300.0000001)]
+        [DataRow("Testing", 71000000001L, 7100.0000001)]
+        public async Task ModernServerSecondsRoundingDoesNotRejectFrameworkClient(string mode, long ticks, double seconds)
+        {
+            var f = new Fixture(); f.Mode = mode;
+            using (var m = f.Monitor())
+            {
+                f.Transport.Transform = r =>
+                {
+                    r.ExpiresAt = r.ServerTime.AddTicks(ticks);
+                    // Literal values produced by .NET 10 TimeSpan.TotalSeconds.
+                    r.RemainingSeconds = seconds;
+                    return r;
+                };
+                await m.PollAsync();
+                Assert.IsTrue(m.IsOnline);
+                Assert.IsFalse(m.IsSessionRejected);
+                Assert.AreEqual("renewed", m.SessionToken);
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("Training")]
+        [DataRow("Testing")]
+        public async Task RemainingSecondsOverclaimBeyondOneTickRemainsTerminal(string mode)
+        {
+            var f = new Fixture(); f.Mode = mode;
+            using (var m = f.Monitor())
+            {
+                f.Transport.Transform = r =>
+                {
+                    r.RemainingSeconds += 0.000001;
+                    r.SessionToken = "untrusted";
+                    return r;
+                };
+                await m.PollAsync();
+                Assert.IsTrue(m.IsSessionRejected);
+                Assert.IsFalse(m.IsOnline);
+                Assert.AreEqual("initial", m.SessionToken);
+            }
+        }
+
+        [DataTestMethod]
         [DataRow("projection")]
         [DataRow("deadline")]
         public async Task MeaningfulServerClockRegressionOrDeadlineExtensionRemainsTerminal(string invalid)

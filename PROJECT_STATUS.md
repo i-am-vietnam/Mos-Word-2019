@@ -10,6 +10,12 @@ Server active inactivity35phút inclusive, access token40phút; resume vẫn15ph
 
 Kiểm chứng C5-FIX trên worktree hiện tại: client1049/1049, server203/203 mỗi Debug/Release,0skipped; bốn build0warnings/0errors. Giữ đủ1036client/193server case C5 (kỳ vọng access token đổi30→40phút theo yêu cầu). C5-FIX thêm9client/10server; tổng client gồm4case rounding đã có sẵn và được giữ riêng chưacommit. 60tick EN/VI mỗi Training/Testing có0Layout và60TextChanged, footer bounds không đổi; auto-open/failure/close-race/outage20/30 đềuPASS.150file package/hash output giữ nguyên, Release0plaintext; review không còn P1/P2. Evidence artifacts/c5-fix ignored. Server local đang chạy được giữ nguyên, cần restart để nhận code mới; nghiệm thu C5-FIX Word native/outage20phút theo checklist. Commit cục bộ C5-FIX, không push.
 
+## C5 — Heartbeat rounding fix, 2026-11-02
+
+Fixed a client-side false session rejection after successful heartbeats: .NET 10 and .NET Framework 4.7.2 can return slightly different double values from TimeSpan.TotalSeconds. The shared monitor now permits one 100 ns tick only in the remaining-seconds upper-bound comparison; existing identity/token/UTC/deadline/clock-regression checks remain strict. Added four cases across Training/Testing, including rejection of a 1 microsecond overclaim without token refresh. The Training reproduction failed before the fix and passes after it.
+
+Verification: Visual Studio MSBuild Debug and Release builds each 0 warnings/0 errors; full Debug client suite 1040/1040 passed (856 core/project + 184 desktop), 0 skipped; Release OnlineSessionTests 43/43 passed, 0 skipped. Full Release suite and a live user UI retest were not run. Read-only review found no actionable issues. Debug local HTTPS configuration was preserved. No server/package/exercise/key/database changes, no commit or push. Evidence: artifacts/heartbeat-rounding-fix/{Debug-build.log,Release-build.log,Debug-full.trx,Release-online.trx}.
+
 ## C5 — Client online, 2026-11-02
 
 Từ cd7bb9c, nối OnlineAuthenticationService vào IAuthenticationService và LoginForm hai bước: đăng nhập hiển thị lượt còn lại, chọn chế độ rồi mới mở/pre-warm Word. Release không biên dịch offline credentials; chỉ Debug có switch phát triển. Lỗi VI/EN có hết lượt, expiry, admin lock, credential/lockout tạm dùng thông báo chung, unreachable và sai chứng thư.
