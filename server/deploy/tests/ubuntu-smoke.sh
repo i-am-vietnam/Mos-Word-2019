@@ -33,15 +33,29 @@ set -euo pipefail
 exec 9>&-
 command=${1:-}; shift || true
 service=${*: -1}
+if [[ $command == show ]]; then service=$1; fi
 case "$service" in
     postgresql) if [[ $command == restart ]]; then pg_ctlcluster 16 main restart; fi; exit 0 ;;
     nginx) if [[ $command == reload ]]; then nginx -s reload; else nginx -t; if [[ ! -s /run/nginx.pid ]] || ! kill -0 "$(cat /run/nginx.pid)" 2>/dev/null; then nginx; fi; fi; exit 0 ;;
     mosword.service)
         case "$command" in
+            show)
+                pid=''
+                if [[ -f /run/test-mosword.pid ]]; then pid=$(pgrep -P "$(cat /run/test-mosword.pid)" dotnet || true); fi
+                case "$*" in
+                    *--property=MainPID*) printf '%s\n' "${pid:-0}" ;;
+                    *--property=ExecMainStartTimestampMonotonic*) if [[ -n $pid ]]; then awk '{print $22}' "/proc/$pid/stat"; else printf '0\n'; fi ;;
+                    *--property=ExecMainStartTimestamp*) if [[ -n $pid ]]; then date -u --iso-8601=seconds; fi ;;
+                esac
+                exit 0 ;;
             is-active) [[ -f /run/test-mosword.pid ]] && kill -0 "$(cat /run/test-mosword.pid)" 2>/dev/null; exit $? ;;
             enable|is-enabled) exit 0 ;;
             start) if [[ -f /run/test-mosword.pid ]] && kill -0 "$(cat /run/test-mosword.pid)" 2>/dev/null; then exit 0; fi ;;
             stop|restart)
+                if [[ -f /run/keep-old-once ]]; then
+                    if [[ $command == restart ]]; then rm /run/keep-old-once; fi
+                    exit 0
+                fi
                 if [[ -f /run/test-mosword.pid ]]; then kill -- "-$(cat /run/test-mosword.pid)" 2>/dev/null || true; rm -f /run/test-mosword.pid; fi
                 [[ $command != stop ]] || exit 0 ;;
         esac
@@ -91,9 +105,13 @@ if ss -lnt | grep -Eq ':80[[:space:]]'; then printf 'FAIL nginx cổng80\n' >&2;
 printf 'PASS TLS SAN/P256, giữ pin qua rerun và nginx không nghe80.\n'
 
 [[ -f /publish/MosWord2019.Server.dll ]]
-tar -czf /tmp/server.tar.gz -C /publish .
-digest=$(sha256sum /tmp/server.tar.gz | cut -d ' ' -f1)
-bash /test-deploy/03-install-release.sh /tmp/server.tar.gz "$digest"
+new_archive() {
+    server_archive="/tmp/$(date -u +%Y%m%dT%H%M%SZ)-$(openssl rand -hex 4).tar.gz"
+    tar -czf "$server_archive" -C /publish .
+    digest=$(sha256sum "$server_archive" | cut -d ' ' -f1)
+}
+new_archive
+bash /test-deploy/03-install-release.sh "$server_archive" "$digest"
 first=$(readlink -f /opt/mosword/current)
 curl -fsS -H 'X-Forwarded-Proto: https' http://127.0.0.1:5000/health/ready >/dev/null
 [[ $(runuser -u postgres -- psql -X -Atd mosword -c 'SELECT COUNT(*) FROM "__EFMigrationsHistory"') -ge 6 ]]
@@ -103,15 +121,25 @@ printf 'PASS publish linux-x64/runtime, migrate và runtime không có DDL.\n'
 
 # A valid archive reaches migration, then fails health; the previous running release must recover.
 printf '%s\n' "$first" >/run/fail-next-start
-if bash /test-deploy/03-install-release.sh /tmp/server.tar.gz "$digest"; then printf 'FAIL phải rollback\n' >&2; exit 1; fi
+new_archive
+if bash /test-deploy/03-install-release.sh "$server_archive" "$digest"; then printf 'FAIL phải rollback\n' >&2; exit 1; fi
 [[ $(readlink -f /opt/mosword/current) == "$first" ]]
 curl -fsS -H 'X-Forwarded-Proto: https' http://127.0.0.1:5000/health/ready >/dev/null
 printf 'PASS health lỗi tự rollback về bản trước.\n'
 
+# An old healthy process must not prove that the new symlink target is running.
+touch /run/keep-old-once
+new_archive
+if bash /test-deploy/03-install-release.sh "$server_archive" "$digest"; then printf 'FAIL chấp nhận tiến trình release cũ\n' >&2; exit 1; fi
+[[ $(readlink -f /opt/mosword/current) == "$first" ]]
+curl -fsS -H 'X-Forwarded-Proto: https' http://127.0.0.1:5000/health/ready >/dev/null
+printf 'PASS từ chối old healthy process/current giả và rollback.\n'
+
 # Repeated successful deployments retain only three release directories.
 for _ in 1 2 3; do
     /usr/bin/sleep 2
-    bash /test-deploy/03-install-release.sh /tmp/server.tar.gz "$digest"
+    new_archive
+    bash /test-deploy/03-install-release.sh "$server_archive" "$digest"
 done
 [[ $(find /opt/mosword/releases -mindepth 1 -maxdepth 1 -type d | wc -l) -eq 3 ]]
 python3 - <<'PY'
@@ -128,7 +156,9 @@ for kind in ('traversal', 'symlink'):
             archive.addfile(member, io.BytesIO(b'x'))
 PY
 for kind in traversal symlink; do
-    if bash /test-deploy/03-install-release.sh "/tmp/$kind.tar.gz" "$(sha256sum "/tmp/$kind.tar.gz" | cut -d ' ' -f1)"; then exit 1; fi
+    attack_archive="/tmp/$(date -u +%Y%m%dT%H%M%SZ)-$(openssl rand -hex 4).tar.gz"
+    mv "/tmp/$kind.tar.gz" "$attack_archive"
+    if bash /test-deploy/03-install-release.sh "$attack_archive" "$(sha256sum "$attack_archive" | cut -d ' ' -f1)"; then exit 1; fi
 done
 [[ ! -e /opt/mosword/escaped ]]
 printf 'PASS retention3 và từ chối archive traversal/symlink.\n'

@@ -3,6 +3,7 @@
 [Oo]bj/
 /packages/
 artifacts/
+/Claude outputs/
 *.user
 *.suo
 *.userosscache

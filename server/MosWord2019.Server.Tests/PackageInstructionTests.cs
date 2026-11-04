@@ -253,6 +253,10 @@ public sealed class PackageInstructionTests(PostgresFixture postgres)
     [InlineData("missing-instruction", "InvalidDataException")]
     [InlineData("malformed-json", "JsonReaderException")]
     [InlineData("invalid-utf8", "DecoderFallbackException")]
+    [InlineData("instruction-object", "InvalidDataException")]
+    [InlineData("instruction-array", "InvalidDataException")]
+    [InlineData("instruction-number", "InvalidDataException")]
+    [InlineData("instruction-boolean", "InvalidDataException")]
     public async Task UnavailableInstructionsReturn503AndLogOnlySafeContext(string kind, string exceptionType)
     {
         await using var s = await ImportRealPackagesAsync();
@@ -269,6 +273,15 @@ public sealed class PackageInstructionTests(PostgresFixture postgres)
                 "missing-instruction" => Encoding.UTF8.GetBytes("{\"unrelated\":\"" + sentinel + "\"}"),
                 "malformed-json" => Encoding.UTF8.GetBytes("{" + sentinel),
                 "invalid-utf8" => [0x7b, 0x22, 0xc3, 0x28, 0x22, 0x3a, 0x30, 0x7d],
+                "instruction-object" or "instruction-array" or "instruction-number" or "instruction-boolean" =>
+                    Encoding.UTF8.GetBytes(new JObject(Tasks(target).Select(task => new JProperty(task.InstructionKey,
+                        JToken.Parse(kind switch
+                        {
+                            "instruction-object" => "{\"value\":\"" + sentinel + "\"}",
+                            "instruction-array" => "[\"" + sentinel + "\"]",
+                            "instruction-number" => "42",
+                            _ => "true"
+                        })))).ToString(Formatting.None)),
                 _ => throw new ArgumentOutOfRangeException(nameof(kind))
             };
             output.Write(contents);

@@ -107,7 +107,7 @@ namespace MosWord2019.Projects.OnlineResults
                             if (record["receipt"]?.Type == JTokenType.Object) { store.ArchiveReceipt(id); continue; }
                             if (expectedOrigin != null && new Uri((string)record["origin"]) != expectedOrigin)
                             { store.Park(id, "origin_mismatch", utcNow()); SafeLog(id, null, "parked: origin_mismatch"); continue; }
-                            // The server owns the 24h permission window; local wall time must never prematurely park evidence.
+                            // Always ask the server first; local time only bounds repeated authorization failures.
                             if (!forceDue && DateTimeOffset.Parse((string)record["nextAttemptUtc"], System.Globalization.CultureInfo.InvariantCulture) > utcNow()) continue;
                             int attempts = (int)record["attempts"];
                             record["attempts"] = Math.Min(attempts + 1L, int.MaxValue);
@@ -123,12 +123,17 @@ namespace MosWord2019.Projects.OnlineResults
                             finally { Array.Clear(key, 0, key.Length); }
                             var reply = await transport.SendAsync(new Uri((string)record["origin"]), (string)record["token"], signature, payload, timeout.Token).ConfigureAwait(false);
                             timeout.Token.ThrowIfCancellationRequested();
-                            if (reply != null && reply.StatusCode >= 400 && reply.StatusCode < 500 && reply.StatusCode != 429)
+                            bool authorizationFailure = reply != null && (reply.StatusCode == 401 || reply.StatusCode == 403);
+                            bool authorizationExpired = authorizationFailure && AuthorizationRetryExpired(payload, utcNow());
+                            if (reply != null && reply.StatusCode >= 400 && reply.StatusCode < 500 && reply.StatusCode != 429 &&
+                                (!authorizationFailure || authorizationExpired))
                             {
-                                using (store.AcquireLease()) store.Park(id, "http_" + reply.StatusCode, utcNow());
+                                using (store.AcquireLease()) store.Park(id, "http_" + reply.StatusCode + (authorizationExpired ? "_expired" : ""), utcNow());
                                 SafeLog(id, null, "parked: HTTP " + reply.StatusCode); continue;
                             }
-                            if (reply == null || reply.StatusCode != 200) { SafeLog(id, null, "retry: response unavailable or temporary failure"); continue; }
+                            if (reply == null || reply.StatusCode != 200)
+                            { SafeLog(id, null, reply == null ? "retry: response unavailable" : "retry: HTTP " + reply.StatusCode); continue; }
+                            SafeLog(id, null, "received: HTTP " + reply.StatusCode);
                             var receipt = VerifyReceipt(reply.Body, id, (string)record["payloadHash"]);
                             using (store.AcquireLease())
                             {
@@ -136,6 +141,7 @@ namespace MosWord2019.Projects.OnlineResults
                                 store.Write(id, record);
                                 store.ArchiveReceipt(id);
                             }
+                            SafeLog(id, null, "acknowledged: HTTP " + reply.StatusCode);
                         }
                     }
                     catch (OperationCanceledException ex) { if (cancellationToken.IsCancellationRequested) throw; SafeLog(id, ex, "retry: request timed out"); }
@@ -151,6 +157,20 @@ namespace MosWord2019.Projects.OnlineResults
                 }
             }
             finally { pump.Release(); }
+        }
+        private static bool AuthorizationRetryExpired(byte[] payload, DateTimeOffset now)
+        {
+            // Legacy/malformed completion metadata cannot establish expiry. Keep evidence retryable.
+            try
+            {
+                var completion = ResultUploadStore.Parse(payload)["completedUtc"];
+                DateTimeOffset completed;
+                if (completion?.Type != JTokenType.String || !DateTimeOffset.TryParseExact((string)completion,
+                    new[] { "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFzzz", "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF'Z'" },
+                    System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out completed)) return false;
+                return now > completed && now - completed > TimeSpan.FromHours(25);
+            }
+            catch (Exception ex) when (ex is JsonException || ex is InvalidDataException || ex is DecoderFallbackException) { return false; }
         }
         public async Task RunAsync(CancellationToken cancellationToken)
         {

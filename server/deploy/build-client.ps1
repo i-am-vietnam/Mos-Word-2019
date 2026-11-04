@@ -25,7 +25,7 @@ if (-not $MSBuildPath) {
 if (-not $MSBuildPath -or -not (Test-Path -LiteralPath $MSBuildPath -PathType Leaf)) { throw 'Không tìm thấy Visual Studio MSBuild.' }
 [void] (New-Item -ItemType Directory -Path $output)
 # Rebuild all referenced assemblies so the selected key cannot reuse a stale binary.
-Invoke-Checked $MSBuildPath @((Join-Path $repo 'MosWord2019.WinForms\MosWord2019.WinForms.csproj'), '/t:Rebuild', '/p:Configuration=Release', '/p:Platform=AnyCPU', '/p:UseLocalPackages=false', "/p:OutDir=$output\", "/p:OnlineServerUrl=$origin", "/p:OnlineServerSpkiPin=$pin", "/p:PackageManifestPublicKey=$key", '/nologo', '/verbosity:minimal', '/clp:Summary')
+Invoke-Checked $MSBuildPath @((Join-Path $repo 'MosWord2019.WinForms\MosWord2019.WinForms.csproj'), '/t:Rebuild', '/p:Configuration=Release', '/p:Platform=AnyCPU', '/p:UseLocalPackages=false', "/p:OutDir=$output/", "/p:OnlineServerUrl=$origin", "/p:OnlineServerSpkiPin=$pin", "/p:PackageManifestPublicKey=$key", '/nologo', '/verbosity:minimal', '/clp:Summary')
 Invoke-Checked 'powershell.exe' @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'verify-client-trust.ps1'), '-OutputDirectory', $output, '-ServerUrl', $origin, '-SpkiPin', $pin, '-ManifestPublicKey', $key)
 $files = @(Get-ChildItem -LiteralPath $output -File | Sort-Object Name | ForEach-Object {
     [ordered]@{ file = $_.Name; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }

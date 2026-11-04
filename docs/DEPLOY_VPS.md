@@ -1,5 +1,80 @@
 # Triển khai MOS Word 2019 trên VPS
 
+## C7 — Cập nhật bộ cài, xác nhận release và đóng gói sạch
+
+Owner đã xác nhận nghiệm thu production bước 1–7 PASS, bao gồm upload HTTP200 sau C7-FIX2. C7 không đổi IP, SPKI, Ed25519 public key hoặc schema. Chỉ dùng public values hiện có để build client mới; giữ nguyên khóa và dữ liệu phiên/queue. Các lệnh dưới đây do owner chạy, agent không truy cập VPS.
+
+### Cập nhật installer C7 một lần trước khi publish
+
+`publish.ps1` gọi installer root-owned đã cài trên VPS. Installer C6 cũ chưa kiểm tra tiến trình như C7 và tự đặt tên release khác upload stamp; publish mới sẽ từ chối stamp không khớp thay vì khẳng định triển khai thành công. Cập nhật installer trước theo các bước dưới đây. Không chạy script trực tiếp từ thư mục upload bằng sudo.
+
+Trên **PC**, tại repo, dùng biến `$VpsIp`, `$SshKey` đã chuẩn bị ở mục1:
+
+```powershell
+$InstallerUpload = Join-Path (Get-Location) 'artifacts/update-deploy'
+New-Item -ItemType Directory -Path $InstallerUpload -Force | Out-Null
+$InstallerFile = Join-Path $InstallerUpload '03-install-release.sh'
+$InstallerText = [IO.File]::ReadAllText((Join-Path (Get-Location) 'server/deploy/03-install-release.sh')).Replace("`r`n", "`n")
+[IO.File]::WriteAllText($InstallerFile, $InstallerText, [Text.UTF8Encoding]::new($false))
+Get-FileHash -LiteralPath $InstallerFile -Algorithm SHA256
+ssh -i $SshKey -o StrictHostKeyChecking=yes "mosword@$VpsIp" 'mkdir -p /home/mosword/mosword-upload'
+scp -i $SshKey -o StrictHostKeyChecking=yes $InstallerFile "mosword@${VpsIp}:/home/mosword/mosword-upload/03-install-release.sh"
+```
+
+Trên **VPS**, tạo snapshot root-owned, kiểm cú pháp và đối chiếu SHA256 với PC:
+
+```bash
+sudo install -o root -g root -m 755 /home/mosword/mosword-upload/03-install-release.sh /usr/local/lib/mosword-deploy/03-install-release.sh.next
+sudo bash -n /usr/local/lib/mosword-deploy/03-install-release.sh.next
+sudo sha256sum /usr/local/lib/mosword-deploy/03-install-release.sh.next
+```
+
+Chỉ sau khi hash khớp, đổi tên atomically:
+
+```bash
+sudo mv -f /usr/local/lib/mosword-deploy/03-install-release.sh.next /usr/local/lib/mosword-deploy/03-install-release.sh
+```
+
+`common.sh` hiện có từ C6 được giữ nguyên. Không chạy lại provision hoặc sinh khóa mới cho bước này.
+
+### Publish và kiểm tra đúng tiến trình mới
+
+Trên **PC**:
+
+```powershell
+.\server\deploy\publish.ps1 -VpsHost $VpsIp -IdentityFile $SshKey
+```
+
+Installer kiểm health, PID/cwd/cmdline và thời điểm bắt đầu tiến trình. SSH cài đặt chạy tương tác để thấy prompt sudo; sau đó publish dùng một SSH chỉ đọc riêng, không sudo, kiểm dịch vụ active và lấy `MOSWORD_ACTIVE_RELEASE=/opt/mosword/releases/<stamp vừa upload>` cùng `MOSWORD_SERVICE_STARTED_AT=...`. Script in đường dẫn và giờ bắt đầu dịch vụ. Non-zero ở một trong hai SSH, thiếu biên nhận hoặc stamp khác đều báo lỗi tiếng Việt. Archive được tạo/SCP xong **chưa** có nghĩa server đã đổi bản. Không công bố thành công chỉ vì health cũ vẫn xanh.
+
+Trên **VPS** đối chiếu ngay (giờ VPS là **UTC**):
+
+```bash
+readlink -f /opt/mosword/current
+sudo systemctl show mosword.service --property=MainPID --property=ExecMainStartTimestamp --property=ActiveState
+sudo systemctl status mosword.service --no-pager
+sudo journalctl -u mosword.service --utc --since '-30 min' --no-pager | tail -50
+sudo grep '/api/results' /var/log/nginx/access.log | tail -10
+```
+
+Nếu publish báo lỗi: giữ archive/log, kiểm start time và symlink; không tự xóa release/keys hoặc đổi schema. Biên nhận thiếu thường do installer C6 chưa cập nhật; stamp khác hoặc cwd sai phải điều tra tiến trình/dịch vụ. Installer có rollback binary khi restart/health/identity lỗi; không hạ schema. Sau thành công chạy [ONLINE_MANUAL_TEST.md](ONLINE_MANUAL_TEST.md) và kiểm upload200/Admin.
+
+### Tạo ZIP chỉ có runtime
+
+Sau khi commit C7, repository phải sạch (không có tracked changes hoặc untracked không ignored). Build bằng public values **hiện có** như mục6. Không xoay pin/key để đóng gói. Với output production vừa verify thành công:
+
+```powershell
+$ProductionOutput = Read-Host 'Đường dẫn output client-production vừa build và verify'
+.\server\deploy\package-client.ps1 -OutputDirectory $ProductionOutput
+Get-Content .\artifacts\release\SHA256SUMS.txt
+```
+
+Kết quả là `artifacts/release/MosWord2019-<yyyyMMdd>-<shortcommit>.zip` và `SHA256SUMS.txt` cạnh ZIP. Script kiểm receipt/hash input, chỉ cho phép tám file runtime xác định, copy sang stage và chạy lại `verify-client-trust.ps1` trước khi ZIP. PDB/XML/receipt public không nằm trong ZIP; Projects, log và file lạ bị từ chối. Source output được giữ nguyên. Không dùng `git add -f` cho output hoặc bằng chứng.
+
+Đối chiếu SHA256 trên máy nhận với giá trị đã nhận qua kênh tin cậy riêng, giải nén toàn bộ ZIP vào thư mục mới rồi mở EXE bằng Windows user đang dùng. Giữ nguyên `%LocalAppData%\MosWord2019`; không xóa profile, queue hoặc state khi cập nhật. Các artifact build cũ không phải gói phát hành sạch C7. Nếu script báo repo dirty, commit phần thay đổi đã review trước; không bỏ qua kiểm tra hoặc giấu source changes để ép đóng gói.
+
+Queue C7 retry401/403 với backoff; chỉ park chúng sau khi đã nhận chính HTTP401/403 và đồng hồ local vượt `completedUtc+25h`, với reason `http_401_expired`/`http_403_expired`. Đây chỉ là ngưỡng ngừng retry bảo thủ, không gia hạn quyền server24h. Completion thiếu/hỏng không dùng để tự kết luận hết hạn. 400/404/409/413/422 vẫn park;429/503 và mạng retry. Log ghi status, không body/credential. Receipt hợp lệ mới xác nhận, bằng chứng local được giữ.
+
 ## Cập nhật C7-FIX: phải thay cả server và client
 
 Bản này sửa resume qua dữ liệu lưu trên đĩa, worker upload và giao diện admin. Giữ nguyên IP, chứng thư/SPKI, Ed25519 signing key và Data Protection keys. Không chạy lại provision, import hoặc tạo tài khoản chỉ để cập nhật. Các lệnh dưới đây do owner chạy; agent không truy cập VPS.
@@ -164,7 +239,7 @@ $ManifestPublicKey = Read-Host 'Giá trị ED25519_PUBLIC_KEY (Base64)'
 ./server/deploy/build-client.ps1 -VpsIp $VpsIp -SpkiPin $SpkiPin -ManifestPublicKey $ManifestPublicKey
 ```
 
-Script build Release bằng VS MSBuild, nhúng URL/pin trong EXE và public manifest key trong assembly Projects, không sửa source `.pub` hoặc App.config. Output mới ở `artifacts/client-production/...`; kiểm `public-trust.json`/SHA256 và thông báo verify thành công. Phân phối **toàn bộ thư mục output** cho learner (không chỉ EXE), cài .NET Framework4.7.2+/Word2019 theo yêu cầu client. Không phân phối Projects plaintext hoặc certificate private key.
+Script build Release bằng VS MSBuild, nhúng URL/pin trong EXE và public manifest key trong assembly Projects, không sửa source `.pub` hoặc App.config. Output mới ở `artifacts/client-production/...`; kiểm `public-trust.json`/SHA256 và thông báo verify thành công. Sau đó dùng `package-client.ps1` ở phần C7 phía trên để phân phối ZIP runtime sạch; cài .NET Framework4.7.2+/Word2019 theo yêu cầu client. Không phân phối Projects plaintext hoặc certificate private key.
 
 Release bỏ qua dev override trong config, từ chối cert khác pin, và không nhận offline credentials. Đổi config cạnh EXE không thay trust. Test login/Training/P01/Testing/upload/admin theo `C5_LOCAL_TEST.md`; không dùng package/dev key khác để bỏ kiểm chữ ký. Nếu máy learner sai ngày giờ làm certificate chưa hợp lệ/hết hạn, chỉnh Windows time; licensing vẫn theo server.
 

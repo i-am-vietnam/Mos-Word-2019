@@ -1,5 +1,12 @@
 # Known Issues and Verification Items
 
+## C7 — Khuyến nghị và nghiệm thu mở rộng, 2026-11-04
+
+- Owner đã xác nhận productionsteps1–7 PASS/upload200. Các ghi chú pendingupload/C7-FIX2 dưới đây là lịch sử trước xác nhận này; không còn coi BOM503 hoặc uploadchưaACK là lỗi production hiện tại.
+- TB: bản export backup AES-CBC/PBKDF2 chưa có MAC/tag; giữ hash qua kênh tin cậy riêng, chỉ restore archive đã kiểm chứng. Đổi định dạng cần kế hoạch tương thích và thử restore riêng. Thấp: journal/AppLogger còn full path/raw exception có PII; ẩn thông tin trước khi chia sẻ. Chưa refactor ngoài phạm vi. Vị trí và kiểm soát đã rà ở docs/C7_SECURITY_REVIEW.md.
+- Cần cập nhật installer03 root-owned một lần trước publish C7; installer cũ thiếu receipt sẽ báo lỗi dù có thể đã đổi binary. Kiểm PID/start/cwd/active path theo DEPLOY_VPS; không coi SCP/archive/health là bằng chứng phiên bản mới. Rollback binary không hạ schema.
+- Checklist mở rộng trong ONLINE_MANUAL_TEST.md chưa được agent chạy với Word/VPS thật; owner ghi PASS/FAIL từng ca. Ngưỡng local completion+25h chỉ quyết định ngừng retry401/403, không đổi quyền24h của server. Giờ Windows lệch xa có thể park sớm hơn dự kiến; giữ giờ máy đúng và bằng chứng, không sửa queue/token để ép quyền.
+
 ## C7-FIX2 — Cần triển khai server trước hạn upload, 2026-11-03
 
 - Đã xác nhận nguyên nhân503 là UTF-8 BOM trong22langVI của gói lưu trữ; parser gói riêng đã sửa, payload kết quả vẫnstrict. Không cần sửa/re-import gói, đổi hash/version, schema hoặc build lại client. Artifactclient20261103T151755Z-7b41671b giữ nguyên.

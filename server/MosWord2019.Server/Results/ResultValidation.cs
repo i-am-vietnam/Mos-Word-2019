@@ -92,8 +92,10 @@ public static class ResultValidation
             var instructions = Instructions(storage, package, result.Language);
             foreach (var failure in failures)
             {
-                string instruction = (string?)instructions[failure.InstructionKey]
-                    ?? throw new InvalidDataException("A pinned task instruction is unavailable.");
+                var value = instructions[failure.InstructionKey];
+                if (value?.Type != JTokenType.String)
+                    throw new InvalidDataException("A pinned task instruction must be a string.");
+                string instruction = value.Value<string>()!;
                 wrong.Add(new JObject { ["projectId"] = project.ProjectId, ["taskId"] = failure.TaskId,
                     ["instructionKey"] = failure.InstructionKey, ["instruction"] = instruction });
             }

@@ -6,6 +6,8 @@ require_root
 [[ $# == 2 && $2 =~ ^[a-fA-F0-9]{64}$ ]] || die 'Dùng: 03-install-release.sh archive.tar.gz SHA256'
 archive=$(realpath -e -- "$1")
 [[ -f $archive ]] || die 'Không có archive.'
+stamp=$(basename -- "$archive" .tar.gz)
+[[ $stamp =~ ^[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}$ ]] || die 'Tên archive phải là timestamp-commit/random.tar.gz do publish.ps1 tạo.'
 operation_lock
 load_env
 snapshot=$(mktemp /var/tmp/mosword-release-XXXXXXXX.tar.gz)
@@ -16,7 +18,9 @@ archive=$snapshot
 if [[ $(sha256sum -- "$archive" | cut -d ' ' -f 1) != "${2,,}" ]]; then rm -- "$snapshot"; die 'SHA256 không khớp.'; fi
 previous=''
 if [[ -e /opt/mosword/current || -L /opt/mosword/current ]]; then previous=$(current_release); fi
-release=$(mktemp -d "/opt/mosword/releases/$(date -u +%Y%m%dT%H%M%SZ)-XXXXXXXX")
+release="/opt/mosword/releases/$stamp"
+[[ ! -e $release && ! -L $release ]] || die 'Release đã tồn tại; không ghi đè.'
+mkdir -- "$release"
 switched=0
 stopped=0
 finish() {
@@ -75,6 +79,7 @@ find "$release" -type d -exec chmod 755 {} +
 find "$release" -type f -exec chmod 644 {} +
 # A consistent backup must succeed before any schema change on an installed server.
 if [[ -n $previous ]]; then "$(dirname -- "${BASH_SOURCE[0]}")/06-backup.sh" --locked; fi
+previous_start=$(systemctl show mosword.service --property=ExecMainStartTimestampMonotonic --value)
 systemctl stop mosword.service
 stopped=1
 (
@@ -98,6 +103,16 @@ mv -Tf /opt/mosword/current.next /opt/mosword/current
 switched=1
 systemctl restart mosword.service
 ready || die 'Server mới chưa ready.'
+# current alone is not proof: an old process can answer health after a failed restart.
+systemctl is-active --quiet mosword.service || die 'Dịch vụ chưa active.'
+pid=$(systemctl show mosword.service --property=MainPID --value)
+start=$(systemctl show mosword.service --property=ExecMainStartTimestampMonotonic --value)
+started_at=$(systemctl show mosword.service --property=ExecMainStartTimestamp --value)
+[[ $pid =~ ^[1-9][0-9]*$ && $start =~ ^[1-9][0-9]*$ && $start != "$previous_start" && -n $started_at ]] || die 'Không xác nhận được tiến trình dịch vụ mới.'
+active=$(current_release)
+[[ $active == "$release" && $(readlink -e -- "/proc/$pid/cwd") == "$release" ]] || die 'Tiến trình dịch vụ vẫn chạy release khác.'
+mapfile -d '' -t command < "/proc/$pid/cmdline"
+[[ ${command[0]:-} == /usr/bin/dotnet && ${command[1]:-} == /opt/mosword/current/MosWord2019.Server.dll ]] || die 'Tiến trình không chạy server dự kiến.'
 systemctl enable mosword.service
 stopped=0
 # Keep three releases, always protecting current and the rollback target.
@@ -116,3 +131,4 @@ for name in "${releases[@]}"; do
     fi
 done
 printf 'Đã triển khai: %s\n' "$release"
+printf 'MOSWORD_ACTIVE_RELEASE=%s\nMOSWORD_SERVICE_STARTED_AT=%s\n' "$active" "$started_at"

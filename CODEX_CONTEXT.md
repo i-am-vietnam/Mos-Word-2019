@@ -1,5 +1,13 @@
 # Technical Context
 
+## C7 — Checkpoint phát hành, 2026-11-04
+
+Owner xác nhận productionsteps1–7 PASS/result200 sau BOMhotfix c53374d. Queue AuthorizationRetryExpired chỉ sau actual401/403, strictISOcompletion và localnow>completion+25h; không cấp quyềnserver, thiếu/hỏngcompletion tiếp tục retry. Permanent400/404/409/413/422,429/503retry, statusliteral logs và encryptedParked/ACK cũ giữ nguyên. WrongTasksAsync yêu cầu JTokenType.String trước Value<string>; nonstringInvalidData503 có safecontext.
+
+package-client.ps1 yêu cầu gitclean cảuntrackednonignored, inputpublictrust receipt/hash, allowlist8runtime, freshprocess trustverifytrênstage, ZIP+SHA256SUMS.txt dướiignoredartifacts/release. build-client OutDir kết thúc bằngslash đểPowerShell/nativeMSBuild khôngnuốtdấuquote. publish phải nhận exactrelease receipt/starttime;03 dùng archive stamp, kiểmPID/cwd/argv/startmonotonic mới vàrollback khiidentitysai. Cần updateinstalled03root một lần trướcpublish; commonkhôngđổi.
+
+docs/ONLINE_MANUAL_TEST.md vàC7_SECURITY_REVIEW.md mô tả manual/security, findings mở CBCexportauthenticity(TB), localfullpathlogs(Thấp). Không đồng nhất source review/fixturetests với nghiệm thuVPS/pentest. Giữ nguyên150packagefiles/catalog/schema/productionURL/SPKI/Edkey. Claude outputs ignored; khôngstageitscontents, khôngdeleteLocalAppData hoặcexistingartifacts. Dừng C7 saucommit/package, khôngpush.
+
 ## C7-FIX — Checkpoint khôi phục và upload, 2026-11-03
 
 TestingFlow.OpenOnline chuẩn bị definition A nhưng LoadOnline/Restore hydrate definition B; StateStore.SaveCore phải kiểm SessionId + canonical ExamDefinitionFingerprint, không reference A/B. Không thay luật chấm, thứ tự task, dữ liệu bài hoặc ownershipWord. Test OnlineTestingPreparationTests đi qua disk thật cả resume/expired/saved-only và queue DPAPI; TestingRecoveryTests kiểm mismatch seed/project/task/order/key/sessionId không ghi state.

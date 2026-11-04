@@ -1,5 +1,13 @@
 # Project Status
 
+## C7 — Rà bảo mật, publish và gói phát hành, 2026-11-04
+
+Owner xác nhận nghiệm thu production1–7 PASS và result upload200 sau C7-FIX2. C7 bổ sung ONLINE_MANUAL_TEST và C7_SECURITY_REVIEW; đây là checklist mở rộng/source review, không tự đánh dấu các ca Word/VPS chưa chạy. Hai khuyến nghị còn mở: export backup CBC chưa có tag/MAC và log local chứa fullpath/PII. Không phát hiện Cao từ phần mã đã rà; không thay cho pentest.
+
+Queue retry401/403 theo backoff; chỉ park khi có phản hồi đó và localnow>completedUtc+25h, reason http_401_expired/http_403_expired. Completion không xác định thì tiếp tục retry; server vẫn kiểm quyền24h. HTTPstatus được log không body/credential; evidence không bị xóa. Guard instruction yêu cầu string, dữ liệu gói sai kiểu trả503/log thay vì épchuỗi/500.
+
+Commit sửa OutDir slash cósẵn, ignore Claude outputs, giữ artifacts ignored. package-client.ps1 chỉ đóng tám runtimefiles sau kiểm inputhash/trust/stage, từ chối dirtytree/filelạ; SHA256SUMS.txt cạnhZIP. publish/installer xác nhận exactuploadedstamp, PID/cwd/cmdline và starttime mới, không chỉ health; hướng dẫn cập nhật installerroot một lần trong DEPLOY_VPS. Không đổi Projects/catalog/schema/trust/grader; không push hoặc truy cập VPS. Kiểm chứng: client1105/1105 và server233/233 mỗi Debug/Release,0skipped; VS Rebuild/dotnet build -warnaserror đều0warnings/0errors. Giữ150file gói/hash, schema/trust, Debugconfig và artifactproduction cũ. Kiểm tra ignore1293/1293file c7-fix; khôngtrackartifact/Claude outputs. PS synthetic/package/publish tests, ShellCheck/bash-n và Ubuntu24.04 harness đềuPASS, gồm oldhealthyprocess/rollback; systemd/firewall/SSH thật vẫn thuộc nghiệm thuowner. Evidence artifacts/c7-final và artifacts/c7-deploy-*.log; ZIP sạch tạo sau commit trêncâysạch.
+
 ## C7-FIX2 — Hotfix BOM cho upload kết quả, 2026-11-03
 
 Sửa riêng server: `PackageJson.Parse` bỏ đúng một UTF-8 BOM đầu JSON gói, giữ strict UTF-8/depth64/duplicate-error/trailing-data/4MiB. `ResultValidation.Parse` dành cho payload kết quả không đổi. `ResultUploads` ghi warning sessionId/packageCode/language/exceptionType, không exception message/token/key/nội dung; InvalidDataException và DecoderFallbackException từ hướng dẫn trả503 retryable. Rà ZIP reader chỉ có Instructions; ServerExamPool/PackageEndpoints/admin detail đọc JSON DB, importer File.ReadAllText đã xử lý BOM. Không sửa client/Projects/schema/phiên bản hoặc hash gói, không re-import production.

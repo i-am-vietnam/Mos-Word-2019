@@ -47,4 +47,23 @@ $upload = "/home/mosword/mosword-upload/$stamp.tar.gz"
 Invoke-Checked 'ssh' ($sshOptions + @($remote, 'mkdir -p /home/mosword/mosword-upload'))
 Invoke-Checked 'scp' ($sshOptions + @($archive, "${remote}:$upload"))
 Write-Host 'Cài đặt trên VPS; nhập mật khẩu sudo trực tiếp trong SSH nếu được yêu cầu.'
-Invoke-Checked 'ssh' ($sshOptions + @('-t', $remote, "sudo /usr/local/lib/mosword-deploy/03-install-release.sh $upload $sha256"))
+try {
+    # Keep the interactive sudo terminal live; never capture prompts/password input.
+    & ssh @sshOptions '-t' $remote "sudo /usr/local/lib/mosword-deploy/03-install-release.sh $upload $sha256"
+    $installCode = $LASTEXITCODE
+} catch { throw 'Triển khai VPS thất bại khi chạy SSH; kiểm tra rollback và dịch vụ trước khi tiếp tục.' }
+if ($installCode -ne 0) { throw "Triển khai VPS thất bại (mã $installCode); kiểm tra rollback và dịch vụ trước khi tiếp tục." }
+# A separate unprivileged, noninteractive query captures only public service state.
+$confirmation = 'set -eu; systemctl is-active --quiet mosword.service; printf MOSWORD_ACTIVE_RELEASE=; readlink -e /opt/mosword/current; printf MOSWORD_SERVICE_STARTED_AT=; systemctl show mosword.service --property=ExecMainStartTimestamp --value'
+try {
+    $confirmationOutput = @(& ssh @sshOptions '-T' $remote $confirmation)
+    $confirmationCode = $LASTEXITCODE
+} catch { throw 'Triển khai VPS chưa được xác nhận: truy vấn trạng thái SSH thất bại.' }
+if ($confirmationCode -ne 0) { throw "Triển khai VPS chưa được xác nhận: truy vấn trạng thái thất bại (mã $confirmationCode)." }
+$confirmationOutput | ForEach-Object { Write-Host $_ }
+$active = @($confirmationOutput | ForEach-Object { if ("$_".Trim() -match '^MOSWORD_ACTIVE_RELEASE=(/opt/mosword/releases/[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8})$') { $Matches[1] } })
+$started = @($confirmationOutput | ForEach-Object { if ("$_".Trim() -match '^MOSWORD_SERVICE_STARTED_AT=(.+)$') { $Matches[1] } })
+if ($active.Count -ne 1 -or $active[0] -cne "/opt/mosword/releases/$stamp" -or $started.Count -ne 1) {
+    throw 'Triển khai VPS chưa được xác nhận: release đang chạy không khớp bản vừa tải lên hoặc thiếu thời gian khởi động dịch vụ.'
+}
+Write-Host 'Đã xác nhận dịch vụ đang chạy đúng release vừa tải lên.'

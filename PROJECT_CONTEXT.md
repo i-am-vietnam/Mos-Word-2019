@@ -1,5 +1,9 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## C7 — Phát hành và kiểm tra bảo mật, 2026-11-04
+
+Productionsteps1–7 và upload200 được owner xácnhận. C7 hoàn thiện manualchecklist/source securityreview, queue401/403retry tới>completion+25hlocal vàsafeHTTPstatuslogs, guardinstructionstring, ignorehygiene, publish xácnhậnactualprocess/release/starttime vàcleanruntimeZIPallowlist. Không đổi trust/package/catalog/schema/grader. Installer03 cần cậpnhậtroot một lần theoDEPLOY_VPS trướcpublish mới; artifactZIP tạo saugitcleancommit. Hai khuyếnnghị bảo mật ngoài phạmvi sửa nhỏ còn mở: CBCbackup thiếuauthenticity, localfullpath/PIIlogs. KiểmthửfixturekhôngthayWord/VPSmanual hoặcpentest; khôngpush, dừng C7.
+
 ## C7-FIX — Sau nghiệm thu VPS, 2026-11-03
 
 Chỉ sửa resume Testing, delivery kết quả, log recovery và admin. SaveCore dùng SessionId+fingerprint đề thay reference sau deserialize; disk E2E có resume/heartbeat/Next/Submit/resultpersist/queue. Worker cô lập từng item, giữ bindingorigin, park nguyên record mã hóa khi lỗi permanent, retry mạng/backoff, phục hồi startup/login/định kỳ. Không xóa B4; chỉ ACK hợp lệ mới xác nhận. Hạnupload do server, không đồng hồ Windows. Journal retainedsummary một dòng/session với count.

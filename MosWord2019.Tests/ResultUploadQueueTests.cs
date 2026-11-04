@@ -37,7 +37,7 @@ namespace MosWord2019.Tests
             }
         }
         [DataTestMethod]
-        [DataRow(429)] [DataRow(503)] [DataRow(500)] [DataRow(302)] [DataRow(201)]
+        [DataRow(401)] [DataRow(403)] [DataRow(429)] [DataRow(503)] [DataRow(500)] [DataRow(302)] [DataRow(201)]
         public async Task Non200RetainsQueueAndBackoffAcrossRestart(int status)
         {
             using (var f = new Fixture())
@@ -297,7 +297,7 @@ namespace MosWord2019.Tests
             }
         }
         [DataTestMethod]
-        [DataRow(400)] [DataRow(401)] [DataRow(403)] [DataRow(404)] [DataRow(409)] [DataRow(410)] [DataRow(422)]
+        [DataRow(400)] [DataRow(404)] [DataRow(409)] [DataRow(410)] [DataRow(413)] [DataRow(422)]
         public async Task PermanentHttpFailureParksEncryptedEvidence(int status)
         {
             using (var f = new Fixture())
@@ -334,7 +334,7 @@ namespace MosWord2019.Tests
             }
         }
         [DataTestMethod]
-        [DataRow(24, 200, false)] [DataRow(25, 401, true)]
+        [DataRow(24, 200, false)] [DataRow(26, 401, true)]
         public async Task ServerOwns24HourUploadWindow(int hours, int serverStatus, bool parked)
         {
             using (var f = new Fixture())
@@ -345,6 +345,64 @@ namespace MosWord2019.Tests
                 f.Now = f.Now.AddHours(hours); await q.PumpAsync();
                 Assert.AreEqual(parked, q.GetStatus(f.Id).Parked); Assert.AreEqual(1, f.Transport.Calls);
                 CollectionAssert.AreEqual(f.Payload, File.ReadAllBytes(f.Result));
+            }
+        }
+        [DataTestMethod]
+        [DataRow(401, -1)] [DataRow(401, 0)] [DataRow(401, 1)]
+        [DataRow(403, -1)] [DataRow(403, 0)] [DataRow(403, 1)]
+        public async Task AuthorizationFailureUsesInjectedClockAndStrict25HourBoundary(int status, int ticksAfterBoundary)
+        {
+            using (var f = new Fixture())
+            {
+                var body = JObject.Parse(Encoding.UTF8.GetString(f.Payload)); body["completedUtc"] = f.Now.ToString("O");
+                f.Payload = Encoding.UTF8.GetBytes(body.ToString()); File.WriteAllBytes(f.Result, f.Payload);
+                var q = f.Register(); f.Transport.Status = status;
+                f.Now = f.Now.AddHours(25).AddTicks(ticksAfterBoundary); await f.Queue().PumpAsync();
+                Assert.AreEqual(1, f.Transport.Calls); Assert.AreEqual(ticksAfterBoundary > 0, q.GetStatus(f.Id).Parked);
+                if (ticksAfterBoundary > 0)
+                    StringAssert.Contains(File.ReadAllText(Path.Combine(f.Root, "Parked", f.Id.ToString("N") + ".reason.json")), "http_" + status + "_expired");
+                else
+                {
+                    Assert.AreEqual(f.Now.AddSeconds(5), q.GetStatus(f.Id).NextAttemptUtc);
+                    await f.Queue().PumpAsync(); Assert.AreEqual(1, f.Transport.Calls);
+                }
+                CollectionAssert.AreEqual(f.Payload, File.ReadAllBytes(f.Result));
+            }
+        }
+        [DataTestMethod]
+        [DataRow(401, "missing")] [DataRow(403, "missing")] [DataRow(401, "invalid")] [DataRow(403, "invalid")]
+        [DataRow(401, "integer")] [DataRow(403, "integer")] [DataRow(401, "no-offset")] [DataRow(403, "no-offset")]
+        public async Task UnusableCompletionTimeCannotPrematurelyParkAuthorizationFailure(int status, string completion)
+        {
+            using (var f = new Fixture())
+            {
+                var body = JObject.Parse(Encoding.UTF8.GetString(f.Payload));
+                if (completion == "integer") body["completedUtc"] = 0;
+                else if (completion != "missing") body["completedUtc"] = completion == "no-offset" ? "2020-01-01T00:00:00" : "invalid";
+                f.Payload = Encoding.UTF8.GetBytes(body.ToString()); File.WriteAllBytes(f.Result, f.Payload);
+                var q = f.Register(); f.Transport.Status = status; f.Now = f.Now.AddYears(10); await q.PumpAsync();
+                Assert.IsTrue(q.GetStatus(f.Id).PendingUpload); Assert.IsFalse(q.GetStatus(f.Id).Parked);
+                Assert.AreEqual(f.Now.AddSeconds(5), q.GetStatus(f.Id).NextAttemptUtc);
+                CollectionAssert.AreEqual(f.Payload, File.ReadAllBytes(f.Result));
+            }
+        }
+        [DataTestMethod]
+        [DataRow(200, "acknowledged")] [DataRow(201, "retry")] [DataRow(302, "retry")] [DataRow(400, "parked")]
+        [DataRow(401, "retry")] [DataRow(403, "retry")] [DataRow(404, "parked")] [DataRow(409, "parked")]
+        [DataRow(413, "parked")] [DataRow(422, "parked")] [DataRow(429, "retry")] [DataRow(500, "retry")] [DataRow(503, "retry")]
+        public async Task EveryHttpStatusHasSafeActionDiagnostic(int status, string action)
+        {
+            using (var f = new Fixture())
+            {
+                var messages = new System.Collections.Generic.List<string>();
+                var q = new ResultUploadQueue(f.Transport, f.Root, () => f.Now, messages.Add);
+                q.Enqueue(f.Result, f.Id, f.Origin, f.Key, f.Token); f.Transport.Status = status; await q.PumpAsync();
+                Assert.IsTrue(messages.Any(message => message.Contains(action + ": HTTP " + status)));
+                foreach (string message in messages)
+                {
+                    Assert.IsFalse(message.Contains(f.Token)); Assert.IsFalse(message.Contains(f.Transport.LastSignature));
+                    Assert.IsFalse(message.Contains(Encoding.UTF8.GetString(f.Payload)));
+                }
             }
         }
         [TestMethod]
