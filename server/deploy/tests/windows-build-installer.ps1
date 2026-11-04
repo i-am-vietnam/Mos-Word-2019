@@ -64,10 +64,17 @@ if ((Get-Content -LiteralPath (Join-Path $repo 'artifacts\mode.txt') -Raw).Trim(
 '@
 Write-Fixture (Join-Path $tools 'compiler.ps1') @'
 $ErrorActionPreference = 'Stop'
-if ($args -contains '/?') { Write-Output 'Inno Setup 6 Command-Line Compiler'; exit 0 }
 $repo = Split-Path -Parent $PSScriptRoot
-[IO.File]::AppendAllText((Join-Path $repo 'artifacts\events.txt'), "compile`n")
 $mode = (Get-Content -LiteralPath (Join-Path $repo 'artifacts\mode.txt') -Raw).Trim()
+if ($args -contains '/?') {
+    if ($mode -eq 'compiler-help-invalid') { Write-Output 'Unrelated compiler'; exit 0 }
+    # Real ISCC help uses stderr and returns its documented usage status 1.
+    [Console]::Error.WriteLine('synthetic compiler help on stderr')
+    Write-Output 'Inno Setup 6 Command-Line Compiler'
+    if ($mode -eq 'compiler-help-failure') { exit 25 }
+    exit 1
+}
+[IO.File]::AppendAllText((Join-Path $repo 'artifacts\events.txt'), "compile`n")
 if ($mode -eq 'compiler-failure') { exit 23 }
 $runtime = @($args | Where-Object { $_ -like '/DRuntimeDirectory=*' })
 $release = @($args | Where-Object { $_ -like '/DReleaseDirectory=*' })
@@ -147,6 +154,8 @@ Run-Installer 'dirty-tracked' $false '' 'Repository phải sạch'
 Write-Fixture (Join-Path $sandbox '.gitignore') "artifacts/`n"
 Run-Installer 'latest-receipt-mismatch' $false '' 'Trust production mới nhất không khớp'
 Run-Installer 'latest-receipt-hash' $false '' 'Hash biên nhận production không khớp'
+Run-Installer 'compiler-help-invalid' $false '' 'Cần đúng trình biên dịch Inno Setup 6'
+Run-Installer 'compiler-help-failure' $false '' 'Cần đúng trình biên dịch Inno Setup 6'
 Run-Installer 'trust-mismatch' $false 'build' 'verify-client-trust.ps1'
 Run-Installer 'zip-extra' $false 'build,package' 'ZIP runtime không đúng allow-list'
 Run-Installer 'compiler-failure' $false 'build,package,compile' 'mã 23'

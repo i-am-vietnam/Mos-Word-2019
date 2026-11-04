@@ -83,8 +83,15 @@ if (-not $ISCCPath) {
     $ISCCPath = Find-ISCC
 }
 if (-not $ISCCPath -or -not (Test-Path -LiteralPath $ISCCPath -PathType Leaf)) { throw 'Không tìm thấy ISCC.exe của Inno Setup 6 sau khi cài.' }
-$compilerHelp = @(& $ISCCPath /? 2>&1) -join "`n"
-if ($LASTEXITCODE -ne 0 -or $compilerHelp -notmatch 'Inno Setup 6') { throw 'Cần đúng trình biên dịch Inno Setup 6.' }
+# ISCC 6 uses stderr and exit 1 for /?; Windows PowerShell 5 must collect it
+# without treating native help text as a terminating PowerShell error.
+$savedPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    $compilerHelp = @(& $ISCCPath /? 2>&1) -join "`n"
+    $compilerExit = $LASTEXITCODE
+} finally { $ErrorActionPreference = $savedPreference }
+if ($compilerExit -notin @(0, 1) -or $compilerHelp -notmatch 'Inno Setup 6') { throw 'Cần đúng trình biên dịch Inno Setup 6.' }
 $useInnoExtract = [bool] $InnoExtractPath
 if (-not $InnoExtractPath) { $InnoExtractPath = Get-Extractor }
 if (-not (Test-Path -LiteralPath $InnoExtractPath -PathType Leaf)) { throw 'Thiếu innoextract để kiểm payload Setup.' }
