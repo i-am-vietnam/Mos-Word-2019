@@ -1,5 +1,13 @@
 # Project Status
 
+## D1 — Bộ cài học viên 1.0.0, 2026-11-04
+
+D1 bổ sung Inno Setup 6 per-user không admin, AppId cố định, prerequisite Windows 10/11 + .NET 4.7.2 + Word desktop, mutex hiện có, Start/Desktop shortcuts và icon chủ sở hữu. Installer/Version.props dùng chung phiên bản installer/assembly/footer Login. PNG hiện có đã được owner xác nhận thay hash ban đầu; giữ nguyên byte, sinh ICO 9 kích thước bằng script tái lập.
+
+Một lệnh server/deploy/build-installer.ps1 yêu cầu Git sạch, đối chiếu trust production hiện có, rebuild Release, verify assembly, C7 allow-list 8 tệp runtime, ISCC và giải nén/đối chiếu hash payload; không chạy Setup/uninstaller. Setup cuối và SHA256SUMS.txt nằm dưới artifacts/release ignored. Không đổi Projects/catalog/schema/grading/trust/server. Upgrade giữ dữ liệu; uninstall theo quyết định owner xóa đúng LocalAppData app và Documents/MosWord2019/Working sau cảnh báo, chặn reparse và giữ ancestor handles. Không chạy cài/gỡ trên profile bằng chứng của owner. Hướng dẫn học viên: docs/HUONG_DAN_CAI_DAT.md; build: Installer/README.md.
+
+Kiểm chứng D1: client 1.107/1.107 và server 233/233 mỗi Debug/Release, không skipped; VS MSBuild Rebuild và dotnet build -warnaserror đều 0 warning/error. Script build-installer 13/13 ca, C7 package regression, icon 9 sizes/tái lập, PowerShell parser, Inno static/prerequisite models/native directory guards và compile Inno 6.6.1 đều PASS. Wizard dùng bản dịch tiếng Việt upstream có giấy phép giữ nguyên byte. Evidence artifacts/d1; Setup production tạo sau commit trên Git sạch và được giải nén/hash tự động, không chạy cài/gỡ trên máy owner.
+
 ## C7 — Rà bảo mật, publish và gói phát hành, 2026-11-04
 
 Owner xác nhận nghiệm thu production1–7 PASS và result upload200 sau C7-FIX2. C7 bổ sung ONLINE_MANUAL_TEST và C7_SECURITY_REVIEW; đây là checklist mở rộng/source review, không tự đánh dấu các ca Word/VPS chưa chạy. Hai khuyến nghị còn mở: export backup CBC chưa có tag/MAC và log local chứa fullpath/PII. Không phát hiện Cao từ phần mã đã rà; không thay cho pentest.

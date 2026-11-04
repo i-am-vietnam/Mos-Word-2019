@@ -864,6 +864,7 @@ namespace MosWord2019
                 FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false })
             {
                 var reason = new Label { Text = message, Bounds = new Rectangle(14, 14, 490, 116) };
+                UiLayout.ApplyIcon(dialog);
                 var retry = new Button { Text = T("Retry", "Thử lại"), DialogResult = DialogResult.Retry, Bounds = new Rectangle(224, 143, 130, 32) };
                 var close = new Button { Text = T("Close Anyway", "Đóng ngay"), DialogResult = DialogResult.Cancel, Bounds = new Rectangle(364, 143, 140, 32) };
                 dialog.Controls.AddRange(new Control[] { reason, retry, close });

@@ -6,8 +6,16 @@ namespace MosWord2019
 {
     internal static class UiLayout
     {
+        private static readonly Lazy<Icon> appIcon = new Lazy<Icon>(() =>
+        {
+            using (var stream = typeof(UiLayout).Assembly.GetManifestResourceStream("MosWord2019.AppIcon.ico"))
+                return new Icon(stream);
+        });
+        internal static void ApplyIcon(Form form) => form.Icon = appIcon.Value;
+
         internal static void ScaleForm(Form form, float fontSize = 9)
         {
+            ApplyIcon(form);
             form.Font = new Font("Segoe UI", fontSize);
             form.AutoScaleMode = AutoScaleMode.Dpi;
             form.AutoScaleDimensions = new SizeF(96, 96);

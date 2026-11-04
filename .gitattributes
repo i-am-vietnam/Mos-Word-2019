@@ -9,6 +9,7 @@
 *.doc binary
 *.dotx binary
 *.png binary
+*.ico binary
 *.jpg binary
 *.gif binary
 *.exe binary
@@ -16,3 +17,7 @@
 
 # Preserve the exact bytes of native plain-text export fixtures.
 MosWord2019.Tests/Fixtures/**/*.txt binary
+
+# Retain the exact licensed upstream translation bytes and checksums.
+Installer/Languages/Vietnamese.isl -text -whitespace
+Installer/Languages/LICENSE-Inno-Setup.txt -text -whitespace

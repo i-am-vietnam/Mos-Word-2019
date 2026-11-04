@@ -41,6 +41,7 @@
     <Compile Include="CountdownLayoutTests.cs" />
     <Compile Include="OfflineAuthenticationForTests.cs" />
     <Compile Include="OnlineLoginTests.cs" />
+    <Compile Include="BrandingTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

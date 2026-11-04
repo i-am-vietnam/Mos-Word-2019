@@ -1,5 +1,11 @@
 # Known Issues and Verification Items
 
+## D1 — Phân phối bộ cài, 2026-11-04
+
+- Setup không có chữ ký số theo quyết định owner; Windows SmartScreen có thể cảnh báo. Chỉ nhận từ nguồn tin cậy và đối chiếu SHA256 qua kênh riêng. Word desktop/.NET phải có trước; bộ cài không tải hay cài chúng tự động.
+- Uninstall chủ ý xóa dữ liệu app, kết quả chưa gửi và recovery theo quyết định D1; upgrade giữ dữ liệu. Uninstall silent bị từ chối; junction/reparse, thư mục chuyển hướng không an toàn hoặc tệp bị khóa được giữ lại và báo, không đi theo sang dữ liệu khác. Agent không chạy Setup/uninstaller trên máy đang chứa bằng chứng.
+- Lệnh build cần biên nhận production gần nhất, VS MSBuild và Inno6; tải công cụ kiểm payload đã ghim hash nếu chưa có. Không xoay trust/keys hoặc tự bỏ qua kiểm payload khi thiếu công cụ.
+
 ## C7 — Khuyến nghị và nghiệm thu mở rộng, 2026-11-04
 
 - Owner đã xác nhận productionsteps1–7 PASS/upload200. Các ghi chú pendingupload/C7-FIX2 dưới đây là lịch sử trước xác nhận này; không còn coi BOM503 hoặc uploadchưaACK là lỗi production hiện tại.

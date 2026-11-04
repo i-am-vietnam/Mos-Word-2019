@@ -52,9 +52,9 @@ namespace MosWord2019
             AutoSize = true; AutoSizeMode = AutoSizeMode.GrowAndShrink;
             FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
             var layout = new TableLayoutPanel { Name = "LoginLayout", AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Dock = DockStyle.Fill, Padding = new Padding(24), ColumnCount = 2, RowCount = 7 };
+                Dock = DockStyle.Fill, Padding = new Padding(24), ColumnCount = 2, RowCount = 8 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            for (int i = 0; i < 7; i++) layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            for (int i = 0; i < 8; i++) layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             foreach (Control c in new Control[] { heading, userLabel, passwordLabel, languageLabel, functionLabel, status, english, vietnamese, training, testing, enter, exit }) UiLayout.Text(c);
             foreach (var label in new[] { userLabel, passwordLabel, languageLabel, functionLabel }) { label.Anchor = AnchorStyles.Right; label.TextAlign = ContentAlignment.MiddleRight; label.Margin = new Padding(4, 8, 12, 8); }
             heading.Anchor = AnchorStyles.None; heading.Margin = new Padding(8, 8, 8, 20);
@@ -66,6 +66,10 @@ namespace MosWord2019
             var buttons = UiLayout.Flow(enter, exit); buttons.Margin = new Padding(0, 16, 0, 4);
             layout.Controls.Add(buttons, 0, 5); layout.SetColumnSpan(buttons, 2);
             layout.Controls.Add(status, 0, 6); layout.SetColumnSpan(status, 2);
+            var version = UiLayout.Text(new Label { Name = "ProductVersion", Text = "v" +
+                System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(LoginForm).Assembly).InformationalVersion,
+                Anchor = AnchorStyles.None, ForeColor = Color.DimGray });
+            layout.Controls.Add(version, 0, 7); layout.SetColumnSpan(version, 2);
             UiLayout.EqualButtons(enter, exit);
             status.TextChanged += (s, e) => status.Visible = status.Text.Length > 0;
             Controls.Add(layout); AcceptButton = enter; CancelButton = exit;

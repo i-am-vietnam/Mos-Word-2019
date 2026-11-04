@@ -1,6 +1,9 @@
 ﻿# Package an existing production build; never rebuild or copy exercise packages.
 [CmdletBinding()]
-param([Parameter(Mandatory = $true)][string] $OutputDirectory)
+param(
+    [Parameter(Mandatory = $true)][string] $OutputDirectory,
+    [ValidatePattern('^[a-f0-9]{8}$')][string] $ArchiveSuffix
+)
 . "$PSScriptRoot\windows-common.ps1"
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 function Assert-CleanTree {
@@ -56,7 +59,8 @@ Assert-NoReparse $ancestor
 Assert-NoReparse $releaseRoot
 & git -C $repo check-ignore -q -- 'artifacts/release/package-probe'
 if ($LASTEXITCODE -ne 0) { throw 'artifacts/release phải được Git ignore.' }
-$archive = Join-Path $releaseRoot ("MosWord2019-" + [DateTime]::UtcNow.ToString('yyyyMMdd') + "-$commit.zip")
+$suffix = if ($ArchiveSuffix) { "-$ArchiveSuffix" } else { '' }
+$archive = Join-Path $releaseRoot ("MosWord2019-" + [DateTime]::UtcNow.ToString('yyyyMMdd') + "-$commit$suffix.zip")
 if (Test-Path -LiteralPath $archive) { throw 'ZIP cùng ngày/commit đã tồn tại; không ghi đè.' }
 $stage = Join-Path $releaseRoot ('.stage-' + [Guid]::NewGuid().ToString('N'))
 [void] (New-Item -ItemType Directory -Path $stage)

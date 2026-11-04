@@ -1,5 +1,9 @@
 # Tài liệu Ngữ cảnh dự án — MOS Word 2019 Trainer
 
+## D1 — Phát hành Setup học viên, 2026-11-04
+
+D1 thêm per-user Inno 6 Setup 1.0.0, icon owner/phiên bản chung và lệnh build-installer.ps1 từ Git sạch với identity production cũ, verify 8 runtime files + hash sau giải nén Setup. Không cài/gỡ trên máy bằng chứng, không thay server/Projects/schema/trust. Upgrade giữ appdata; uninstall theo quyết định mới của owner xóa appdata và Documents working sau cảnh báo, không theo junction/reparse. Hướng dẫn học viên ở docs/HUONG_DAN_CAI_DAT.md, kỹ thuật ở Installer/README.md. Các hạn chế C7 còn mở giữ nguyên; dừng D1 sau commit cục bộ và xuất Setup, không push.
+
 ## C7 — Phát hành và kiểm tra bảo mật, 2026-11-04
 
 Productionsteps1–7 và upload200 được owner xácnhận. C7 hoàn thiện manualchecklist/source securityreview, queue401/403retry tới>completion+25hlocal vàsafeHTTPstatuslogs, guardinstructionstring, ignorehygiene, publish xácnhậnactualprocess/release/starttime vàcleanruntimeZIPallowlist. Không đổi trust/package/catalog/schema/grader. Installer03 cần cậpnhậtroot một lần theoDEPLOY_VPS trướcpublish mới; artifactZIP tạo saugitcleancommit. Hai khuyếnnghị bảo mật ngoài phạmvi sửa nhỏ còn mở: CBCbackup thiếuauthenticity, localfullpath/PIIlogs. KiểmthửfixturekhôngthayWord/VPSmanual hoặcpentest; khôngpush, dừng C7.

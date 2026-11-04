@@ -1,5 +1,11 @@
 # Technical Context
 
+## D1 — Installer và branding, 2026-11-04
+
+Installer/Version.props là nguồn phiên bản duy nhất 1.0.0, MSBuild sinh assembly/file/informational version và Login đọc informational footer. UiLayout dùng shared embedded ICO cho mọi form/dialog; exe/Setup/shortcuts/uninstall dùng artwork owner xác nhận (SHA256 3b0040fb…2373a, nguồn không sửa). Generator giữ proportions và9 PNG frames 32-bit; assetsource/ICO được track ngoài Claude outputs ignored.
+
+build-installer.ps1 ghim public production identity hiện có, so receipt mới nhất+hash trước build; gọi build-client/verify/package-client, ZIP stage đúng 8 tệp, hash và trust, ISCC 6 và pinned InnoUnpacker để kiểm lại payload trước publish Setup+SHA. package-client thêm ArchiveSuffix tùy chọn cho build lặp; mặc định C7 không đổi. Không chạy Setup. AppId 5A497F38-92D0-4C9B-BCF1-D3C8E28A42B0 giữ mãi; AppMutex Local\MosWord2019.Trainer. Cleanup chỉ usPostUninstall, không upgrade: hai user roots chính xác, native directory handles READ, không share DELETE/WRITE + OPEN_REPARSE_POINT, từ chối reparse/UNC/ancestor không an toàn, không kill process. Silent uninstall bị chặn để giữ consent. Không thay server/package/schema/trust/grading.
+
 ## C7 — Checkpoint phát hành, 2026-11-04
 
 Owner xác nhận productionsteps1–7 PASS/result200 sau BOMhotfix c53374d. Queue AuthorizationRetryExpired chỉ sau actual401/403, strictISOcompletion và localnow>completion+25h; không cấp quyềnserver, thiếu/hỏngcompletion tiếp tục retry. Permanent400/404/409/413/422,429/503retry, statusliteral logs và encryptedParked/ACK cũ giữ nguyên. WrongTasksAsync yêu cầu JTokenType.String trước Value<string>; nonstringInvalidData503 có safecontext.
